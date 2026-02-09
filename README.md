@@ -2,8 +2,8 @@
 
 This repository contains the data and code to reproduce the results presented in the paper:
 
-> **Title:** [THE MULTISCALE ARCHITECTURE OF THE SALIENCE NETWORK SUPPORTS A BRAIN-WIDE “SWITCH” FUNCTION]
-> **Authors:** [Author List]
+> **Title:** THE MULTISCALE ARCHITECTURE OF THE SALIENCE NETWORK SUPPORTS A BRAIN-WIDE “SWITCH” FUNCTION  
+> **Authors:** Author List  
 > **Link:** Preprint
 
 ## Overview
