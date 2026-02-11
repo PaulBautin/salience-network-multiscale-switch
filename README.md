@@ -7,9 +7,7 @@ This repository contains the data and code to reproduce the results presented in
 > **Link:** Preprint
 
 ## Overview
-<div style="text-align: justify">
-Understanding how relatively static brain anatomy supports dynamic patterns of brain activity remains a fundamental challenge in neuroscience. The salience network (SN) is hypothesized to regulate critical transitions between internally and externally oriented brain states, yet the neuroanatomical principles enabling this flexibility remain elusive. Integrating in vivo 7T neuroimaging with ultra-high-resolution ex vivo histology and intracranial electrophysiology, we demonstrate that the SN possesses a distinct superior-inferior architectural profile. We find that specific patterns of laminar differentiation, connectivity and electrophysiology uniquely position the SN to bridge “task-negative” and “task-positive” systems. These results establish a structural basis for the SN’s switching function, offering a mechanistic link between cortical microarchitecture and the dynamic regulation of human brain states.
-</div>
+<div style="text-align: justify"> Understanding how relatively static brain anatomy supports dynamic patterns of brain activity remains a fundamental challenge in neuroscience. The salience network (SN) is hypothesized to regulate critical transitions between internally and externally oriented brain states, yet the neuroanatomical principles enabling this flexibility remain elusive. Integrating in vivo 7T neuroimaging with ultra-high-resolution ex vivo histology and intracranial electrophysiology, we demonstrate that the SN possesses a distinct superior-inferior architectural profile. We find that specific patterns of laminar differentiation, connectivity and electrophysiology uniquely position the SN to bridge “task-negative” and “task-positive” systems. These results establish a structural basis for the SN’s switching function, offering a mechanistic link between cortical microarchitecture and the dynamic regulation of human brain states. </div>
 
 ## Repository structure
 
