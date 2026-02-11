@@ -1,0 +1,24 @@
+name: env_salience
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy
+  - pandas
+  - nibabel
+  - matplotlib
+  - scipy
+  - pip
+  - pip:
+      - brainspace
+
+
+## To create the environment from this file, run:
+# conda env create -f environment.yml
+
+## To update the environment with changes to this file, run:
+# conda env update -f environment.yml --prune
+
+## To export the current environment to this file, run:
+# conda env export --no-builds > environment.yml
