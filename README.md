@@ -1,4 +1,4 @@
-# salience-network-multiscale-switch
+# Salience network multiscale switch
 
 This repository contains the data and code to reproduce the results presented in the paper:
 
@@ -20,7 +20,7 @@ This repository contains the data and code to reproduce the results presented in
 The recommended setup uses a Conda environment.
 
    ```bash
-   git clone [https://github.com/PaulBautin/salience-network-multiscale-switch.git](https://github.com/PaulBautin/salience-network-multiscale-switch.git)
+   git clone https://github.com/PaulBautin/salience-network-multiscale-switch.git
    conda env create -f environment.yml
    conda activate env_salience
    ```
