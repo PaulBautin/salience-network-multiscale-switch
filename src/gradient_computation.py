@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def partial_corr_with_covariate(X, covar):
     """
     Compute partial correlation matrix between vertices, controlling for covariate.
@@ -36,7 +39,6 @@ def partial_corr_with_covariate(X, covar):
     R = np.corrcoef(residuals, rowvar=False) 
     # Fisher z-transform
     with np.errstate(divide='ignore', invalid='ignore'):
-        # MPC = 0.5 * np.log((1 + R) / (1 - R))
         MPC = np.arctanh(R)
         MPC[np.isnan(MPC)] = 0
         MPC[np.isinf(MPC)] = 0 

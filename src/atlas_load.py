@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 from scipy.stats import zscore
 
+from brainspace.mesh.array_operations import get_labeling_border
+
 
 def convert_states_str2int(states_str):
     """This function takes a list of strings that designate a distinct set of binary brain states and returns
@@ -64,20 +66,20 @@ def normalize_to_range(data, target_min, target_max):
 
 # Yeo 7-network atlas (Schaefer-400)
 def load_yeo_atlas(micapipe, surf_32k):
-    atlas_yeo_lh = nib.load(micapipe + '/parcellations/schaefer-400_conte69_lh.label.gii').darrays[0].data + 1000
-    atlas_yeo_rh = nib.load(micapipe + '/parcellations/schaefer-400_conte69_rh.label.gii').darrays[0].data + 1800
+    atlas_yeo_lh = nib.load(micapipe / 'data/parcellations/schaefer-400_conte69_lh.label.gii').darrays[0].data + 1000
+    atlas_yeo_rh = nib.load(micapipe / 'data/parcellations/schaefer-400_conte69_rh.label.gii').darrays[0].data + 1800
     atlas_yeo_rh[atlas_yeo_rh == 1800] = 2000
     df_yeo_surf = pd.DataFrame({'mics': np.concatenate([atlas_yeo_lh, atlas_yeo_rh]).astype(float)})
 
     #### load yeo atlas 7 network information
-    df_label = pd.read_csv(micapipe + '/parcellations/lut/lut_schaefer-400_mics.csv')
-    df_label_sub = pd.read_csv(micapipe + '/parcellations/lut/lut_subcortical-cerebellum_mics.csv')
+    df_label = pd.read_csv(micapipe / 'data/parcellations/lut/lut_schaefer-400_mics.csv')
+    df_label_sub = pd.read_csv(micapipe / 'data/parcellations/lut/lut_subcortical-cerebellum_mics.csv')
     df_label = pd.concat([df_label_sub, df_label])
     df_label['network'] = df_label['label'].str.extract(r'(Vis|Default|Cont|DorsAttn|Limbic|SalVentAttn|SomMot|medial_wall)')
     df_label['hemisphere'] = df_label['label'].str.extract(r'(LH|RH)')
     df_yeo_surf = df_yeo_surf.merge(df_label[['mics', 'hemisphere','network', 'label']], on='mics', validate="many_to_one", how='left')
     df_yeo_surf['network_int'] = convert_states_str2int(df_yeo_surf['network'].values)[0]
-    df_yeo_surf['salience_border'] = array_operations.get_labeling_border(surf_32k, df_yeo_surf['network'].eq('SalVentAttn').to_numpy())
+    df_yeo_surf['salience_border'] = get_labeling_border(surf_32k, df_yeo_surf['network'].eq('SalVentAttn').to_numpy())
     df_yeo_surf.loc[df_yeo_surf['salience_border'].values == 1, 'salience_border'] = np.nan
     df_yeo_surf.loc[df_yeo_surf['salience_border'].values == 0, 'salience_border'] = 1
     # plt_values = df_yeo_surf['network_int'].values * df_yeo_surf['salience_border'].values
