@@ -20,10 +20,9 @@ This repository contains the data and code to reproduce the results presented in
 The recommended setup uses a Conda environment.
 
    ```bash
-   git clone [https://github.com/username/repo-name.git](https://github.com/username/repo-name.git)
+   git clone [https://github.com/PaulBautin/salience-network-multiscale-switch.git](https://github.com/PaulBautin/salience-network-multiscale-switch.git)
    conda env create -f environment.yml
-   conda activate project-name
-   pip install -e .
+   conda activate env_salience
    ```
 
 ## Data availability
