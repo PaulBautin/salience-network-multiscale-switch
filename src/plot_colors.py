@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib as mpl
 
+
 # Yeo et al. (2011) – 7-network parcellation (+ background)
 yeo7_rgb = np.array(
     [
