@@ -12,6 +12,7 @@ dependencies:
   - pip
   - pip:
       - brainspace
+      - bctpy
 
 
 ## To create the environment from this file, run:

@@ -31,8 +31,8 @@ from brainspace.datasets import load_conte69
 from brainspace.gradient.gradient import GradientMaps
 from brainspace.plotting import plot_hemispheres
 
-from src.atlas_load import load_yeo_atlas
-from src.gradient_computation import partial_corr_with_covariate
+from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles
+from src.gradient_computation import partial_corr_with_covariate, compute_t1_gradient
 
 plt.rcParams['font.size'] = 12
 plt.rcParams['svg.fonttype'] = 'none'
@@ -52,40 +52,6 @@ def get_parser():
         help="Absolute path to the PNI derivatives folder (e.g., /data/mica/...)"
     )
     return parser
-
-
-def surf_type_isolation(surf_type_test, i):
-    # Work on a copy of the input array to avoid modifying the original
-    surf_type_copy = surf_type_test.copy()
-    surf_type_copy[surf_type_copy != i] = np.nan
-    return surf_type_copy
-
-
-def load_mpc(File):
-     """Loads and process a MPC"""
-     mpc = nib.load(File).darrays[0].data
-     mpc = np.triu(mpc,1)+mpc.T
-     mpc[~np.isfinite(mpc)] = np.finfo(float).eps
-     mpc[mpc==0] = np.finfo(float).eps
-     return(mpc)
-
-
-def load_t1_salience_profiles(path, df_yeo_surf, network='SalVentAttn'):
-    ## t1 profiles (n_subject, n_features, n_vertices)
-    t1_files = glob.glob(path)
-    print("number of files/subjects: {}".format(len(t1_files)))
-    t1_salience_profiles = np.stack([nib.load(f).darrays[0].data[:, df_yeo_surf['network'].eq(network).to_numpy()] for f in t1_files[:]])
-    return t1_salience_profiles
-
-
-def compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network='SalVentAttn'):
-    t1_salience_mpc = [partial_corr_with_covariate(subj_data, covar=t1_mean_profile) for subj_data, t1_mean_profile in zip(t1_salience_profiles[:, :, :], np.nanmean(t1_salience_profiles, axis=2))]
-    gm_t1 = GradientMaps(n_components=10, random_state=None, approach='dm', kernel='normalized_angle', alignment='procrustes')
-    gm_t1.fit(t1_salience_mpc, sparsity=0.9)
-    t1_gradients = np.mean(np.asarray(gm_t1.aligned_), axis=0)
-    print("gradient lambdas: {}".format(np.mean(np.asarray(gm_t1.lambdas_), axis=0)))
-    df_yeo_surf.loc[df_yeo_surf['network'].eq(network), 't1_gradient1_' + network] = t1_gradients[:, 0]
-    return df_yeo_surf
 
 
 def plot_gradient_profiles(df_yeo_surf, t1_salience_profiles, network='SalVentAttn'):

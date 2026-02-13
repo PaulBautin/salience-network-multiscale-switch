@@ -1,4 +1,5 @@
 import numpy as np
+from brainspace.gradient.gradient import GradientMaps
 
 
 def partial_corr_with_covariate(X, covar):
@@ -43,3 +44,13 @@ def partial_corr_with_covariate(X, covar):
         MPC[np.isnan(MPC)] = 0
         MPC[np.isinf(MPC)] = 0 
     return MPC
+
+
+def compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network='SalVentAttn'):
+    t1_salience_mpc = [partial_corr_with_covariate(subj_data, covar=t1_mean_profile) for subj_data, t1_mean_profile in zip(t1_salience_profiles[:, :, :], np.nanmean(t1_salience_profiles, axis=2))]
+    gm_t1 = GradientMaps(n_components=10, random_state=None, approach='dm', kernel='normalized_angle', alignment='procrustes')
+    gm_t1.fit(t1_salience_mpc, sparsity=0.9)
+    t1_gradients = np.mean(np.asarray(gm_t1.aligned_), axis=0)
+    print("gradient lambdas: {}".format(np.mean(np.asarray(gm_t1.lambdas_), axis=0)))
+    df_yeo_surf.loc[df_yeo_surf['network'].eq(network), 't1_gradient1_' + network] = t1_gradients[:, 0]
+    return df_yeo_surf
