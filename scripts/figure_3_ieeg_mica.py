@@ -166,25 +166,16 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
             nan_color=(0, 0, 0, 1), cmap="Purples", transparent_bg=True, return_plotter=True)
         p.show()
 
-        # 4. Correlation Analysis
-        # Extract data only within the mask
+        # Correlation Analysis
         x_raw = surf_map[mask[32492:]]
         y = df_yeo_surf['t1_gradient1_SalVentAttn'].values[32492:][mask[32492:]]
-        print(x_raw.shape, y.shape)
-
-
-        # Filter: Only correlate vertices that had signal (non-zero smoothed)
-        # AND are finite (no NaNs from bad electrodes)
+        # Filter: Only correlate vertices that had signal
         valid_data_mask = (x_raw != 0) & np.isfinite(x_raw) & np.isfinite(y)
-        
-        # if np.sum(valid_data_mask) < 10:
-        #     print(f"Skipping {band}: Not enough valid vertices in mask.")
-        #     continue
-
         # Z-score for statistics
         x_stats = zscore(x_raw[valid_data_mask])
         y_stats = zscore(y[valid_data_mask])
 
+        # Plot
         surf_map = np.zeros(n_vertices)
         idx = np.flatnonzero(mask)[valid_data_mask]
         surf_map[idx] = x_stats
@@ -279,62 +270,8 @@ def main():
     df2['SensitivityMap_bip'] = df2['Sens1'] - df2['Sens2']
     df2['SensitivityMap_bip'] = df2['SensitivityMap_bip'].map(lambda x: np.abs(x) if isinstance(x, np.ndarray) else np.zeros(32492))
 
-
+    # Perform frequency band analysis and correlate with T1 gradient in the SalVentAttn network
     frequency_band_analysis_sensitivity(df2, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf)
-
-
-
-
-
-    # print(df_channel)
-    # frequency_band_analysis(df_channel, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf)
-    # # #df_channel_info = df_channel_info[df_channel_info.Subject == 'PX001']
-    # # # Explode the lists and drop NaNs
-    # indices_rh = df_channel["ChannelIndices"].explode()
-    # indices_rh = indices_rh[~indices_rh.isna()].astype(int).to_numpy()
-    # plt_values = np.zeros(32492, dtype=int)
-    # plt_values[indices_rh] = 1
-
-    # # create df_electrodes with positions
-    # surf_lh = read_surface('/host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA/sub-PX001/ses-01/surf/sub-PX001_ses-01_hemi-L_space-nativepro_surf-fsLR-32k_label-midthickness.surf.gii')
-    # surf_rh = read_surface('/host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA/sub-PX001/ses-01/surf/sub-PX001_ses-01_hemi-R_space-nativepro_surf-fsLR-32k_label-midthickness.surf.gii')
-
-    # # Append to surface
-    # #salience_border = nib.load('/host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA/sub-PX001/ses-01/maps/sub-PX001_ses-01_ChannelMap_hemi-R_space-nativepro_surf-fsLR-32k_label-midthickness.gii').darrays[0].data
-    # surf_rh.append_array(plt_values, name="overlay2")
-    # surfs = {'rh1': surf_rh, 'rh2': surf_rh}
-    # layout = [['rh1', 'rh2']]
-    # view = [['lateral', 'medial']]
-    # p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 600), zoom=1.3, color_bar='bottom', share='both',
-    #             nan_color=(220, 220, 220, 1), cmap="Purples", transparent_bg=True, return_plotter=True)
-    # p.show()
-    # # Add colored spheres
-    # for i, pos in enumerate(df_electrode_pos[['x', 'y', 'z']].values):
-    #     sphere = vtkSphereSource()
-    #     sphere.SetCenter(*pos)
-    #     sphere.SetRadius(1.5)
-    #     sphere.Update()
-    #     actor = p.renderers[0][0].AddActor()
-    #     actor.SetMapper(inputData=sphere.GetOutput())
-    #     #actor.GetProperty().SetColor(*rgb)
-    #     actor.GetProperty().SetOpacity(1.0)
-    #     actor.RotateX(-90)
-    #     actor.RotateZ(90)
-
-    # # Add colored spheres
-    # for i, pos in enumerate(df_electrode_pos[['x', 'y', 'z']].values):
-    #     sphere = vtkSphereSource()
-    #     sphere.SetCenter(*pos)
-    #     sphere.SetRadius(1.5)
-    #     sphere.Update()
-    #     actor = p.renderers[1][0].AddActor()
-    #     actor.SetMapper(inputData=sphere.GetOutput())
-    #     #actor.GetProperty().SetColor(*rgb)
-    #     actor.GetProperty().SetOpacity(1.0)
-    #     actor.RotateX(-90)
-    #     actor.RotateZ(90)
-    #     actor.RotateZ(180)
-    # p.show()
 
 
 if __name__ == "__main__":
