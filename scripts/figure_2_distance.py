@@ -12,6 +12,8 @@ from __future__ import division
 # AttributeError: module 'itertools' has no attribute 'izip_longest': change izip_longest for zip_longest
 #
 # example:
+# python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py \
+#   -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
 # ---------------------------------------------------------------------------------------
 # Authors: Paul Bautin
 #
@@ -226,6 +228,21 @@ def compute_navigation(df_label, A_400, A_400_euclidian):
     return PL_wei
 
 
+def compute_pvals_spin(x, df_yeo_surf, df_label, spin_model, n_rand):
+        y_surf = df_yeo_surf["bigbrain_g2"].values
+        y_lh, y_rh = y_surf[:32492], y_surf[32492:]
+        y_rotated = np.hstack(spin_model.randomize(y_lh, y_rh))
+        # Compute perm pval
+        r_spin = np.empty(n_rand)
+        for j, perm in enumerate(y_rotated):
+            perm_label = reduce_by_labels(perm, df_yeo_surf['mics'].values, target_labels=df_label['mics'].values, red_op='mean')
+            mask_label = ~np.isnan(x) & ~np.isnan(perm_label)
+            x_norm = zscore(x[mask_label])
+            perm_label = zscore(perm_label[mask_label])
+            r_spin[j] = spearmanr(x_norm, perm_label)[0]
+        return r_spin
+
+
 def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, pni_deriv, network='SalVentAttn', n_rand=100):
     """
     Structural connectivity analysis linking BigBrain gradients and different connectivity measures,
@@ -238,12 +255,14 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
     A_400_nav = compute_navigation(df_label, A_400_sc, A_400_euclidian)
     
     # bigbrain gradient 2
-    bigbrain_g2 = reduce_by_labels(load_bigbrain_gradients(), df_yeo_surf['mics'].values, red_op='mean')
+    bigbrain_g2 = reduce_by_labels(load_bigbrain_gradients(), df_yeo_surf['mics'].values, target_labels=df_label['mics'].values, red_op='mean')
     df_label = df_label.copy()
     df_label["bigbrain_g2"] = bigbrain_g2
     df_label.loc[df_label.hemisphere.isna(), 'bigbrain_g2'] = np.nan
     df_label["bigbrain_g2_network"] = (df_label.groupby("network")["bigbrain_g2"].transform("mean"))
     df_yeo_surf = df_yeo_surf.merge(df_label[['mics', 'bigbrain_g2']], on='mics', how="left", validate="many_to_one")
+    df_yeo_surf['bigbrain_g2'] = load_bigbrain_gradients()
+    df_yeo_surf.loc[df_yeo_surf.hemisphere.isna(), 'bigbrain_g2'] = np.nan
 
     # Spin permutation null model
     spin_model = SpinPermutations(n_rep=n_rand, random_state=42)
@@ -306,28 +325,19 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
 
         # Correlation analysis
         x = df_label[f"A_400_diff{network}{i}"].values
-        y = zscore(df_label["bigbrain_g2"].values, nan_policy="omit")
-
-        # Surface maps
-        x_surf = df_yeo_surf[f"A_400_diff{network}{i}"].values
-        y_surf = zscore(df_yeo_surf["bigbrain_g2"].values, nan_policy="omit")
-        corr, pval = spearmanr(x_surf, y_surf, nan_policy="omit")
-        # Split hemispheres
-        x_lh, x_rh = x_surf[:n_lh], x_surf[n_lh:]
-        # Generate rotated surrogate maps
-        x_rotated = np.hstack(spin_model.randomize(x_lh, x_rh))
-        # Compute perm pval
-        r_spin = np.empty(n_rand)
-        mask = ~np.isnan(y_surf)
-        for j, perm in enumerate(x_rotated):
-            mask_rot = mask & ~np.isnan(perm)
-            r_spin[j] = spearmanr(perm[mask_rot], y_surf[mask_rot], nan_policy="omit")[0]
+        y = df_label["bigbrain_g2"].values
+        mask_label = ~np.isnan(x) & ~np.isnan(y)
+        x_norm = zscore(x[mask_label])
+        y_norm = zscore(y[mask_label])
+        corr, pval = spearmanr(x_norm, y_norm)
+        r_spin = compute_pvals_spin(x, df_yeo_surf, df_label, spin_model, n_rand)
         pv_spin = np.mean(np.abs(r_spin) >= np.abs(corr))
 
+
         # Scatter
-        colors = [yeo7_rgb[int(k)] for k in df_label["network_int"]]
-        axes[0, i].scatter(x, y, s=10, alpha=0.9, c=colors, rasterized=True)
-        sns.regplot(x=x, y=y, scatter=False, color="black", line_kws={"linewidth": 1}, ax=axes[0, i])
+        colors = [yeo7_rgb[int(k)] for k in df_label["network_int"].values[mask_label]]
+        axes[0, i].scatter(x_norm, y_norm, s=10, alpha=0.9, c=colors, rasterized=True)
+        sns.regplot(x=x_norm, y=y_norm, scatter=False, color="black", line_kws={"linewidth": 1}, ax=axes[0, i])
         axes[0, i].text(0.05, 0.95, f"r = {corr:.2f}\np = {pv_spin:.2e}", transform=axes[0, i].transAxes, va="top")
         axes[0, 0].set_xlabel("SC$_{top}$ - SC$_{bottom}$")
         axes[0, 1].set_xlabel("Nav$_{top}$ - Nav$_{bottom}$")
@@ -336,6 +346,7 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
         axes[0, i].set_xlim(-3, 3)
         axes[0, i].set_ylim(-3, 3)
         axes[0, i].set_aspect("equal", adjustable="box")
+    plt.tight_layout()
     plt.savefig("/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_2a_distance_metric.svg")
 
 
@@ -406,28 +417,18 @@ def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k
         
         # Correlation analysis
         x = df_label[f"A_400_diff{network}{i}"].values
-        y = zscore(df_label["bigbrain_g2"].values, nan_policy="omit")
-
-        # Surface maps
-        x_surf = df_yeo_surf[f"A_400_diff{network}{i}"].values
-        y_surf = zscore(df_yeo_surf["bigbrain_g2"].values, nan_policy="omit")
-        corr, pval = spearmanr(x_surf, y_surf, nan_policy="omit")
-        # Split hemispheres
-        x_lh, x_rh = x_surf[:n_lh], x_surf[n_lh:]
-        # Generate rotated surrogate maps
-        x_rotated = np.hstack(spin_model.randomize(x_lh, x_rh))
-        # Compute perm pval
-        r_spin = np.empty(n_rand)
-        mask = ~np.isnan(y_surf)
-        for j, perm in enumerate(x_rotated):
-            mask_rot = mask & ~np.isnan(perm)
-            r_spin[j] = spearmanr(perm[mask_rot], y_surf[mask_rot], nan_policy="omit")[0]
+        y = df_label["bigbrain_g2"].values
+        mask_label = ~np.isnan(x) & ~np.isnan(y)
+        x_norm = zscore(x[mask_label])
+        y_norm = zscore(y[mask_label])
+        corr, pval = spearmanr(x_norm, y_norm)
+        r_spin = compute_pvals_spin(x, df_yeo_surf, df_label, spin_model, n_rand)
         pv_spin = np.mean(np.abs(r_spin) >= np.abs(corr))
 
         # Scatter
-        colors = [yeo7_rgb[int(k)] for k in df_label["network_int"]]
-        axes[i].scatter(x, y, s=10, alpha=0.9, c=colors, rasterized=True)
-        sns.regplot(x=x, y=y, scatter=False, color="black", line_kws={"linewidth": 1}, ax=axes[i])
+        colors = [yeo7_rgb[int(k)] for k in df_label["network_int"].values[mask_label]]
+        axes[i].scatter(x_norm, y_norm, s=10, alpha=0.9, c=colors, rasterized=True)
+        sns.regplot(x=x_norm, y=y_norm, scatter=False, color="black", line_kws={"linewidth": 1}, ax=axes[i])
 
         axes[i].text(0.05, 0.95, f"r = {corr:.2f}\np = {pv_spin:.2e}", transform=axes[i].transAxes, va="top")
         axes[i].set_title(f"{network}", fontdict={"color": yeo7_rgb[int(df_label.loc[df_label.network == network, 'network_int'].values[0])]})
@@ -438,6 +439,8 @@ def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k
         axes[i].set_xlim(-3, 3)
         axes[i].set_ylim(-3, 3)
         axes[i].set_aspect("equal", adjustable="box")
+    axes[-1].set_axis_off()
+    plt.tight_layout()
     plt.savefig("/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_2b_distance_network.svg")
 
 
