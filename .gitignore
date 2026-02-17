@@ -1,2 +1,3 @@
 .vscode
-data/dataframes/
+src/__pycache__
+data/dataframes/figure_3_channel_data_df.pkl
