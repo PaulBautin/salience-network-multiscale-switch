@@ -50,7 +50,7 @@ from vtkmodules.vtkFiltersSources import vtkSphereSource
 
 from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, load_bigbrain_gradients, convert_states_str2int
 from src.gradient_computation import compute_t1_gradient
-from src.ieeg_processing import preprocess_and_compute_psd_ieeg, extract_band_power
+from src.ieeg_processing import preprocess_and_compute_psd_ieeg, extract_band_power, plot_surface_sphere
 from src.plot_colors import yeo7_rgba, yeo7_rgb
 
 plt.rcParams['font.size'] = 12
@@ -96,7 +96,7 @@ def plot_surface_nodes(surf, df_data, df_yeo_surf, project_root):
     }
     channel_integers = np.array([channel_type_mapping_int.get(ct, 0) for ct in channel_type_flat])
 
-    ##### Plotting #####
+    # Plot surface contacts
     salience_border = df_yeo_surf['salience_border'].values.astype(float)
     surf.append_array(salience_border[32492:], name="overlay2")
     surfs = {'rh1': surf, 'rh2': surf}
@@ -105,41 +105,10 @@ def plot_surface_nodes(surf, df_data, df_yeo_surf, project_root):
     #screenshot_path = f"/local_raid/data/pbautin/software/neuroimaging_scripts/salience_network/manuscript/figures/figure3_ieeg_{band}_map_mni_atlas.svg"
     p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 500), zoom=1.4, color_bar='bottom', share='both',
         nan_color=(220, 220, 220, 1), cmap="Greys", transparent_bg=True, return_plotter=True)
-    for i, pos in enumerate(df_data['ChannelPosition_conte69_infl']):
-        val = channel_integers[i]
-        rgba = custom_cmap(norm(val))
-        rgb = rgba[:3]
-        sphere = vtkSphereSource()
-        sphere.SetCenter(*pos)
-        sphere.SetRadius(1.5)
-        sphere.Update()
-        actor = p.renderers[0][0].AddActor()
-        actor.SetMapper(inputData=sphere.GetOutput())
-        actor.GetProperty().SetColor(*rgb)
-        actor.GetProperty().SetOpacity(1.0)
-        actor.RotateX(-90)
-        actor.RotateZ(90)
-
-    # Add colored spheres
-    for i, pos in enumerate(df_data['ChannelPosition_conte69_infl']):
-        val = channel_integers[i]
-        rgba = custom_cmap(norm(val))
-        rgb = rgba[:3]
-        sphere = vtkSphereSource()
-        sphere.SetCenter(*pos)
-        sphere.SetRadius(1.5)
-        sphere.Update()
-        actor = p.renderers[1][0].AddActor()
-        actor.SetMapper(inputData=sphere.GetOutput())
-        actor.GetProperty().SetColor(*rgb)
-        actor.GetProperty().SetOpacity(1.0)
-        actor.RotateX(-90)
-        actor.RotateZ(90)
-        actor.RotateZ(180)
     screenshot_path = project_root / "results/figures/figure_3a_ieeg_mni_channel_types.svg"
-    p.screenshot(screenshot_path, transparent_bg=True)
+    plot_surface_sphere(p, df_data['ChannelPosition_conte69_infl'], custom_cmap(norm(channel_integers)), screenshot_path)
 
-    # coverage map
+    # Plot coverage map
     mask = np.zeros(df_yeo_surf["t1_gradient1_SalVentAttn"].values.shape)
     mask[df_data['ChannelIndices_conte69']] = 1
     # Smooth the mesh or a vertex function using Laplace smoothing.
@@ -177,42 +146,10 @@ def plot_surface_nodes_gradients(surf, df_data, df_yeo_surf, project_root):
     view = [['lateral', 'medial']]
     p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 500), zoom=1.4, color_bar='bottom', share='both',
         nan_color=(220, 220, 220, 1), cmap="Greys", transparent_bg=True, return_plotter=True)
-    
+    screenshot_path = project_root / "results/figures/figure_3a_ieeg_mni_channel_gradient.svg"
     custom_cmap = plt.get_cmap(name="coolwarm")
     norm = mp.colors.Normalize(vmin=-3, vmax=3)
-    for i, pos in enumerate(df['ChannelPosition_conte69_infl']):
-        val = df['t1_gradient1'].values[i]
-        rgba = custom_cmap(norm(val))
-        rgb = rgba[:3]
-        sphere = vtkSphereSource()
-        sphere.SetCenter(*pos)
-        sphere.SetRadius(1.5)
-        sphere.Update()
-        actor = p.renderers[0][0].AddActor()
-        actor.SetMapper(inputData=sphere.GetOutput())
-        actor.GetProperty().SetColor(*rgb)
-        actor.GetProperty().SetOpacity(1.0)
-        actor.RotateX(-90)
-        actor.RotateZ(90)
-
-    # Add colored spheres
-    for i, pos in enumerate(df['ChannelPosition_conte69_infl']):
-        val = df['t1_gradient1'].values[i]
-        rgba = custom_cmap(norm(val))
-        rgb = rgba[:3]
-        sphere = vtkSphereSource()
-        sphere.SetCenter(*pos)
-        sphere.SetRadius(1.5)
-        sphere.Update()
-        actor = p.renderers[1][0].AddActor()
-        actor.SetMapper(inputData=sphere.GetOutput())
-        actor.GetProperty().SetColor(*rgb)
-        actor.GetProperty().SetOpacity(1.0)
-        actor.RotateX(-90)
-        actor.RotateZ(90)
-        actor.RotateZ(180)
-    screenshot_path = project_root / "results/figures/figure_3a_ieeg_mni_channel_gradient.svg"
-    p.screenshot(screenshot_path, transparent_bg=True)
+    plot_surface_sphere(p, df['ChannelPosition_conte69_infl'], custom_cmap(norm(df['t1_gradient1'].values)), screenshot_path)
 
 
 def load_mni_ieeg_data(ieeg_deriv, project_root, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl):
@@ -516,42 +453,11 @@ def correlation_analysis_scatter(surf, df_data, sampling_frequency, df_yeo_surf,
     view = [['lateral', 'medial']]
     p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 500), zoom=1.4, color_bar='bottom', share='both',
         nan_color=(220, 220, 220, 1), cmap="Greys", transparent_bg=True, return_plotter=True)
+    screenshot_path = project_root / "results/figures/figure_3a_ieeg_mni_channel_corr_diff.svg"
     df = df_data.dropna(subset=['corr_diff'])
     custom_cmap = plt.get_cmap(name="coolwarm")
     norm = mp.colors.Normalize(vmin=-3, vmax=3)
-    for i, pos in enumerate(df['ChannelPosition_conte69_infl']):
-        val = df['corr_diff'].values[i]
-        rgba = custom_cmap(norm(val))
-        rgb = rgba[:3]
-        sphere = vtkSphereSource()
-        sphere.SetCenter(*pos)
-        sphere.SetRadius(1.5)
-        sphere.Update()
-        actor = p.renderers[0][0].AddActor()
-        actor.SetMapper(inputData=sphere.GetOutput())
-        actor.GetProperty().SetColor(*rgb)
-        actor.GetProperty().SetOpacity(1.0)
-        actor.RotateX(-90)
-        actor.RotateZ(90)
-
-    # Add colored spheres
-    for i, pos in enumerate(df['ChannelPosition_conte69_infl']):
-        val = df['corr_diff'].values[i]
-        rgba = custom_cmap(norm(val))
-        rgb = rgba[:3]
-        sphere = vtkSphereSource()
-        sphere.SetCenter(*pos)
-        sphere.SetRadius(1.5)
-        sphere.Update()
-        actor = p.renderers[1][0].AddActor()
-        actor.SetMapper(inputData=sphere.GetOutput())
-        actor.GetProperty().SetColor(*rgb)
-        actor.GetProperty().SetOpacity(1.0)
-        actor.RotateX(-90)
-        actor.RotateZ(90)
-        actor.RotateZ(180)
-    screenshot_path = project_root / "results/figures/figure_3a_ieeg_mni_channel_corr_diff.svg"
-    p.screenshot(screenshot_path, transparent_bg=True)
+    plot_surface_sphere(p, df['ChannelPosition_conte69_infl'], custom_cmap(norm(df['corr_diff'].values)), screenshot_path)
 
     # coverage map
     mask = np.zeros(df_yeo_surf["t1_gradient1_SalVentAttn"].values.shape)
@@ -620,199 +526,6 @@ def main():
     correlation_analysis_scatter(surf32k_rh_infl, df_data, sampling_frequency, df_yeo_surf, project_root)
     # frequency_analysis(df_data, sampling_frequency, project_root)
     # frequency_band_analysis(df_data, surf32k_rh_infl, df_yeo_surf, sampling_frequency, project_root)
-
-    # plot_values_gradient = np.zeros(vertices_32k_infl.shape[0])
-    # plot_values_gradient[channel_indices_32k] = 1
-    # smoothed_values_gradient = smooth_lapy(plot_values_gradient, load_conte69(join=True), sigma=5.0, lambda_=0.1, fix_zeros=False)
-    # smoothed_values_gradient[df_yeo_surf.network == 'medial_wall'] = np.nan
-
-
-    # # Append to surface
-    # surf32k_rh_infl.append_array(df_yeo_surf['t1_gradient1_SalVentAttn'].values[32492:], name="overlay1")
-    # salience_border = df_yeo_surf['salience_border'].values.astype(float)
-    # surf32k_rh_infl.append_array(salience_border[32492:], name="overlay2")
-    # surf32k_rh_infl.append_array(smoothed_values_gradient[32492:], name="overlay3")
-    # surfs = {'rh1': surf32k_rh_infl, 'rh2': surf32k_rh_infl}
-    # layout = [['rh1', 'rh2']]
-    # view = [['lateral', 'medial']]
-
-    # # coverage map
-    # screenshot_path = f"/local_raid/data/pbautin/software/neuroimaging_scripts/salience_network/manuscript/figures/figure3_ieeg_coverage_mni_atlas.svg"
-    # p = plot_surf(surfs, layout=layout, view=view, array_name="overlay3", size=(1200, 500), zoom=1.4, color_bar='bottom', share='both',
-    #         nan_color=(220, 220, 220, 1), cmap="Purples", transparent_bg=True, screenshot=True, filename=screenshot_path)
-    
-    # #data['ChannelPosition'] = data['ChannelPosition'][indices_in_salience_mask,:]
-    # gradient_values = df_yeo_surf['t1_gradient1_SalVentAttn'][indices_32k_salience].values
-    # p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 500), zoom=1.4, color_bar='bottom', share='both',
-    #             nan_color=(220, 220, 220, 1), cmap="Greys", color_range=(0,1), transparent_bg=True, return_plotter=True)
-    # # Add colored spheres
-    # # salience channel index: 89
-    # custom_cmap = plt.get_cmap(name="coolwarm")
-    # norm = mp.colors.Normalize(vmin=-1, vmax=1)
-    # for i, pos in enumerate(data['ChannelPosition'][:,:]):
-    #     val = gradient_values[i]
-    #     rgba = custom_cmap(norm(val))
-    #     rgb = rgba[:3]
-    #     sphere = vtkSphereSource()
-    #     sphere.SetCenter(*pos)
-    #     sphere.SetRadius(1.5)
-    #     sphere.Update()
-    #     actor = p.renderers[0][0].AddActor()
-    #     actor.SetMapper(inputData=sphere.GetOutput())
-    #     actor.GetProperty().SetColor(*rgb)
-    #     actor.GetProperty().SetOpacity(1.0)
-    #     actor.RotateX(-90)
-    #     actor.RotateZ(90)
-
-    # # Add colored spheres
-    # for i, pos in enumerate(data['ChannelPosition'][:,:]):
-    #     val = gradient_values[i]
-    #     rgba = custom_cmap(norm(val))
-    #     rgb = rgba[:3]
-    #     sphere = vtkSphereSource()
-    #     sphere.SetCenter(*pos)
-    #     sphere.SetRadius(1.5)
-    #     sphere.Update()
-    #     actor = p.renderers[1][0].AddActor()
-    #     actor.SetMapper(inputData=sphere.GetOutput())
-    #     actor.GetProperty().SetColor(*rgb)
-    #     actor.GetProperty().SetOpacity(1.0)
-    #     actor.RotateX(-90)
-    #     actor.RotateZ(90)
-    #     actor.RotateZ(180)
-    # screenshot_path = f"/local_raid/data/pbautin/software/neuroimaging_scripts/salience_network/manuscript/figures/figure3_ieeg_salience_gradient_mni_atlas.svg"
-    # p.screenshot(screenshot_path, transparent_bg=True)
-    
-
-    # data_w = data['Data_W'].T
-    # freq, pxx = preprocess_and_compute_psd_ieeg(data_w, data['SamplingFrequency'], fmin=0.5, fmax=80.0, fs_target=200.0, filter_order=4, window_sec=2.0, overlap_sec=1.0)
-    # pxx = (pxx - pxx.mean(axis=0, keepdims=True)) / pxx.std(axis=0, keepdims=True)
-    # A_psd = np.corrcoef(pxx)
-    # # print(connectivity_psd)
-    # # plt.imshow(connectivity_psd, cmap='coolwarm', vmin=-1, vmax=1)
-    # # plt.show()
-
-    # from scipy.ndimage import rotate
-    # # --- Sort nodes by network ---
-    # node_networks = df_yeo_surf['network'].values[channel_indices_32k]
-    # print(node_networks)
-    # sort_idx = np.argsort(node_networks)
-    # print(node_networks[sort_idx])
-    # A_sorted = A_psd[sort_idx][:, sort_idx]
-    # sorted_networks = node_networks[sort_idx]
-    # import matplotlib.patches as patches
-
-    # # --- Find network boundaries ---
-    # boundaries = np.where(sorted_networks[:-1] != sorted_networks[1:])[0] + 1
-    # boundaries = np.insert(boundaries,0,0)
-
-    # mpc_fig = A_sorted.copy()
-    # mpc_fig[np.tri(mpc_fig.shape[0], mpc_fig.shape[0]) == 1] = np.nan
-    # mpc_fig = rotate(mpc_fig, angle=-45, order=0, cval=np.nan)
-    # fig, ax = plt.subplots()
-    # # Overlay borders
-    # b_ext = np.append(boundaries,node_networks.shape[0])
-    # for i, b in enumerate(boundaries):
-    #     rect = patches.Rectangle((node_networks.shape[0] / 2  * np.sqrt(2), b * np.sqrt(2)), b_ext[i+1] - b_ext[i], b_ext[i+1] - b_ext[i], linewidth=2, edgecolor=yeo7_colors.colors[i], facecolor='none', angle=45)
-    #     # Add the patch to the Axes
-    #     ax.add_patch(rect)
-
-    # mpc_fig[mpc_fig > 1] = 1
-    # plt.imshow(mpc_fig, cmap='coolwarm', origin='upper')
-    # plt.axis('off')
-    # plt.title('Upper Triangle of MPC Rotated by 45°')
-    # plt.tight_layout()
-    # plt.show()
-
-    # A_bottom = np.mean(A_psd[df_yeo_surf.quantile_idx.values[channel_indices_32k] == -1, :], axis=0)
-    # A_top = np.mean(A_psd[df_yeo_surf.quantile_idx.values[channel_indices_32k] == 1, :], axis=0)
-    # A_salience = np.abs(A_top) - np.abs(A_bottom)
-    # #A_salience[df_yeo_surf.quantile_idx.values[channel_indices_32k] == -1] = -1
-    # #A_salience[df_yeo_surf.quantile_idx.values[channel_indices_32k] == 1] = 1
-    # plot_values_gradient = np.zeros(vertices_32k_infl.shape[0])
-    # plot_values_gradient[channel_indices_32k] = A_salience
-    # smoothed_values_gradient = smooth_lapy(plot_values_gradient, load_conte69(join=True), sigma=2, fix_zeros=False)
-    # smoothed_values_gradient[df_yeo_surf.network == 'medial_wall'] = np.nan
-    # smoothed_values_gradient[smoothed_values_gradient == 0] = np.nan
-    # #plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, smoothed_values_gradient)
-
-    # # Z-score for normalization
-    # n_lh = surf32k_lh_infl.n_points
-    # df_corr = pd.DataFrame({
-    #     'network': df_yeo_surf['network'].values[n_lh:],
-    #     'corr_diff': zscore(smoothed_values_gradient[32492:], nan_policy='omit')
-    # })
-    # print(df_corr)
-
-    # print(df_yeo_surf)
-    # df_corr["bigbrain_g2"] = zscore(load_bigbrain_gradients()[32492:])
-    # df_yeo_surf['network_int'] = convert_states_str2int(df_yeo_surf['network'].values)[0]
-    # colors = [yeo7_rgb[int(k)] for k in df_yeo_surf["network_int"]][:32492]
-    # corr, pval = spearmanr(df_corr['corr_diff'], df_corr['bigbrain_g2'], nan_policy="omit")
-
-
-    # fig, axes = plt.subplots(1, 2,figsize=(12, 6))
-    # axes[0].scatter(df_corr['corr_diff'], df_corr['bigbrain_g2'], color=colors, s=10, alpha=0.9)
-    # sns.regplot(x=df_corr['corr_diff'], y=df_corr['bigbrain_g2'], scatter=False, color="black", line_kws={"linewidth": 1}, ax=axes[0])
-    # axes[0].text(0.05, 0.95, f"r = {corr:.2f}\np = {pval:.2e}", transform=axes[0].transAxes, va="top")
-    # axes[0].set_ylabel('BigBrain Gradient 2')
-    # axes[0].set_xlabel("ES$_{top}$ - ES$_{bottom}$")
-    # #plt.show()
-
-    # # Compute mean correlation difference per network
-    # df_corr_mean = (
-    #     df_corr
-    #     .dropna(subset=['corr_diff'])
-    #     .groupby('network')['corr_diff']
-    #     .mean()
-    # )
-   
-    # # Create SpinPermutations model (1000 rotations)
-    # spin_model = SpinPermutations(n_rep=100, random_state=42)
-    # spin_model.fit(load_conte69(as_sphere=True)[1])
-
-    # # Split data into hemispheres
-    # n_lh = surf32k_lh_infl.n_points
-    # # Generate rotated surrogate maps
-    # corr_spins = spin_model.randomize(smoothed_values_gradient[n_lh:])  # shape: (1000, n_vertices)
-    # print(corr_spins.shape)
-
-    # # Compute mean per network for each permutation
-    # df_corr_spin = pd.DataFrame({
-    #     'network': df_yeo_surf['network'].values[n_lh:]
-    # })
-
-    # spin_means = []
-    # for perm in corr_spins:
-    #     df_corr_spin['corr_diff'] = perm
-    #     spin_means.append(
-    #         df_corr_spin.dropna().groupby('network')['corr_diff'].mean().reindex(df_corr_mean.index)
-    #     )
-    # spin_means = np.vstack(spin_means)
-    # # Compute null mean and 95% CI across spins
-    # spin_mean = np.nanmean(spin_means, axis=0)
-    # spin_ci = np.nanstd(spin_means, axis=0) * 1.96  # 95% CI
-
-    # # ---------------------------------------------------------------------
-    # # Plot: bars = null model (spin), scatter = real data
-    # # ---------------------------------------------------------------------
-    # #fig, ax = plt.subplots(figsize=(8, 4))
-    # x = np.arange(len(df_corr_mean))
-    # print(df_corr_mean)
-    # print(x.shape)
-    # # Bars for null distribution mean ± 95% CI
-    # axes[1].barh(x, spin_mean, yerr=spin_ci, color='lightgrey', edgecolor='black', alpha=0.8, capsize=3, label='Spin null mean ± 95% CI')
-    # # Scatter points for empirical correlation difference
-    # axes[1].scatter(df_corr_mean.values, x, color=yeo7_rgba[:-1], alpha=0.8, s=100, zorder=5, label='Empirical mean')
-    # axes[1].axvline(0, color='black', linewidth=1)
-    # axes[1].set_xlabel("Mean ES$_{top}$ - ES$_{bottom}$")
-    # yticks = np.arange(len(df_corr_mean.index))
-    # axes[1].set_yticks(yticks)
-    # axes[1].set_yticklabels(df_corr_mean.index.values)
-    # axes[1].yaxis.set_label_position("right")
-    # axes[1].yaxis.tick_right()
-    # plt.tight_layout()
-    # plt.show()
 
 
 if __name__ == "__main__":

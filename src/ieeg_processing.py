@@ -9,6 +9,8 @@ from scipy.integrate import simpson
 import nibabel as nib
 import matplotlib.pyplot as plt
 
+from brainspace.plotting import plot_surf
+from vtkmodules.vtkFiltersSources import vtkSphereSource
 
 
 def load_original_data_files(
@@ -413,3 +415,38 @@ def compute_psd_vectorized(data, fs, fmin=0.5, fmax=80.0):
     pxx_rel = pxx_band / (total_power + 1e-12)
     
     return f_band, pxx_rel
+
+
+def plot_surface_sphere(p, channel_position, channel_color, screenshot_path):
+    for i, pos in enumerate(channel_position):
+        val = channel_color[i]
+        rgba = val
+        rgb = rgba[:3]
+        sphere = vtkSphereSource()
+        sphere.SetCenter(*pos)
+        sphere.SetRadius(1.5)
+        sphere.Update()
+        actor = p.renderers[0][0].AddActor()
+        actor.SetMapper(inputData=sphere.GetOutput())
+        actor.GetProperty().SetColor(*rgb)
+        actor.GetProperty().SetOpacity(1.0)
+        actor.RotateX(-90)
+        actor.RotateZ(90)
+
+    # Add colored spheres
+    for i, pos in enumerate(channel_position):
+        val = channel_color[i]
+        rgba = val
+        rgb = rgba[:3]
+        sphere = vtkSphereSource()
+        sphere.SetCenter(*pos)
+        sphere.SetRadius(1.5)
+        sphere.Update()
+        actor = p.renderers[1][0].AddActor()
+        actor.SetMapper(inputData=sphere.GetOutput())
+        actor.GetProperty().SetColor(*rgb)
+        actor.GetProperty().SetOpacity(1.0)
+        actor.RotateX(-90)
+        actor.RotateZ(90)
+        actor.RotateZ(180)
+    p.screenshot(screenshot_path, transparent_bg=True)

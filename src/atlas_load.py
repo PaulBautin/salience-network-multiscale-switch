@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Tuple
 import glob
+import logging
 
 import nibabel as nib
 import numpy as np
@@ -9,6 +10,9 @@ from scipy.stats import zscore
 
 from brainspace.mesh.array_operations import get_labeling_border
 from brainspace.utils.parcellation import relabel
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 
 def convert_states_str2int(states_str):
@@ -66,11 +70,34 @@ def normalize_to_range(data, target_min, target_max):
     return scaled_data
 
 
-def load_t1_salience_profiles(path, df_yeo_surf, network='SalVentAttn'):
-    ## t1 profiles (n_subject, n_features, n_vertices)
-    t1_files = glob.glob(path)
-    print("number of files/subjects: {}".format(len(t1_files)))
-    t1_salience_profiles = np.stack([nib.load(f).darrays[0].data[:, df_yeo_surf['network'].eq(network).to_numpy()] for f in t1_files[:]])
+def load_t1_salience_profiles(path_pattern, df_yeo_surf, network='SalVentAttn'):
+    """
+    Load T1 intensity profiles for a specific network across all subjects.
+    
+    Parameters
+    ----------
+    path_pattern : str
+        Glob pattern for the .gii profile files.
+    df_yeo_surf : pd.DataFrame
+        Surface dataframe containing network labels.
+    network : str
+        The specific network to extract.
+        
+    Returns
+    -------
+    t1_stack : np.ndarray
+        Stack of profiles with shape (n_subjects, n_depths, n_network_vertices).
+    """
+    t1_files = sorted(glob.glob(path_pattern))
+    n_files = len(t1_files)
+    if n_files == 0:
+        raise FileNotFoundError(f"No files found matching pattern: {path_pattern}")
+    logging.info(f"Loading profiles for {n_files} subjects...")
+    network_mask = df_yeo_surf['network'].eq(network).to_numpy()
+    if not np.any(network_mask):
+            raise ValueError(f"Network '{network}' not found in df_yeo_surf.")
+    t1_salience_profiles = np.stack([nib.load(f).darrays[0].data[:, network_mask] for f in t1_files])
+    logging.info(f"Final array shape: {t1_salience_profiles.shape}")
     return t1_salience_profiles
 
 
