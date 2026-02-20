@@ -29,27 +29,22 @@ import pandas as pd
 import nibabel as nib
 import glob
 import os
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 import seaborn as sns
 
-from brainspace.plotting import plot_hemispheres, plot_surf
+from brainspace.plotting import plot_surf
 from brainspace.mesh.mesh_io import read_surface
-from brainspace.mesh import array_operations, mesh_elements
 from brainspace.datasets import load_conte69
-from brainspace.utils.parcellation import map_to_labels, reduce_by_labels, relabel
-from brainspace.datasets import load_gradient, load_marker, load_conte69, load_parcellation
-from brainspace import mesh
-from brainspace.gradient import GradientMaps, kernels
-from brainspace.null_models import SpinPermutations, moran
+from brainspace.utils.parcellation import reduce_by_labels
+from brainspace.null_models import SpinPermutations
 
 import bct.algorithms as bct_alg
 import bct.utils as bct
 
-from scipy.stats import pearsonr, spearmanr, linregress, skew, zscore
-import os
-
+from scipy.stats import spearmanr, zscore
 from scipy.ndimage import rotate
+
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 import matplotlib.patches as patches
 
 from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, convert_states_str2int
@@ -77,23 +72,6 @@ def get_parser():
         help="Absolute path to the PNI derivatives folder (e.g., /data/mica/...)"
     )
     return parser
-
-
-def load_yeo_surf_5k(micapipe):
-    #### load yeo atlas 7 network fslr5k
-    atlas_yeo_lh_5k = nib.load(micapipe + '/parcellations/schaefer-400_fslr-5k_lh.label.gii').darrays[0].data + 1000
-    atlas_yeo_rh_5k = nib.load(micapipe + '/parcellations/schaefer-400_fslr-5k_rh.label.gii').darrays[0].data + 1800
-    atlas_yeo_rh_5k[atlas_yeo_rh_5k == 1800] = 2000
-    yeo_surf_5k = np.concatenate((atlas_yeo_lh_5k, atlas_yeo_rh_5k), axis=0).astype(float)
-    df_yeo_surf_5k = pd.DataFrame(data={'mics': yeo_surf_5k})
-
-    df_label = pd.read_csv(micapipe + '/parcellations/lut/lut_schaefer-400_mics.csv')
-    df_label_sub = pd.read_csv(micapipe + '/parcellations/lut/lut_subcortical-cerebellum_mics.csv')
-    df_label = pd.concat([df_label_sub, df_label])
-    df_label['network'] = df_label['label'].str.extract(r'(Vis|Default|Cont|DorsAttn|Limbic|SalVentAttn|SomMot|medial_wall)')
-    df_label['hemisphere'] = df_label['label'].str.extract(r'(LH|RH)')
-    df_yeo_surf_5k = df_yeo_surf_5k.merge(df_label[['mics', 'hemisphere','network', 'label']], on='mics', validate="many_to_one", how='left')
-    return df_yeo_surf_5k
 
 
 def load_label_atlas(micapipe):
@@ -145,15 +123,6 @@ def load_connectomes_euclidian(df_label):
     coords = df_label.drop(index=exclude_idx)[["coor.x", "coor.y", "coor.z"]].to_numpy(dtype=float)
     diff = coords[:, None, :] - coords[None, :, :]
     return np.linalg.norm(diff, axis=-1)
-
-
-def load_bigbrain_gradients():
-    script_path = Path(__file__).resolve()
-    project_root = script_path.parent.parent
-    gradient_lh = nib.load(project_root / 'data/parcellations/tpl-fs_LR_hemi-L_den-32k_desc-Hist_G2.shape.gii').darrays[0].data
-    gradient_rh = nib.load(project_root / 'data/parcellations/tpl-fs_LR_hemi-R_den-32k_desc-Hist_G2.shape.gii').darrays[0].data
-    gradient = np.concatenate((gradient_lh, gradient_rh), axis=0)
-    return gradient   
 
 
 def plot_connectome(df_label, A_400):

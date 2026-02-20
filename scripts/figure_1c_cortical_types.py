@@ -215,8 +215,6 @@ def cortical_type_analysis(df_yeo_surf):
     # plt.show()
 
 
-
-
 def main():
     # Setup Relative Paths
     parser = get_parser()

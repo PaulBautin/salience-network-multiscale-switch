@@ -74,8 +74,8 @@ def load_t1_salience_profiles(path, df_yeo_surf, network='SalVentAttn'):
     return t1_salience_profiles
 
 
-# Yeo 7-network atlas (Schaefer-400)
 def load_yeo_atlas(micapipe, surf_32k):
+    # Yeo 7-network atlas (Schaefer-400)
     atlas_yeo_lh = nib.load(micapipe / 'data/parcellations/schaefer-400_conte69_lh.label.gii').darrays[0].data + 1000
     atlas_yeo_rh = nib.load(micapipe / 'data/parcellations/schaefer-400_conte69_rh.label.gii').darrays[0].data + 1800
     atlas_yeo_rh[atlas_yeo_rh == 1800] = 2000
@@ -96,6 +96,23 @@ def load_yeo_atlas(micapipe, surf_32k):
     # plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=plt_values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
     #         nan_color=(0, 0, 0, 1), cmap='CustomCmap_yeo', transparent_bg=True)
     return df_yeo_surf
+
+
+def load_yeo_surf_5k(micapipe):
+    #### load yeo atlas 7 network fslr5k
+    atlas_yeo_lh_5k = nib.load(micapipe + '/parcellations/schaefer-400_fslr-5k_lh.label.gii').darrays[0].data + 1000
+    atlas_yeo_rh_5k = nib.load(micapipe + '/parcellations/schaefer-400_fslr-5k_rh.label.gii').darrays[0].data + 1800
+    atlas_yeo_rh_5k[atlas_yeo_rh_5k == 1800] = 2000
+    yeo_surf_5k = np.concatenate((atlas_yeo_lh_5k, atlas_yeo_rh_5k), axis=0).astype(float)
+    df_yeo_surf_5k = pd.DataFrame(data={'mics': yeo_surf_5k})
+
+    df_label = pd.read_csv(micapipe + '/parcellations/lut/lut_schaefer-400_mics.csv')
+    df_label_sub = pd.read_csv(micapipe + '/parcellations/lut/lut_subcortical-cerebellum_mics.csv')
+    df_label = pd.concat([df_label_sub, df_label])
+    df_label['network'] = df_label['label'].str.extract(r'(Vis|Default|Cont|DorsAttn|Limbic|SalVentAttn|SomMot|medial_wall)')
+    df_label['hemisphere'] = df_label['label'].str.extract(r'(LH|RH)')
+    df_yeo_surf_5k = df_yeo_surf_5k.merge(df_label[['mics', 'hemisphere','network', 'label']], on='mics', validate="many_to_one", how='left')
+    return df_yeo_surf_5k
 
 
 def load_econo_atlas(micapipe, df_yeo_surf):
@@ -136,6 +153,7 @@ def load_intrusion_atlas(df_yeo_surf):
     # plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=intrusion_surf, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
     #         nan_color=(0, 0, 0, 1), cmap='CustomCmap_intrusion', transparent_bg=True)
 
+
 def load_t1map(df_yeo_surf, t1_salience_profiles):
     df_yeo_surf.loc[df_yeo_surf['network'].eq('SalVentAttn'), 'T1map'] = zscore(np.mean(t1_salience_profiles, axis=(0, 1)), nan_policy='omit')
     return df_yeo_surf
@@ -148,12 +166,23 @@ def load_bigbrain(micapipe, df_yeo_surf):
     df_yeo_surf.loc[df_yeo_surf['network'].eq('SalVentAttn'), 'BigBrain'] = zscore(np.mean(salience_bigbrain, axis=0), nan_policy='omit')
     return df_yeo_surf
 
+
+def load_bigbrain_gradients():
+    script_path = Path(__file__).resolve()
+    project_root = script_path.parent.parent
+    gradient_lh = nib.load(project_root / 'data/parcellations/tpl-fs_LR_hemi-L_den-32k_desc-Hist_G2.shape.gii').darrays[0].data
+    gradient_rh = nib.load(project_root / 'data/parcellations/tpl-fs_LR_hemi-R_den-32k_desc-Hist_G2.shape.gii').darrays[0].data
+    gradient = np.concatenate((gradient_lh, gradient_rh), axis=0)
+    return gradient   
+
+
 def load_ahead_biel(micapipe, df_yeo_surf):
     ### Load the data from AHEAD
     data_biel = nib.load(micapipe / 'data/parcellations/sub-Ahead-Bielschowsky_surf-fsLR-32k_desc-intensity_profiles.shape.gii').darrays[0].data
     salience_biel = data_biel[:, df_yeo_surf['network'].eq('SalVentAttn').to_numpy()]
     df_yeo_surf.loc[df_yeo_surf['network'].eq('SalVentAttn'), 'Bielschowsky'] = zscore(np.mean(salience_biel, axis=0), nan_policy='omit')
     return df_yeo_surf
+
 
 def load_ahead_parva(micapipe, df_yeo_surf):
     data_parva = nib.load(micapipe / 'data/parcellations/sub-Ahead-Parvalbumin_surf-fsLR-32k_desc-intensity_profiles.shape.gii').darrays[0].data

@@ -395,50 +395,6 @@ def extract_band_power(pxx_raw, freq, band, relative=True):
     return np.log10(bp + 1e-12)
 
 
-def frequency_analysis(data, indices_32k, values):
-    data_w = data['Data_W'].T
-    freq, pxx = preprocess_and_compute_psd_ieeg(data_w[indices_32k, :], data['SamplingFrequency'], fmin=0.5, fmax=80.0, fs_target=200.0, filter_order=4, window_sec=2.0, overlap_sec=1.0)
-    #pxx_log = np.log10(pxx + 1e-12)
-    custom_cmap = plt.get_cmap(name="coolwarm")
-    norm = mp.colors.Normalize(vmin=-1, vmax=1)
-    fig, ax = plt.subplots(figsize=(6, 4))
-    for i in range(pxx.shape[0]): 
-        plt.loglog(freq, pxx[i, :], color=custom_cmap(norm(values[i])))
-    plt.xlabel('Frequency (Hz)')
-    plt.ylabel('Normalized PSD')
-    plt.title('Power Spectral Density')
-    xticks = [0.5, 4, 8, 13, 30, 80]
-    xtick_labels = ["0.5", "4", "8", "13", "30", "80"]
-    ax.set_xticks(xticks)
-    ax.set_xticklabels(xtick_labels)
-    for x in xticks:
-        ax.axvline(x=x, color="grey", linestyle="--", alpha=0.4)
-    plt.savefig("/local_raid/data/pbautin/software/neuroimaging_scripts/salience_network/manuscript/figures/figure3_ieeg_mni_atlas.svg")
-
-
-def smooth_lapy(surf_map, surf, sigma=10.0, lambda_=0.1, fix_zeros=True):
-    """
-    Smooth the mesh or a vertex function using Laplace smoothing.
-    Applies iterative smoothing: v_new = (1-lambda)*v + lambda * M*v where M is the vertex-area weighted adjacency matrix.
-    """
-    tm = TriaMesh(mesh.mesh_elements.get_points(surf), mesh.mesh_elements.get_cells(surf))
-    t = (sigma ** 2) / 2.0
-    n_iter = int(np.ceil(t / lambda_))
-    if fix_zeros:
-        # Mask zero values
-        mask_nonzero = surf_map != 0
-        vfunc = surf_map.copy()
-        vfunc[~mask_nonzero] = np.nan  # Use NaN so smoothing ignores them if supported
-        smoothed = tm.smooth_laplace(vfunc=vfunc, n=n_iter, lambda_=lambda_, mat=None)
-
-        # Replace NaNs with smoothed values (so output has values everywhere)
-        smoothed = np.nan_to_num(smoothed)
-    else:
-        smoothed = tm.smooth_laplace(vfunc=surf_map, n=n_iter, lambda_=lambda_, mat=None)
-
-    return smoothed
-
-
 def compute_psd_vectorized(data, fs, fmin=0.5, fmax=80.0):
     """
     Vectorized PSD calculation for iEEG.

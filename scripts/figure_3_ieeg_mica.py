@@ -147,7 +147,7 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
     plt.savefig("/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_psd.svg")
 
     # Process Bands
-    fig, axes = plt.subplots(1, len(band_order), figsize=(20, 4), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, len(band_order), figsize=(20, 4.5), sharex=True, sharey=True)
     band_maps = {}
     for i, band in enumerate(band_order):
         # Extract Power in Band for each channel
@@ -199,18 +199,15 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
         r_null = np.asarray(r_null)
         p_perm = np.mean(np.abs(r_null) >= np.abs(r))
 
-        # 5. Visualization
         # Plot Scatter
         slope, intercept = np.polyfit(x_stats, y_stats, 1)
         axes[i].scatter(x_stats, y_stats, s=10, alpha=0.3, c='gray', edgecolors='none', rasterized=True)
         axes[i].set_xlim([-3, 3])
         axes[i].set_ylim([-3, 3])
         axes[i].plot(x_stats, slope*x_stats + intercept, c=band_colors[i], lw=2.5)
-        
-        stats_text = f"$r={r:.2f}$\n$p_{{perm}}={p_perm:.3f}$"
-        axes[i].text(0.05, 0.95, stats_text, transform=axes[i].transAxes, 
-                     va='top', fontsize=11, fontweight='bold')
+        axes[i].text(0.05, 0.95, f"r = {r:.2f}\np = {p_perm:.2e}", transform=axes[i].transAxes, va="top")
         axes[i].set_xlabel(band.capitalize(), color=band_colors[i])
+        axes[i].set_aspect("equal")
         axes[0].set_ylabel('MPC gradient')
     plt.tight_layout()
     plt.savefig("/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_band_power_corr.svg")
