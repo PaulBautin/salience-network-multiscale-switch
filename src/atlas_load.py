@@ -70,7 +70,7 @@ def normalize_to_range(data, target_min, target_max):
     return scaled_data
 
 
-def load_t1_salience_profiles(path_pattern, df_yeo_surf, network='SalVentAttn'):
+def load_t1_salience_profiles(t1_files, df_yeo_surf, network='SalVentAttn'):
     """
     Load T1 intensity profiles for a specific network across all subjects.
     
@@ -88,10 +88,9 @@ def load_t1_salience_profiles(path_pattern, df_yeo_surf, network='SalVentAttn'):
     t1_stack : np.ndarray
         Stack of profiles with shape (n_subjects, n_depths, n_network_vertices).
     """
-    t1_files = sorted(glob.glob(path_pattern))
     n_files = len(t1_files)
     if n_files == 0:
-        raise FileNotFoundError(f"No files found matching pattern: {path_pattern}")
+        raise FileNotFoundError("No files found")
     logging.info(f"Loading profiles for {n_files} subjects...")
     network_mask = df_yeo_surf['network'].eq(network).to_numpy()
     if not np.any(network_mask):
