@@ -10,6 +10,7 @@ from scipy.stats import zscore
 
 from brainspace.mesh.array_operations import get_labeling_border
 from brainspace.utils.parcellation import relabel
+from brainspace.plotting import plot_hemispheres
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -118,9 +119,6 @@ def load_yeo_atlas(micapipe, surf_32k):
     df_yeo_surf['salience_border'] = get_labeling_border(surf_32k, df_yeo_surf['network'].eq('SalVentAttn').to_numpy())
     df_yeo_surf.loc[df_yeo_surf['salience_border'].values == 1, 'salience_border'] = np.nan
     df_yeo_surf.loc[df_yeo_surf['salience_border'].values == 0, 'salience_border'] = 1
-    # plt_values = df_yeo_surf['network_int'].values * df_yeo_surf['salience_border'].values
-    # plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=plt_values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
-    #         nan_color=(0, 0, 0, 1), cmap='CustomCmap_yeo', transparent_bg=True)
     return df_yeo_surf
 
 
@@ -215,3 +213,4 @@ def load_ahead_parva(micapipe, df_yeo_surf):
     salience_parva = data_parva[:, df_yeo_surf['network'].eq('SalVentAttn').to_numpy()]
     df_yeo_surf.loc[df_yeo_surf['network'].eq('SalVentAttn'), 'Parvalbumin'] = zscore(np.mean(salience_parva, axis=0), nan_policy='omit')
     return df_yeo_surf
+

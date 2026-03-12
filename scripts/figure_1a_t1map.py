@@ -4,11 +4,12 @@ from __future__ import division
 # -*- coding: utf-8
 #########################################################################################
 #
-# Local microstructural heterogeneity of the salience network
+# Local microstructural heterogeneity of the salience network with gradient analysis
 #
 # example:
 # python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py \
-#   -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+#   -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0 \
+#   -mics_deriv /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
 # ---------------------------------------------------------------------------------------
 # Authors: Paul Bautin
 #
@@ -21,6 +22,7 @@ import os
 import glob
 from pathlib import Path
 
+from igraph import plot
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -110,6 +112,10 @@ def plot_gradient_profiles(df_yeo_surf, t1_salience_profiles, screenshot_path: P
 def extract_pnc_id(path: Path) -> str:
     return str(path.parent.parent.parent.parent.name).split("-")[1]
 
+def extract_id_from_path(path: Path) -> str:
+    """Helper function to extract ID from a given path."""
+    return str(path.parent.parent.parent.parent.name).split("-")[1]
+
 
 def main():
     parser = get_parser()
@@ -133,36 +139,22 @@ def main():
 
     # load atlases
     df_yeo_surf = load_yeo_atlas(micapipe=project_root, surf_32k=surf_32k)
-    df_pni = pd.read_csv(project_root / 'data/dataframes/MICA_PNI.csv')[['ID_PNI', 'session', 'ID_MICs']].drop_duplicates()
 
     ######### Part 1 -- T1 map
     path_df_1a = project_root / 'data/dataframes/df_1a.tsv'
-    if os.path.exists(path_df_1a):
+    if path_df_1a.exists():
         logging.info(f"Found existing dataframe at {path_df_1a}. Loading...")
         df_pni = pd.read_csv(project_root / "data/dataframes/figure_1a_pni_to_mics.csv")
         t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), df_yeo_surf, network='SalVentAttn')
         df_yeo_surf = pd.read_csv(path_df_1a)
     else:
-        t1_files = list(pni_deriv.glob('sub-PNC*/ses-a1/mpc/acq-T1map/sub-PNC*_ses-a1_surf-fsLR-32k_desc-intensity_profiles.shape.gii'))
-        file_df = (pd.DataFrame({'path_t1_profile': t1_files}).assign(
-            ID_PNI=lambda df: df['path_t1_profile'].map(lambda p: str(p.parent.parent.parent.parent.name).split("-")[1]),
-            session=lambda df: df['path_t1_profile'].map(lambda p: str(p.parts[p.parts.index('ses-a1')]).split("-")[1]))).sort_values(by='ID_PNI')
-        df_pni = df_pni.merge(file_df, on=['ID_PNI','session'], validate="one_to_one", how='left').dropna(subset=['path_t1_profile', 'ID_MICs'])
-        df_pni = df_pni[(df_pni['ID_MICs'].str.contains('HC', na=False)) & (df_pni['session'].str.contains('a1', na=False))]
-
-        # load MICA-MICS connectome
-        logging.info("loading SC connectomes from MICA-MICs 3T")
-        sc_files = list(mics_deriv.glob("sub-*/ses-01/dwi/connectomes/sub-*_ses-01_space-dwi_atlas-schaefer-400_desc-iFOD2-40M-SIFT2_full-connectome.shape.gii"))
-        file_df_sc = (pd.DataFrame({'path_sc': sc_files}).assign(
-            ID_MICs=lambda df: df['path_sc'].map(lambda p: str(p.parent.parent.parent.parent.name).split("-")[1])))
-        df_pni = df_pni.merge(file_df_sc, on=['ID_MICs'], validate="one_to_one", how='left').dropna(subset=['path_sc'])
-
-        logging.info("loading dist connectomes from MICA-MICs 3T")
-        dist_files = list(mics_deriv.glob("sub-*/ses-01/dwi/connectomes/sub-*_ses-01_space-dwi_atlas-schaefer-400_desc-iFOD2-40M-SIFT2_full-edgeLengths.shape.gii"))
-        file_df_dist = (pd.DataFrame({'path_dist': dist_files}).assign(
-            ID_MICs=lambda df: df['path_dist'].map(lambda p: str(p.parent.parent.parent.parent.name).split("-")[1])))
-        df_pni = df_pni.merge(file_df_dist, on=['ID_MICs'], validate="one_to_one", how='left').dropna(subset=['path_dist'])
-        print(df_pni)
+        df_pni = pd.read_csv(project_root / 'data/dataframes/MICA_PNI.csv')[['ID_PNI', 'session', 'ID_MICs']].drop_duplicates()
+        df_pni = df_pni[(df_pni['ID_PNI'].str.contains('PNC', na=False)) & (df_pni['session'].str.contains('a1', na=False)) & (df_pni['ID_MICs'].str.contains('HC', na=False))]
+        # add column with path to T1 profiles if exists, otherwise drop rows with missing T1 profiles
+        df_pni['path_t1_profile'] = df_pni.apply(lambda row: list(pni_deriv.glob(f'sub-{row["ID_PNI"]}/ses-{row["session"]}/mpc/acq-T1map/sub-{row["ID_PNI"]}_ses-{row["session"]}_surf-fsLR-32k_desc-intensity_profiles.shape.gii')), axis=1)
+        df_pni['path_sc'] = df_pni.apply(lambda row: list(mics_deriv.glob(f'sub-{row["ID_MICs"]}/ses-01/dwi/connectomes/sub-{row["ID_MICs"]}_ses-01_space-dwi_atlas-schaefer-400_desc-iFOD2-40M-SIFT2_full-connectome.shape.gii')), axis=1)
+        df_pni['path_dist'] = df_pni.apply(lambda row: list(mics_deriv.glob(f'sub-{row["ID_MICs"]}/ses-01/dwi/connectomes/sub-{row["ID_MICs"]}_ses-01_space-dwi_atlas-schaefer-400_desc-iFOD2-40M-SIFT2_full-edgeLengths.shape.gii')), axis=1)
+        df_pni = df_pni.explode('path_t1_profile').explode('path_sc').explode('path_dist').dropna(subset=['path_t1_profile', 'path_sc', 'path_dist'])
 
         df_pni.to_csv(project_root / "data/dataframes/figure_1a_pni_to_mics.csv", index=False)
         t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), df_yeo_surf, network='SalVentAttn')
