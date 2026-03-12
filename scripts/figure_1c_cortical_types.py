@@ -29,25 +29,8 @@ import seaborn as sns
 
 from brainspace.plotting import plot_hemispheres
 from brainspace.mesh.mesh_io import read_surface
-from brainspace.mesh import array_operations, mesh_operations
 from brainspace.datasets import load_conte69
-from brainspace.utils.parcellation import map_to_labels, reduce_by_labels, relabel
-from brainspace.datasets import load_gradient, load_marker, load_conte69, load_parcellation
-from brainspace.mesh import mesh_elements
-
-from brainspace.null_models import SpinPermutations, moran
-from scipy.stats import spearmanr
-
-
-from brainspace.gradient import GradientMaps, kernels
-import scipy
-from scipy.stats import pearsonr, spearmanr, linregress, skew, zscore
-from joblib import Parallel, delayed
-
-from sklearn.linear_model import LinearRegression
-from functools import partial
-from scipy.stats import ks_2samp
-from sklearn.decomposition import PCA
+from brainspace.null_models import SpinPermutations
 
 import logging
 

@@ -5,7 +5,7 @@ from __future__ import division
 #########################################################################################
 #
 # Contextualisation of local microstructural heterogeneity of the salience network
-# using BigBrain and Ahead dataset
+# using BigBrain and Ahead datasets
 #
 # example:
 # python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py \
