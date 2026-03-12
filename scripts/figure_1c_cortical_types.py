@@ -49,8 +49,11 @@ from functools import partial
 from scipy.stats import ks_2samp
 from sklearn.decomposition import PCA
 
+import logging
+
 from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, load_econo_atlas, convert_states_str2int
 from src.plot_colors import cmap_types, cmap_types_mw
+from src.logging_utils import setup_manuscript_logger
 
 
 plt.rcParams['font.size'] = 12
@@ -105,6 +108,8 @@ def cortical_type_analysis(df_yeo_surf):
         full_counts = np.array([counts_dict.get(t, 0) for t in expected_types])
         percentages = (full_counts / len(comp)) * 100
         real_data[net_name] = dict(zip(expected_types, percentages))
+        type_summary = ", ".join(f"{label_map[t]}={percentages[t-1]:.1f}%" for t in expected_types)
+        logging.info(f"[Figure 1C] {net_name}: cortical type composition | {type_summary}")
 
         # comp = surf_type[mask] * mask[mask]
         # u, c = np.unique(comp, return_counts=True)
@@ -127,6 +132,8 @@ def cortical_type_analysis(df_yeo_surf):
         all_data[net_name] = df
 
     # --- Plotting ---
+    logging.info(f"[Figure 1C] Spin permutations: n_rep={n_rand}, random_state=0")
+
     # Setup: Salience in full column
     n_total = len(all_data)
     n_cols = 4
@@ -141,7 +148,6 @@ def cortical_type_analysis(df_yeo_surf):
     df = all_data["SalVentAttn"][type_labels]
     sns.barplot(data=df, ax=ax_sal, color='lightgrey')
     rdict = {label_map.get(k, k): v for k, v in real_data["SalVentAttn"].items()}
-    print(rdict)
     sns.scatterplot(x=list(rdict.keys()), y=list(rdict.values()), color=cmap_types_mw.colors, s=100, edgecolors='none', ax=ax_sal)
     ax_sal.set_title("SalVentAttn")
     ax_sal.set_ylim(0, 60)
@@ -150,16 +156,20 @@ def cortical_type_analysis(df_yeo_surf):
     plt.tight_layout()
     plt.savefig("/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1c_type_salience.svg")
 
-
-
     fig = plt.figure(figsize=(16, 8))
     gs = fig.add_gridspec(n_rows, n_cols, wspace=0.4, hspace=0.6)
 
     # Plot Salience in full column
     ax_sal = fig.add_subplot(gs[:, 0])  # full height first column
     df = all_data["SalVentAttn"]
-    sns.barplot(data=df, ax=ax_sal, color='lightgrey')
+    null_means = df[type_labels].mean()
+    null_stds = df[type_labels].std()
     rdict = {label_map.get(k, k): v for k, v in real_data["SalVentAttn"].items()}
+    for lbl in type_labels:
+        obs = rdict.get(lbl, np.nan)
+        z = (obs - null_means[lbl]) / (null_stds[lbl] + 1e-12) if null_stds[lbl] > 0 else np.nan
+        logging.info(f"[Figure 1C] SalVentAttn {lbl}: observed={obs:.1f}%, spin null mean={null_means[lbl]:.1f}% ± {null_stds[lbl]:.1f}%, z={z:.2f}")
+    sns.barplot(data=df, ax=ax_sal, color='lightgrey')
     sns.scatterplot(x=list(rdict.keys()), y=list(rdict.values()), color=cmap_types_mw.colors, s=100, ax=ax_sal)
     ax_sal.set_title("SalVentAttn")
     ax_sal.set_ylim(0, 60)
@@ -219,11 +229,18 @@ def main():
     # Setup Relative Paths
     parser = get_parser()
     args = parser.parse_args()
-    pni_deriv=args.pni_deriv
+    pni_deriv = args.pni_deriv
     script_path = Path(__file__).resolve()
-    print(f"Script path: {script_path}")
     project_root = script_path.parent.parent
-    print(f"Project root: {project_root}")
+
+    logger = setup_manuscript_logger("figure_1c_cortical_types", project_root, args)
+    logger.info(f"Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels")
+    logger.info(f"Cortical types : von Economo-Koskinas atlas (7 types: Kon, Eu-III, Eu-II, Eu-I, Dys, Ag, Other)")
+    logger.info(f"Analysis       : cortical type composition per network vs spin permutation null")
+    logger.info(f"Null model     : SpinPermutations (n_rep=100, random_state=0)")
+
+    logging.info(f"Script path: {script_path}")
+    logging.info(f"Project root: {project_root}")
 
     # load surfaces
     surf32k_lh_infl = read_surface(project_root / 'data/surfaces/fsLR-32k.L.inflated.surf.gii', itype='gii')

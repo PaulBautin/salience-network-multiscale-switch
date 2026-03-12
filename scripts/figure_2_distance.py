@@ -51,6 +51,7 @@ import matplotlib.patches as patches
 from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, convert_states_str2int, load_bigbrain_gradients
 from src.gradient_computation import compute_t1_gradient
 from src.plot_colors import yeo7_rgba, yeo7_rgb
+from src.logging_utils import setup_manuscript_logger
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -362,6 +363,7 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
         corr, pval = spearmanr(x_norm, y_norm)
         r_spin = compute_pvals_spin(x, df_yeo_surf, df_label, spin_model, n_rand)
         pv_spin = np.mean(np.abs(r_spin) >= np.abs(corr))
+        logging.info(f"[Figure 2A] {name}: SalVentAttn top-bottom diff vs FC-G1 | Spearman r={corr:.3f}, spin-test p={pv_spin:.3e} (n_perm={n_rand})")
 
         # Scatter
         colors = [yeo7_rgb[int(k)] for k in df_label["network_int"].values[mask_label]]
@@ -455,6 +457,7 @@ def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k
         corr, pval = spearmanr(x_norm, y_norm)
         r_spin = compute_pvals_spin(x, df_yeo_surf, df_label, spin_model, n_rand)
         pv_spin = np.mean(np.abs(r_spin) >= np.abs(corr))
+        logging.info(f"[Figure 2B] {network}: SC top-bottom diff vs BigBrain-G2 | Spearman r={corr:.3f}, spin-test p={pv_spin:.3e} (n_perm={n_rand})")
 
         # Scatter
         colors = [yeo7_rgb[int(k)] for k in df_label["network_int"].values[mask_label]]
@@ -485,6 +488,12 @@ def main():
     project_root = script_path.parent.parent
     pni_deriv = Path(args.pni_deriv)
 
+    logger = setup_manuscript_logger("figure_2_distance", project_root, args)
+    logger.info(f"Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels")
+    logger.info(f"SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed")
+    logger.info(f"Distance metric: streamline edge lengths (converted to lengths via BCT)")
+    logger.info(f"Navigation     : greedy navigation (BCT navigation_wu), computed per hemisphere")
+    logger.info(f"Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)")
     logging.info(f"Script path: {script_path}")
     logging.info(f"Project root: {project_root}")
 

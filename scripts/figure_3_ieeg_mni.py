@@ -48,10 +48,13 @@ import matplotlib.patches as patches
 
 from vtkmodules.vtkFiltersSources import vtkSphereSource
 
+import logging
+
 from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, load_bigbrain_gradients, convert_states_str2int
 from src.gradient_computation import compute_t1_gradient
 from src.ieeg_processing import preprocess_and_compute_psd_ieeg, extract_band_power, plot_surface_sphere
 from src.plot_colors import yeo7_rgba, yeo7_rgb
+from src.logging_utils import setup_manuscript_logger
 
 plt.rcParams['font.size'] = 12
 plt.rcParams['svg.fonttype'] = 'none'
@@ -322,7 +325,7 @@ def frequency_band_analysis(df_data, surf32k_rh_infl, df_yeo_surf, sampling_freq
         p.screenshot(screenshot_path, transparent_bg=True)
 
         # Pearson
-        r, _ = spearmanr(x_stats, y_stats)            
+        r, _ = spearmanr(x_stats, y_stats)
         r_null = []
         # Generate surrogates for the specific mask
         for y_surr_full in msr.randomize(y_stats):
@@ -330,6 +333,7 @@ def frequency_band_analysis(df_data, surf32k_rh_infl, df_yeo_surf, sampling_freq
             r_null.append(spearmanr(x_stats, y_surr_full[valid_data_mask])[0])
         r_null = np.asarray(r_null)
         p_perm = np.mean(np.abs(r_null) >= np.abs(r))
+        logging.info(f"[Figure 3A] Band {band}: power vs MPC-gradient | Spearman r={r:.3f}, Moran permutation p={p_perm:.3e} (n_perm=100, n_electrodes={valid_data_mask.sum()})")
 
         # Plot Scatter
         slope, intercept = np.polyfit(x_stats, y_stats, 1)
@@ -492,9 +496,19 @@ def main():
     ieeg_deriv = args.ieeg_deriv
     pni_deriv = args.pni_deriv
     script_path = Path(__file__).resolve()
-    print(f"Script path: {script_path}")
     project_root = script_path.parent.parent
-    print(f"Project root: {project_root}")
+
+    logger = setup_manuscript_logger("figure_3_ieeg_mni", project_root, args)
+    logger.info(f"Dataset        : MNI Open iEEG Atlas (N=106 subjects, 1772 channels, wakefulness)")
+    logger.info(f"Electrode types: D=Dixi, M=MNI homemade, A=AdTech depth, G=AdTech subdural")
+    logger.info(f"Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned")
+    logger.info(f"PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum")
+    logger.info(f"Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz")
+    logger.info(f"Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)")
+    logger.info(f"Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels")
+
+    logging.info(f"Script path: {script_path}")
+    logging.info(f"Project root: {project_root}")
 
     # load surfaces
     surf32k_lh_infl = read_surface(project_root / 'data/surfaces/fsLR-32k.L.inflated.surf.gii', itype='gii')
@@ -518,7 +532,7 @@ def main():
 
     ######### Part 2 -- Extract iEEG data
     df_data, sampling_frequency = load_mni_ieeg_data(ieeg_deriv, project_root, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl)
-    print(df_data)
+    logging.info(f"MNI iEEG loaded: {len(df_data)} channels, sampling frequency={sampling_frequency} Hz")
 
     # plot_surface_nodes(surf32k_rh_infl, df_data, df_yeo_surf, project_root)
     # plot_surface_nodes_gradients(surf32k_rh_infl, df_data, df_yeo_surf, project_root)

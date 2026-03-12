@@ -53,9 +53,12 @@ import re
 import matplotlib as mp
 from scipy.stats import zscore
 
+import logging
+
 from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles
 from src.gradient_computation import compute_t1_gradient
 from src.ieeg_processing import load_sensitivity_info, load_original_data_files, preprocess_and_compute_psd_ieeg, extract_band_power
+from src.logging_utils import setup_manuscript_logger
 
 
 plt.rcParams['font.size'] = 12
@@ -189,15 +192,16 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
             nan_color=(0, 0, 0, 1), cmap="coolwarm", color_range='sym', transparent_bg=True, screenshot=True, filename=screenshot_path)
 
         # Pearson
-        r, _ = spearmanr(x_stats, y_stats)            
+        r, _ = spearmanr(x_stats, y_stats)
         r_null = []
         # Generate surrogates for the specific mask
         for y_surr_full in msr.randomize(y_stats):
             # Apply same valid mask filter
             r_null.append(spearmanr(x_stats, y_surr_full[valid_data_mask])[0])
-        
+
         r_null = np.asarray(r_null)
         p_perm = np.mean(np.abs(r_null) >= np.abs(r))
+        logging.info(f"[Figure 3B] Band {band}: power vs MPC-gradient | Spearman r={r:.3f}, Moran permutation p={p_perm:.3e} (n_perm=100, n_vertices={valid_data_mask.sum()})")
 
         # Plot Scatter
         slope, intercept = np.polyfit(x_stats, y_stats, 1)
@@ -221,9 +225,19 @@ def main():
     ieeg_deriv = args.ieeg_deriv
     pni_deriv = args.pni_deriv
     script_path = Path(__file__).resolve()
-    print(f"Script path: {script_path}")
     project_root = script_path.parent.parent
-    print(f"Project root: {project_root}")
+
+    logger = setup_manuscript_logger("figure_3_ieeg_mica", project_root, args)
+    logger.info(f"Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)")
+    logger.info(f"Sensitivity maps: electroMICA leadfield, fsLR-32k surface, bipolar derivation (|Sens1 - Sens2|)")
+    logger.info(f"Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned")
+    logger.info(f"PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum")
+    logger.info(f"Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz")
+    logger.info(f"Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)")
+    logger.info(f"Surface space  : fsLR-32k RH only, Schaefer-400, Yeo SalVentAttn network")
+
+    logging.info(f"Script path: {script_path}")
+    logging.info(f"Project root: {project_root}")
 
     # load surfaces
     surf32k_lh_infl = read_surface(project_root / 'data/surfaces/fsLR-32k.L.inflated.surf.gii', itype='gii')
@@ -247,19 +261,21 @@ def main():
 
     # Load sensitivity for each contact information.
     df_sensitivity = load_sensitivity_info(root_dir=ieeg_deriv)
+    logging.info(f"Sensitivity maps loaded: {df_sensitivity['Subject'].nunique()} subjects, {len(df_sensitivity)} contacts")
 
     # Load channel information
     cache_path = '/local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl'
     if os.path.exists(cache_path):
-        print(f"Loading cached channel info from {cache_path}...")
+        logging.info(f"Loading cached channel info from {cache_path}...")
         with open(cache_path, 'rb') as f:
             df_channel_data = pickle.load(f)
     else:
-        print("Cache not found. Loading and processing channel info...")
+        logging.info("Cache not found. Loading and processing channel info...")
         df_channel_data = load_original_data_files()
         with open(cache_path, 'wb') as f:
                 pickle.dump(df_channel_data, f)
-                print(f"Channel info saved to {cache_path}.")
+                logging.info(f"Channel info saved to {cache_path}.")
+    logging.info(f"Channel data: {df_channel_data['Subject'].nunique()} subjects, {len(df_channel_data)} bipolar channels")
 
     # Align sensitivity maps by contact name
     df1 = df_channel_data.merge(df_sensitivity, left_on=['Subject', 'Session', 'ContactName1'], right_on=['Subject', 'Session', 'ContactName'], how='left').rename(columns={'ContactSensitivityMap': 'Sens1'})

@@ -34,6 +34,7 @@ from brainspace.plotting import plot_hemispheres
 
 from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles
 from src.gradient_computation import compute_t1_gradient
+from src.logging_utils import setup_manuscript_logger
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -120,13 +121,18 @@ def extract_id_from_path(path: Path) -> str:
 def main():
     parser = get_parser()
     args = parser.parse_args()
-    
+
     # Setup Paths dynamically
     script_path = Path(__file__).resolve()
     project_root = script_path.parent.parent
     pni_deriv = Path(args.pni_deriv)
     mics_deriv = Path(args.mics_deriv)
-    
+
+    logger = setup_manuscript_logger("figure_1a_t1map", project_root, args)
+    logger.info(f"Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)")
+    logger.info(f"Parcellation   : Schaefer-400 with Yeo 7-network labels")
+    logger.info(f"Network        : SalVentAttn (Salience/Ventral Attention)")
+
     logging.info(f"Script path: {script_path}")
     logging.info(f"Project root: {project_root}")
     logging.info(f"MICA-PNI derivatives: {pni_deriv}")
@@ -155,6 +161,11 @@ def main():
         df_pni['path_sc'] = df_pni.apply(lambda row: list(mics_deriv.glob(f'sub-{row["ID_MICs"]}/ses-01/dwi/connectomes/sub-{row["ID_MICs"]}_ses-01_space-dwi_atlas-schaefer-400_desc-iFOD2-40M-SIFT2_full-connectome.shape.gii')), axis=1)
         df_pni['path_dist'] = df_pni.apply(lambda row: list(mics_deriv.glob(f'sub-{row["ID_MICs"]}/ses-01/dwi/connectomes/sub-{row["ID_MICs"]}_ses-01_space-dwi_atlas-schaefer-400_desc-iFOD2-40M-SIFT2_full-edgeLengths.shape.gii')), axis=1)
         df_pni = df_pni.explode('path_t1_profile').explode('path_sc').explode('path_dist').dropna(subset=['path_t1_profile', 'path_sc', 'path_dist'])
+        logger.info(f"Participants   : N={len(df_pni)} (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)")
+        logger.info(f"T1 profiles    : acq-T1map, fsLR-32k surface, 14 intracortical depths")
+        logger.info(f"Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, atlas-schaefer-400")
+        logger.info(f"MPC            : partial correlation controlling for mean profile, Fisher z-transformed")
+        logger.info(f"Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment")
 
         df_pni.to_csv(project_root / "data/dataframes/figure_1a_pni_to_mics.csv", index=False)
         t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), df_yeo_surf, network='SalVentAttn')
