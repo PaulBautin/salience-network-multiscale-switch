@@ -20,31 +20,21 @@ Understanding how relatively static brain anatomy supports dynamic patterns of b
 
 ## Installation & Requirements
 <p align="justify">
-Three installation paths are supported. Choose whichever best fits your workflow.
+Two installation paths are supported. Choose whichever best fits your workflow.
 
 **Option 1 – uv (recommended for pure Python environments)**
 
-[uv](https://docs.astral.sh/uv/) is a fast, drop-in replacement for `pip` / `pip-tools`.
+[uv](https://docs.astral.sh/uv/) is a fast Python package manager.
 
 ```bash
 git clone https://github.com/PaulBautin/salience-network-multiscale-switch.git
 cd salience-network-multiscale-switch
-uv venv                  # creates .venv/
-uv pip install -e .      # installs all dependencies from pyproject.toml
-source .venv/bin/activate
+uv venv env_salience             # creates env_salience/ virtual environment
+uv pip install -e . --python env_salience/bin/python
+source env_salience/bin/activate
 ```
 
-**Option 2 – pip**
-
-```bash
-git clone https://github.com/PaulBautin/salience-network-multiscale-switch.git
-cd salience-network-multiscale-switch
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-**Option 3 – Conda (recommended when MKL / compiled binaries are needed)**
+**Option 2 – Conda (recommended when MKL / compiled binaries are needed)**
 
 ```bash
 git clone https://github.com/PaulBautin/salience-network-multiscale-switch.git

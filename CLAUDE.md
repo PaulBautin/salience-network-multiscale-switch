@@ -4,20 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Environment Setup
 
-Three options are available:
+Two options are available:
 
 **uv (fast, pure-Python):**
 ```bash
-uv venv
-uv pip install -e .
-source .venv/bin/activate
-```
-
-**pip:**
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+uv venv env_salience
+uv pip install -e . --python env_salience/bin/python
+source env_salience/bin/activate
 ```
 
 **Conda:**
