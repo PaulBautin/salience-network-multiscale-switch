@@ -1,0 +1,10 @@
+# Core scientific stack
+numpy
+pandas
+nibabel
+matplotlib
+scipy
+
+# Neuroimaging / graph tools (pip-only)
+brainspace
+bctpy
