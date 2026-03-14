@@ -20,13 +20,27 @@ Understanding how relatively static brain anatomy supports dynamic patterns of b
 
 ## Installation & Requirements
 <p align="justify">
-The recommended setup uses a Conda environment.
+Two installation paths are supported. Choose whichever best fits your workflow.
 
-   ```bash
-   git clone https://github.com/PaulBautin/salience-network-multiscale-switch.git
-   conda env create -f environment.yml
-   conda activate env_salience
-   ```
+**Option 1 – uv (recommended for pure Python environments)**
+
+[uv](https://docs.astral.sh/uv/) is a fast Python package manager.
+
+```bash
+git clone https://github.com/PaulBautin/salience-network-multiscale-switch.git
+cd salience-network-multiscale-switch
+uv venv env_salience             # creates env_salience/ virtual environment
+uv pip install -e . --python env_salience/bin/python
+source env_salience/bin/activate
+```
+
+**Option 2 – Conda (recommended when MKL / compiled binaries are needed)**
+
+```bash
+git clone https://github.com/PaulBautin/salience-network-multiscale-switch.git
+conda env create -f environment.yml
+conda activate env_salience
+```
 </p>
 
 ## Data availability

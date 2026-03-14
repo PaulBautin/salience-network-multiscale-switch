@@ -1,3 +1,4 @@
 .vscode
 src/__pycache__
 data/dataframes/figure_3_channel_data_df.pkl
+env_salience/
