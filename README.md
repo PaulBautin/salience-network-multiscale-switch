@@ -45,5 +45,5 @@ conda activate env_salience
 
 ## Data availability
 <p align="justify">
-Raw data are not distributed within this repository due to size and/or privacy constraints. Instructions for obtaining and organizing the data are provided in: data/README.md
+Raw data are not distributed within this repository due to size and/or privacy constraints. Instructions for obtaining and organizing the data, including links to all source datasets, are provided in <a href="data/README.md">data/README.md</a>.
 </p>
