@@ -39,17 +39,6 @@ from brainspace.mesh import mesh_elements
 from brainspace.null_models import SpinPermutations, moran
 from scipy.stats import spearmanr
 
-
-from brainspace.gradient import GradientMaps, kernels
-import scipy
-from scipy.stats import pearsonr, spearmanr, linregress, skew, zscore
-from joblib import Parallel, delayed
-
-from sklearn.linear_model import LinearRegression
-from functools import partial
-from scipy.stats import ks_2samp
-from sklearn.decomposition import PCA
-
 import logging
 
 from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, load_t1map, load_bigbrain, load_ahead_biel, load_ahead_parva

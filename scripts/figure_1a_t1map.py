@@ -22,7 +22,6 @@ import os
 import glob
 from pathlib import Path
 
-from igraph import plot
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
