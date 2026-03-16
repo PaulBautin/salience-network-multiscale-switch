@@ -9,7 +9,8 @@ from __future__ import division
 # example:
 # python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py \
 #   -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0 \
-#   -mics_deriv /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+#   -mics_deriv /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0 \
+#   -hemi LH
 # ---------------------------------------------------------------------------------------
 # Authors: Paul Bautin
 #
