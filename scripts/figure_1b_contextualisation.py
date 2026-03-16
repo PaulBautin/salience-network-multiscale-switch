@@ -9,7 +9,8 @@ from __future__ import division
 #
 # example:
 # python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py \
-#   -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+#   -hemi LH
+# (requires figure_1a_t1map.py to have been run first)
 # ---------------------------------------------------------------------------------------
 # Authors: Paul Bautin
 #
@@ -22,7 +23,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import nibabel as nib
-import glob
 import os
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -37,11 +37,11 @@ from brainspace.datasets import load_gradient, load_marker, load_conte69, load_p
 from brainspace.mesh import mesh_elements
 
 from brainspace.null_models import SpinPermutations, moran
-from scipy.stats import spearmanr
+from scipy.stats import spearmanr, zscore
 
 import logging
 
-from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, load_t1map, load_bigbrain, load_ahead_biel, load_ahead_parva
+from src.atlas_load import load_yeo_atlas, load_bigbrain, load_ahead_biel, load_ahead_parva
 from src.logging_utils import setup_manuscript_logger
 
 
@@ -56,20 +56,25 @@ def get_parser():
         prog=os.path.basename(__file__).strip(".py")
     )
 
-    mandatory = parser.add_argument_group("\nMANDATORY ARGUMENTS")
-    mandatory.add_argument(
-        "-pni_deriv", 
-        type=str, 
-        help="Absolute path to the PNI derivatives folder (e.g., /data/mica/...)"
+    optional = parser.add_argument_group("OPTIONAL ARGUMENTS")
+    optional.add_argument(
+        "-hemi",
+        type=str,
+        default="both",
+        choices=["both", "LH", "RH"],
+        help="Hemisphere for gradient computation: 'both', 'LH', or 'RH' (default: both)"
     )
     return parser
 
 
-def context_analysis(df_yeo_surf, surf_32k, modalities, n_rep=10):
+def context_analysis(df_yeo_surf, surf_32k, modalities, n_rep=10, hemisphere='both', project_root=None):
     ## Correlation analyses
-    x = zscore(df_yeo_surf.loc[df_yeo_surf['network'].eq('SalVentAttn'), 't1_gradient1_SalVentAttn'].values)
+    net_mask = df_yeo_surf['network'].eq('SalVentAttn')
+    if hemisphere in ('LH', 'RH'):
+        net_mask = net_mask & df_yeo_surf['hemisphere'].eq(hemisphere)
+    x = zscore(df_yeo_surf.loc[net_mask, 't1_gradient1_SalVentAttn'].values)
     # Moran spatial autocorrelation model
-    w = mesh_elements.get_ring_distance(surf_32k, n_ring=1, mask=df_yeo_surf['network'].eq('SalVentAttn').values)
+    w = mesh_elements.get_ring_distance(surf_32k, n_ring=1, mask=net_mask.values)
     w.data **= -1
     msr = moran.MoranRandomization(n_rep=n_rep, procedure='singleton', tol=1e-6, random_state=0)
     msr.fit(w)
@@ -77,7 +82,7 @@ def context_analysis(df_yeo_surf, surf_32k, modalities, n_rep=10):
     # Plot 
     fig, axes = plt.subplots(len(modalities), 1, figsize=(3, 2.5 * len(modalities)), sharex=True, sharey=True)
     for ax, label in zip(axes, modalities):
-        y = df_yeo_surf.loc[df_yeo_surf['network'].eq('SalVentAttn'), label].values
+        y = df_yeo_surf.loc[net_mask, label].values
         y = np.nan_to_num(y)
         rand = msr.randomize(y)
         sns.regplot(x=x, y=y, ax=ax, scatter_kws={"s": 10, "alpha": 0.3, "edgecolors":'none', 'rasterized':True}, line_kws={"color": "black", "lw":2.5})
@@ -93,12 +98,12 @@ def context_analysis(df_yeo_surf, surf_32k, modalities, n_rep=10):
         ax.set_yticks([-2, 2])
     ax.set_xlabel('MPC gradient')
     plt.tight_layout()
-    plt.savefig("/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_correlations.svg")
+    plt.savefig(project_root / "results/figures/figure_1b_correlations.svg")
 
     r_vals, labels = [], []
     for label in modalities:
         if label in df_yeo_surf.columns:
-            y = df_yeo_surf.loc[df_yeo_surf['network'].eq('SalVentAttn'), label].values
+            y = df_yeo_surf.loc[net_mask, label].values
             if len(y) > 1 and not np.all(np.isnan(y)):
                 r, _ = spearmanr(x, y, nan_policy='omit')
                 r_vals.append(r)
@@ -128,14 +133,13 @@ def context_analysis(df_yeo_surf, surf_32k, modalities, n_rep=10):
     ax.set_xticklabels([])
     ax.set_ylabel("Spearman's |r|")
     #ax.set_yticklabels([])
-    plt.savefig("/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_correlations_circle.svg")
+    plt.savefig(project_root / "results/figures/figure_1b_correlations_circle.svg")
 
 
 def main():
     # Setup Relative Paths
     parser = get_parser()
     args = parser.parse_args()
-    pni_deriv = args.pni_deriv
     script_path = Path(__file__).resolve()
     project_root = script_path.parent.parent
 
@@ -155,41 +159,35 @@ def main():
 
     # load atlases
     df_yeo_surf = load_yeo_atlas(micapipe=project_root, surf_32k=surf_32k)
-    # df_yeo_surf = load_econo_atlas(micapipe=project_root, df_yeo_surf)
-    # load_baillarger_atlas(df_yeo_surf)
-    # load_intrusion_atlas(df_yeo_surf)
 
-    ######### Part 1 -- T1 map
-    path_figure1_part1 = '/local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure1_part1_df.tsv'
-    if os.path.exists(path_figure1_part1):
-        path = pni_deriv + '/sub-PNC*/ses-a1/mpc/acq-T1map/sub-PNC*_ses-a1_surf-fsLR-32k_desc-intensity_profiles.shape.gii'
-        t1_salience_profiles = load_t1_salience_profiles(path, df_yeo_surf)
-        df_yeo_surf = pd.read_csv(path_figure1_part1)
-    else:
-        path = pni_deriv + '/sub-PNC*/ses-a1/mpc/acq-T1map/sub-PNC*_ses-a1_surf-fsLR-32k_desc-intensity_profiles.shape.gii'
-        t1_salience_profiles = load_t1_salience_profiles(path, df_yeo_surf)
-        df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network='SalVentAttn')
-        df_yeo_surf.to_csv(path_figure1_part1, index=False)
+    ######### Part 1 -- Load gradient and T1map from figure_1a cache
+    path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
+    if not path_df_1a.exists():
+        raise FileNotFoundError(
+            f"Gradient cache not found: {path_df_1a}\n"
+            "Run figure_1a_t1map.py first to generate it."
+        )
+    logging.info(f"Loading gradient from figure_1a cache: {path_df_1a}")
+    df_yeo_surf = pd.read_csv(path_df_1a)
 
     ######### Part 2 -- Contextualisation
-    df_yeo_surf = load_t1map(df_yeo_surf, t1_salience_profiles)
-    screenshot_path = "/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_brain_t1map.svg"
+    screenshot_path = project_root / "results/figures/figure_1b_brain_t1map.svg"
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['T1map'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
         nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path)
     df_yeo_surf = load_bigbrain(project_root, df_yeo_surf)
-    screenshot_path = "/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_brain_bigbrain.svg"
+    screenshot_path = project_root / "results/figures/figure_1b_brain_bigbrain.svg"
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['BigBrain'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
         nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path)
     df_yeo_surf = load_ahead_biel(project_root, df_yeo_surf)
-    screenshot_path = "/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_brain_biel.svg"
+    screenshot_path = project_root / "results/figures/figure_1b_brain_biel.svg"
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['Bielschowsky'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
         nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path)
     df_yeo_surf = load_ahead_parva(project_root, df_yeo_surf)
-    screenshot_path = "/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_brain_parva.svg"
+    screenshot_path = project_root / "results/figures/figure_1b_brain_parva.svg"
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['Parvalbumin'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
         nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path)
 
-    context_analysis(df_yeo_surf, surf_32k, modalities=["BigBrain", "T1map", "Bielschowsky", "Parvalbumin"], n_rep=100)
+    context_analysis(df_yeo_surf, surf_32k, modalities=["BigBrain", "T1map", "Bielschowsky", "Parvalbumin"], n_rep=100, hemisphere=args.hemi, project_root=project_root)
 
 
 if __name__ == "__main__":

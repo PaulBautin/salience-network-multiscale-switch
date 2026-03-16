@@ -1,0 +1,43 @@
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-03-16 15:57:33
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : T1map (in-vivo MRI), BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-03-16 15:57:54
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : T1map (in-vivo MRI), BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading profiles for 35 subjects...
+Final array shape: (35, 14, 3502)
+Computing T1 gradients for SalVentAttn...
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-03-16 16:21:48
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : T1map (in-vivo MRI), BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient from figure_1a cache: /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.237, Moran permutation p=0.000e+00 (n_perm=100)
+[Figure 1B] T1map: MPC-gradient vs T1map | Spearman r=0.092, Moran permutation p=1.400e-01 (n_perm=100)
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.044, Moran permutation p=4.600e-01 (n_perm=100)
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.187, Moran permutation p=1.000e-02 (n_perm=100)

@@ -11,6 +11,8 @@ from __future__ import division
 #   -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0 \
 #   -mics_deriv /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0 \
 #   -hemi LH
+#
+# If working on remote server: xvfb-run -s "-screen 0 1920x1080x24" python ...
 # ---------------------------------------------------------------------------------------
 # Authors: Paul Bautin
 #
@@ -32,7 +34,7 @@ from brainspace.mesh.mesh_io import read_surface
 from brainspace.datasets import load_conte69
 from brainspace.plotting import plot_hemispheres
 
-from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles
+from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, load_t1map
 from src.gradient_computation import compute_t1_gradient
 from src.logging_utils import setup_manuscript_logger
 
@@ -180,6 +182,7 @@ def main():
         df_pni.to_csv(project_root / "data/dataframes/figure_1a_pni_to_mics.csv", index=False)
         t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), df_yeo_surf, network='SalVentAttn', hemisphere=args.hemi)
         df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network='SalVentAttn', hemisphere=args.hemi)
+        df_yeo_surf = load_t1map(df_yeo_surf, t1_salience_profiles, hemisphere=args.hemi)
         df_yeo_surf.to_csv(path_df_1a, index=False)
     
     # plot figures

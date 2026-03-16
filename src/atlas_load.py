@@ -183,8 +183,11 @@ def load_intrusion_atlas(df_yeo_surf):
     #         nan_color=(0, 0, 0, 1), cmap='CustomCmap_intrusion', transparent_bg=True)
 
 
-def load_t1map(df_yeo_surf, t1_salience_profiles):
-    df_yeo_surf.loc[df_yeo_surf['network'].eq('SalVentAttn'), 'T1map'] = zscore(np.mean(t1_salience_profiles, axis=(0, 1)), nan_policy='omit')
+def load_t1map(df_yeo_surf, t1_salience_profiles, hemisphere='both'):
+    mask = df_yeo_surf['network'].eq('SalVentAttn')
+    if hemisphere in ('LH', 'RH'):
+        mask = mask & df_yeo_surf['hemisphere'].eq(hemisphere)
+    df_yeo_surf.loc[mask, 'T1map'] = zscore(np.mean(t1_salience_profiles, axis=(0, 1)), nan_policy='omit')
     return df_yeo_surf
 
 
