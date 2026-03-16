@@ -73,8 +73,10 @@ def get_parser():
     return parser
 
 
-def plot_gradient_profiles(df_yeo_surf, t1_salience_profiles, screenshot_path: Path, network: str = 'SalVentAttn'):
-    net_mask = (df_yeo_surf["network"] == network)
+def plot_gradient_profiles(df_yeo_surf, t1_salience_profiles, screenshot_path: Path, network: str = 'SalVentAttn', hemisphere: str = 'both'):
+    net_mask = df_yeo_surf["network"] == network
+    if hemisphere in ('LH', 'RH'):
+        net_mask = net_mask & (df_yeo_surf["hemisphere"] == hemisphere)
 
     # find top and bottom quantiles
     low_q, high_q = np.nanquantile(df_yeo_surf["t1_gradient1_SalVentAttn"], [0.25, 0.75])
@@ -182,7 +184,7 @@ def main():
     # plot figures
     screenshot_path = project_root / "results/figures/figure_1a_profiles.svg"
     logging.info(f"Generating brain qt1 profiles figure at {screenshot_path}")
-    plot_gradient_profiles(df_yeo_surf, t1_salience_profiles, screenshot_path, network='SalVentAttn')
+    plot_gradient_profiles(df_yeo_surf, t1_salience_profiles, screenshot_path, network='SalVentAttn', hemisphere=args.hemi)
 
     screenshot_path = project_root / "results/figures/figure_1a_brain.svg"
     logging.info(f"Generating brain hemispheres screenshot at {screenshot_path}")
