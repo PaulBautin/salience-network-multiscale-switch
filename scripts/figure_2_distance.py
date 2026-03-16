@@ -4,16 +4,29 @@ from __future__ import division
 # -*- coding: utf-8
 #########################################################################################
 #
-# Ooverlapping community detection algorithms (OCDAs) code
-# conda activate env_ocda
+# Figure 2 – Structural connectivity at MPC gradient extremes
 #
-# Changes to make in github code:
-# AttributeError: 'dict' object has no attribute 'iteritems': change .iteritems for .items
-# AttributeError: module 'itertools' has no attribute 'izip_longest': change izip_longest for zip_longest
+# Tests whether structural connectivity differs between parcels at the high vs. low
+# ends of the MPC (T1) gradient computed in Figure 1a, within the Salience/Ventral
+# Attention network and across all 7 Yeo networks.
 #
-# example:
-# python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py \
-#   -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+# Figure 2A: For the SalVentAttn network, computes connectivity differences between
+#            MPC-gradient-extreme parcels using three metrics (structural connectivity,
+#            greedy-navigation path length, Euclidean distance) and correlates those
+#            differences with the whole brain FC gradient.
+# Figure 2B: Replicates the SC-difference analysis for each of the 7 Yeo networks
+#            and correlates the results with the whole brain FC gradient.
+#
+# Outputs:
+#   results/figures/figure_2a_distance_metric.svg
+#   results/figures/figure_2a_brain_{SC,Nav,Dist}_diff.svg
+#   results/figures/figure_2b_distance_network.svg
+#   results/figures/figure_2b_brain_SC_diff_{network}.svg
+#   data/dataframes/df_2b_label_{hemisphere}.csv  (parcel-level cache)
+#
+# Example:
+#   python scripts/figure_2_distance.py \
+#     -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
 # ---------------------------------------------------------------------------------------
 # Authors: Paul Bautin
 #
@@ -29,7 +42,6 @@ import numpy as np
 import pandas as pd
 import nibabel as nib
 import glob
-import os
 import seaborn as sns
 
 from brainspace.plotting import plot_surf, plot_hemispheres
@@ -42,11 +54,9 @@ import bct.algorithms as bct_alg
 import bct.utils as bct
 
 from scipy.stats import spearmanr, zscore
-from scipy.ndimage import rotate
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-import matplotlib.patches as patches
 
 from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, convert_states_str2int, load_bigbrain_gradients
 from src.gradient_computation import compute_t1_gradient
@@ -65,7 +75,7 @@ plt.rcParams["text.usetex"] = False
 def get_parser():
     """Configure and return the argument parser."""
     parser = argparse.ArgumentParser(
-        description="Process PNI derivatives and surfaces for T1 microstructural profiles.",
+        description="Compute structural connectivity differences between MPC-gradient extremes in the salience network (Fig 2A) and across all Yeo networks (Fig 2B).",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     mandatory = parser.add_argument_group("MANDATORY ARGUMENTS")
@@ -82,6 +92,23 @@ def get_parser():
 
 
 def load_label_atlas(micapipe):
+    """
+    Load the Schaefer-400 parcellation lookup table and derive per-parcel metadata.
+
+    Reads the LUT CSV and extracts the Yeo 7-network label, hemisphere (LH/RH),
+    and an integer network code for each parcel.
+
+    Parameters
+    ----------
+    micapipe : Path
+        Root path of the micapipe repository (used to locate the LUT file).
+
+    Returns
+    -------
+    df_label : pd.DataFrame
+        One row per Schaefer-400 parcel with columns: label, network, hemisphere,
+        network_int, and parcel coordinates.
+    """
     df_label = pd.read_csv(micapipe / "data/parcellations/lut/lut_schaefer-400_mics.csv")
     # df_label_sub = pd.read_csv(micapipe + '/parcellations/lut/lut_subcortical-cerebellum_mics.csv')
     # df_label = pd.concat([df_label_sub, df_label])
@@ -93,6 +120,30 @@ def load_label_atlas(micapipe):
 
 
 def load_connectomes(files, df_label, log_transform=False, split_hemi=True):
+    """
+    Load and average subject-level structural connectome GIFTI files.
+
+    Reads each file, masks to cortical parcels (dropping 48 subcortical nodes),
+    zeros out non-positive entries, and optionally zeros inter-hemispheric connections.
+    Returns the subject-averaged matrix, optionally log1p-transformed.
+
+    Parameters
+    ----------
+    files : list of str
+        Paths to subject-level connectome GIFTI files (Schaefer-400 + subcortex).
+    df_label : pd.DataFrame
+        Parcel metadata from `load_label_atlas`; used to identify cortical parcels
+        and hemisphere membership.
+    log_transform : bool, optional
+        Apply log1p to the averaged matrix (default False).
+    split_hemi : bool, optional
+        Zero out inter-hemispheric connections before averaging (default True).
+
+    Returns
+    -------
+    A_400 : np.ndarray, shape (n_cortex, n_cortex)
+        Symmetric, subject-averaged connectivity matrix for cortical parcels.
+    """
     if not files:
         raise FileNotFoundError("No connectome files found.")
 
@@ -130,6 +181,22 @@ def load_connectomes(files, df_label, log_transform=False, split_hemi=True):
 
 
 def load_connectomes_euclidian(df_label):
+    """
+    Compute pairwise Euclidean distances between Schaefer-400 parcel centroids.
+
+    Inter-hemispheric pairs are set to NaN so they are excluded from analyses
+    that treat hemispheres independently.
+
+    Parameters
+    ----------
+    df_label : pd.DataFrame
+        Parcel metadata including 'coor.x', 'coor.y', 'coor.z', and 'hemisphere'.
+
+    Returns
+    -------
+    A_400 : np.ndarray, shape (n_cortex, n_cortex)
+        Symmetric Euclidean distance matrix; NaN for cross-hemisphere pairs.
+    """
     exclude_idx = df_label[df_label["hemisphere"].isna()].index
     coords = df_label.drop(index=exclude_idx)[["coor.x", "coor.y", "coor.z"]].to_numpy(dtype=float)
     diff = coords[:, None, :] - coords[None, :, :]
@@ -140,48 +207,28 @@ def load_connectomes_euclidian(df_label):
     return A_400
 
 
-def plot_connectome(df_label, A_400):
-    # --- Sort nodes by network ---
-    print(df_label)
-    node_networks = df_label[~df_label.hemisphere.isna()].network.values
-    sort_idx = np.argsort(node_networks)
-    A_sorted = A_400[sort_idx][:, sort_idx]
-    sorted_networks = node_networks[sort_idx]
-    sorted_quantiles = df_label[~df_label.hemisphere.isna()].quantile_idx.values[sort_idx]
-
-    # --- Find network boundaries ---
-    boundaries = np.where(sorted_networks[:-1] != sorted_networks[1:])[0]
-    boundaries = np.insert(boundaries, 0, 0)
-
-    mpc_fig = A_sorted.copy()
-    mpc_fig = rotate(mpc_fig, angle=-45, order=0, cval=np.nan)
-
-    mpc_fig_top = A_sorted.copy()
-    mpc_fig_top[(np.tri(mpc_fig_top.shape[0], mpc_fig_top.shape[0]) == 1) | (sorted_quantiles != 1)] = np.nan
-    mpc_fig_top = rotate(mpc_fig_top, angle=-45, order=0, cval=np.nan)
-
-    mpc_fig_bottom = A_sorted.copy()
-    mpc_fig_bottom[(np.tri(mpc_fig_bottom.shape[0], mpc_fig_bottom.shape[0]) == 1) | (sorted_quantiles != -1)] = np.nan
-    mpc_fig_bottom = rotate(mpc_fig_bottom, angle=-45, order=0, cval=np.nan)
-
-    fig, ax = plt.subplots()
-    # Overlay borders
-    b_ext = np.append(boundaries, 400)
-    for i, b in enumerate(boundaries):
-        rect = patches.Rectangle((200 * np.sqrt(2), b * np.sqrt(2)), b_ext[i + 1] - b_ext[i], b_ext[i + 1] - b_ext[i], linewidth=2, edgecolor=yeo7_colors.colors[i], facecolor="none", angle=45)
-        # Add the patch to the Axes
-        ax.add_patch(rect)
-
-    plt.imshow(mpc_fig, cmap="Purples", origin="upper")
-    # plt.imshow(mpc_fig_top, cmap='Reds', origin='upper')
-    # plt.imshow(mpc_fig_bottom, cmap='Blues', origin='upper')
-    plt.axis("off")
-    plt.title("Upper Triangle of MPC Rotated by 45°")
-    plt.tight_layout()
-    plt.show()
-
-
 def split_by_hemisphere(df_label, matrix):
+    """
+    Split a parcellation-level matrix into left- and right-hemisphere submatrices.
+
+    Parameters
+    ----------
+    df_label : pd.DataFrame
+        Parcel metadata with a 'hemisphere' column ('LH'/'RH'/NaN).
+    matrix : np.ndarray, shape (n_cortex, n_cortex)
+        Full connectivity or distance matrix.
+
+    Returns
+    -------
+    lh_mat : np.ndarray
+        Submatrix for left-hemisphere parcels.
+    rh_mat : np.ndarray
+        Submatrix for right-hemisphere parcels.
+    lh_idx : np.ndarray of int
+        Row/column indices of LH parcels in the full matrix.
+    rh_idx : np.ndarray of int
+        Row/column indices of RH parcels in the full matrix.
+    """
     cortex_mask = df_label["hemisphere"].notna().to_numpy()
     hemi = df_label.loc[cortex_mask, "hemisphere"].to_numpy()
 
@@ -217,6 +264,30 @@ def compute_navigation(df_label, A_400, A_400_euclidean):
 
 
 def compute_pvals_spin(x, df_yeo_surf, df_label, spin_model, n_rand):
+    """
+    Compute a spin-permutation null distribution of Spearman correlations with the FC gradient.
+
+    Rotates the FC gradient on the sphere `n_rand` times and recomputes the Spearman
+    correlation between each rotated gradient and `x` at the parcel level.
+
+    Parameters
+    ----------
+    x : np.ndarray, shape (n_parcels,)
+        The connectivity-difference values to correlate against the FC gradient.
+    df_yeo_surf : pd.DataFrame
+        Per-vertex surface DataFrame containing 'fc_g1' and 'mics' columns.
+    df_label : pd.DataFrame
+        Parcel-level metadata with a 'mics' column used for label-based reduction.
+    spin_model : SpinPermutations
+        Pre-fitted brainspace spin-permutation model.
+    n_rand : int
+        Number of spin permutations.
+
+    Returns
+    -------
+    r_spin : np.ndarray, shape (n_rand,)
+        Spearman r values under the spin null model.
+    """
     y_surf = df_yeo_surf["fc_g1"].values
     y_lh, y_rh = y_surf[:32492], y_surf[32492:]
     y_rotated = np.hstack(spin_model.randomize(y_lh, y_rh))
@@ -243,6 +314,26 @@ def compute_top_bottom_diff(conn, top_idx, bottom_idx, other_idx):
 
 
 def compute_quantile_mask(values, mask, q=(0.25, 0.75)):
+    """
+    Label parcels as high (+1) or low (-1) gradient quantile extremes.
+
+    Parcels within `mask` that fall at or below the q[0] quantile are labeled -1;
+    those at or above q[1] are labeled +1; all others are set to 0.
+
+    Parameters
+    ----------
+    values : np.ndarray, shape (n_parcels,)
+        Gradient values (e.g., T1 MPC gradient) at the parcel level.
+    mask : np.ndarray of bool, shape (n_parcels,)
+        Boolean mask selecting the parcels to include (e.g., a single network).
+    q : tuple of float, optional
+        Lower and upper quantile thresholds (default: (0.25, 0.75)).
+
+    Returns
+    -------
+    out : np.ndarray of int, shape (n_parcels,)
+        Array with values in {-1, 0, +1}.
+    """
     low, high = np.nanquantile(values[mask], q)
     out = np.full(values.shape, 0)
     out[mask & (values <= low)] = -1
@@ -250,13 +341,27 @@ def compute_quantile_mask(values, mask, q=(0.25, 0.75)):
     return out
 
 
-def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, pni_deriv, network="SalVentAttn", n_rand=100, hemisphere="both"):
+def save_brain_map(surf_lh, surf_rh, values, array_name, filename):
+    """Append `values` to inflated surfaces and save a brain-map screenshot."""
+    surf_lh.append_array(values[:32492], name=array_name)
+    surf_rh.append_array(values[32492:], name=array_name)
+    surfs = {"rh1": surf_rh, "lh1": surf_lh}
+    plot_surf(
+        surfs, layout=[["rh1", "lh1"]], view=[["medial", "lateral"]],
+        array_name=array_name, size=(1200, 500), zoom=1.4, color_bar="bottom",
+        share="both", nan_color=(220, 220, 220, 1), cmap="coolwarm",
+        color_range="sym", transparent_bg=True, screenshot=True, filename=filename,
+    )
+
+
+def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl,
+                                df_pni, project_root, spin_model, network="SalVentAttn",
+                                n_rand=100, hemisphere="both"):
     """
     Structural connectivity analysis linking FC gradients and different connectivity measures,
     T1-derived gradients, and connectivity-based differences.
     """
     # load connectomes
-    df_pni = pd.read_csv("/local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv")
     A_sc = load_connectomes(df_pni["path_sc"].to_list(), df_label, log_transform=True, split_hemi=False)
     A_dist = load_connectomes(df_pni["path_dist"].to_list(), df_label, log_transform=False, split_hemi=False)
     A_dist = bct.other.weight_conversion(A_dist, "lengths")
@@ -270,20 +375,15 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
         "Dist": A_dist,
     }
 
-    # FC gradient 1
-    fc_g1 = reduce_by_labels(-load_gradient("fc", join=True), df_yeo_surf["mics"].values, target_labels=df_label["mics"].values, red_op="mean")
+    # FC gradient 1 — load once; negate for df_label convention, keep raw for spin test
+    _fc_raw = load_gradient("fc", join=True)
+    fc_g1 = reduce_by_labels(-_fc_raw, df_yeo_surf["mics"].values, target_labels=df_label["mics"].values, red_op="mean")
     df_label = df_label.copy()
     df_label["fc_g1"] = fc_g1
     df_label.loc[df_label.hemisphere.isna(), "fc_g1"] = np.nan
     df_label["fc_g1_network"] = df_label.groupby("network")["fc_g1"].transform("mean")
-    df_yeo_surf = df_yeo_surf.merge(df_label[["mics", "fc_g1"]], on="mics", how="left", validate="many_to_one")
-    df_yeo_surf["fc_g1"] = load_gradient("fc", join=True)
+    df_yeo_surf["fc_g1"] = _fc_raw
     df_yeo_surf.loc[df_yeo_surf.hemisphere.isna(), "fc_g1"] = np.nan
-
-    # Spin permutation null model
-    spin_model = SpinPermutations(n_rep=n_rand, random_state=42)
-    sphere_lh, sphere_rh = load_conte69(as_sphere=True, with_normals=False, join=False)
-    spin_model.fit(sphere_lh, sphere_rh)
 
     # Find T1-derived gradient and quantiles within the network
     valid = df_label.hemisphere.notna().values
@@ -301,32 +401,22 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
             red_op="mean",
         )
 
-    # Quantiles computed only within the network (and optionally filtered by hemisphere)
+    # Quantiles computed only within the network, per hemisphere
     net_mask = valid & (df_label.network == network)
-    if hemisphere in ('LH', 'RH'):
-        net_mask = net_mask & (df_label["hemisphere"] == hemisphere)
-    q_all = compute_quantile_mask(df_label[grad_col].values, net_mask)
-    df_label["quantile_idx"] = q_all
-    df_label.loc[df_label["quantile_idx"] == 0, "quantile_idx"] = np.nan
-
     if hemisphere == "both":
-        df_label['label_suffix'] = df_label['label'].str.split('_').str[-2:].str.join('_')
-        # Only keep quantiles_idx if they have a same label_suffix and quantile idx value in both hemispheres
-        for suffix in df_label['label_suffix'].unique():
-            mask_suffix = df_label['label_suffix'] == suffix
-            if mask_suffix.sum() == 2:  # Check if both hemispheres are present
-                q_values = df_label.loc[mask_suffix, 'quantile_idx'].values
-                if np.nansum(q_values) != 0:  # Check if at least one quantile is assigned
-                    df_label.loc[mask_suffix, 'quantile_idx'] = q_values[0]  # Assign the same quantile idx to both hemispheres
-                else:
-                    df_label.loc[mask_suffix, 'quantile_idx'] = np.nan  # Set to NaN if no quantiles are assigned
-            else:
-                df_label.loc[mask_suffix, 'quantile_idx'] = np.nan  # Set to NaN if only one hemisphere is present
-
-
-
-    
-
+        net_mask_lh = net_mask & (df_label["hemisphere"] == "LH")
+        net_mask_rh = net_mask & (df_label["hemisphere"] == "RH")
+        df_label["quantile_idx"] = (
+            compute_quantile_mask(df_label[grad_col].values, net_mask_lh)
+            + compute_quantile_mask(df_label[grad_col].values, net_mask_rh)
+        )
+    elif hemisphere == "LH":
+        net_mask_lh = net_mask & (df_label["hemisphere"] == "LH")
+        df_label["quantile_idx"] = compute_quantile_mask(df_label[grad_col].values, net_mask_lh)
+    else:  # RH
+        net_mask_rh = net_mask & (df_label["hemisphere"] == "RH")
+        df_label["quantile_idx"] = compute_quantile_mask(df_label[grad_col].values, net_mask_rh)
+    df_label.loc[df_label["quantile_idx"] == 0, "quantile_idx"] = np.nan
 
     # plot hemispheres with quantiles
     df_yeo_surf = df_yeo_surf.merge(df_label[["mics", "quantile_idx"]], on="mics", how="left", validate="many_to_one")
@@ -344,13 +434,8 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
 
         # Brain map
         df_yeo_surf = df_yeo_surf.merge(df_label[["mics", f"{name}_diff"]], on="mics", how="left", validate="many_to_one")
-        surf32k_lh_infl.append_array(df_yeo_surf[f"{name}_diff"].values[:32492], name="overlay")
-        surf32k_rh_infl.append_array(df_yeo_surf[f"{name}_diff"].values[32492:], name="overlay")
-        surfs = {"rh1": surf32k_rh_infl, "lh1": surf32k_lh_infl}
-        layout = [["rh1", "lh1"]]
-        view = [["medial", "lateral"]]
-        screenshot_path = f"/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_2a_brain_{name}_diff.svg"
-        plot_surf(surfs, layout=layout, view=view, array_name="overlay", size=(1200, 500), zoom=1.4, color_bar="bottom", share="both", nan_color=(220, 220, 220, 1), cmap="coolwarm", color_range="sym", transparent_bg=True, screenshot=True, filename=screenshot_path)
+        save_brain_map(surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf[f"{name}_diff"].values,
+                       array_name="overlay", filename=project_root / f"results/figures/figure_2a_brain_{name}_diff.svg")
 
         # Bar plot with average A_400_diff per metric aranged by FC G1 value
         df_plot = df_label.loc[other_idx, ["network", "network_int", f"{name}_diff", "fc_g1", "fc_g1_network"]].dropna(subset=[f"{name}_diff"]).sort_values("fc_g1_network")
@@ -370,7 +455,7 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
         y = df_label["fc_g1"].values
         mask_label = ~np.isnan(x) & ~np.isnan(y)
         x_norm, y_norm = zscore(x[mask_label]), zscore(y[mask_label])
-        corr, pval = spearmanr(x_norm, y_norm)
+        corr, _ = spearmanr(x_norm, y_norm)
         r_spin = compute_pvals_spin(x, df_yeo_surf, df_label, spin_model, n_rand)
         pv_spin = np.mean(np.abs(r_spin) >= np.abs(corr))
         logging.info(f"[Figure 2A] {name}: SalVentAttn top-bottom diff vs FC-G1 | Spearman r={corr:.3f}, spin-test p={pv_spin:.3e} (n_perm={n_rand})")
@@ -388,17 +473,18 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
         axes[0, i].set_ylim(-3, 3)
         axes[0, i].set_aspect("equal", adjustable="box")
     plt.tight_layout()
-    plt.savefig("/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_2a_distance_metric.svg")
+    plt.savefig(project_root / "results/figures/figure_2a_distance_metric.svg")
     plt.close(fig)
 
 
-def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, pni_deriv, networks=["SalVentAttn", "Limbic"], n_rand=100, hemisphere="both"):
+def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl,
+                                 df_pni, project_root, spin_model, networks=["SalVentAttn", "Limbic"],
+                                 n_rand=100, hemisphere="both"):
     """
     Structural connectivity analysis linking BigBrain gradients and SC,
     T1-derived gradients across networks, and connectivity-based differences.
     """
     # load connectomes
-    df_pni = pd.read_csv("/local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv")
     A_400_sc = load_connectomes(df_pni["path_sc"].tolist(), df_label, log_transform=True)
 
     # bigbrain gradient 2
@@ -408,11 +494,6 @@ def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k
     df_label.loc[df_label.hemisphere.isna(), "bigbrain_g2"] = np.nan
     df_label["bigbrain_g2_network"] = df_label.groupby("network")["bigbrain_g2"].transform("mean")
     df_yeo_surf = df_yeo_surf.merge(df_label[["mics", "bigbrain_g2"]], on="mics", how="left", validate="many_to_one")
-
-    # Spin permutation null model
-    spin_model = SpinPermutations(n_rep=n_rand, random_state=42)
-    sphere_lh, sphere_rh = load_conte69(as_sphere=True)
-    spin_model.fit(sphere_lh, sphere_rh)
 
     # make subplot of the size of network
     n_col = int(np.ceil(len(networks) / 2))
@@ -457,21 +538,15 @@ def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k
 
         df_label.loc[other_net, f"{network}_diff"] = diff
         df_yeo_surf = df_yeo_surf.merge(df_label[["mics", f"{network}_diff"]], on="mics", how="left", validate="many_to_one")
-
-        surf32k_rh_infl.append_array(df_yeo_surf[f"{network}_diff"].values[32492:], name="overlay2")
-        surf32k_lh_infl.append_array(df_yeo_surf[f"{network}_diff"].values[:32492], name="overlay2")
-        surfs = {"rh1": surf32k_rh_infl, "lh1": surf32k_lh_infl}
-        layout = [["rh1", "lh1"]]
-        view = [["medial", "lateral"]]
-        screenshot_path = f"/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_2b_brain_SC_diff_{network}.svg"
-        plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 500), zoom=1.4, color_bar="bottom", share="both", nan_color=(220, 220, 220, 1), cmap="coolwarm", color_range="sym", transparent_bg=True, screenshot=True, filename=screenshot_path)
+        save_brain_map(surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf[f"{network}_diff"].values,
+                       array_name="overlay2", filename=project_root / f"results/figures/figure_2b_brain_SC_diff_{network}.svg")
 
         # Correlation analysis
         x = df_label[f"{network}_diff"].values
         y = df_label["bigbrain_g2"].values
         mask_label = ~np.isnan(x) & ~np.isnan(y)
         x_norm, y_norm = zscore(x[mask_label]), zscore(y[mask_label])
-        corr, pval = spearmanr(x_norm, y_norm)
+        corr, _ = spearmanr(x_norm, y_norm)
         r_spin = compute_pvals_spin(x, df_yeo_surf, df_label, spin_model, n_rand)
         pv_spin = np.mean(np.abs(r_spin) >= np.abs(corr))
         logging.info(f"[Figure 2B] {network}: SC top-bottom diff vs BigBrain-G2 | Spearman r={corr:.3f}, spin-test p={pv_spin:.3e} (n_perm={n_rand})")
@@ -492,7 +567,7 @@ def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k
         axes[i].set_aspect("equal", adjustable="box")
     axes[-1].set_axis_off()
     plt.tight_layout()
-    plt.savefig("/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_2b_distance_network.svg")
+    plt.savefig(project_root / "results/figures/figure_2b_distance_network.svg")
     return df_label
 
 
@@ -503,7 +578,6 @@ def main():
     # Setup Paths dynamically
     script_path = Path(__file__).resolve()
     project_root = script_path.parent.parent
-    pni_deriv = Path(args.pni_deriv)
 
     logger = setup_manuscript_logger("figure_2_distance", project_root, args)
     logger.info(f"Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels")
@@ -519,26 +593,28 @@ def main():
     surf32k_rh_infl = read_surface(project_root / "data/surfaces/fsLR-32k.R.inflated.surf.gii", itype="gii")
     surf_32k = load_conte69(join=True)
 
+    # shared setup: subject manifest, spin permutation model
+    df_pni = pd.read_csv(project_root / "data/dataframes/figure_1a_pni_to_mics.csv")
+    n_rand = 100
+    spin_model = SpinPermutations(n_rep=n_rand, random_state=42)
+    sphere_lh, sphere_rh = load_conte69(as_sphere=True, with_normals=False, join=False)
+    spin_model.fit(sphere_lh, sphere_rh)
+
     # load atlases
     df_yeo_surf = load_yeo_atlas(micapipe=project_root, surf_32k=surf_32k)
     df_yeo_surf = pd.read_csv(project_root / f"data/dataframes/df_1a_{args.hemi}.tsv")
-    path_df_2b = project_root / f"data/dataframes/df_2b_label_{args.hemi}.csv"
-    verify = None
-    if verify == "test":
-        if os.path.exists(path_df_2b):
-            logging.info(f"Loading existing dataframe from {path_df_2b}")
-            df_label = pd.read_csv(path_df_2b)
-        else:
-            df_label = load_label_atlas(micapipe=project_root)
-    else:
-        df_label = load_label_atlas(micapipe=project_root)
+    df_label = load_label_atlas(micapipe=project_root)
 
-    ######### Analysisis
+    ######### Analysis
     # Part A -- SC, navigation, distance
-    struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, pni_deriv, network="SalVentAttn", n_rand=100, hemisphere=args.hemi)
+    struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl,
+                                df_pni, project_root, spin_model, network="SalVentAttn",
+                                n_rand=n_rand, hemisphere=args.hemi)
     # Part B -- per network analysis
     network = ["Limbic", "Default", "Cont", "SalVentAttn", "DorsAttn", "Vis", "SomMot"]
-    df_label = struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, pni_deriv, networks=network, n_rand=100, hemisphere=args.hemi)
+    df_label = struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl,
+                                            df_pni, project_root, spin_model, networks=network,
+                                            n_rand=n_rand, hemisphere=args.hemi)
     df_label.to_csv(project_root / f"data/dataframes/df_2b_label_{args.hemi}.csv", index=False)
 
 

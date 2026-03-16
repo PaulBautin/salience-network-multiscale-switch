@@ -24,3 +24,42 @@ Navigation     : greedy navigation (BCT navigation_wu), computed per hemisphere
 Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
 Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
 Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-03-16 16:52:02
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed
+Distance metric: streamline edge lengths (converted to lengths via BCT)
+Navigation     : greedy navigation (BCT navigation_wu), computed per hemisphere
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-03-16 17:07:58
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed
+Distance metric: streamline edge lengths (converted to lengths via BCT)
+Navigation     : greedy navigation (BCT navigation_wu), computed per hemisphere
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-03-16 17:28:06
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed
+Distance metric: streamline edge lengths (converted to lengths via BCT)
+Navigation     : greedy navigation (BCT navigation_wu), computed per hemisphere
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
