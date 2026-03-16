@@ -71,10 +71,10 @@ def normalize_to_range(data, target_min, target_max):
     return scaled_data
 
 
-def load_t1_salience_profiles(t1_files, df_yeo_surf, network='SalVentAttn'):
+def load_t1_salience_profiles(t1_files, df_yeo_surf, network='SalVentAttn', hemisphere='both'):
     """
     Load T1 intensity profiles for a specific network across all subjects.
-    
+
     Parameters
     ----------
     path_pattern : str
@@ -83,7 +83,9 @@ def load_t1_salience_profiles(t1_files, df_yeo_surf, network='SalVentAttn'):
         Surface dataframe containing network labels.
     network : str
         The specific network to extract.
-        
+    hemisphere : str
+        Hemisphere selection: 'both', 'LH', or 'RH'.
+
     Returns
     -------
     t1_stack : np.ndarray
@@ -94,6 +96,9 @@ def load_t1_salience_profiles(t1_files, df_yeo_surf, network='SalVentAttn'):
         raise FileNotFoundError("No files found")
     logging.info(f"Loading profiles for {n_files} subjects...")
     network_mask = df_yeo_surf['network'].eq(network).to_numpy()
+    if hemisphere in ('LH', 'RH'):
+        hemi_mask = df_yeo_surf['hemisphere'].eq(hemisphere).to_numpy()
+        network_mask = network_mask & hemi_mask
     if not np.any(network_mask):
             raise ValueError(f"Network '{network}' not found in df_yeo_surf.")
     t1_salience_profiles = np.stack([nib.load(f).darrays[0].data[:, network_mask] for f in t1_files])

@@ -57,10 +57,18 @@ def get_parser():
         help="Absolute path to the PNI derivatives folder (e.g., /data/mica/mica3/...)"
     )
     mandatory.add_argument(
-        "-mics_deriv", 
-        type=str, 
+        "-mics_deriv",
+        type=str,
         required=True,
         help="Absolute path to the MICs derivatives folder (e.g., /data/mica/mica3/...)"
+    )
+    optional = parser.add_argument_group("OPTIONAL ARGUMENTS")
+    optional.add_argument(
+        "-hemi",
+        type=str,
+        default="both",
+        choices=["both", "LH", "RH"],
+        help="Hemisphere for gradient computation: 'both', 'LH', or 'RH' (default: both)"
     )
     return parser
 
@@ -146,11 +154,11 @@ def main():
     df_yeo_surf = load_yeo_atlas(micapipe=project_root, surf_32k=surf_32k)
 
     ######### Part 1 -- T1 map
-    path_df_1a = project_root / 'data/dataframes/df_1a.tsv'
+    path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
     if path_df_1a.exists():
         logging.info(f"Found existing dataframe at {path_df_1a}. Loading...")
         df_pni = pd.read_csv(project_root / "data/dataframes/figure_1a_pni_to_mics.csv")
-        t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), df_yeo_surf, network='SalVentAttn')
+        t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), df_yeo_surf, network='SalVentAttn', hemisphere=args.hemi)
         df_yeo_surf = pd.read_csv(path_df_1a)
     else:
         df_pni = pd.read_csv(project_root / 'data/dataframes/MICA_PNI.csv')[['ID_PNI', 'session', 'ID_MICs']].drop_duplicates()
@@ -167,8 +175,8 @@ def main():
         logger.info(f"Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment")
 
         df_pni.to_csv(project_root / "data/dataframes/figure_1a_pni_to_mics.csv", index=False)
-        t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), df_yeo_surf, network='SalVentAttn')
-        df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network='SalVentAttn')
+        t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), df_yeo_surf, network='SalVentAttn', hemisphere=args.hemi)
+        df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network='SalVentAttn', hemisphere=args.hemi)
         df_yeo_surf.to_csv(path_df_1a, index=False)
     
     # plot figures

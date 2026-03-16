@@ -40,9 +40,10 @@ def partial_corr_with_covariate(X: np.ndarray, covar: np.ndarray) -> np.ndarray:
 
 
 def compute_t1_gradient(
-    df_yeo_surf, 
-    t1_salience_profiles: list | np.ndarray, 
+    df_yeo_surf,
+    t1_salience_profiles: list | np.ndarray,
     network: str = 'SalVentAttn',
+    hemisphere: str = 'both',
     n_components: int = 10,
     sparsity: float = 0.9
 ):
@@ -95,6 +96,8 @@ def compute_t1_gradient(
     # Update the dataframe
     df_out = df_yeo_surf.copy()
     mask = df_out['network'].eq(network)
+    if hemisphere in ('LH', 'RH'):
+        mask = mask & df_out['hemisphere'].eq(hemisphere)
     df_out.loc[mask, f't1_gradient1_{network}'] = zscore(t1_gradients[:, 0], nan_policy='omit')
     
     return df_out
