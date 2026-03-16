@@ -70,6 +70,14 @@ def get_parser():
     )
     mandatory = parser.add_argument_group("MANDATORY ARGUMENTS")
     mandatory.add_argument("-pni_deriv", type=str, required=True, help="Absolute path to the PNI derivatives folder (e.g., /data/mica/mica3/...)")
+    optional = parser.add_argument_group("OPTIONAL ARGUMENTS")
+    optional.add_argument(
+        "-hemi",
+        type=str,
+        default="both",
+        choices=["both", "LH", "RH"],
+        help="Hemisphere for analysis: 'both', 'LH', or 'RH' (default: both)"
+    )
     return parser
 
 
@@ -242,7 +250,7 @@ def compute_quantile_mask(values, mask, q=(0.25, 0.75)):
     return out
 
 
-def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, pni_deriv, network="SalVentAttn", n_rand=100):
+def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, pni_deriv, network="SalVentAttn", n_rand=100, hemisphere="both"):
     """
     Structural connectivity analysis linking FC gradients and different connectivity measures,
     T1-derived gradients, and connectivity-based differences.
@@ -284,8 +292,8 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
     # Ensure parcel-level gradient exists
     if grad_col not in df_label.columns:
         if grad_col not in df_yeo_surf.columns:
-            t1_salience_profiles = load_t1_salience_profiles(df_pni["path_t1_profile"].tolist(), df_yeo_surf, network=network)
-            df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network=network)
+            t1_salience_profiles = load_t1_salience_profiles(df_pni["path_t1_profile"].tolist(), df_yeo_surf, network=network, hemisphere=hemisphere)
+            df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network=network, hemisphere=hemisphere)
         df_label[grad_col] = reduce_by_labels(
             df_yeo_surf[grad_col].values,
             df_yeo_surf["mics"].values,
@@ -293,25 +301,27 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
             red_op="mean",
         )
 
-    # Quantiles computed only within the network
+    # Quantiles computed only within the network (and optionally filtered by hemisphere)
     net_mask = valid & (df_label.network == network)
+    if hemisphere in ('LH', 'RH'):
+        net_mask = net_mask & (df_label["hemisphere"] == hemisphere)
     q_all = compute_quantile_mask(df_label[grad_col].values, net_mask)
     df_label["quantile_idx"] = q_all
     df_label.loc[df_label["quantile_idx"] == 0, "quantile_idx"] = np.nan
 
-
-    df_label['label_suffix'] = df_label['label'].str.split('_').str[-2:].str.join('_')
-    # Only keep quantiles_idx if they have a same label_suffix and quantile idx value in both hemispheres
-    for suffix in df_label['label_suffix'].unique():
-        mask_suffix = df_label['label_suffix'] == suffix
-        if mask_suffix.sum() == 2:  # Check if both hemispheres are present
-            q_values = df_label.loc[mask_suffix, 'quantile_idx'].values
-            if np.nansum(q_values) != 0:  # Check if at least one quantile is assigned
-                df_label.loc[mask_suffix, 'quantile_idx'] = q_values[0]  # Assign the same quantile idx to both hemispheres
+    if hemisphere == "both":
+        df_label['label_suffix'] = df_label['label'].str.split('_').str[-2:].str.join('_')
+        # Only keep quantiles_idx if they have a same label_suffix and quantile idx value in both hemispheres
+        for suffix in df_label['label_suffix'].unique():
+            mask_suffix = df_label['label_suffix'] == suffix
+            if mask_suffix.sum() == 2:  # Check if both hemispheres are present
+                q_values = df_label.loc[mask_suffix, 'quantile_idx'].values
+                if np.nansum(q_values) != 0:  # Check if at least one quantile is assigned
+                    df_label.loc[mask_suffix, 'quantile_idx'] = q_values[0]  # Assign the same quantile idx to both hemispheres
+                else:
+                    df_label.loc[mask_suffix, 'quantile_idx'] = np.nan  # Set to NaN if no quantiles are assigned
             else:
-                df_label.loc[mask_suffix, 'quantile_idx'] = np.nan  # Set to NaN if no quantiles are assigned
-        else:
-            df_label.loc[mask_suffix, 'quantile_idx'] = np.nan  # Set to NaN if only one hemisphere is present
+                df_label.loc[mask_suffix, 'quantile_idx'] = np.nan  # Set to NaN if only one hemisphere is present
 
 
 
@@ -382,7 +392,7 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
     plt.close(fig)
 
 
-def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, pni_deriv, networks=["SalVentAttn", "Limbic"], n_rand=100):
+def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, pni_deriv, networks=["SalVentAttn", "Limbic"], n_rand=100, hemisphere="both"):
     """
     Structural connectivity analysis linking BigBrain gradients and SC,
     T1-derived gradients across networks, and connectivity-based differences.
@@ -414,17 +424,24 @@ def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k
         grad_col = f"t1_gradient1_{network}"
         if grad_col not in df_label:
             if grad_col not in df_yeo_surf:
-                t1_salience_profiles = load_t1_salience_profiles(df_pni["path_t1_profile"].tolist(), df_yeo_surf, network=network)
-                df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network=network)
+                t1_salience_profiles = load_t1_salience_profiles(df_pni["path_t1_profile"].tolist(), df_yeo_surf, network=network, hemisphere=hemisphere)
+                df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network=network, hemisphere=hemisphere)
             else:
                 logging.info(f"{grad_col} already exists in df_yeo_surf.")
             df_label[f"t1_gradient1_{network}"] = reduce_by_labels(df_yeo_surf[f"t1_gradient1_{network}"].values, df_yeo_surf["mics"].values, target_labels=df_label["mics"].values, red_op="mean")
 
-        # Quantiles computed only within the network
+        # Quantiles computed only within the network (and optionally filtered by hemisphere)
         net_mask = (df_label["network"] == network) & valid_mask
-        net_mask_lh = net_mask & (df_label["hemisphere"] == "LH")
-        net_mask_rh = net_mask & (df_label["hemisphere"] == "RH")
-        df_label["quantile_idx"] = compute_quantile_mask(df_label[grad_col].values, net_mask_lh) + compute_quantile_mask(df_label[grad_col].values, net_mask_rh)
+        if hemisphere == "both":
+            net_mask_lh = net_mask & (df_label["hemisphere"] == "LH")
+            net_mask_rh = net_mask & (df_label["hemisphere"] == "RH")
+            df_label["quantile_idx"] = compute_quantile_mask(df_label[grad_col].values, net_mask_lh) + compute_quantile_mask(df_label[grad_col].values, net_mask_rh)
+        elif hemisphere == "LH":
+            net_mask_lh = net_mask & (df_label["hemisphere"] == "LH")
+            df_label["quantile_idx"] = compute_quantile_mask(df_label[grad_col].values, net_mask_lh)
+        else:  # RH
+            net_mask_rh = net_mask & (df_label["hemisphere"] == "RH")
+            df_label["quantile_idx"] = compute_quantile_mask(df_label[grad_col].values, net_mask_rh)
         df_label.loc[df_label["quantile_idx"] == 0, "quantile_idx"] = np.nan
 
         # low_q, high_q = np.nanquantile(df_label.loc[net_mask, f"t1_gradient1_{network}"], [0.25, 0.75])
@@ -504,8 +521,8 @@ def main():
 
     # load atlases
     df_yeo_surf = load_yeo_atlas(micapipe=project_root, surf_32k=surf_32k)
-    df_yeo_surf = pd.read_csv(project_root / "data/dataframes/df_1a.tsv")
-    path_df_2b = project_root / "data/dataframes/df_2b_label.csv"
+    df_yeo_surf = pd.read_csv(project_root / f"data/dataframes/df_1a_{args.hemi}.tsv")
+    path_df_2b = project_root / f"data/dataframes/df_2b_label_{args.hemi}.csv"
     verify = None
     if verify == "test":
         if os.path.exists(path_df_2b):
@@ -518,11 +535,11 @@ def main():
 
     ######### Analysisis
     # Part A -- SC, navigation, distance
-    struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, pni_deriv, network="SalVentAttn", n_rand=100)
+    struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, pni_deriv, network="SalVentAttn", n_rand=100, hemisphere=args.hemi)
     # Part B -- per network analysis
     network = ["Limbic", "Default", "Cont", "SalVentAttn", "DorsAttn", "Vis", "SomMot"]
-    df_label = struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, pni_deriv, networks=network, n_rand=100)
-    df_label.to_csv(project_root / "data/dataframes/df_2b_label.csv", index=False)
+    df_label = struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, pni_deriv, networks=network, n_rand=100, hemisphere=args.hemi)
+    df_label.to_csv(project_root / f"data/dataframes/df_2b_label_{args.hemi}.csv", index=False)
 
 
 if __name__ == "__main__":
