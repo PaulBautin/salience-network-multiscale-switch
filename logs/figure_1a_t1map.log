@@ -1,0 +1,36 @@
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-03-16 15:06:29
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a.tsv. Loading...
+Loading profiles for 9 subjects...
+Final array shape: (9, 14, 7593)
+Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-03-16 15:07:41
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a.tsv. Loading...
+Loading profiles for 9 subjects...
+Final array shape: (9, 14, 7593)
+Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
