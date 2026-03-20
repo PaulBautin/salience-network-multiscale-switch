@@ -51,7 +51,7 @@ Scripts cache intermediate DataFrames to `data/dataframes/` (TSV/CSV) and skip r
 
 ### Core modules (`src/`)
 
-- **`atlas_load.py`** — Loads and merges atlases onto the fsLR-32k surface. Central function is `load_yeo_atlas()` which returns `df_yeo_surf`, a per-vertex DataFrame with Schaefer-400 parcellation, Yeo 7-network labels, hemisphere, and salience network border mask. Other loaders (`load_bigbrain`, `load_ahead_biel`, `load_ahead_parva`, `load_econo_atlas`) add histology columns to this same DataFrame.
+- **`atlas_load.py`** — Loads and merges atlases onto the fsLR-32k surface. Central function is `load_yeo_atlas()` which returns `df_yeo_surf`, a per-vertex DataFrame with Schaefer-400 parcellation, Yeo 7-network labels, hemisphere, and salience network border mask. Other loaders (`load_bigbrain`, `load_ahead_biel`, `load_ahead_parva`, `load_econo_atlas`, `load_t1map`) add histology columns to this same DataFrame.
 
 - **`gradient_computation.py`** — Computes microstructure profile covariance (MPC) gradients. `compute_t1_gradient()` takes subject T1 intensity profiles, computes per-subject partial-correlation matrices (controlling for the mean profile), fits `GradientMaps` (diffusion map, normalized angle kernel, procrustes alignment), and appends the z-scored first gradient to `df_yeo_surf`.
 
@@ -63,7 +63,7 @@ Scripts cache intermediate DataFrames to `data/dataframes/` (TSV/CSV) and skip r
 All analyses use **fsLR-32k** space (64,984 vertices total: 32,492 LH + 32,492 RH). Parcellation is **Schaefer-400** with Yeo 7-network labels. The primary network of interest is `'SalVentAttn'` (Salience/Ventral Attention).
 
 ### Key DataFrame conventions
-- `df_yeo_surf`: one row per surface vertex, columns include `mics` (parcel ID), `network`, `hemisphere`, `label`, `salience_border`. Analysis columns (e.g., `t1_gradient1_SalVentAttn`, `T1map`, `BigBrain`) are added in-place.
+- `df_yeo_surf`: one row per surface vertex, columns include `mics` (parcel ID), `network`, `hemisphere`, `label`, `salience_border`, based on schaeffer 400 parcellation. Analysis columns (e.g., `t1_gradient1_SalVentAttn`, `T1map`, `BigBrain`) are added in-place.
 - iEEG DataFrames: one row per channel, with `Subject`, `Session`, `ChannelName`, and signal/PSD columns.
 
 ### External data not in repo

@@ -18,8 +18,9 @@ from __future__ import division
 #
 # example:
 # python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py \
-#   -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0 \
-#   -ieeg_deriv /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+#   -ieeg_deriv /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA \
+#   -hemi RH
+# Requires df_1a_{hemi}.tsv to exist (run figure_1a_t1map.py with matching -hemi first)
 # ---------------------------------------------------------------------------------------
 # Authors: Paul Bautin
 #
@@ -55,8 +56,7 @@ from scipy.stats import zscore
 
 import logging
 
-from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles
-from src.gradient_computation import compute_t1_gradient
+from src.atlas_load import load_yeo_atlas
 from src.ieeg_processing import load_sensitivity_info, load_original_data_files, preprocess_and_compute_psd_ieeg, extract_band_power
 from src.logging_utils import setup_manuscript_logger
 
@@ -76,40 +76,49 @@ def get_parser():
 
     mandatory = parser.add_argument_group("\nMANDATORY ARGUMENTS")
     mandatory.add_argument(
-        "-pni_deriv",
-        type=str,
-        help="Absolute path to the PNI derivatives folder (e.g., /data/mica/...)"
-    )
-    mandatory.add_argument(
         "-ieeg_deriv",
         type=str,
         help="Absolute path to the ieeg derivatives folder (e.g., /data/mica/...)"
     )
+    optional = parser.add_argument_group("\nOPTIONAL ARGUMENTS")
+    optional.add_argument(
+        "-hemi",
+        type=str,
+        default="RH",
+        choices=["both", "LH", "RH"],
+        help="Hemisphere for analysis: 'both', 'LH', or 'RH' (default: RH)"
+    )
     return parser
 
 
-def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf):
+def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf, hemi='RH'):
     freq_bands = {"delta": (0.5, 4), "theta": (4, 8), "alpha": (8, 13), "beta": (13, 30), "gamma": (30, 80)}
     band_order = ["delta", "theta", "alpha", "beta", "gamma"]
     band_colors = ['#1f77b4', '#9467bd', '#e377c2', '#2ca02c', '#17becf']
     N_LH = 32492
-    
+    hemi_offset = N_LH if hemi == 'RH' else 0
+
     # Setup Geometry
     surf_combined = load_conte69(join=True)
     surf_lh, surf_rh = load_conte69(join=False)
+    surf_hemi = surf_rh if hemi == 'RH' else surf_lh
+    surf_hemi_infl = surf32k_rh_infl if hemi == 'RH' else surf32k_lh_infl
     n_vertices = surf_combined.GetPoints().shape[0]
     fs = df_channel['SamplingRate'].iloc[0]
-    
-    # Define Analysis Mask: SalVent network specifically within the RH
-    mask = ((df_yeo_surf['hemisphere'] == 'RH') & (df_yeo_surf['network'] == 'SalVentAttn')).values
+
+    # Define Analysis Mask: SalVent network for the specified hemisphere
+    if hemi in ('LH', 'RH'):
+        mask = ((df_yeo_surf['hemisphere'] == hemi) & (df_yeo_surf['network'] == 'SalVentAttn')).values
+    else:
+        mask = (df_yeo_surf['network'] == 'SalVentAttn').values
 
     # Find top and bottom 25% of vertices in the SalVentAttn network based on the T1 gradient
-    low_q, high_q = np.nanquantile(df_yeo_surf["t1_gradient1_SalVentAttn"], [0.25, 0.75])
+    low_q, high_q = np.nanquantile(df_yeo_surf.loc[mask, "t1_gradient1_SalVentAttn"], [0.25, 0.75])
     df_yeo_surf.loc[mask & (df_yeo_surf["t1_gradient1_SalVentAttn"] <= low_q), "quantiles"] = -1
     df_yeo_surf.loc[mask & (df_yeo_surf["t1_gradient1_SalVentAttn"] >= high_q), "quantiles"] = 1
 
     # Pre-calculate Moran Weights
-    w = mesh_elements.get_ring_distance(surf_rh, n_ring=1, mask=mask[N_LH:])
+    w = mesh_elements.get_ring_distance(surf_hemi, n_ring=1, mask=mask[hemi_offset:hemi_offset + N_LH])
     w.data **= -1
     msr = moran.MoranRandomization(n_rep=100, procedure='singleton', tol=1e-6, random_state=0)
     msr.fit(w)
@@ -121,7 +130,7 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
         print(f"Warning: Variable lengths detected ({min_len} to {max_len} samples).")
         print(f"Truncating all channels to {min_len} samples for vectorization.")
     data_matrix = np.vstack([np.asarray(sig)[:min_len] for sig in df_channel['Data']])
-    
+
     # Compute PSD
     f, pxx_raw = preprocess_and_compute_psd_ieeg(data_matrix, fs)
     sens = np.nan_to_num(np.vstack(df_channel['SensitivityMap_bip'].values), nan=0.0)
@@ -129,15 +138,15 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
 
     # Plot all PSDs colored by gradient value
     fig, ax = plt.subplots(figsize=(6, 4))
-    grad = df_yeo_surf['t1_gradient1_SalVentAttn'].values[32492:][mask[32492:]]
-    surf_map_sal = surf_map[:, mask[32492:]].T
+    grad = df_yeo_surf['t1_gradient1_SalVentAttn'].values[hemi_offset:hemi_offset + N_LH][mask[hemi_offset:hemi_offset + N_LH]]
+    surf_map_sal = surf_map[:, mask[hemi_offset:hemi_offset + N_LH]].T
     custom_cmap = plt.get_cmap(name="coolwarm")
     norm = mp.colors.Normalize(vmin=-1, vmax=1)
-    for i in range(surf_map_sal.shape[0]): 
+    for i in range(surf_map_sal.shape[0]):
         ax.loglog(f, surf_map_sal[i, :], color=custom_cmap(norm(grad[i])), alpha=0.1, rasterized=True)
-    surf_map_top = np.nanmean(surf_map[:, (df_yeo_surf['quantiles'] == 1).values[32492:]],axis=1)
+    surf_map_top = np.nanmean(surf_map[:, (df_yeo_surf['quantiles'] == 1).values[hemi_offset:hemi_offset + N_LH]], axis=1)
     ax.loglog(f, surf_map_top, color='red', alpha=0.8)
-    surf_map_bottom = np.nanmean(surf_map[:, (df_yeo_surf['quantiles'] == -1).values[32492:]],axis=1)
+    surf_map_bottom = np.nanmean(surf_map[:, (df_yeo_surf['quantiles'] == -1).values[hemi_offset:hemi_offset + N_LH]], axis=1)
     ax.loglog(f, surf_map_bottom, color='blue', alpha=0.8)
     plt.xlabel('Frequency (Hz)')
     plt.ylabel('Normalized PSD')
@@ -147,7 +156,7 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
     ax.set_xticklabels(xtick_labels)
     for x in xticks:
         ax.axvline(x=x, color="grey", linestyle="--", alpha=0.4)
-    plt.savefig("/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_psd.svg")
+    plt.savefig(f"/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_psd_{hemi}.svg")
 
     # Process Bands
     fig, axes = plt.subplots(1, len(band_order), figsize=(20, 4.5), sharex=True, sharey=True)
@@ -160,18 +169,18 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
         surf_map[np.sum(sens, axis=0) == 0] = np.nan
 
         # Plot Surface Map
-        surf_map[df_yeo_surf.hemisphere.isna()[32492:]] = np.nan
-        surf32k_rh_infl.append_array(surf_map, name="overlay2")
-        surfs = {'rh1': surf32k_rh_infl, 'rh2': surf32k_rh_infl}
-        layout = [['rh1', 'rh2']]
+        surf_map[df_yeo_surf.hemisphere.isna()[hemi_offset:hemi_offset + N_LH]] = np.nan
+        surf_hemi_infl.append_array(surf_map, name="overlay2")
+        surfs = {'hemi1': surf_hemi_infl, 'hemi2': surf_hemi_infl}
+        layout = [['hemi1', 'hemi2']]
         view = [['lateral', 'medial']]
-        p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 600), zoom=1.3, color_bar='bottom', share='both',
-            nan_color=(0, 0, 0, 1), cmap="Purples", transparent_bg=True, return_plotter=True)
-        p.show()
+        # p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 600), zoom=1.3, color_bar='bottom', share='both',
+        #     nan_color=(0, 0, 0, 1), cmap="Purples", transparent_bg=True, return_plotter=True)
+        # p.show()
 
         # Correlation Analysis
-        x_raw = surf_map[mask[32492:]]
-        y = df_yeo_surf['t1_gradient1_SalVentAttn'].values[32492:][mask[32492:]]
+        x_raw = surf_map[mask[hemi_offset:hemi_offset + N_LH]]
+        y = df_yeo_surf['t1_gradient1_SalVentAttn'].values[hemi_offset:hemi_offset + N_LH][mask[hemi_offset:hemi_offset + N_LH]]
         # Filter: Only correlate vertices that had signal
         valid_data_mask = (x_raw != 0) & np.isfinite(x_raw) & np.isfinite(y)
         # Z-score for statistics
@@ -183,21 +192,20 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
         idx = np.flatnonzero(mask)[valid_data_mask]
         surf_map[idx] = x_stats
         surf_map[df_yeo_surf['salience_border'].isna()] = np.nan
-        surf32k_rh_infl.append_array(surf_map[32492:], name="overlay2")
-        surfs = {'rh1': surf32k_rh_infl, 'rh2': surf32k_rh_infl}
-        layout = [['rh1', 'rh2']]
+        surf_hemi_infl.append_array(surf_map[hemi_offset:hemi_offset + N_LH], name="overlay2")
+        surfs = {'hemi1': surf_hemi_infl, 'hemi2': surf_hemi_infl}
+        layout = [['hemi1', 'hemi2']]
         view = [['lateral', 'medial']]
-        screenshot_path = f"/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_{band}_map.svg"
+        screenshot_path = f"/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_{band}_map_{hemi}.svg"
         p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 500), zoom=1.4, color_bar='bottom', share='both',
             nan_color=(0, 0, 0, 1), cmap="coolwarm", color_range='sym', transparent_bg=True, screenshot=True, filename=screenshot_path)
 
         # Pearson
         r, _ = spearmanr(x_stats, y_stats)
         r_null = []
-        # Generate surrogates for the specific mask
-        for y_surr_full in msr.randomize(y_stats):
-            # Apply same valid mask filter
-            r_null.append(spearmanr(x_stats, y_surr_full[valid_data_mask])[0])
+        # Generate surrogates from full-mask y (size matches w geometry), then filter to valid vertices
+        for y_surr in msr.randomize(y):
+            r_null.append(spearmanr(x_stats, zscore(y_surr[valid_data_mask]))[0])
 
         r_null = np.asarray(r_null)
         p_perm = np.mean(np.abs(r_null) >= np.abs(r))
@@ -210,11 +218,11 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
         axes[i].set_ylim([-3, 3])
         axes[i].plot(x_stats, slope*x_stats + intercept, c=band_colors[i], lw=2.5)
         axes[i].text(0.05, 0.95, f"r = {r:.2f}\np = {p_perm:.2e}", transform=axes[i].transAxes, va="top")
-        axes[i].set_xlabel(band.capitalize(), color=band_colors[i])
+        axes[i].set_xlabel(band.capitalize(), color=band_colors[i], fontsize=16)
         axes[i].set_aspect("equal")
-        axes[0].set_ylabel('MPC gradient')
+        axes[0].set_ylabel('MPC gradient', fontsize=16)
     plt.tight_layout()
-    plt.savefig("/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_band_power_corr.svg")
+    plt.savefig(f"/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_band_power_corr_{hemi}.svg")
     return band_maps
         
 
@@ -223,7 +231,6 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     ieeg_deriv = args.ieeg_deriv
-    pni_deriv = args.pni_deriv
     script_path = Path(__file__).resolve()
     project_root = script_path.parent.parent
 
@@ -234,7 +241,7 @@ def main():
     logger.info(f"PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum")
     logger.info(f"Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz")
     logger.info(f"Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)")
-    logger.info(f"Surface space  : fsLR-32k RH only, Schaefer-400, Yeo SalVentAttn network")
+    logger.info(f"Surface space  : fsLR-32k {args.hemi}, Schaefer-400, Yeo SalVentAttn network")
 
     logging.info(f"Script path: {script_path}")
     logging.info(f"Project root: {project_root}")
@@ -247,17 +254,12 @@ def main():
     # load atlases
     df_yeo_surf = load_yeo_atlas(micapipe=project_root, surf_32k=surf_32k)
 
-    ######### Part 1 -- T1 map
-    path_figure1_part1 = '/local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure1_part1_df.tsv'
-    if os.path.exists(path_figure1_part1):
-        path = pni_deriv + '/sub-PNC*/ses-a1/mpc/acq-T1map/sub-PNC*_ses-a1_surf-fsLR-32k_desc-intensity_profiles.shape.gii'
-        t1_salience_profiles = load_t1_salience_profiles(path, df_yeo_surf)
-        df_yeo_surf = pd.read_csv(path_figure1_part1)
-    else:
-        path = pni_deriv + '/sub-PNC*/ses-a1/mpc/acq-T1map/sub-PNC*_ses-a1_surf-fsLR-32k_desc-intensity_profiles.shape.gii'
-        t1_salience_profiles = load_t1_salience_profiles(path, df_yeo_surf)
-        df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network='SalVentAttn')
-        df_yeo_surf.to_csv(path_figure1_part1, index=False)
+    ######### Part 1 -- T1 gradient (output of figure_1a_t1map.py)
+    path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
+    if not path_df_1a.exists():
+        raise FileNotFoundError(f"Gradient dataframe not found at {path_df_1a}. Run figure_1a_t1map.py with -hemi {args.hemi} first.")
+    logging.info(f"Loading gradient dataframe from {path_df_1a}")
+    df_yeo_surf = pd.read_csv(path_df_1a)
 
     # Load sensitivity for each contact information.
     df_sensitivity = load_sensitivity_info(root_dir=ieeg_deriv)
@@ -284,7 +286,7 @@ def main():
     df2['SensitivityMap_bip'] = df2['SensitivityMap_bip'].map(lambda x: np.abs(x) if isinstance(x, np.ndarray) else np.zeros(32492))
 
     # Perform frequency band analysis and correlate with T1 gradient in the SalVentAttn network
-    frequency_band_analysis_sensitivity(df2, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf)
+    frequency_band_analysis_sensitivity(df2, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf, hemi=args.hemi)
 
 
 if __name__ == "__main__":

@@ -63,3 +63,240 @@ Navigation     : greedy navigation (BCT navigation_wu), computed per hemisphere
 Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
 Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
 Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-03-17 14:36:06
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed
+Distance metric: streamline edge lengths (converted to lengths via BCT)
+Navigation     : greedy navigation (BCT navigation_wu), computed per hemisphere
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.167, spin-test p=3.700e-01 (n_perm=100)
+[Figure 2A] Nav: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.031, spin-test p=9.300e-01 (n_perm=100)
+[Figure 2A] Dist: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.302, spin-test p=1.300e-01 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 2027)
+Computing T1 gradients for Limbic...
+Gradient lambdas: [0.06944493 0.06021429 0.04909578 0.04378072 0.03043414 0.02801279
+ 0.02083416 0.01796642 0.01553699 0.01410466]
+[Figure 2B] Limbic: SC top-bottom diff vs BigBrain-G2 | Spearman r=0.228, spin-test p=3.500e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7722)
+Computing T1 gradients for Default...
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-03-17 14:41:50
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed
+Distance metric: streamline edge lengths (converted to lengths via BCT)
+Navigation     : greedy navigation (BCT navigation_wu), computed per hemisphere
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.026, spin-test p=9.500e-01 (n_perm=100)
+[Figure 2A] Nav: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.031, spin-test p=9.300e-01 (n_perm=100)
+[Figure 2A] Dist: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.268, spin-test p=2.900e-01 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 2027)
+Computing T1 gradients for Limbic...
+Gradient lambdas: [0.06944243 0.06025795 0.04911542 0.04378171 0.03042177 0.02802045
+ 0.02084137 0.01796134 0.01553889 0.01410626]
+[Figure 2B] Limbic: SC top-bottom diff vs BigBrain-G2 | Spearman r=0.228, spin-test p=3.500e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7722)
+Computing T1 gradients for Default...
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-03-17 14:44:16
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed
+Distance metric: streamline edge lengths (converted to lengths via BCT)
+Navigation     : greedy navigation (BCT navigation_wu), computed per hemisphere
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.026, spin-test p=9.500e-01 (n_perm=100)
+[Figure 2A] Nav: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.031, spin-test p=9.300e-01 (n_perm=100)
+[Figure 2A] Dist: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.268, spin-test p=2.900e-01 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 2027)
+Computing T1 gradients for Limbic...
+Gradient lambdas: [0.06946592 0.06024491 0.04909305 0.04377768 0.03044842 0.02801172
+ 0.0208326  0.01796452 0.015539   0.01410264]
+[Figure 2B] Limbic: SC top-bottom diff vs BigBrain-G2 | Spearman r=0.228, spin-test p=3.500e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7722)
+Computing T1 gradients for Default...
+Gradient lambdas: [0.07892902 0.06115721 0.04906359 0.04537847 0.03189532 0.02988618
+ 0.02402941 0.02048138 0.01705898 0.01583716]
+[Figure 2B] Default: SC top-bottom diff vs BigBrain-G2 | Spearman r=-0.107, spin-test p=7.700e-01 (n_perm=100)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 2959)
+Computing T1 gradients for Cont...
+Gradient lambdas: [0.07866633 0.06243633 0.0494776  0.04378901 0.03305914 0.03024729
+ 0.02199277 0.01974428 0.0177943  0.01570792]
+[Figure 2B] Cont: SC top-bottom diff vs BigBrain-G2 | Spearman r=0.187, spin-test p=4.700e-01 (n_perm=100)
+Processing network: SalVentAttn
+t1_gradient1_SalVentAttn already exists in df_yeo_surf.
+[Figure 2B] SalVentAttn: SC top-bottom diff vs BigBrain-G2 | Spearman r=0.051, spin-test p=8.900e-01 (n_perm=100)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 3267)
+Computing T1 gradients for DorsAttn...
+Gradient lambdas: [0.07937856 0.06204733 0.05062103 0.04306676 0.03327864 0.03114953
+ 0.02251344 0.02006795 0.01827415 0.01602176]
+[Figure 2B] DorsAttn: SC top-bottom diff vs BigBrain-G2 | Spearman r=0.072, spin-test p=8.600e-01 (n_perm=100)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 4522)
+Computing T1 gradients for Vis...
+Gradient lambdas: [0.07913967 0.05996419 0.05192863 0.04730823 0.03368021 0.03156681
+ 0.02239324 0.02032842 0.01855449 0.01695517]
+[Figure 2B] Vis: SC top-bottom diff vs BigBrain-G2 | Spearman r=-0.185, spin-test p=4.500e-01 (n_perm=100)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 5592)
+Computing T1 gradients for SomMot...
+Gradient lambdas: [0.07947641 0.0608174  0.05140651 0.04677892 0.03302107 0.03023535
+ 0.02272457 0.02027582 0.01808584 0.01675951]
+[Figure 2B] SomMot: SC top-bottom diff vs BigBrain-G2 | Spearman r=0.038, spin-test p=9.000e-01 (n_perm=100)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-03-18 17:55:24
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed
+Distance metric: streamline edge lengths (converted to lengths via BCT)
+Navigation     : greedy navigation (BCT navigation_wu), computed per hemisphere
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.026, spin-test p=9.500e-01 (n_perm=100)
+[Figure 2A] Nav: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.031, spin-test p=9.300e-01 (n_perm=100)
+[Figure 2A] Dist: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.268, spin-test p=2.900e-01 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 2027)
+Computing T1 gradients for Limbic...
+Gradient lambdas: [0.06940089 0.06025049 0.04910906 0.04375776 0.03042996 0.02801033
+ 0.02083191 0.01796458 0.01554176 0.01410876]
+[Figure 2B] Limbic: SC top-bottom diff vs BigBrain-G2 | Spearman r=0.228, spin-test p=3.500e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7722)
+Computing T1 gradients for Default...
+Gradient lambdas: [0.07893331 0.06119052 0.04909906 0.04536491 0.03192966 0.02989519
+ 0.02403667 0.02048562 0.01705868 0.01583948]
+[Figure 2B] Default: SC top-bottom diff vs BigBrain-G2 | Spearman r=-0.107, spin-test p=7.700e-01 (n_perm=100)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 2959)
+Computing T1 gradients for Cont...
+Gradient lambdas: [0.0786322  0.0624188  0.04953749 0.04380856 0.03305146 0.03024469
+ 0.02197775 0.01974222 0.01779476 0.01570662]
+[Figure 2B] Cont: SC top-bottom diff vs BigBrain-G2 | Spearman r=0.187, spin-test p=4.700e-01 (n_perm=100)
+Processing network: SalVentAttn
+t1_gradient1_SalVentAttn already exists in df_yeo_surf.
+[Figure 2B] SalVentAttn: SC top-bottom diff vs BigBrain-G2 | Spearman r=0.051, spin-test p=8.900e-01 (n_perm=100)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 3267)
+Computing T1 gradients for DorsAttn...
+Gradient lambdas: [0.07946316 0.06200257 0.05061882 0.04305708 0.03330297 0.03117203
+ 0.02252541 0.02006162 0.01827123 0.01602425]
+[Figure 2B] DorsAttn: SC top-bottom diff vs BigBrain-G2 | Spearman r=0.072, spin-test p=8.600e-01 (n_perm=100)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 4522)
+Computing T1 gradients for Vis...
+Gradient lambdas: [0.07912987 0.05992787 0.05185099 0.04732701 0.03369502 0.03156578
+ 0.02238223 0.02030142 0.01854367 0.01694434]
+[Figure 2B] Vis: SC top-bottom diff vs BigBrain-G2 | Spearman r=-0.185, spin-test p=4.500e-01 (n_perm=100)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 5592)
+Computing T1 gradients for SomMot...
+Gradient lambdas: [0.07952369 0.06082162 0.05149572 0.04680406 0.0330381  0.0302616
+ 0.02274672 0.02028481 0.01809008 0.01674782]
+[Figure 2B] SomMot: SC top-bottom diff vs BigBrain-G2 | Spearman r=0.038, spin-test p=9.000e-01 (n_perm=100)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-03-19 00:05:02
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed
+Distance metric: streamline edge lengths (converted to lengths via BCT)
+Navigation     : greedy navigation (BCT navigation_wu), computed per hemisphere
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.026, spin-test p=9.500e-01 (n_perm=100)
+[Figure 2A] Nav: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.031, spin-test p=9.300e-01 (n_perm=100)
+[Figure 2A] Dist: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.268, spin-test p=2.900e-01 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 2027)
+Computing T1 gradients for Limbic...
+Gradient lambdas: [0.06945923 0.06023217 0.0490976  0.04378338 0.03043708 0.02800649
+ 0.02083946 0.01796117 0.01553666 0.01410228]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=0.215, spin-test p=3.700e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7722)
+Computing T1 gradients for Default...
+Gradient lambdas: [0.07894245 0.06119456 0.0491856  0.04537778 0.03192149 0.02990707
+ 0.02402976 0.02048642 0.017064   0.01584172]
+[Figure 2B] Default: SC top-bottom diff vs FC-G1 | Spearman r=0.107, spin-test p=7.700e-01 (n_perm=100)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 2959)
+Computing T1 gradients for Cont...
+Gradient lambdas: [0.0786429  0.06246492 0.0495358  0.04379536 0.03301713 0.03023753
+ 0.02200712 0.0197479  0.01779266 0.01570662]
+[Figure 2B] Cont: SC top-bottom diff vs FC-G1 | Spearman r=0.258, spin-test p=2.800e-01 (n_perm=100)
+Processing network: SalVentAttn
+t1_gradient1_SalVentAttn already exists in df_yeo_surf.
+[Figure 2B] SalVentAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.026, spin-test p=9.500e-01 (n_perm=100)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 3267)
+Computing T1 gradients for DorsAttn...
+Gradient lambdas: [0.07948538 0.06205961 0.05067675 0.04305579 0.0333257  0.03117502
+ 0.02252304 0.02006862 0.01827519 0.01602694]
+[Figure 2B] DorsAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.203, spin-test p=4.400e-01 (n_perm=100)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 4522)
+Computing T1 gradients for Vis...
+Gradient lambdas: [0.07919603 0.05998677 0.05192986 0.04728214 0.03367113 0.03154852
+ 0.02238935 0.02031467 0.01854542 0.01694331]
+[Figure 2B] Vis: SC top-bottom diff vs FC-G1 | Spearman r=-0.084, spin-test p=7.000e-01 (n_perm=100)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 5592)
+Computing T1 gradients for SomMot...
+Gradient lambdas: [0.0794625  0.0608012  0.05146785 0.04678281 0.03299275 0.03024926
+ 0.02271319 0.02028147 0.01808281 0.01674512]
+[Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=-0.042, spin-test p=8.800e-01 (n_perm=100)

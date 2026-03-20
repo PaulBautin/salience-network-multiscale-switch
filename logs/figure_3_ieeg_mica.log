@@ -1,0 +1,171 @@
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-03-19 00:26:52
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield, fsLR-32k surface, bipolar derivation (|Sens1 - Sens2|)
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)
+Surface space  : fsLR-32k RH only, Schaefer-400, Yeo SalVentAttn network
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading profiles for 147 subjects...
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-03-19 00:39:04
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield, fsLR-32k surface, bipolar derivation (|Sens1 - Sens2|)
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo SalVentAttn network
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 31 subjects, 4469 contacts
+Cache not found. Loading and processing channel info...
+Channel info saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl.
+Channel data: 30 subjects, 4092 bipolar channels
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-03-19 00:57:26
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield, fsLR-32k surface, bipolar derivation (|Sens1 - Sens2|)
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo SalVentAttn network
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 31 subjects, 4469 contacts
+Loading cached channel info from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl...
+Channel data: 30 subjects, 4092 bipolar channels
+[Figure 3B] Band delta: power vs MPC-gradient | Spearman r=-0.237, Moran permutation p=0.000e+00 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band theta: power vs MPC-gradient | Spearman r=0.166, Moran permutation p=1.000e-02 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band alpha: power vs MPC-gradient | Spearman r=-0.051, Moran permutation p=3.500e-01 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band beta: power vs MPC-gradient | Spearman r=0.043, Moran permutation p=5.200e-01 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band gamma: power vs MPC-gradient | Spearman r=-0.051, Moran permutation p=4.300e-01 (n_perm=100, n_vertices=3502)
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-03-19 11:31:01
+  --hemi: LH
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield, fsLR-32k surface, bipolar derivation (|Sens1 - Sens2|)
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo SalVentAttn network
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-03-19 11:31:18
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield, fsLR-32k surface, bipolar derivation (|Sens1 - Sens2|)
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo SalVentAttn network
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 31 subjects, 4469 contacts
+Loading cached channel info from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl...
+Channel data: 30 subjects, 4092 bipolar channels
+[Figure 3B] Band delta: power vs MPC-gradient | Spearman r=-0.237, Moran permutation p=0.000e+00 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band theta: power vs MPC-gradient | Spearman r=0.166, Moran permutation p=1.000e-02 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band alpha: power vs MPC-gradient | Spearman r=-0.051, Moran permutation p=3.500e-01 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band beta: power vs MPC-gradient | Spearman r=0.043, Moran permutation p=5.200e-01 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band gamma: power vs MPC-gradient | Spearman r=-0.051, Moran permutation p=4.300e-01 (n_perm=100, n_vertices=3502)
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-03-19 11:36:06
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield, fsLR-32k surface, bipolar derivation (|Sens1 - Sens2|)
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo SalVentAttn network
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 31 subjects, 4469 contacts
+Loading cached channel info from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl...
+Channel data: 30 subjects, 4092 bipolar channels
+[Figure 3B] Band delta: power vs MPC-gradient | Spearman r=-0.237, Moran permutation p=0.000e+00 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band theta: power vs MPC-gradient | Spearman r=0.166, Moran permutation p=1.000e-02 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band alpha: power vs MPC-gradient | Spearman r=-0.051, Moran permutation p=3.500e-01 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band beta: power vs MPC-gradient | Spearman r=0.043, Moran permutation p=5.200e-01 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band gamma: power vs MPC-gradient | Spearman r=-0.051, Moran permutation p=4.300e-01 (n_perm=100, n_vertices=3502)
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-03-19 11:54:14
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield, fsLR-32k surface, bipolar derivation (|Sens1 - Sens2|)
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo SalVentAttn network
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 31 subjects, 4469 contacts
+Loading cached channel info from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl...
+Channel data: 30 subjects, 4092 bipolar channels
+[Figure 3B] Band delta: power vs MPC-gradient | Spearman r=-0.237, Moran permutation p=0.000e+00 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band theta: power vs MPC-gradient | Spearman r=0.166, Moran permutation p=1.000e-02 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band alpha: power vs MPC-gradient | Spearman r=-0.051, Moran permutation p=3.500e-01 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band beta: power vs MPC-gradient | Spearman r=0.043, Moran permutation p=5.200e-01 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band gamma: power vs MPC-gradient | Spearman r=-0.051, Moran permutation p=4.300e-01 (n_perm=100, n_vertices=3502)
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-03-19 12:00:54
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield, fsLR-32k surface, bipolar derivation (|Sens1 - Sens2|)
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo SalVentAttn network
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 31 subjects, 4469 contacts
+Loading cached channel info from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl...
+Channel data: 30 subjects, 4092 bipolar channels
+[Figure 3B] Band delta: power vs MPC-gradient | Spearman r=-0.237, Moran permutation p=0.000e+00 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band theta: power vs MPC-gradient | Spearman r=0.166, Moran permutation p=1.000e-02 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band alpha: power vs MPC-gradient | Spearman r=-0.051, Moran permutation p=3.500e-01 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band beta: power vs MPC-gradient | Spearman r=0.043, Moran permutation p=5.200e-01 (n_perm=100, n_vertices=3502)
+[Figure 3B] Band gamma: power vs MPC-gradient | Spearman r=-0.051, Moran permutation p=4.300e-01 (n_perm=100, n_vertices=3502)

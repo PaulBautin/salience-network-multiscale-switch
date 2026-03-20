@@ -234,16 +234,11 @@ def main():
     df_yeo_surf = load_yeo_atlas(micapipe=project_root, surf_32k=surf_32k)
 
     ######### Part 1 -- T1 map
-    path_figure1_part1 = '/local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure1_part1_df.tsv'
-    if os.path.exists(path_figure1_part1):
-        path = pni_deriv + '/sub-PNC*/ses-a1/mpc/acq-T1map/sub-PNC*_ses-a1_surf-fsLR-32k_desc-intensity_profiles.shape.gii'
-        t1_salience_profiles = load_t1_salience_profiles(path, df_yeo_surf)
-        df_yeo_surf = pd.read_csv(path_figure1_part1)
-    else:
-        path = pni_deriv + '/sub-PNC*/ses-a1/mpc/acq-T1map/sub-PNC*_ses-a1_surf-fsLR-32k_desc-intensity_profiles.shape.gii'
-        t1_salience_profiles = load_t1_salience_profiles(path, df_yeo_surf)
-        df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network='SalVentAttn')
-        df_yeo_surf.to_csv(path_figure1_part1, index=False)
+    path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
+    if not path_df_1a.exists():
+        raise FileNotFoundError(f"Gradient dataframe not found at {path_df_1a}. Run figure_1a_t1map.py with -hemi {args.hemi} first.")
+    logging.info(f"Loading gradient dataframe from {path_df_1a}")
+    df_yeo_surf = pd.read_csv(path_df_1a)
 
 
     ######### Part 3 -- Cortical type comparisons

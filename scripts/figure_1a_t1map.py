@@ -4,7 +4,11 @@ from __future__ import division
 # -*- coding: utf-8
 #########################################################################################
 #
-# Local microstructural heterogeneity of the salience network with gradient analysis
+# Figure 1a - Local microstructural heterogeneity of the salience network 
+#
+# This script processes MICA-PNI derivatives to extract T1 microstructural profiles, 
+# computes gradients within the Salience/Ventral Attention network, and visualizes 
+# the relationship between T1 profiles and gradient values.
 #
 # example:
 # python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py \

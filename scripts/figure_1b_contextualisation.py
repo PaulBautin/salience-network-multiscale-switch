@@ -163,11 +163,8 @@ def main():
     ######### Part 1 -- Load gradient and T1map from figure_1a cache
     path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
     if not path_df_1a.exists():
-        raise FileNotFoundError(
-            f"Gradient cache not found: {path_df_1a}\n"
-            "Run figure_1a_t1map.py first to generate it."
-        )
-    logging.info(f"Loading gradient from figure_1a cache: {path_df_1a}")
+        raise FileNotFoundError(f"Gradient dataframe not found at {path_df_1a}. Run figure_1a_t1map.py with -hemi {args.hemi} first.")
+    logging.info(f"Loading gradient dataframe from {path_df_1a}")
     df_yeo_surf = pd.read_csv(path_df_1a)
 
     ######### Part 2 -- Contextualisation
