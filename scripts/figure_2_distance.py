@@ -12,7 +12,7 @@ from __future__ import division
 #
 # Figure 2A: For the SalVentAttn network, computes connectivity differences between
 #            MPC-gradient-extreme parcels using three metrics (structural connectivity,
-#            greedy-navigation path length, Euclidean distance) and correlates those
+#            navigation path length, Euclidean distance) and correlates those
 #            differences with the whole brain FC gradient.
 # Figure 2B: Replicates the SC-difference analysis for each of the 7 Yeo networks
 #            and correlates the results with the whole brain FC gradient.
@@ -348,7 +348,7 @@ def save_brain_map(surf_lh, surf_rh, values, array_name, filename):
     surf_rh.append_array(values[32492:], name=array_name)
     surfs = {"rh1": surf_rh, "lh1": surf_lh}
     plot_surf(
-        surfs, layout=[["rh1", "lh1"]], view=[["medial", "lateral"]],
+        surfs, layout=[["lh1", "lh1"]], view=[["medial", "lateral"]],
         array_name=array_name, size=(1200, 500), zoom=1.4, color_bar="bottom",
         share="both", nan_color=(220, 220, 220, 1), cmap="coolwarm",
         color_range="sym", transparent_bg=True, screenshot=True, filename=filename,
