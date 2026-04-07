@@ -9,6 +9,8 @@
 # python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py \
 #   -hemi LH
 # (requires figure_1a_t1map.py to have been run first)
+#
+# If working on remote server add before command: xvfb-run -s "-screen 0 1920x1080x24" 
 # ---------------------------------------------------------------------------------------
 # Authors: Paul Bautin
 #
@@ -39,7 +41,7 @@ from scipy.stats import spearmanr, zscore
 
 import logging
 
-from src.atlas_load import load_yeo_atlas, load_bigbrain, load_ahead_biel, load_ahead_parva
+from src.atlas_load import load_yeo_atlas, load_bigbrain, load_ahead_biel, load_ahead_parva, compute_network_mask
 from src.logging_utils import setup_manuscript_logger
 
 logger = logging.getLogger(__name__)
@@ -171,15 +173,17 @@ def main():
     screenshot_path = project_root / "results/figures/figure_1b_brain_t1map.svg"
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['T1map'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
         nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path)
-    df_yeo_surf = load_bigbrain(project_root, df_yeo_surf)
+    # Use 'both' to match original behavior: old loaders had no hemisphere filter
+    net_mask = compute_network_mask(df_yeo_surf, 'SalVentAttn', 'both')
+    df_yeo_surf.loc[net_mask, 'BigBrain'] = load_bigbrain(project_root, net_mask)
     screenshot_path = project_root / "results/figures/figure_1b_brain_bigbrain.svg"
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['BigBrain'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
         nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path)
-    df_yeo_surf = load_ahead_biel(project_root, df_yeo_surf)
+    df_yeo_surf.loc[net_mask, 'Bielschowsky'] = load_ahead_biel(project_root, net_mask)
     screenshot_path = project_root / "results/figures/figure_1b_brain_biel.svg"
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['Bielschowsky'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
         nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path)
-    df_yeo_surf = load_ahead_parva(project_root, df_yeo_surf)
+    df_yeo_surf.loc[net_mask, 'Parvalbumin'] = load_ahead_parva(project_root, net_mask)
     screenshot_path = project_root / "results/figures/figure_1b_brain_parva.svg"
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['Parvalbumin'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
         nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path)

@@ -25,6 +25,8 @@
 # Example:
 #   python scripts/figure_2_distance.py \
 #     -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+#
+# If working on remote server add before command: xvfb-run -s "-screen 0 1920x1080x24" 
 # ---------------------------------------------------------------------------------------
 # Authors: Paul Bautin
 #
@@ -56,7 +58,7 @@ from scipy.stats import spearmanr, zscore
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, convert_states_str2int
+from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, convert_states_str2int, compute_network_mask
 from src.gradient_computation import compute_t1_gradient
 from src.plot_colors import yeo7_rgba, yeo7_rgb
 from src.logging_utils import setup_manuscript_logger
@@ -387,8 +389,9 @@ def struct_conn_metric_analysis(df_label: pd.DataFrame, df_yeo_surf: pd.DataFram
     # Ensure parcel-level gradient exists
     if grad_col not in df_label.columns:
         if grad_col not in df_yeo_surf.columns:
-            t1_salience_profiles = load_t1_salience_profiles(df_pni["path_t1_profile"].tolist(), df_yeo_surf, network=network, hemisphere=hemisphere)
-            df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network=network, hemisphere=hemisphere)
+            net_mask = compute_network_mask(df_yeo_surf, network, hemisphere)
+            t1_salience_profiles = load_t1_salience_profiles(df_pni["path_t1_profile"].tolist(), net_mask)
+            df_yeo_surf.loc[net_mask, grad_col] = compute_t1_gradient(t1_salience_profiles)
         df_label[grad_col] = reduce_by_labels(df_yeo_surf[grad_col].values, df_yeo_surf["mics"].values, target_labels=df_label["mics"].values, red_op="mean")
 
     # Quantiles computed only within the network, per hemisphere
@@ -492,8 +495,9 @@ def struct_conn_network_analysis(df_label: pd.DataFrame, df_yeo_surf: pd.DataFra
         grad_col = f"t1_gradient1_{network}"
         if grad_col not in df_label:
             if grad_col not in df_yeo_surf:
-                t1_salience_profiles = load_t1_salience_profiles(df_pni["path_t1_profile"].tolist(), df_yeo_surf, network=network, hemisphere=hemisphere)
-                df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network=network, hemisphere=hemisphere)
+                net_mask = compute_network_mask(df_yeo_surf, network, hemisphere)
+                t1_salience_profiles = load_t1_salience_profiles(df_pni["path_t1_profile"].tolist(), net_mask)
+                df_yeo_surf.loc[net_mask, f't1_gradient1_{network}'] = compute_t1_gradient(t1_salience_profiles)
             else:
                 logger.info(f"{grad_col} already exists in df_yeo_surf.")
             df_label[f"t1_gradient1_{network}"] = reduce_by_labels(df_yeo_surf[f"t1_gradient1_{network}"].values, df_yeo_surf["mics"].values, target_labels=df_label["mics"].values, red_op="mean")

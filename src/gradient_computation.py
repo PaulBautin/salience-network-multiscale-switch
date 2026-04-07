@@ -1,7 +1,6 @@
 import logging
 
 import numpy as np
-import pandas as pd
 from brainspace.gradient.gradient import GradientMaps
 from scipy.stats import zscore
 
@@ -42,35 +41,28 @@ def partial_corr_with_covariate(X: np.ndarray, covar: np.ndarray) -> np.ndarray:
 
 
 def compute_t1_gradient(
-    df_yeo_surf: pd.DataFrame,
     t1_salience_profiles: list | np.ndarray,
-    network: str = 'SalVentAttn',
-    hemisphere: str = 'both',
     n_components: int = 10,
     sparsity: float = 0.9,
-) -> pd.DataFrame:
+) -> np.ndarray:
     """
-    Compute T1 gradients from MPC and map them to a surface dataframe.
-    
+    Compute T1 MPC gradients and return the z-scored first component.
+
     Parameters
     ----------
-    df_yeo_surf : pandas.DataFrame
-        DataFrame containing network assignments.
-    t1_salience_profiles : list or np.ndarray, shape (n_subjects, n_features, n_vertices)
-        Subject profile data.
-    network : str, default='SalVentAttn'
-        Target network to map the gradients to.
+    t1_salience_profiles : list or np.ndarray, shape (n_subjects, n_depths, n_vertices)
+        Pre-masked T1 profiles for the network of interest.
     n_components : int, default=10
         Number of gradient components to extract.
     sparsity : float, default=0.9
         Sparsity threshold for GradientMaps.
-        
+
     Returns
     -------
-    df_yeo_surf : pandas.DataFrame
-        The updated DataFrame.
+    np.ndarray, shape (n_vertices,)
+        Z-scored first gradient component.
     """
-    logger.info(f"Computing T1 gradients for {network}...")
+    logger.info("Computing T1 gradients...")
     # Calculate the mean profile for each subject across all vertices (axis=2)
     t1_mean_profiles = np.nanmean(t1_salience_profiles, axis=2)
 
@@ -82,24 +74,17 @@ def compute_t1_gradient(
 
     # Fit GradientMaps
     gm_t1 = GradientMaps(
-        n_components=n_components, 
-        random_state=None, 
-        approach='dm', 
-        kernel='normalized_angle', 
+        n_components=n_components,
+        random_state=None,
+        approach='dm',
+        kernel='normalized_angle',
         alignment='procrustes'
     )
     gm_t1.fit(t1_salience_mpc, sparsity=sparsity)
-    
+
     # Extract and log gradient lambdas
     t1_gradients = np.mean(np.asarray(gm_t1.aligned_), axis=0)
     mean_lambdas = np.mean(np.asarray(gm_t1.lambdas_), axis=0)
     logger.info(f"Gradient lambdas: {mean_lambdas}")
-    
-    # Update the dataframe
-    df_out = df_yeo_surf.copy()
-    mask = df_out['network'].eq(network)
-    if hemisphere in ('LH', 'RH'):
-        mask = mask & df_out['hemisphere'].eq(hemisphere)
-    df_out.loc[mask, f't1_gradient1_{network}'] = zscore(t1_gradients[:, 0], nan_policy='omit')
-    
-    return df_out
+
+    return zscore(t1_gradients[:, 0], nan_policy='omit')

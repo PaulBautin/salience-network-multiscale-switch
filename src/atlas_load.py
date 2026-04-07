@@ -67,20 +67,39 @@ def normalize_to_range(data: np.ndarray | list, target_min: float, target_max: f
     return scaled_data
 
 
-def load_t1_salience_profiles(t1_files: list, df_yeo_surf: pd.DataFrame, network: str = 'SalVentAttn', hemisphere: str = 'both') -> np.ndarray:
+def compute_network_mask(df: pd.DataFrame, network: str, hemisphere: str = 'both') -> np.ndarray:
     """
-    Load T1 intensity profiles for a specific network across all subjects.
+    Compute a boolean vertex mask for a given network and hemisphere.
 
     Parameters
     ----------
-    path_pattern : str
-        Glob pattern for the .gii profile files.
-    df_yeo_surf : pd.DataFrame
-        Surface dataframe containing network labels.
+    df : pd.DataFrame
+        Surface DataFrame with 'network' and 'hemisphere' columns.
     network : str
-        The specific network to extract.
+        Yeo 7-network label (e.g. 'SalVentAttn').
     hemisphere : str
-        Hemisphere selection: 'both', 'LH', or 'RH'.
+        'both', 'LH', or 'RH'.
+
+    Returns
+    -------
+    mask : np.ndarray of bool, shape (n_vertices,)
+    """
+    mask = df['network'].eq(network)
+    if hemisphere in ('LH', 'RH'):
+        mask = mask & df['hemisphere'].eq(hemisphere)
+    return mask.to_numpy()
+
+
+def load_t1_salience_profiles(t1_files: list, mask: np.ndarray) -> np.ndarray:
+    """
+    Load T1 intensity profiles for a pre-masked set of vertices across all subjects.
+
+    Parameters
+    ----------
+    t1_files : list
+        List of paths to .gii profile files, one per subject.
+    mask : np.ndarray of bool, shape (n_vertices,)
+        Boolean vertex mask selecting the vertices to load (e.g. from compute_network_mask).
 
     Returns
     -------
@@ -90,14 +109,10 @@ def load_t1_salience_profiles(t1_files: list, df_yeo_surf: pd.DataFrame, network
     n_files = len(t1_files)
     if n_files == 0:
         raise FileNotFoundError("No files found")
+    if not np.any(mask):
+        raise ValueError("mask is all-False: no vertices selected.")
     logger.info(f"Loading profiles for {n_files} subjects...")
-    network_mask = df_yeo_surf['network'].eq(network).to_numpy()
-    if hemisphere in ('LH', 'RH'):
-        hemi_mask = df_yeo_surf['hemisphere'].eq(hemisphere).to_numpy()
-        network_mask = network_mask & hemi_mask
-    if not np.any(network_mask):
-            raise ValueError(f"Network '{network}' not found in df_yeo_surf.")
-    t1_salience_profiles = np.stack([nib.load(f).darrays[0].data[:, network_mask] for f in t1_files])
+    t1_salience_profiles = np.stack([nib.load(f).darrays[0].data[:, mask] for f in t1_files])
     logger.info(f"Final array shape: {t1_salience_profiles.shape}")
     return t1_salience_profiles
 
@@ -153,7 +168,7 @@ def load_econo_atlas(micapipe: Path, df_yeo_surf: pd.DataFrame) -> pd.DataFrame:
     return df_yeo_surf
 
 
-def load_baillarger_atlas(df_yeo_surf: pd.DataFrame, path_atlas: Path) -> None:
+def load_baillarger_atlas(df_yeo_surf: pd.DataFrame, path_atlas: Path) -> np.ndarray:
     #### Baillarger type
     baillarger_surf_lh = nib.load(path_atlas / 'Baillarger_type_parcellation_from_colin27_to_conte69_32k_lh.label.gii').darrays[0].data
     baillarger_surf_rh = nib.load(path_atlas / 'Baillarger_type_parcellation_from_colin27_to_conte69_32k_rh.label.gii').darrays[0].data
@@ -161,11 +176,10 @@ def load_baillarger_atlas(df_yeo_surf: pd.DataFrame, path_atlas: Path) -> None:
     baillarger_surf[(baillarger_surf == 0) | (baillarger_surf == 1)] = 1
     logger.debug('Baillarger unique values: %s', np.unique(baillarger_surf))
     baillarger_surf = baillarger_surf * df_yeo_surf['salience_border'].values
-    # plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=baillarger_surf, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
-    #         nan_color=(0, 0, 0, 1), cmap='CustomCmap_baillarger', transparent_bg=True)
+    return baillarger_surf
 
 
-def load_intrusion_atlas(df_yeo_surf: pd.DataFrame, path_atlas: Path) -> None:
+def load_intrusion_atlas(df_yeo_surf: pd.DataFrame, path_atlas: Path) -> np.ndarray:
     #### Intrusion type
     intrusion_surf_lh = nib.load(path_atlas / 'Intrusion_type_parcellation_from_colin27_to_conte69_32k_lh.label.gii').darrays[0].data
     intrusion_surf_rh = nib.load(path_atlas / 'Intrusion_type_parcellation_from_colin27_to_conte69_32k_rh.label.gii').darrays[0].data
@@ -173,24 +187,43 @@ def load_intrusion_atlas(df_yeo_surf: pd.DataFrame, path_atlas: Path) -> None:
     intrusion_surf[(intrusion_surf == 0) | (intrusion_surf == 1)] = 1
     logger.debug('Intrusion unique values: %s', np.unique(intrusion_surf))
     intrusion_surf = intrusion_surf * df_yeo_surf['salience_border'].values
-    # plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=intrusion_surf, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
-    #         nan_color=(0, 0, 0, 1), cmap='CustomCmap_intrusion', transparent_bg=True)
+    return intrusion_surf
 
 
-def load_t1map(df_yeo_surf: pd.DataFrame, t1_salience_profiles: np.ndarray, hemisphere: str = 'both') -> pd.DataFrame:
-    mask = df_yeo_surf['network'].eq('SalVentAttn')
-    if hemisphere in ('LH', 'RH'):
-        mask = mask & df_yeo_surf['hemisphere'].eq(hemisphere)
-    df_yeo_surf.loc[mask, 'T1map'] = zscore(np.mean(t1_salience_profiles, axis=(0, 1)), nan_policy='omit')
-    return df_yeo_surf
+def compute_t1map(t1_salience_profiles: np.ndarray) -> np.ndarray:
+    """Return the z-scored mean profile collapsed over subjects and depths.
+
+    Parameters
+    ----------
+    t1_salience_profiles : np.ndarray, shape (n_subjects, n_depths, n_vertices)
+        Pre-masked T1 profiles for the network of interest.
+
+    Returns
+    -------
+    np.ndarray, shape (n_vertices,)
+    """
+    return zscore(np.mean(t1_salience_profiles, axis=(0, 1)), nan_policy='omit')
 
 
-def load_bigbrain(micapipe: Path, df_yeo_surf: pd.DataFrame) -> pd.DataFrame:
-    ### Load the data from BigBrain (Invert values so high values ~ more staining)
+def load_bigbrain(micapipe: Path, mask: np.ndarray) -> np.ndarray:
+    """Load BigBrain intensity profiles and return z-scored mean for masked vertices.
+
+    Inverts values so high values correspond to more staining.
+
+    Parameters
+    ----------
+    micapipe : Path
+        Project root containing data/parcellations/.
+    mask : np.ndarray of bool, shape (n_vertices,)
+        Boolean vertex mask (e.g. from compute_network_mask).
+
+    Returns
+    -------
+    np.ndarray, shape (n_masked_vertices,)
+    """
     data_bigbrain = nib.load(micapipe / 'data/parcellations/sub-BigBrain_surf-fsLR-32k_desc-intensity_profiles.shape.gii').darrays[0].data
-    salience_bigbrain = -data_bigbrain[:, df_yeo_surf['network'].eq('SalVentAttn').to_numpy()]
-    df_yeo_surf.loc[df_yeo_surf['network'].eq('SalVentAttn'), 'BigBrain'] = zscore(np.mean(salience_bigbrain, axis=0), nan_policy='omit')
-    return df_yeo_surf
+    salience_bigbrain = -data_bigbrain[:, mask]
+    return zscore(np.mean(salience_bigbrain, axis=0), nan_policy='omit')
 
 
 def load_bigbrain_gradients() -> np.ndarray:
@@ -202,17 +235,40 @@ def load_bigbrain_gradients() -> np.ndarray:
     return gradient   
 
 
-def load_ahead_biel(micapipe: Path, df_yeo_surf: pd.DataFrame) -> pd.DataFrame:
-    ### Load the data from AHEAD
+def load_ahead_biel(micapipe: Path, mask: np.ndarray) -> np.ndarray:
+    """Load AHEAD Bielschowsky profiles and return z-scored mean for masked vertices.
+
+    Parameters
+    ----------
+    micapipe : Path
+        Project root containing data/parcellations/.
+    mask : np.ndarray of bool, shape (n_vertices,)
+        Boolean vertex mask (e.g. from compute_network_mask).
+
+    Returns
+    -------
+    np.ndarray, shape (n_masked_vertices,)
+    """
     data_biel = nib.load(micapipe / 'data/parcellations/sub-Ahead-Bielschowsky_surf-fsLR-32k_desc-intensity_profiles.shape.gii').darrays[0].data
-    salience_biel = data_biel[:, df_yeo_surf['network'].eq('SalVentAttn').to_numpy()]
-    df_yeo_surf.loc[df_yeo_surf['network'].eq('SalVentAttn'), 'Bielschowsky'] = zscore(np.mean(salience_biel, axis=0), nan_policy='omit')
-    return df_yeo_surf
+    salience_biel = data_biel[:, mask]
+    return zscore(np.mean(salience_biel, axis=0), nan_policy='omit')
 
 
-def load_ahead_parva(micapipe: Path, df_yeo_surf: pd.DataFrame) -> pd.DataFrame:
+def load_ahead_parva(micapipe: Path, mask: np.ndarray) -> np.ndarray:
+    """Load AHEAD Parvalbumin profiles and return z-scored mean for masked vertices.
+
+    Parameters
+    ----------
+    micapipe : Path
+        Project root containing data/parcellations/.
+    mask : np.ndarray of bool, shape (n_vertices,)
+        Boolean vertex mask (e.g. from compute_network_mask).
+
+    Returns
+    -------
+    np.ndarray, shape (n_masked_vertices,)
+    """
     data_parva = nib.load(micapipe / 'data/parcellations/sub-Ahead-Parvalbumin_surf-fsLR-32k_desc-intensity_profiles.shape.gii').darrays[0].data
-    salience_parva = data_parva[:, df_yeo_surf['network'].eq('SalVentAttn').to_numpy()]
-    df_yeo_surf.loc[df_yeo_surf['network'].eq('SalVentAttn'), 'Parvalbumin'] = zscore(np.mean(salience_parva, axis=0), nan_policy='omit')
-    return df_yeo_surf
+    salience_parva = data_parva[:, mask]
+    return zscore(np.mean(salience_parva, axis=0), nan_policy='omit')
 

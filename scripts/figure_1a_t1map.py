@@ -14,7 +14,7 @@
 #   -mics_deriv /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0 \
 #   -hemi LH
 #
-# If working on remote server: xvfb-run -s "-screen 0 1920x1080x24" python ...
+# If working on remote server add before command: xvfb-run -s "-screen 0 1920x1080x24" 
 # ---------------------------------------------------------------------------------------
 # Authors: Paul Bautin
 #
@@ -34,7 +34,7 @@ from brainspace.mesh.mesh_io import read_surface
 from brainspace.datasets import load_conte69
 from brainspace.plotting import plot_hemispheres
 
-from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, load_t1map
+from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, compute_t1map, compute_network_mask
 from src.gradient_computation import compute_t1_gradient
 from src.logging_utils import setup_manuscript_logger
 
@@ -160,7 +160,8 @@ def main():
     if path_df_1a.exists():
         logger.info(f"Found existing dataframe at {path_df_1a}. Loading...")
         df_pni = pd.read_csv(project_root / "data/dataframes/figure_1a_pni_to_mics.csv")
-        t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), df_yeo_surf, network='SalVentAttn', hemisphere=args.hemi)
+        net_mask = compute_network_mask(df_yeo_surf, 'SalVentAttn', args.hemi)
+        t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), net_mask)
         df_yeo_surf = pd.read_csv(path_df_1a)
     else:
         df_pni = pd.read_csv(project_root / 'data/dataframes/MICA_PNI.csv')[['ID_PNI', 'session', 'ID_MICs']].drop_duplicates()
@@ -177,9 +178,10 @@ def main():
         logger.info(f"Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment")
 
         df_pni.to_csv(project_root / "data/dataframes/figure_1a_pni_to_mics.csv", index=False)
-        t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), df_yeo_surf, network='SalVentAttn', hemisphere=args.hemi)
-        df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network='SalVentAttn', hemisphere=args.hemi)
-        df_yeo_surf = load_t1map(df_yeo_surf, t1_salience_profiles, hemisphere=args.hemi)
+        net_mask = compute_network_mask(df_yeo_surf, 'SalVentAttn', args.hemi)
+        t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), net_mask)
+        df_yeo_surf.loc[net_mask, 't1_gradient1_SalVentAttn'] = compute_t1_gradient(t1_salience_profiles)
+        df_yeo_surf.loc[net_mask, 'T1map'] = compute_t1map(t1_salience_profiles)
         df_yeo_surf.to_csv(path_df_1a, index=False)
     
     # plot figures

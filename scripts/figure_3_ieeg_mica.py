@@ -19,6 +19,8 @@
 #   -ieeg_deriv /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA \
 #   -hemi RH
 # Requires df_1a_{hemi}.tsv to exist (run figure_1a_t1map.py with matching -hemi first)
+#
+# If working on remote server add before command: xvfb-run -s "-screen 0 1920x1080x24" 
 # ---------------------------------------------------------------------------------------
 # Authors: Paul Bautin
 #

@@ -12,6 +12,8 @@
 # python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mni.py \
 #   -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0 \
 #   -ieeg_deriv /local_raid/data/pbautin/downloads/MNI_ieeg/MatlabFile.mat
+#
+# If working on remote server add before command: xvfb-run -s "-screen 0 1920x1080x24" 
 # ---------------------------------------------------------------------------------------
 # Authors: Paul Bautin
 #
@@ -48,8 +50,7 @@ from vtkmodules.vtkFiltersSources import vtkSphereSource
 
 import logging
 
-from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, load_bigbrain_gradients, convert_states_str2int
-from src.gradient_computation import compute_t1_gradient
+from src.atlas_load import load_yeo_atlas, load_bigbrain_gradients, convert_states_str2int
 from src.ieeg_processing import preprocess_and_compute_psd_ieeg, extract_band_power, plot_surface_sphere
 from src.plot_colors import yeo7_rgba, yeo7_rgb
 from src.logging_utils import setup_manuscript_logger

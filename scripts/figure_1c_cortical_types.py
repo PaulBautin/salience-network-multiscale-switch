@@ -7,6 +7,8 @@
 # example:
 # python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1c_cortical_types.py \
 #   -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+#
+# If working on remote server add before command: xvfb-run -s "-screen 0 1920x1080x24" 
 # ---------------------------------------------------------------------------------------
 # Authors: Paul Bautin
 #
@@ -31,7 +33,7 @@ from brainspace.null_models import SpinPermutations
 
 import logging
 
-from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, load_econo_atlas, convert_states_str2int
+from src.atlas_load import load_yeo_atlas, load_econo_atlas, convert_states_str2int
 from src.plot_colors import cmap_types, cmap_types_mw
 from src.logging_utils import setup_manuscript_logger
 
