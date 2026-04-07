@@ -1,5 +1,3 @@
-from __future__ import division
-
 # !/usr/bin/env python
 # -*- coding: utf-8
 #########################################################################################
@@ -21,7 +19,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import nibabel as nib
-import glob
 import os
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -38,11 +35,13 @@ from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, load_econo
 from src.plot_colors import cmap_types, cmap_types_mw
 from src.logging_utils import setup_manuscript_logger
 
+logger = logging.getLogger(__name__)
+
 
 plt.rcParams['font.size'] = 12
 plt.rcParams['svg.fonttype'] = 'none'
 
-def get_parser():
+def get_parser() -> argparse.ArgumentParser:
     """parser function"""
     parser = argparse.ArgumentParser(
         description="Process PNI derivatives and surfaces.",
@@ -59,7 +58,7 @@ def get_parser():
     return parser
 
 
-def cortical_type_analysis(df_yeo_surf):
+def cortical_type_analysis(df_yeo_surf: pd.DataFrame, project_root: Path) -> None:
     # Define type labels
     type_labels = ['Kon', 'Eu-III', 'Eu-II', 'Eu-I', 'Dys', 'Ag', 'Other']
     label_map = dict(zip(range(1, 8), type_labels))
@@ -92,7 +91,7 @@ def cortical_type_analysis(df_yeo_surf):
         percentages = (full_counts / len(comp)) * 100
         real_data[net_name] = dict(zip(expected_types, percentages))
         type_summary = ", ".join(f"{label_map[t]}={percentages[t-1]:.1f}%" for t in expected_types)
-        logging.info(f"[Figure 1C] {net_name}: cortical type composition | {type_summary}")
+        logger.info(f"[Figure 1C] {net_name}: cortical type composition | {type_summary}")
 
         # comp = surf_type[mask] * mask[mask]
         # u, c = np.unique(comp, return_counts=True)
@@ -115,7 +114,7 @@ def cortical_type_analysis(df_yeo_surf):
         all_data[net_name] = df
 
     # --- Plotting ---
-    logging.info(f"[Figure 1C] Spin permutations: n_rep={n_rand}, random_state=0")
+    logger.info(f"[Figure 1C] Spin permutations: n_rep={n_rand}, random_state=0")
 
     # Setup: Salience in full column
     n_total = len(all_data)
@@ -137,7 +136,7 @@ def cortical_type_analysis(df_yeo_surf):
     ax_sal.tick_params(axis='x', labelrotation=90)
     ax_sal.set_ylabel("Percentage (%)")
     plt.tight_layout()
-    plt.savefig("/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1c_type_salience.svg")
+    plt.savefig(project_root / "results/figures/figure_1c_type_salience.svg")
 
     fig = plt.figure(figsize=(16, 8))
     gs = fig.add_gridspec(n_rows, n_cols, wspace=0.4, hspace=0.6)
@@ -151,7 +150,7 @@ def cortical_type_analysis(df_yeo_surf):
     for lbl in type_labels:
         obs = rdict.get(lbl, np.nan)
         z = (obs - null_means[lbl]) / (null_stds[lbl] + 1e-12) if null_stds[lbl] > 0 else np.nan
-        logging.info(f"[Figure 1C] SalVentAttn {lbl}: observed={obs:.1f}%, spin null mean={null_means[lbl]:.1f}% ± {null_stds[lbl]:.1f}%, z={z:.2f}")
+        logger.info(f"[Figure 1C] SalVentAttn {lbl}: observed={obs:.1f}%, spin null mean={null_means[lbl]:.1f}% ± {null_stds[lbl]:.1f}%, z={z:.2f}")
     sns.barplot(data=df, ax=ax_sal, color='lightgrey')
     sns.scatterplot(x=list(rdict.keys()), y=list(rdict.values()), color=cmap_types_mw.colors, s=100, ax=ax_sal)
     ax_sal.set_title("SalVentAttn")
@@ -222,8 +221,8 @@ def main():
     logger.info(f"Analysis       : cortical type composition per network vs spin permutation null")
     logger.info(f"Null model     : SpinPermutations (n_rep=100, random_state=0)")
 
-    logging.info(f"Script path: {script_path}")
-    logging.info(f"Project root: {project_root}")
+    logger.info(f"Script path: {script_path}")
+    logger.info(f"Project root: {project_root}")
 
     # load surfaces
     surf32k_lh_infl = read_surface(project_root / 'data/surfaces/fsLR-32k.L.inflated.surf.gii', itype='gii')
@@ -237,18 +236,18 @@ def main():
     path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
     if not path_df_1a.exists():
         raise FileNotFoundError(f"Gradient dataframe not found at {path_df_1a}. Run figure_1a_t1map.py with -hemi {args.hemi} first.")
-    logging.info(f"Loading gradient dataframe from {path_df_1a}")
+    logger.info(f"Loading gradient dataframe from {path_df_1a}")
     df_yeo_surf = pd.read_csv(path_df_1a)
 
 
     ######### Part 3 -- Cortical type comparisons
     df_yeo_surf = load_econo_atlas(project_root, df_yeo_surf)
-    screenshot_path = "/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1c_brain_economo.svg"
+    screenshot_path = project_root / "results/figures/figure_1c_brain_economo.svg"
     plt_values = df_yeo_surf['surf_type'].values * df_yeo_surf['salience_border'].values
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=plt_values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
         nan_color=(0, 0, 0, 1), cmap=cmap_types, transparent_bg=True, screenshot=True, filename=screenshot_path)
-    
-    cortical_type_analysis(df_yeo_surf)
+
+    cortical_type_analysis(df_yeo_surf, project_root)
 
 
 

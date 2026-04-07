@@ -1,5 +1,3 @@
-from __future__ import division
-
 # !/usr/bin/env python
 # -*- coding: utf-8
 #########################################################################################
@@ -38,10 +36,10 @@ from __future__ import division
 import argparse
 import logging
 from pathlib import Path
+
+import nibabel as nib
 import numpy as np
 import pandas as pd
-import nibabel as nib
-import glob
 import seaborn as sns
 
 from brainspace.plotting import plot_surf, plot_hemispheres
@@ -63,8 +61,7 @@ from src.gradient_computation import compute_t1_gradient
 from src.plot_colors import yeo7_rgba, yeo7_rgb
 from src.logging_utils import setup_manuscript_logger
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
 
 # Matplotlib globals
 plt.rcParams["font.size"] = 12
@@ -72,7 +69,7 @@ plt.rcParams["svg.fonttype"] = "none"
 plt.rcParams["text.usetex"] = False
 
 
-def get_parser():
+def get_parser() -> argparse.ArgumentParser:
     """Configure and return the argument parser."""
     parser = argparse.ArgumentParser(
         description="Compute structural connectivity differences between MPC-gradient extremes in the salience network (Fig 2A) and across all Yeo networks (Fig 2B).",
@@ -91,7 +88,7 @@ def get_parser():
     return parser
 
 
-def load_label_atlas(micapipe):
+def load_label_atlas(micapipe: Path) -> pd.DataFrame:
     """
     Load the Schaefer-400 parcellation lookup table and derive per-parcel metadata.
 
@@ -119,7 +116,7 @@ def load_label_atlas(micapipe):
     return df_label
 
 
-def load_connectomes(files, df_label, log_transform=False, split_hemi=True):
+def load_connectomes(files: list, df_label: pd.DataFrame, log_transform: bool = False, split_hemi: bool = True) -> np.ndarray:
     """
     Load and average subject-level structural connectome GIFTI files.
 
@@ -180,7 +177,7 @@ def load_connectomes(files, df_label, log_transform=False, split_hemi=True):
     return A_400
 
 
-def load_connectomes_euclidian(df_label):
+def load_connectomes_euclidian(df_label: pd.DataFrame) -> np.ndarray:
     """
     Compute pairwise Euclidean distances between Schaefer-400 parcel centroids.
 
@@ -207,7 +204,7 @@ def load_connectomes_euclidian(df_label):
     return A_400
 
 
-def split_by_hemisphere(df_label, matrix):
+def split_by_hemisphere(df_label: pd.DataFrame, matrix: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Split a parcellation-level matrix into left- and right-hemisphere submatrices.
 
@@ -238,7 +235,7 @@ def split_by_hemisphere(df_label, matrix):
     return matrix[np.ix_(lh_idx, lh_idx)], matrix[np.ix_(rh_idx, rh_idx)], lh_idx, rh_idx
 
 
-def compute_navigation(df_label, A_400, A_400_euclidean):
+def compute_navigation(df_label: pd.DataFrame, A_400: np.ndarray, A_400_euclidean: np.ndarray) -> np.ndarray:
     """
     Compute greedy navigation separately for LH and RH
     and reassemble into a full matrix.
@@ -263,7 +260,7 @@ def compute_navigation(df_label, A_400, A_400_euclidean):
     return PL
 
 
-def compute_pvals_spin(x, y_surf, df_yeo_surf, df_label, spin_model, n_rand):
+def compute_pvals_spin(x: np.ndarray, y_surf: np.ndarray, df_yeo_surf: pd.DataFrame, df_label: pd.DataFrame, spin_model: SpinPermutations, n_rand: int) -> np.ndarray:
     """
     Compute a spin-permutation null distribution of Spearman correlations.
 
@@ -303,7 +300,7 @@ def compute_pvals_spin(x, y_surf, df_yeo_surf, df_label, spin_model, n_rand):
     return r_spin
 
 
-def compute_top_bottom_diff(conn, top_idx, bottom_idx, other_idx):
+def compute_top_bottom_diff(conn: np.ndarray, top_idx: np.ndarray, bottom_idx: np.ndarray, other_idx: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Compute z-scored top–bottom connectivity difference."""
     conn = conn.copy()
     conn[conn <= 0] = np.nan
@@ -314,7 +311,7 @@ def compute_top_bottom_diff(conn, top_idx, bottom_idx, other_idx):
     return zscore(top - bottom, nan_policy="omit"), top, bottom
 
 
-def compute_quantile_mask(values, mask, q=(0.25, 0.75)):
+def compute_quantile_mask(values: np.ndarray, mask: np.ndarray, q: tuple[float, float] = (0.25, 0.75)) -> np.ndarray:
     """
     Label parcels as high (+1) or low (-1) gradient quantile extremes.
 
@@ -342,7 +339,7 @@ def compute_quantile_mask(values, mask, q=(0.25, 0.75)):
     return out
 
 
-def save_brain_map(surf_lh, surf_rh, values, array_name, filename):
+def save_brain_map(surf_lh, surf_rh, values: np.ndarray, array_name: str, filename: Path) -> None:
     """Append `values` to inflated surfaces and save a brain-map screenshot."""
     surf_lh.append_array(values[:32492], name=array_name)
     surf_rh.append_array(values[32492:], name=array_name)
@@ -355,9 +352,9 @@ def save_brain_map(surf_lh, surf_rh, values, array_name, filename):
     )
 
 
-def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl,
-                                df_pni, project_root, spin_model, network="SalVentAttn",
-                                n_rand=100, hemisphere="both"):
+def struct_conn_metric_analysis(df_label: pd.DataFrame, df_yeo_surf: pd.DataFrame, surf32k_lh_infl, surf32k_rh_infl,
+                                df_pni: pd.DataFrame, project_root: Path, spin_model: SpinPermutations, network: str = "SalVentAttn",
+                                n_rand: int = 100, hemisphere: str = "both") -> None:
     """
     Analysis linking SN qt1-MPC gradients and SC. 
     Computes SN MPC-g1 connectivity fingerprints correlation with FC-g1 across different connectivity measures (SC, Nav, Dist).
@@ -445,7 +442,7 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
         corr, _ = spearmanr(x_norm, y_norm)
         r_spin = compute_pvals_spin(x, df_yeo_surf["fc_g1"].values, df_yeo_surf, df_label, spin_model, n_rand)
         pv_spin = np.mean(np.abs(r_spin) >= np.abs(corr))
-        logging.info(f"[Figure 2A] {name}: SalVentAttn top-bottom diff vs FC-G1 | Spearman r={corr:.3f}, spin-test p={pv_spin:.3e} (n_perm={n_rand})")
+        logger.info(f"[Figure 2A] {name}: SalVentAttn top-bottom diff vs FC-G1 | Spearman r={corr:.3f}, spin-test p={pv_spin:.3e} (n_perm={n_rand})")
 
         # Scatter
         colors = [yeo7_rgb[int(k)] for k in df_label["network_int"].values[mask_label]]
@@ -464,9 +461,9 @@ def struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_
     plt.close(fig)
 
 
-def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl,
-                                 df_pni, project_root, spin_model, networks=["SalVentAttn", "Limbic"],
-                                 n_rand=100, hemisphere="both"):
+def struct_conn_network_analysis(df_label: pd.DataFrame, df_yeo_surf: pd.DataFrame, surf32k_lh_infl, surf32k_rh_infl,
+                                 df_pni: pd.DataFrame, project_root: Path, spin_model: SpinPermutations, networks: list[str] = ["SalVentAttn", "Limbic"],
+                                 n_rand: int = 100, hemisphere: str = "both") -> pd.DataFrame:
     """
     Analysis linking network specific qt1-MPC gradients and SC. Tests SN MPC-g1 connectivity fingerprints correlation with FC-g1 compared to other networks.
 
@@ -491,14 +488,14 @@ def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k
     axes = axes.flatten()
     valid_mask = df_label["hemisphere"].notna().values
     for i, network in enumerate(networks):
-        logging.info(f"Processing network: {network}")
+        logger.info(f"Processing network: {network}")
         grad_col = f"t1_gradient1_{network}"
         if grad_col not in df_label:
             if grad_col not in df_yeo_surf:
                 t1_salience_profiles = load_t1_salience_profiles(df_pni["path_t1_profile"].tolist(), df_yeo_surf, network=network, hemisphere=hemisphere)
                 df_yeo_surf = compute_t1_gradient(df_yeo_surf, t1_salience_profiles, network=network, hemisphere=hemisphere)
             else:
-                logging.info(f"{grad_col} already exists in df_yeo_surf.")
+                logger.info(f"{grad_col} already exists in df_yeo_surf.")
             df_label[f"t1_gradient1_{network}"] = reduce_by_labels(df_yeo_surf[f"t1_gradient1_{network}"].values, df_yeo_surf["mics"].values, target_labels=df_label["mics"].values, red_op="mean")
 
         # Quantiles computed only within the network (and optionally filtered by hemisphere)
@@ -534,7 +531,7 @@ def struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k
         corr, _ = spearmanr(x_norm, y_norm)
         r_spin = compute_pvals_spin(x, df_yeo_surf["fc_g1"].values, df_yeo_surf, df_label, spin_model, n_rand)
         pv_spin = np.mean(np.abs(r_spin) >= np.abs(corr))
-        logging.info(f"[Figure 2B] {network}: SC top-bottom diff vs FC-G1 | Spearman r={corr:.3f}, spin-test p={pv_spin:.3e} (n_perm={n_rand})")
+        logger.info(f"[Figure 2B] {network}: SC top-bottom diff vs FC-G1 | Spearman r={corr:.3f}, spin-test p={pv_spin:.3e} (n_perm={n_rand})")
 
         # Scatter
         colors = [yeo7_rgb[int(k)] for k in df_label["network_int"].values[mask_label]]
@@ -570,8 +567,8 @@ def main():
     logger.info(f"Distance metric: streamline edge lengths (converted to lengths via BCT)")
     logger.info(f"Navigation     : greedy navigation (BCT navigation_wu), computed per hemisphere")
     logger.info(f"Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)")
-    logging.info(f"Script path: {script_path}")
-    logging.info(f"Project root: {project_root}")
+    logger.info(f"Script path: {script_path}")
+    logger.info(f"Project root: {project_root}")
 
     # load surfaces
     surf32k_lh_infl = read_surface(project_root / "data/surfaces/fsLR-32k.L.inflated.surf.gii", itype="gii")
@@ -590,7 +587,7 @@ def main():
     path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
     if not path_df_1a.exists():
         raise FileNotFoundError(f"Gradient dataframe not found at {path_df_1a}. Run figure_1a_t1map.py with -hemi {args.hemi} first.")
-    logging.info(f"Loading gradient dataframe from {path_df_1a}")
+    logger.info(f"Loading gradient dataframe from {path_df_1a}")
     df_yeo_surf = pd.read_csv(path_df_1a)
     df_label = load_label_atlas(micapipe=project_root)
 

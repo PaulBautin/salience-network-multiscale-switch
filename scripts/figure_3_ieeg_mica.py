@@ -1,5 +1,3 @@
-from __future__ import division
-
 # !/usr/bin/env python
 # -*- coding: utf-8
 #########################################################################################
@@ -33,11 +31,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import nibabel as nib
-import glob
 import os
+import pickle
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-import pickle
 
 
 
@@ -60,13 +57,15 @@ from src.atlas_load import load_yeo_atlas
 from src.ieeg_processing import load_sensitivity_info, load_original_data_files, preprocess_and_compute_psd_ieeg, extract_band_power
 from src.logging_utils import setup_manuscript_logger
 
+logger = logging.getLogger(__name__)
+
 
 plt.rcParams['font.size'] = 12
 plt.rcParams['svg.fonttype'] = 'none'
 plt.rcParams['text.usetex'] = False
 
 
-def get_parser():
+def get_parser() -> argparse.ArgumentParser:
     """parser function"""
     parser = argparse.ArgumentParser(
         description="Process ieeg derivatives and surfaces.",
@@ -91,7 +90,7 @@ def get_parser():
     return parser
 
 
-def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf, hemi='RH'):
+def frequency_band_analysis_sensitivity(df_channel: pd.DataFrame, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf: pd.DataFrame, project_root: Path, hemi: str = 'RH') -> None:
     freq_bands = {"delta": (0.5, 4), "theta": (4, 8), "alpha": (8, 13), "beta": (13, 30), "gamma": (30, 80)}
     band_order = ["delta", "theta", "alpha", "beta", "gamma"]
     band_colors = ['#1f77b4', '#9467bd', '#e377c2', '#2ca02c', '#17becf']
@@ -127,8 +126,7 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
     lengths = [len(sig) for sig in df_channel['Data']]
     min_len, max_len = min(lengths), max(lengths)
     if min_len != max_len:
-        print(f"Warning: Variable lengths detected ({min_len} to {max_len} samples).")
-        print(f"Truncating all channels to {min_len} samples for vectorization.")
+        logger.warning(f"Variable lengths detected ({min_len} to {max_len} samples). Truncating all to {min_len}.")
     data_matrix = np.vstack([np.asarray(sig)[:min_len] for sig in df_channel['Data']])
 
     # Compute PSD
@@ -156,7 +154,7 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
     ax.set_xticklabels(xtick_labels)
     for x in xticks:
         ax.axvline(x=x, color="grey", linestyle="--", alpha=0.4)
-    plt.savefig(f"/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_psd_{hemi}.svg")
+    plt.savefig(project_root / f"results/figures/figure_3b_ieeg_mica_psd_{hemi}.svg")
 
     # Process Bands
     fig, axes = plt.subplots(1, len(band_order), figsize=(20, 4.5), sharex=True, sharey=True)
@@ -196,7 +194,7 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
         surfs = {'hemi1': surf_hemi_infl, 'hemi2': surf_hemi_infl}
         layout = [['hemi1', 'hemi2']]
         view = [['lateral', 'medial']]
-        screenshot_path = f"/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_{band}_map_{hemi}.svg"
+        screenshot_path = project_root / f"results/figures/figure_3b_ieeg_mica_{band}_map_{hemi}.svg"
         p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 500), zoom=1.4, color_bar='bottom', share='both',
             nan_color=(0, 0, 0, 1), cmap="coolwarm", color_range='sym', transparent_bg=True, screenshot=True, filename=screenshot_path)
 
@@ -209,7 +207,7 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
 
         r_null = np.asarray(r_null)
         p_perm = np.mean(np.abs(r_null) >= np.abs(r))
-        logging.info(f"[Figure 3B] Band {band}: power vs MPC-gradient | Spearman r={r:.3f}, Moran permutation p={p_perm:.3e} (n_perm=100, n_vertices={valid_data_mask.sum()})")
+        logger.info(f"[Figure 3B] Band {band}: power vs MPC-gradient | Spearman r={r:.3f}, Moran permutation p={p_perm:.3e} (n_perm=100, n_vertices={valid_data_mask.sum()})")
 
         # Plot Scatter
         slope, intercept = np.polyfit(x_stats, y_stats, 1)
@@ -222,7 +220,7 @@ def frequency_band_analysis_sensitivity(df_channel, surf32k_lh_infl, surf32k_rh_
         axes[i].set_aspect("equal")
         axes[0].set_ylabel('MPC gradient', fontsize=16)
     plt.tight_layout()
-    plt.savefig(f"/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_band_power_corr_{hemi}.svg")
+    plt.savefig(project_root / f"results/figures/figure_3b_ieeg_mica_band_power_corr_{hemi}.svg")
     return band_maps
         
 
@@ -243,8 +241,8 @@ def main():
     logger.info(f"Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)")
     logger.info(f"Surface space  : fsLR-32k {args.hemi}, Schaefer-400, Yeo SalVentAttn network")
 
-    logging.info(f"Script path: {script_path}")
-    logging.info(f"Project root: {project_root}")
+    logger.info(f"Script path: {script_path}")
+    logger.info(f"Project root: {project_root}")
 
     # load surfaces
     surf32k_lh_infl = read_surface(project_root / 'data/surfaces/fsLR-32k.L.inflated.surf.gii', itype='gii')
@@ -258,26 +256,26 @@ def main():
     path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
     if not path_df_1a.exists():
         raise FileNotFoundError(f"Gradient dataframe not found at {path_df_1a}. Run figure_1a_t1map.py with -hemi {args.hemi} first.")
-    logging.info(f"Loading gradient dataframe from {path_df_1a}")
+    logger.info(f"Loading gradient dataframe from {path_df_1a}")
     df_yeo_surf = pd.read_csv(path_df_1a)
 
     # Load sensitivity for each contact information.
     df_sensitivity = load_sensitivity_info(root_dir=ieeg_deriv)
-    logging.info(f"Sensitivity maps loaded: {df_sensitivity['Subject'].nunique()} subjects, {len(df_sensitivity)} contacts")
+    logger.info(f"Sensitivity maps loaded: {df_sensitivity['Subject'].nunique()} subjects, {len(df_sensitivity)} contacts")
 
     # Load channel information
-    cache_path = '/local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl'
-    if os.path.exists(cache_path):
-        logging.info(f"Loading cached channel info from {cache_path}...")
+    cache_path = project_root / 'data/dataframes/figure_3_channel_data_df.pkl'
+    if cache_path.exists():
+        logger.info(f"Loading cached channel info from {cache_path}...")
         with open(cache_path, 'rb') as f:
             df_channel_data = pickle.load(f)
     else:
-        logging.info("Cache not found. Loading and processing channel info...")
+        logger.info("Cache not found. Loading and processing channel info...")
         df_channel_data = load_original_data_files()
         with open(cache_path, 'wb') as f:
-                pickle.dump(df_channel_data, f)
-                logging.info(f"Channel info saved to {cache_path}.")
-    logging.info(f"Channel data: {df_channel_data['Subject'].nunique()} subjects, {len(df_channel_data)} bipolar channels")
+            pickle.dump(df_channel_data, f)
+        logger.info(f"Channel info saved to {cache_path}.")
+    logger.info(f"Channel data: {df_channel_data['Subject'].nunique()} subjects, {len(df_channel_data)} bipolar channels")
 
     # Align sensitivity maps by contact name
     df1 = df_channel_data.merge(df_sensitivity, left_on=['Subject', 'Session', 'ContactName1'], right_on=['Subject', 'Session', 'ContactName'], how='left').rename(columns={'ContactSensitivityMap': 'Sens1'})
@@ -286,7 +284,7 @@ def main():
     df2['SensitivityMap_bip'] = df2['SensitivityMap_bip'].map(lambda x: np.abs(x) if isinstance(x, np.ndarray) else np.zeros(32492))
 
     # Perform frequency band analysis and correlate with T1 gradient in the SalVentAttn network
-    frequency_band_analysis_sensitivity(df2, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf, hemi=args.hemi)
+    frequency_band_analysis_sensitivity(df2, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf, project_root, hemi=args.hemi)
 
 
 if __name__ == "__main__":

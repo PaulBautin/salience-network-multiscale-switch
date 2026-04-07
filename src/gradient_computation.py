@@ -1,10 +1,12 @@
 import logging
+
 import numpy as np
+import pandas as pd
 from brainspace.gradient.gradient import GradientMaps
 from scipy.stats import zscore
 
-# Configure basic logging
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
+
 
 def partial_corr_with_covariate(X: np.ndarray, covar: np.ndarray) -> np.ndarray:
     """
@@ -40,13 +42,13 @@ def partial_corr_with_covariate(X: np.ndarray, covar: np.ndarray) -> np.ndarray:
 
 
 def compute_t1_gradient(
-    df_yeo_surf,
+    df_yeo_surf: pd.DataFrame,
     t1_salience_profiles: list | np.ndarray,
     network: str = 'SalVentAttn',
     hemisphere: str = 'both',
     n_components: int = 10,
-    sparsity: float = 0.9
-):
+    sparsity: float = 0.9,
+) -> pd.DataFrame:
     """
     Compute T1 gradients from MPC and map them to a surface dataframe.
     
@@ -68,7 +70,7 @@ def compute_t1_gradient(
     df_yeo_surf : pandas.DataFrame
         The updated DataFrame.
     """
-    logging.info(f"Computing T1 gradients for {network}...")
+    logger.info(f"Computing T1 gradients for {network}...")
     # Calculate the mean profile for each subject across all vertices (axis=2)
     t1_mean_profiles = np.nanmean(t1_salience_profiles, axis=2)
 
@@ -91,7 +93,7 @@ def compute_t1_gradient(
     # Extract and log gradient lambdas
     t1_gradients = np.mean(np.asarray(gm_t1.aligned_), axis=0)
     mean_lambdas = np.mean(np.asarray(gm_t1.lambdas_), axis=0)
-    logging.info(f"Gradient lambdas: {mean_lambdas}")
+    logger.info(f"Gradient lambdas: {mean_lambdas}")
     
     # Update the dataframe
     df_out = df_yeo_surf.copy()

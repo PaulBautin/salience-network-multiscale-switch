@@ -1,5 +1,3 @@
-from __future__ import division
-
 # !/usr/bin/env python
 # -*- coding: utf-8
 #########################################################################################
@@ -44,11 +42,13 @@ import logging
 from src.atlas_load import load_yeo_atlas, load_bigbrain, load_ahead_biel, load_ahead_parva
 from src.logging_utils import setup_manuscript_logger
 
+logger = logging.getLogger(__name__)
+
 
 plt.rcParams['font.size'] = 12
 plt.rcParams['svg.fonttype'] = 'none'
 
-def get_parser():
+def get_parser() -> argparse.ArgumentParser:
     """parser function"""
     parser = argparse.ArgumentParser(
         description="Process PNI derivatives and surfaces.",
@@ -67,7 +67,7 @@ def get_parser():
     return parser
 
 
-def context_analysis(df_yeo_surf, surf_32k, modalities, n_rep=10, hemisphere='both', project_root=None):
+def context_analysis(df_yeo_surf: pd.DataFrame, surf_32k, modalities: list[str], n_rep: int = 10, hemisphere: str = 'both', project_root: Path | None = None) -> None:
     ## Correlation analyses
     net_mask = df_yeo_surf['network'].eq('SalVentAttn')
     if hemisphere in ('LH', 'RH'):
@@ -89,7 +89,7 @@ def context_analysis(df_yeo_surf, surf_32k, modalities, n_rep=10, hemisphere='bo
         r_obs, p = spearmanr(x, y, nan_policy='omit')
         r_rand = np.asarray([spearmanr(x, d, nan_policy='omit')[0] for d in rand])
         pv_rand = np.mean(np.abs(r_rand) >= np.abs(r_obs))
-        logging.info(f"[Figure 1B] {label}: MPC-gradient vs {label} | Spearman r={r_obs:.3f}, Moran permutation p={pv_rand:.3e} (n_perm={n_rep})")
+        logger.info(f"[Figure 1B] {label}: MPC-gradient vs {label} | Spearman r={r_obs:.3f}, Moran permutation p={pv_rand:.3e} (n_perm={n_rep})")
         stats_text = f"$r={r_obs:.2f}$\n$p_{{perm}}={pv_rand:.2e}$"
         ax.text(0.05, 0.95, stats_text, transform=ax.transAxes, 
                      va='top', fontweight='bold')
@@ -149,8 +149,8 @@ def main():
     logger.info(f"Modalities     : T1map (in-vivo MRI), BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)")
     logger.info(f"Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)")
 
-    logging.info(f"Script path: {script_path}")
-    logging.info(f"Project root: {project_root}")
+    logger.info(f"Script path: {script_path}")
+    logger.info(f"Project root: {project_root}")
 
     # load surfaces
     surf32k_lh_infl = read_surface(project_root / 'data/surfaces/fsLR-32k.L.inflated.surf.gii', itype='gii')
@@ -164,7 +164,7 @@ def main():
     path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
     if not path_df_1a.exists():
         raise FileNotFoundError(f"Gradient dataframe not found at {path_df_1a}. Run figure_1a_t1map.py with -hemi {args.hemi} first.")
-    logging.info(f"Loading gradient dataframe from {path_df_1a}")
+    logger.info(f"Loading gradient dataframe from {path_df_1a}")
     df_yeo_surf = pd.read_csv(path_df_1a)
 
     ######### Part 2 -- Contextualisation

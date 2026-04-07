@@ -6,13 +6,14 @@ output (including from imported modules) is captured in logs/<script>.log.
 Each script run appends a new block; the file is never overwritten.
 """
 
+import argparse
 import logging
 import sys
 from datetime import datetime
 from pathlib import Path
 
 
-def setup_manuscript_logger(script_name: str, project_root: Path, args=None) -> logging.Logger:
+def setup_manuscript_logger(script_name: str, project_root: Path, args: argparse.Namespace | None = None) -> logging.Logger:
     """
     Configure logging to write to both console and logs/<script_name>.log.
 

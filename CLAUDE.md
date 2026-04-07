@@ -1,6 +1,13 @@
-# CLAUDE.md
+# CLAUDE.md — AI Assistant Instructions
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Project Overview & Context
+
+What this repo does: See `README.md` for full detail.
+Primary language(s): Python (≥ 3.10).
+Key external tools: micapipe, brainspace.
+Key inputs: micapipe derivatives (MPC profiles, DWI connectomes), iEEG BIDS dataset, BigBrain dataset, AHEAD dataset. 
+Key output: SVG figures + intermediate TSV/CSV dataframes cached in `data/dataframes/`.
+Intended users: Neuroimaging researchers. Repo is public, citable, and must be fully reproducible.
 
 ## Environment Setup
 

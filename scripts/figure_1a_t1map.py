@@ -1,5 +1,3 @@
-from __future__ import division
-
 # !/usr/bin/env python
 # -*- coding: utf-8
 #########################################################################################
@@ -25,8 +23,6 @@ from __future__ import division
 
 import argparse
 import logging
-import os
-import glob
 from pathlib import Path
 
 import numpy as np
@@ -42,8 +38,7 @@ from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, load_t1map
 from src.gradient_computation import compute_t1_gradient
 from src.logging_utils import setup_manuscript_logger
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 
 # Matplotlib globals
 plt.rcParams['font.size'] = 12
@@ -80,7 +75,13 @@ def get_parser():
     return parser
 
 
-def plot_gradient_profiles(df_yeo_surf, t1_salience_profiles, screenshot_path: Path, network: str = 'SalVentAttn', hemisphere: str = 'both'):
+def plot_gradient_profiles(
+    df_yeo_surf: pd.DataFrame,
+    t1_salience_profiles: np.ndarray,
+    screenshot_path: Path,
+    network: str = 'SalVentAttn',
+    hemisphere: str = 'both',
+) -> None:
     net_mask = df_yeo_surf["network"] == network
     if hemisphere in ('LH', 'RH'):
         net_mask = net_mask & (df_yeo_surf["hemisphere"] == hemisphere)
@@ -126,14 +127,6 @@ def plot_gradient_profiles(df_yeo_surf, t1_salience_profiles, screenshot_path: P
     plt.savefig(screenshot_path)
 
 
-def extract_pnc_id(path: Path) -> str:
-    return str(path.parent.parent.parent.parent.name).split("-")[1]
-
-def extract_id_from_path(path: Path) -> str:
-    """Helper function to extract ID from a given path."""
-    return str(path.parent.parent.parent.parent.name).split("-")[1]
-
-
 def main():
     parser = get_parser()
     args = parser.parse_args()
@@ -149,10 +142,10 @@ def main():
     logger.info(f"Parcellation   : Schaefer-400 with Yeo 7-network labels")
     logger.info(f"Network        : SalVentAttn (Salience/Ventral Attention)")
 
-    logging.info(f"Script path: {script_path}")
-    logging.info(f"Project root: {project_root}")
-    logging.info(f"MICA-PNI derivatives: {pni_deriv}")
-    logging.info(f"MICA-MICs derivatives: {mics_deriv}")
+    logger.info(f"Script path: {script_path}")
+    logger.info(f"Project root: {project_root}")
+    logger.info(f"MICA-PNI derivatives: {pni_deriv}")
+    logger.info(f"MICA-MICs derivatives: {mics_deriv}")
 
     # load surfaces
     surf32k_lh_infl = read_surface(project_root / 'data/surfaces/fsLR-32k.L.inflated.surf.gii', itype='gii')
@@ -165,7 +158,7 @@ def main():
     ######### Part 1 -- T1 map
     path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
     if path_df_1a.exists():
-        logging.info(f"Found existing dataframe at {path_df_1a}. Loading...")
+        logger.info(f"Found existing dataframe at {path_df_1a}. Loading...")
         df_pni = pd.read_csv(project_root / "data/dataframes/figure_1a_pni_to_mics.csv")
         t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), df_yeo_surf, network='SalVentAttn', hemisphere=args.hemi)
         df_yeo_surf = pd.read_csv(path_df_1a)
@@ -191,11 +184,11 @@ def main():
     
     # plot figures
     screenshot_path = project_root / "results/figures/figure_1a_profiles.svg"
-    logging.info(f"Generating brain qt1 profiles figure at {screenshot_path}")
+    logger.info(f"Generating brain qt1 profiles figure at {screenshot_path}")
     plot_gradient_profiles(df_yeo_surf, t1_salience_profiles, screenshot_path, network='SalVentAttn', hemisphere=args.hemi)
 
     screenshot_path = project_root / "results/figures/figure_1a_brain.svg"
-    logging.info(f"Generating brain hemispheres screenshot at {screenshot_path}")
+    logger.info(f"Generating brain hemispheres screenshot at {screenshot_path}")
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['t1_gradient1_SalVentAttn'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
         nan_color=(220, 220, 220, 1), cmap='coolwarm', color_range=(-3,3), transparent_bg=True, screenshot=True, filename=screenshot_path)
 

@@ -1,7 +1,5 @@
-from pathlib import Path
-from typing import Tuple
-import glob
 import logging
+from pathlib import Path
 
 import nibabel as nib
 import numpy as np
@@ -10,13 +8,11 @@ from scipy.stats import zscore
 
 from brainspace.mesh.array_operations import get_labeling_border
 from brainspace.utils.parcellation import relabel
-from brainspace.plotting import plot_hemispheres
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 
 
-def convert_states_str2int(states_str):
+def convert_states_str2int(states_str: list | np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """This function takes a list of strings that designate a distinct set of binary brain states and returns
     a numpy array of integers encoding those states alongside a list of keys for those integers.
 
@@ -43,7 +39,7 @@ def convert_states_str2int(states_str):
     return states.astype(float), state_labels
 
 
-def normalize_to_range(data, target_min, target_max):
+def normalize_to_range(data: np.ndarray | list, target_min: float, target_max: float) -> np.ndarray:
     """
     Normalizes a NumPy array or list of numerical data to a specified target range.
 
@@ -71,7 +67,7 @@ def normalize_to_range(data, target_min, target_max):
     return scaled_data
 
 
-def load_t1_salience_profiles(t1_files, df_yeo_surf, network='SalVentAttn', hemisphere='both'):
+def load_t1_salience_profiles(t1_files: list, df_yeo_surf: pd.DataFrame, network: str = 'SalVentAttn', hemisphere: str = 'both') -> np.ndarray:
     """
     Load T1 intensity profiles for a specific network across all subjects.
 
@@ -94,7 +90,7 @@ def load_t1_salience_profiles(t1_files, df_yeo_surf, network='SalVentAttn', hemi
     n_files = len(t1_files)
     if n_files == 0:
         raise FileNotFoundError("No files found")
-    logging.info(f"Loading profiles for {n_files} subjects...")
+    logger.info(f"Loading profiles for {n_files} subjects...")
     network_mask = df_yeo_surf['network'].eq(network).to_numpy()
     if hemisphere in ('LH', 'RH'):
         hemi_mask = df_yeo_surf['hemisphere'].eq(hemisphere).to_numpy()
@@ -102,11 +98,11 @@ def load_t1_salience_profiles(t1_files, df_yeo_surf, network='SalVentAttn', hemi
     if not np.any(network_mask):
             raise ValueError(f"Network '{network}' not found in df_yeo_surf.")
     t1_salience_profiles = np.stack([nib.load(f).darrays[0].data[:, network_mask] for f in t1_files])
-    logging.info(f"Final array shape: {t1_salience_profiles.shape}")
+    logger.info(f"Final array shape: {t1_salience_profiles.shape}")
     return t1_salience_profiles
 
 
-def load_yeo_atlas(micapipe, surf_32k):
+def load_yeo_atlas(micapipe: Path, surf_32k) -> pd.DataFrame:
     # Yeo 7-network atlas (Schaefer-400)
     atlas_yeo_lh = nib.load(micapipe / 'data/parcellations/schaefer-400_conte69_lh.label.gii').darrays[0].data + 1000
     atlas_yeo_rh = nib.load(micapipe / 'data/parcellations/schaefer-400_conte69_rh.label.gii').darrays[0].data + 1800
@@ -127,7 +123,7 @@ def load_yeo_atlas(micapipe, surf_32k):
     return df_yeo_surf
 
 
-def load_yeo_surf_5k(micapipe):
+def load_yeo_surf_5k(micapipe: str) -> pd.DataFrame:
     #### load yeo atlas 7 network fslr5k
     atlas_yeo_lh_5k = nib.load(micapipe + '/parcellations/schaefer-400_fslr-5k_lh.label.gii').darrays[0].data + 1000
     atlas_yeo_rh_5k = nib.load(micapipe + '/parcellations/schaefer-400_fslr-5k_rh.label.gii').darrays[0].data + 1800
@@ -144,7 +140,7 @@ def load_yeo_surf_5k(micapipe):
     return df_yeo_surf_5k
 
 
-def load_econo_atlas(micapipe, df_yeo_surf):
+def load_econo_atlas(micapipe: Path, df_yeo_surf: pd.DataFrame) -> pd.DataFrame:
     #### load econo atlas Hardcoded based on table data in Garcia-Cabezas (2021)
     econo_surf_lh = nib.load(micapipe / 'data/parcellations/economo_conte69_lh.label.gii').darrays[0].data
     econo_surf_rh = nib.load(micapipe / 'data/parcellations/economo_conte69_rh.label.gii').darrays[0].data
@@ -157,33 +153,31 @@ def load_econo_atlas(micapipe, df_yeo_surf):
     return df_yeo_surf
 
 
-def load_baillarger_atlas(df_yeo_surf):
-        #### Baillarger type
-    baillarger_surf_lh = nib.load('/local_raid/data/pbautin/downloads/MYATLAS_package/MYATLAS_package_new/maps/Surface/HCP_conte69/conte69_32k/gii/parcellation/Baillarger_type_parcellation_from_colin27_to_conte69_32k_lh.label.gii').darrays[0].data
-    baillarger_surf_rh = nib.load('/local_raid/data/pbautin/downloads/MYATLAS_package/MYATLAS_package_new/maps/Surface/HCP_conte69/conte69_32k/gii/parcellation/Baillarger_type_parcellation_from_colin27_to_conte69_32k_rh.label.gii').darrays[0].data
+def load_baillarger_atlas(df_yeo_surf: pd.DataFrame, path_atlas: Path) -> None:
+    #### Baillarger type
+    baillarger_surf_lh = nib.load(path_atlas / 'Baillarger_type_parcellation_from_colin27_to_conte69_32k_lh.label.gii').darrays[0].data
+    baillarger_surf_rh = nib.load(path_atlas / 'Baillarger_type_parcellation_from_colin27_to_conte69_32k_rh.label.gii').darrays[0].data
     baillarger_surf = np.concatenate((baillarger_surf_lh, baillarger_surf_rh), axis=0).astype(float)
     baillarger_surf[(baillarger_surf == 0) | (baillarger_surf == 1)] = 1
-    print(np.unique(baillarger_surf))
-    print(np.array(sns.color_palette('Set2', 5)) * 255)
+    logger.debug('Baillarger unique values: %s', np.unique(baillarger_surf))
     baillarger_surf = baillarger_surf * df_yeo_surf['salience_border'].values
     # plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=baillarger_surf, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
     #         nan_color=(0, 0, 0, 1), cmap='CustomCmap_baillarger', transparent_bg=True)
 
 
-def load_intrusion_atlas(df_yeo_surf):
+def load_intrusion_atlas(df_yeo_surf: pd.DataFrame, path_atlas: Path) -> None:
     #### Intrusion type
-    intrusion_surf_lh = nib.load('/local_raid/data/pbautin/downloads/MYATLAS_package/MYATLAS_package_new/maps/Surface/HCP_conte69/conte69_32k/gii/parcellation/Intrusion_type_parcellation_from_colin27_to_conte69_32k_lh.label.gii').darrays[0].data
-    intrusion_surf_rh = nib.load('/local_raid/data/pbautin/downloads/MYATLAS_package/MYATLAS_package_new/maps/Surface/HCP_conte69/conte69_32k/gii/parcellation/Intrusion_type_parcellation_from_colin27_to_conte69_32k_rh.label.gii').darrays[0].data
+    intrusion_surf_lh = nib.load(path_atlas / 'Intrusion_type_parcellation_from_colin27_to_conte69_32k_lh.label.gii').darrays[0].data
+    intrusion_surf_rh = nib.load(path_atlas / 'Intrusion_type_parcellation_from_colin27_to_conte69_32k_rh.label.gii').darrays[0].data
     intrusion_surf = np.concatenate((intrusion_surf_lh, intrusion_surf_rh), axis=0).astype(float)
     intrusion_surf[(intrusion_surf == 0) | (intrusion_surf == 1)] = 1
-    print(np.unique(intrusion_surf))
-    print(np.array(sns.color_palette('Set2', 5)) * 255)
+    logger.debug('Intrusion unique values: %s', np.unique(intrusion_surf))
     intrusion_surf = intrusion_surf * df_yeo_surf['salience_border'].values
     # plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=intrusion_surf, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
     #         nan_color=(0, 0, 0, 1), cmap='CustomCmap_intrusion', transparent_bg=True)
 
 
-def load_t1map(df_yeo_surf, t1_salience_profiles, hemisphere='both'):
+def load_t1map(df_yeo_surf: pd.DataFrame, t1_salience_profiles: np.ndarray, hemisphere: str = 'both') -> pd.DataFrame:
     mask = df_yeo_surf['network'].eq('SalVentAttn')
     if hemisphere in ('LH', 'RH'):
         mask = mask & df_yeo_surf['hemisphere'].eq(hemisphere)
@@ -191,7 +185,7 @@ def load_t1map(df_yeo_surf, t1_salience_profiles, hemisphere='both'):
     return df_yeo_surf
 
 
-def load_bigbrain(micapipe, df_yeo_surf):
+def load_bigbrain(micapipe: Path, df_yeo_surf: pd.DataFrame) -> pd.DataFrame:
     ### Load the data from BigBrain (Invert values so high values ~ more staining)
     data_bigbrain = nib.load(micapipe / 'data/parcellations/sub-BigBrain_surf-fsLR-32k_desc-intensity_profiles.shape.gii').darrays[0].data
     salience_bigbrain = -data_bigbrain[:, df_yeo_surf['network'].eq('SalVentAttn').to_numpy()]
@@ -199,7 +193,7 @@ def load_bigbrain(micapipe, df_yeo_surf):
     return df_yeo_surf
 
 
-def load_bigbrain_gradients():
+def load_bigbrain_gradients() -> np.ndarray:
     script_path = Path(__file__).resolve()
     project_root = script_path.parent.parent
     gradient_lh = nib.load(project_root / 'data/parcellations/tpl-fs_LR_hemi-L_den-32k_desc-Hist_G2.shape.gii').darrays[0].data
@@ -208,7 +202,7 @@ def load_bigbrain_gradients():
     return gradient   
 
 
-def load_ahead_biel(micapipe, df_yeo_surf):
+def load_ahead_biel(micapipe: Path, df_yeo_surf: pd.DataFrame) -> pd.DataFrame:
     ### Load the data from AHEAD
     data_biel = nib.load(micapipe / 'data/parcellations/sub-Ahead-Bielschowsky_surf-fsLR-32k_desc-intensity_profiles.shape.gii').darrays[0].data
     salience_biel = data_biel[:, df_yeo_surf['network'].eq('SalVentAttn').to_numpy()]
@@ -216,7 +210,7 @@ def load_ahead_biel(micapipe, df_yeo_surf):
     return df_yeo_surf
 
 
-def load_ahead_parva(micapipe, df_yeo_surf):
+def load_ahead_parva(micapipe: Path, df_yeo_surf: pd.DataFrame) -> pd.DataFrame:
     data_parva = nib.load(micapipe / 'data/parcellations/sub-Ahead-Parvalbumin_surf-fsLR-32k_desc-intensity_profiles.shape.gii').darrays[0].data
     salience_parva = data_parva[:, df_yeo_surf['network'].eq('SalVentAttn').to_numpy()]
     df_yeo_surf.loc[df_yeo_surf['network'].eq('SalVentAttn'), 'Parvalbumin'] = zscore(np.mean(salience_parva, axis=0), nan_policy='omit')

@@ -1,21 +1,24 @@
+import glob
+import logging
+import os
+import re
+
+import nibabel as nib
 import numpy as np
 import pandas as pd
 import scipy.io as sio
-import glob
-import re
-import os
-from scipy.signal import butter, filtfilt, resample_poly, welch
 from scipy.integrate import simpson
-import nibabel as nib
-import matplotlib.pyplot as plt
+from scipy.signal import butter, filtfilt, resample_poly, welch
 
 from brainspace.plotting import plot_surf
 from vtkmodules.vtkFiltersSources import vtkSphereSource
 
+logger = logging.getLogger(__name__)
+
 
 def load_original_data_files(
-    root: str = "/host/verges/tank/data/BIDS_iEEG/original",
-):
+    root: str = '/host/verges/tank/data/BIDS_iEEG/original',
+) -> pd.DataFrame:
     """
     Load original iEEG MATLAB files and return channel-level data.
 
@@ -83,7 +86,7 @@ def load_original_data_files(
     return df
 
 
-def load_channel_info(root_dir="/host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA"):
+def load_channel_info(root_dir: str = '/host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA') -> pd.DataFrame:
     """
     Load channel information from BIDS-iEEG channel TSV files and
     surface-based channel maps.
@@ -101,7 +104,7 @@ def load_channel_info(root_dir="/host/verges/tank/data/BIDS_iEEG/derivatives/ele
     tsv_files = glob.glob(tsv_pattern)
 
     if not tsv_files:
-        print("No ChannelMap TSV files found.")
+        logger.warning('No ChannelMap TSV files found.')
         return pd.DataFrame(columns=["Subject", "Session", "ChannelName", "ChannelNumber",
                                      "ChannelIndices_lh", "ChannelIndices_rh"])
 
@@ -124,7 +127,7 @@ def load_channel_info(root_dir="/host/verges/tank/data/BIDS_iEEG/derivatives/ele
             img = nib.load(gii_files[0])
             data = img.darrays[0].data
         except Exception as e:
-            print(f"Error loading {gii_files[0]}: {e}")
+            logger.debug('Error loading %s: %s', gii_files[0], e)
             return [[] for _ in channel_numbers]
 
         # Case A: 1D ROI Map (Value at vertex = Channel Number)
@@ -172,7 +175,7 @@ def load_channel_info(root_dir="/host/verges/tank/data/BIDS_iEEG/derivatives/ele
         # Basic Cleanup
         df_meta["ChannelName"] = df_meta["ChannelName"].astype(str).str.upper()
         if "ChannelNumber" not in df_meta.columns:
-            print(f"Skipping {tsv_file}: Missing 'ChannelNumber'")
+            logger.warning('Skipping %s: Missing ChannelNumber', tsv_file)
             continue
 
         # Extract Subject/Session info
@@ -213,10 +216,10 @@ def load_channel_info(root_dir="/host/verges/tank/data/BIDS_iEEG/derivatives/ele
 
 
 def load_sensitivity_info(
-    root_dir: str = "/host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA",
+    root_dir: str = '/host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA',
     *,
     threshold: float = 0.001,
-):
+) -> pd.DataFrame:
     """
     Load and aggregate surface-based contact sensitivity maps.
 
@@ -320,7 +323,7 @@ def preprocess_and_compute_psd_ieeg(
     filter_order: int = 4,
     window_sec: float = 2.0,
     overlap_sec: float = 1.0,
-):
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Full iEEG preprocessing and PSD computation .
 
@@ -375,10 +378,10 @@ def preprocess_and_compute_psd_ieeg(
     # Normalize power
     pxx /= np.sum(pxx, axis=-1, keepdims=True) + 1e-12
 
-    return freq[mask], pxx
+    return freq[mask], pxx  # type: ignore[return-value]
 
 
-def extract_band_power(pxx_raw, freq, band, relative=True):
+def extract_band_power(pxx_raw: np.ndarray, freq: np.ndarray, band: tuple[float, float], relative: bool = True) -> np.ndarray:
     """
     Integrates power in a specific band. Returns Log-Power.
     """
@@ -397,7 +400,7 @@ def extract_band_power(pxx_raw, freq, band, relative=True):
     return np.log10(bp + 1e-12)
 
 
-def compute_psd_vectorized(data, fs, fmin=0.5, fmax=80.0):
+def compute_psd_vectorized(data: np.ndarray, fs: float, fmin: float = 0.5, fmax: float = 80.0) -> tuple[np.ndarray, np.ndarray]:
     """
     Vectorized PSD calculation for iEEG.
     data: (n_channels, n_times) array
@@ -417,7 +420,7 @@ def compute_psd_vectorized(data, fs, fmin=0.5, fmax=80.0):
     return f_band, pxx_rel
 
 
-def plot_surface_sphere(p, channel_position, channel_color, screenshot_path):
+def plot_surface_sphere(p, channel_position: list | np.ndarray, channel_color: np.ndarray, screenshot_path) -> None:
     for i, pos in enumerate(channel_position):
         val = channel_color[i]
         rgba = val

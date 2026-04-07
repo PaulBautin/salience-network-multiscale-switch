@@ -1,5 +1,3 @@
-from __future__ import division
-
 # !/usr/bin/env python
 # -*- coding: utf-8
 #########################################################################################
@@ -55,6 +53,8 @@ from src.gradient_computation import compute_t1_gradient
 from src.ieeg_processing import preprocess_and_compute_psd_ieeg, extract_band_power, plot_surface_sphere
 from src.plot_colors import yeo7_rgba, yeo7_rgb
 from src.logging_utils import setup_manuscript_logger
+
+logger = logging.getLogger(__name__)
 
 plt.rcParams['font.size'] = 12
 plt.rcParams['svg.fonttype'] = 'none'
@@ -192,7 +192,7 @@ def load_mni_ieeg_data(ieeg_deriv, project_root, df_yeo_surf, surf32k_lh_infl, s
     df_data['ChannelPosition_surf_atlas'] = vertices[indices_surf].tolist()
 
     # electrode projection on registered (to template) cortical surface
-    print(project_root)
+    logger.debug(f"Project root: {project_root}")
     surf_reg_lh = read_surface(project_root / 'data/surfaces/ieeg_surfaces/L.anat.reg.surf.gii', itype='gii')
     surf_reg_rh = read_surface(project_root / 'data/surfaces/ieeg_surfaces/R.anat.reg.surf.gii', itype='gii')
     vertices_surf_reg = np.vstack((surf_reg_lh.GetPoints(), surf_reg_rh.GetPoints()))
@@ -333,7 +333,7 @@ def frequency_band_analysis(df_data, surf32k_rh_infl, df_yeo_surf, sampling_freq
             r_null.append(spearmanr(x_stats, y_surr_full[valid_data_mask])[0])
         r_null = np.asarray(r_null)
         p_perm = np.mean(np.abs(r_null) >= np.abs(r))
-        logging.info(f"[Figure 3A] Band {band}: power vs MPC-gradient | Spearman r={r:.3f}, Moran permutation p={p_perm:.3e} (n_perm=100, n_electrodes={valid_data_mask.sum()})")
+        logger.info(f"[Figure 3A] Band {band}: power vs MPC-gradient | Spearman r={r:.3f}, Moran permutation p={p_perm:.3e} (n_perm=100, n_electrodes={valid_data_mask.sum()})")
 
         # Plot Scatter
         slope, intercept = np.polyfit(x_stats, y_stats, 1)
@@ -507,8 +507,8 @@ def main():
     logger.info(f"Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)")
     logger.info(f"Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels")
 
-    logging.info(f"Script path: {script_path}")
-    logging.info(f"Project root: {project_root}")
+    logger.info(f"Script path: {script_path}")
+    logger.info(f"Project root: {project_root}")
 
     # load surfaces
     surf32k_lh_infl = read_surface(project_root / 'data/surfaces/fsLR-32k.L.inflated.surf.gii', itype='gii')
@@ -522,12 +522,12 @@ def main():
     path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
     if not path_df_1a.exists():
         raise FileNotFoundError(f"Gradient dataframe not found at {path_df_1a}. Run figure_1a_t1map.py with -hemi {args.hemi} first.")
-    logging.info(f"Loading gradient dataframe from {path_df_1a}")
+    logger.info(f"Loading gradient dataframe from {path_df_1a}")
     df_yeo_surf = pd.read_csv(path_df_1a)
 
     ######### Part 2 -- Extract iEEG data
     df_data, sampling_frequency = load_mni_ieeg_data(ieeg_deriv, project_root, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl)
-    logging.info(f"MNI iEEG loaded: {len(df_data)} channels, sampling frequency={sampling_frequency} Hz")
+    logger.info(f"MNI iEEG loaded: {len(df_data)} channels, sampling frequency={sampling_frequency} Hz")
 
     # plot_surface_nodes(surf32k_rh_infl, df_data, df_yeo_surf, project_root)
     # plot_surface_nodes_gradients(surf32k_rh_infl, df_data, df_yeo_surf, project_root)
