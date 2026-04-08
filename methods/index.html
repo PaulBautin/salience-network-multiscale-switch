@@ -1,0 +1,858 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Code and data to reproduce analyses from "The multiscale architecture of the salience network supports a brain-wide switch function"">
+      
+      
+        <meta name="author" content="Paul Bautin">
+      
+      
+        <link rel="canonical" href="https://paulbautin.github.io/salience-network-multiscale-switch/methods/">
+      
+      
+        <link rel="prev" href="../api/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Methods - Salience Network Multiscale Switch</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Avenir+Next:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Avenir Next";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#methods" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Salience Network Multiscale Switch" class="md-header__button md-logo" aria-label="Salience Network Multiscale Switch" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.5 9V1.5h-3V9h-3V1.5h-3V9h-3V1.5H4.65V9H3v1.5h18V9zm0 4.5h-3V21h-3v-7.5h-3V21h-3v-7.5H4.65V21H3v1.5h18V21h-1.5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Salience Network Multiscale Switch
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Methods
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/PaulBautin/salience-network-multiscale-switch" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    PaulBautin/salience-network-multiscale-switch
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../usage/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Usage
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../api/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Methods
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Salience Network Multiscale Switch" class="md-nav__button md-logo" aria-label="Salience Network Multiscale Switch" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.5 9V1.5h-3V9h-3V1.5h-3V9h-3V1.5H4.65V9H3v1.5h18V9zm0 4.5h-3V21h-3v-7.5h-3V21h-3v-7.5H4.65V21H3v1.5h18V21h-1.5z"/></svg>
+
+    </a>
+    Salience Network Multiscale Switch
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/PaulBautin/salience-network-multiscale-switch" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    PaulBautin/salience-network-multiscale-switch
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Methods
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mica-pni-dataset-acquisition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MICA-PNI dataset acquisition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bigbrain-dataset-acquisition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BigBrain dataset acquisition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ahead-dataset-acquisition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AHEAD dataset acquisition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mni-open-ieeg-atlas-acquisition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MNI open iEEG atlas acquisition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#microstructure-profile-covariance-gradients-reconstruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Microstructure profile covariance gradients reconstruction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cortical-type-reconstruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cortical type reconstruction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#structural-network-reconstruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structural network reconstruction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mica-ieeg-dataset-acquisition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MICA iEEG dataset acquisition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ieeg-signal-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iEEG signal processing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#brain-surface-feature-comparisons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Brain surface feature comparisons
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mica-pni-dataset-acquisition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MICA-PNI dataset acquisition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bigbrain-dataset-acquisition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BigBrain dataset acquisition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ahead-dataset-acquisition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AHEAD dataset acquisition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mni-open-ieeg-atlas-acquisition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MNI open iEEG atlas acquisition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#microstructure-profile-covariance-gradients-reconstruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Microstructure profile covariance gradients reconstruction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cortical-type-reconstruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cortical type reconstruction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#structural-network-reconstruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structural network reconstruction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mica-ieeg-dataset-acquisition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MICA iEEG dataset acquisition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ieeg-signal-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iEEG signal processing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#brain-surface-feature-comparisons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Brain surface feature comparisons
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/PaulBautin/salience-network-multiscale-switch/edit/main/docs/methods.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="methods">METHODS<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h1>
+<h2 id="mica-pni-dataset-acquisition">MICA-PNI dataset acquisition<a class="headerlink" href="#mica-pni-dataset-acquisition" title="Permanent link">&para;</a></h2>
+<p>MICA-PNI dataset images were all acquired at the McConnell Brain Imaging Centre of the Montreal Neurological Institute on a 7 T Terra Siemens with a 32-receive and 8-transmit channel head coil in parallel transmission (pTX) mode. <strong>Quantitative T1</strong> images were acquired using a three-dimensional magnetization-prepared two rapid gradient echo (MP2RAGE) sequence with universal pulses (UPs) to improve B1+ homogeneity. Imaging parameters were: 0.5 mm isotropic resolution; matrix size, 320 × 512 × 520; repetition time (TR), 5170 ms; echo time (TE), 2.81 ms; inversion times (T1​/T2​), 1000/3200 ms; flip angles, 4°; in-plane GRAPPA acceleration factor, 3; partial Fourier factor, 0.75; field of view (FOV), 160 × 256 × 260 mm3. These data were used for cortical surface reconstruction and intracortical microstructural profiling. <strong>Diffusion-weighted images</strong> were acquired using a pulsed gradient spin-echo (PGSE) echo-planar imaging (SE-EPI) multi-shell protocol comprising 110 volumes across four diffusion weightings. These included b = 0 s/mm² (n = 10), b = 300 s/mm² (n = 7), b = 1000 s/mm² (n = 28), and b = 2000 s/mm² (n = 64), and a b = 0 image acquired with reversed phase-encoding to enable correction of susceptibility-induced distortions. Imaging parameters were: 1.1-mm isotropic resolution; matrix size, 192 × 192; repetition time (TR), 4840 ms; echo time (TE), 79.4 ms; flip angle, 90°; refocusing flip angle, 180°; field of view (FOV); 211 × 211 mm²; partial Fourier factor, 0.75; multiband acceleration factor, 3; GRAPPA acceleration factor, 3. These data were used to estimate whole-brain structural connectivity. <strong>Resting-state functional MRI</strong> data were acquired using a multiecho T2*-weighted gradient-recalled echo-planar imaging (GRE-EPI) sequence (Center for Magnetic Resonance Research, University of Minnesota). Imaging parameters were: 1.9 mm isotropic resolution; matrix size, 118 × 118; 75 slices oriented 39° relative to the AC–PC line;  repetition time (TR), 1690 ms; echo time (TE1/TE2/TE3), 10.8/27.3/43.8 ms; flip angle, 67°; FOV, 224 × 224 mm2; partial Fourier factor, 0.75; multiband acceleration factor, 3; GRAPPA acceleration factor, 3. During the resting-state acquisition, participants were instructed to fixate on a gray cross and remain at rest for 7 min 46 s, yielding 275 volumes.</p>
+<h2 id="bigbrain-dataset-acquisition">BigBrain dataset acquisition<a class="headerlink" href="#bigbrain-dataset-acquisition" title="Permanent link">&para;</a></h2>
+<p>An ultrahigh-resolution 3D reconstruction of a sliced and cell-body-stained postmortem human brain from a 65-year-old woman was obtained from the open-access BigBrain repository (https://bigbrain.loris.ca/main.php). The postmortem brain was paraffin-embedded, coronally sliced into 7,400 20-μm sections, stained using the Merker method for cell bodies and digitized. Manual inspection for artefacts (such as rips, tears, shears and stain crystallization) was followed by automatic repair procedures, involving nonlinear alignment to a postmortem MRI of the same individual acquired before sectioning, together with intensity normalization and block averaging. The 3D reconstruction was implemented with a successive coarse-to-fine hierarchical procedure. We downloaded the 3D volume at 100-μm resolution, which was the highest resolution available for the whole brain. Computations were performed on inverted images, where intensity reflects greater cellular density and soma size.</p>
+<h2 id="ahead-dataset-acquisition">AHEAD dataset acquisition<a class="headerlink" href="#ahead-dataset-acquisition" title="Permanent link">&para;</a></h2>
+<p>The Ahead brain open-access dataset is a multimodal 3D reconstruction of the whole human brain at 200 μm resolution, created by integrating ultra-high-field MRI and light microscopy from two post-mortem human brains Microscopic images were obtained coronally by sectioning the brain at 200 μm intervals and applying six different staining techniques. The ANTs SyN algorithm was used to re-register blockface and microscopic images, minimizing nonlinear distortions and ensuring accurate alignment of brain boundaries and vascular maps. Although small intensity variations were present in the 3D reconstruction, these were linearly adjusted to preserve the original dynamic range of each stain. In our study, we utilized a single subject from the dataset, a 59-year-old female (https://doi.org/10.21942/uva.16844500.v1), and selected only Bielschowsky and Parvalbumin stainings, which target nerve fibers and interneurons, respectively.</p>
+<h2 id="mni-open-ieeg-atlas-acquisition">MNI open iEEG atlas acquisition<a class="headerlink" href="#mni-open-ieeg-atlas-acquisition" title="Permanent link">&para;</a></h2>
+<p>Atlas of the human intracranial electroencephalogram (Discovery cohort). The MNI open iEEG atlas is a multicentre initiative providing openly available human intracranial recordings acquired during different states of vigilance. This dataset includes iEEG recordings from a sample of 106 patients (52 women; mean  standard deviation (SD) age = 33.1 ± 10.8 years) with intractable epilepsy, totalling 1772 data points taken from non-epileptic channels mapped to a common stereotactic space. The present study focused on segments recorded during resting wakefulness with eyes closed. All data was collected during a standard clinical protocol implemented in all participating sites.</p>
+<h2 id="microstructure-profile-covariance-gradients-reconstruction">Microstructure profile covariance gradients reconstruction<a class="headerlink" href="#microstructure-profile-covariance-gradients-reconstruction" title="Permanent link">&para;</a></h2>
+<p>Microstructural profile covariance (MPC) was estimated by sampling intracortical signal intensities from a microstructure-sensitive quantitative T1 (qT1) contrast. Fourteen equivolumetric cortical surfaces were generated between the pial and white matter boundaries, enabling the extraction of vertex-wise intracortical intensity profiles along the cortical ribbon. The Salience Network (SN) was defined according to the Yeo seven-network parcellation (Schaefer-400), corresponding to the ventral attention network (VAN).​ For each subject, MPC matrices were constructed by computing partial correlations between vertex-wise profiles while controlling for the mean cortical profile as a covariate, thereby capturing the similarity of intracortical microstructural organization across vertices within the salience network. Low-dimensional representations (gradients) of salience network MPC were derived using the BrainSpace toolbox. Ten gradient components were extracted using diffusion map embedding, a nonlinear manifold learning approach based on the graph Laplacian. Affinity matrices were constructed using a normalized angle kernel with a sparsity threshold of 0.9, and resulting gradients were aligned across subjects using Procrustes rotation.</p>
+<h2 id="cortical-type-reconstruction">Cortical type reconstruction<a class="headerlink" href="#cortical-type-reconstruction" title="Permanent link">&para;</a></h2>
+<p>Cortical types were assigned to Von Economo areas based on a recent reanalysis of Von Economo micrographs. This classification scheme was used because its criteria are (1) clearly defined, (2) applied consistently across the entire cortex, (3) align with Von Economo’s original descriptions and (4) are supported by several histological samples. Criteria included ‘development of layer IV, prominence (denser cellularity and larger neurons) of deep (V–VI) or superficial (II–III) layers, definition of sublayers (for example, IIIa and IIIb), sharpness of boundaries between layers and presence of large pyramids in superficial layers’. Thereby, cortical types synopsize degree of granularity, from high laminar elaboration in koniocortical areas, six identifiable layers in Eu-III to -I, poorly differentiated layers in dysgranular and absent layers in agranular.</p>
+<h2 id="structural-network-reconstruction">Structural network reconstruction<a class="headerlink" href="#structural-network-reconstruction" title="Permanent link">&para;</a></h2>
+<p>DWI pre-processing was implemented with micapipe DWI module, which heavily relies on tools from MRtrix. More specifically, fiber orientation distributions were generated using the multi-shell, multi-tissue constrained spherical deconvolution (msmt-CSD) algorithm from MRtrix. 40 million streamlines were then reconstructed using an anatomically constrained probabilistic tractography algorithm (ACT-iFOD2) based on the generated fiber orientation distributions (fODF). The <strong>connectivity weights</strong> were then optimized using the Spherical-deconvolution Informed Filtering of Tractograms (SIFT2) by estimating an appropriate cross-section multiplier for each streamline based on apparent fiber density (AFD), and a connectivity matrix was built for each participant using the 400-region Schaefer parcellation. Associated <strong>edge length</strong> matrix consisting of the mean streamline length between each node pair. Communication in the structural connectome was modeled using <strong>navigation</strong> implemented in bctpy toolkit. Navigation combines the structural connectome with euclidian distance between parcellation nodes. In brief, navigation involves identifying a single, efficient path between two nodes, where each step is determined by spatial proximity to the target node. Specifically, the next node in the path is the neighbor of the current node (that is, sharing a structural connection) that is closest to the final target node. Navigation is the sum of connection weights as defined by SC along the navigation path. Navigation was calculated within each hemisphere separately, then concatenated for analyses.</p>
+<h2 id="mica-ieeg-dataset-acquisition">MICA iEEG dataset acquisition<a class="headerlink" href="#mica-ieeg-dataset-acquisition" title="Permanent link">&para;</a></h2>
+<p>Intracranial EEG data from the MICA laboratory were obtained from 31 patients (sub-PX* series) with intractable epilepsy who underwent presurgical evaluation. Recordings were acquired during resting wakefulness (eyes closed, stage-W) and organized in BIDS format. Electrode contact sensitivity maps were derived from subject-specific leadfield models computed as part of the electroMICA derivatives pipeline. For each contact, sensitivity maps were rectified (absolute value), thresholded at 0.001, and aggregated across hemispheres onto the fsLR-32k surface (32,492 vertices per hemisphere) to produce a per-contact spatial weighting vector used for surface-based mapping.</p>
+<h2 id="ieeg-signal-processing">iEEG signal processing<a class="headerlink" href="#ieeg-signal-processing" title="Permanent link">&para;</a></h2>
+<p>iEEG signals (MNI open iEEG atlas and MICA iEEG datasets) were preprocessed using a common pipeline. Raw signals were band-pass filtered between 0.5 and 80 Hz using a 4th-order zero-phase Butterworth filter, then downsampled to 200 Hz. Signals were subsequently demeaned by subtracting the temporal mean of each channel. Power spectral density (PSD) was estimated using Welch's method with a Hamming window of 2-second segments and 1-second overlap. Band power was computed by integrating the PSD within each canonical frequency band using Simpson's rule. Relative band power was obtained by dividing each band's integral by the total power, and log₁₀-transformed (floor = 1×10⁻¹²). Frequency bands were defined as: delta (0.5–4 Hz), theta (4–8 Hz), alpha (8–13 Hz), beta (13–30 Hz), and gamma (30–80 Hz).</p>
+<h2 id="brain-surface-feature-comparisons">Brain surface feature comparisons<a class="headerlink" href="#brain-surface-feature-comparisons" title="Permanent link">&para;</a></h2>
+<p><strong>Whole brain surface feature comparison</strong> was implemented with brainspace using sphere spin permutation (23) with 100 permutations to generate null data for hypothesis testing. <strong>Salience network brain surface feature comparison</strong> was implemented with brainspace using moran spectra randomisation (24) with 100 permutations, which uses the eigenvectors to generate null model data with similar spatial autocorrelation. The implemented procedure “singleton” matches the input data’s autocorrelation more closely at the cost of fewer possible randomizations.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.instant", "content.code.copy", "content.action.edit", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
