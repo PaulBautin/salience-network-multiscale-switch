@@ -44,8 +44,15 @@ theme:
 nav:
   - Home: index.md
   - Usage: usage.md
-  - API Reference: api.md
-  - Methods: methods.md
+  - API Reference:
+    - Overview: api/overview.md
+    - atlas_load: api/atlas_load.md
+    - gradient_computation: api/gradient_computation.md
+    - ieeg_processing: api/ieeg_processing.md
+    - logging_utils: api/logging_utils.md
+  - Methods:
+    - Data Acquisition: methods/datasets.md
+    - Analysis Methods: methods/analysis.md
 
 docs_dir: docs
 
