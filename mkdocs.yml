@@ -69,3 +69,12 @@ markdown_extensions:
   - pymdownx.superfences
   - toc:
       permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/PaulBautin
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/micalab/micapipe
+    - icon: fontawesome/solid/globe
+      link: https://mica-mni.github.io/
