@@ -37,7 +37,6 @@ theme:
     - content.tabs.link
   icon:
     repo: fontawesome/brands/github
-  custom_dir: docs/overrides
 
 nav:
   - Home: index.md
