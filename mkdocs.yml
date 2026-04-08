@@ -12,24 +12,26 @@ theme:
     # Light mode (default)
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: deep purple
-      accent: indigo
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     # Dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: deep purple
-      accent: indigo
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
   font:
-    text: Roboto
+    text: Avenir Next
     code: Roboto Mono
   features:
     - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.top
     - navigation.instant
     - content.code.copy
@@ -37,6 +39,7 @@ theme:
     - content.tabs.link
   icon:
     repo: fontawesome/brands/github
+    logo: material/library-shelves
 
 nav:
   - Home: index.md
