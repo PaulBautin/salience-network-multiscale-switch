@@ -1,0 +1,41 @@
+/* ============================================================
+   Contrast & typography tweaks — Claude Code documentation style
+   ============================================================ */
+
+/* --- Inline code: visible chip against page background --- */
+:root {
+  --md-code-bg-color: #ede7f6;      /* light purple tint, light mode */
+  --md-code-fg-color: #4527a0;      /* deep purple text */
+}
+
+[data-md-color-scheme="slate"] {
+  --md-code-bg-color: #2a2040;      /* dark purple tint, dark mode */
+  --md-code-fg-color: #ce93d8;      /* soft purple text */
+}
+
+/* --- Code blocks: slightly more padding, visible border --- */
+.highlight pre {
+  border-left: 3px solid var(--md-primary-fg-color);
+  border-radius: 4px;
+}
+
+/* --- Tables: zebra striping for readability --- */
+.md-typeset table:not([class]) tr:nth-child(even) {
+  background-color: rgba(94, 53, 177, 0.05);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) tr:nth-child(even) {
+  background-color: rgba(149, 117, 205, 0.08);
+}
+
+/* --- Headings: stronger weight to distinguish sections --- */
+.md-typeset h2 {
+  border-bottom: 1px solid var(--md-primary-fg-color--light);
+  padding-bottom: 0.2em;
+  font-weight: 700;
+}
+
+/* --- Nav sidebar: slightly bolder active item --- */
+.md-nav__link--active {
+  font-weight: 700;
+}

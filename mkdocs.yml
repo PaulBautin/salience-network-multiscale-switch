@@ -1,6 +1,7 @@
 site_name: Salience Network Multiscale Switch
 site_description: Code and data to reproduce analyses from "The multiscale architecture of the salience network supports a brain-wide switch function"
 site_author: Paul Bautin
+site_url: https://paulbautin.github.io/salience-network-multiscale-switch/
 repo_url: https://github.com/PaulBautin/salience-network-multiscale-switch
 repo_name: PaulBautin/salience-network-multiscale-switch
 edit_uri: edit/main/docs/
@@ -8,9 +9,22 @@ edit_uri: edit/main/docs/
 theme:
   name: material
   palette:
-    scheme: default
-    primary: black
-    accent: indigo
+    # Light mode (default)
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
   font:
     text: Roboto
     code: Roboto Mono
@@ -20,8 +34,10 @@ theme:
     - navigation.instant
     - content.code.copy
     - content.action.edit
+    - content.tabs.link
   icon:
     repo: fontawesome/brands/github
+  custom_dir: docs/overrides
 
 nav:
   - Home: index.md
@@ -30,6 +46,9 @@ nav:
   - Methods: methods.md
 
 docs_dir: docs
+
+extra_css:
+  - stylesheets/extra.css
 
 markdown_extensions:
   - admonition
