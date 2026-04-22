@@ -10,7 +10,6 @@ import scipy.io as sio
 from scipy.integrate import simpson
 from scipy.signal import butter, filtfilt, resample_poly, welch
 
-from brainspace.plotting import plot_surf
 from vtkmodules.vtkFiltersSources import vtkSphereSource
 
 logger = logging.getLogger(__name__)
@@ -20,21 +19,28 @@ def load_original_data_files(
     root: str = '/host/verges/tank/data/BIDS_iEEG/original',
 ) -> pd.DataFrame:
     """
-    Load original iEEG MATLAB files and return channel-level data.
+    Load original iEEG MATLAB files and return bipolar channel-level data.
 
-    Each row in the returned DataFrame corresponds to one channel from one
-    subject/session pair.
+    Each row corresponds to one **bipolar channel** from one subject/session
+    pair. In the electroMICA terminology, a *channel* is a differential
+    recording between two physical *contacts*: ``ChannelName`` stores the pair
+    (e.g. ``"LCi1-LCi2"``), while ``ContactName1`` and ``ContactName2`` hold
+    the individual contact identifiers that index into the electroMICA
+    leadfield/sensitivity files.
 
     Args:
-        root (str): Root directory of the BIDS iEEG dataset.
+        root (str): Root directory of the BIDS iEEG dataset. Expected layout:
+            ``<root>/sub-PX*/ses-01/*stage-W.mat``
 
     Returns:
-        pd.DataFrame: Channel-level iEEG data with columns:
+        pd.DataFrame: Bipolar channel data with columns:
             - Subject
             - Session
-            - ChannelName
+            - ChannelName    — bipolar pair label (e.g. ``"LCi1-LCi2"``)
             - SamplingRate
-            - Data
+            - Data           — raw signal array, shape (n_samples,)
+            - ContactName1   — first contact of the bipolar pair (upper element)
+            - ContactName2   — second contact of the bipolar pair (lower element)
     """
     pattern = re.compile(r"sub-(PX\d+)/ses-(\d+)")
     files = glob.glob(f"{root}/sub-PX*/ses-01/*stage-W.mat")
@@ -81,21 +87,33 @@ def load_original_data_files(
                 }
             )
     df = pd.DataFrame(rows)
-    df['ContactName1'] = df['ChannelName'].str.split('-').str[0]
-    df['ContactName2'] = df['ChannelName'].str.split('-').str[1]
+    df[['ContactName1', 'ContactName2']] = df['ChannelName'].str.split('-', n=1, expand=True)
     return df
 
 
 def load_channel_info(root_dir: str = '/host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA') -> pd.DataFrame:
     """
-    Load channel information from BIDS-iEEG channel TSV files and
-    surface-based channel maps.
+    Load channel information from electroMICA ChannelMap TSV files and the
+    corresponding GIFTI surface maps.
+
+    electroMICA distinguishes between *contacts* (physical electrodes, used in
+    sensitivity/leadfield files) and *channels* (bipolar recordings, one per row
+    here). ``ChannelNumber`` in the TSV indexes into the GIFTI channel map where
+    each vertex stores the channel ID it belongs to.
+
+    Surface vertex indices are returned in a **combined-hemisphere convention**:
+    LH vertices are numbered 0–32491 and RH vertices 32492–64983, consistent
+    with the 64984-vertex fsLR-32k whole-brain surface used elsewhere in this
+    pipeline (cf. ``load_sensitivity_info``, which folds both hemispheres into
+    a single 32k space using bilateral summation).
 
     Returns
     -------
     pd.DataFrame
-        Columns include ChannelIndices_lh and ChannelIndices_rh with
-        offsets applied for combined surface indexing (LH=0-32k, RH=32k+).
+        Columns:
+        - Subject, Session, ChannelName, ChannelNumber
+        - ChannelIndices_lh : list of int, LH vertex indices in [0, 32491]
+        - ChannelIndices_rh : list of int, RH vertex indices in [32492, 64983]
     """
     # Constants for surface offsets (Conte69 / fs_LR 32k)
     N_VERTS_LH = 32492 
@@ -187,19 +205,14 @@ def load_channel_info(root_dir: str = '/host/verges/tank/data/BIDS_iEEG/derivati
         df_meta["Subject"] = subject
         df_meta["Session"] = session
 
-        # Define GIFTI paths
-        # Using wildcard lookup to be safe against minor naming variations
-        base_path = os.path.dirname(tsv_file).replace("feat", "maps")
-        # Construct the prefix based on file structure assumptions
-        # (You may need to adjust the path replacement logic if folder structure varies)
         deriv_root = os.path.join(root_dir, f"sub-{subject}", f"ses-{session}", "maps")
         
         files_lh = glob.glob(os.path.join(deriv_root, "*_hemi-L_*_surf-fsLR-32k_*.gii"))
         files_rh = glob.glob(os.path.join(deriv_root, "*_hemi-R_*_surf-fsLR-32k_*.gii"))
 
-        # Extract Indices
-        # FIX: LH gets offset 0. RH gets offset 32492.
-        df_meta["ChannelIndices_lh"] = extract_indices(files_lh, df_meta["ChannelNumber"], offset=N_VERTS_LH)
+        # LH vertex indices stay in [0, N_VERTS_LH-1]; RH gets offset N_VERTS_LH
+        # so that combined indexing covers the full 64984-vertex surface.
+        df_meta["ChannelIndices_lh"] = extract_indices(files_lh, df_meta["ChannelNumber"], offset=0)
         df_meta["ChannelIndices_rh"] = extract_indices(files_rh, df_meta["ChannelNumber"], offset=N_VERTS_LH)
 
         all_records.append(df_meta)
@@ -221,23 +234,45 @@ def load_sensitivity_info(
     threshold: float = 0.001,
 ) -> pd.DataFrame:
     """
-    Load and aggregate surface-based contact sensitivity maps.
+    Load and aggregate surface-based contact sensitivity maps from electroMICA
+    leadfield derivatives.
 
-    Each row in the returned DataFrame corresponds to one unique
-    (Subject, Session, ContactName) tuple, with sensitivity maps summed
-    across hemispheres when applicable.
+    electroMICA stores one leadfield .mat file per hemisphere (hemi-L, hemi-R),
+    each containing a ContactSensitivityMap of shape (n_contacts, 32492) for
+    the fsLR-32k surface of that hemisphere. This function sums the LH and RH
+    maps element-wise, yielding a single (32492,) bilateral sensitivity vector
+    per contact.
+
+    **Bilateral-sum design rationale**: fsLR-32k is a bilaterally symmetric
+    template, so vertex index *i* on LH and vertex *i* on RH occupy
+    approximately homologous cortical positions. Summing both hemispheres into
+    the same 32k vertex space means that channels whose primary sensitivity lies
+    on the "other" hemisphere still contribute to the surface projection,
+    effectively doubling the number of channels that inform any given vertex.
+    This is appropriate for group-level analyses where contacts are distributed
+    across both hemispheres and the goal is maximal coverage.
+
+    Contacts whose summed map is entirely zero after thresholding are excluded.
 
     Args:
         root_dir (str): Root directory containing electroMICA derivatives.
-        threshold (float): Minimum absolute sensitivity value retained
-            in the contact sensitivity maps.
+            Expected layout:
+            ``<root_dir>/sub-PX*/ses-01/model/
+              *_leadfield_hemi-{L,R}_space-nativepro_surf-fsLR-32k_label-midthickness.mat``
+        threshold (float): Minimum absolute sensitivity value retained before
+            hemisphere summation. Vertices below this value are set to zero.
 
     Returns:
-        pd.DataFrame: Aggregated sensitivity information with columns:
+        pd.DataFrame: One row per unique (Subject, Session, ContactName) with
+            columns:
             - Subject
             - Session
-            - ContactName
-            - ContactSensitivityMap
+            - ContactName  — physical electrode identifier (electroMICA
+              ``ContactName``), upper-cased; distinct from bipolar
+              ``ChannelName`` (e.g. "LCi1" vs "LCi1-LCi2").
+            - ContactSensitivityMap — bilateral sensitivity array of shape
+              (32492,), computed as the element-wise sum of the LH and RH
+              fsLR-32k sensitivity maps for that contact.
     """
     pattern = os.path.join(root_dir, "sub-PX*", "ses-01", "model", "*_leadfield_hemi-*_space-nativepro_surf-fsLR-32k_label-midthickness.mat")
     mat_files = glob.glob(pattern)
@@ -285,14 +320,14 @@ def load_sensitivity_info(
                 f"{sensitivity.shape[0]} vs {len(contact_names)} names"
             )
 
-        # Rectify and threshold
+        # Rectify, threshold, and drop contacts whose map is entirely zero
         sensitivity = np.abs(sensitivity)
         sensitivity[sensitivity < threshold] = 0.0
+        active = sensitivity.any(axis=1)
+        contact_names = np.asarray(contact_names)[active]
+        sensitivity = sensitivity[active]
 
         for name, sens in zip(contact_names, sensitivity):
-            if not np.any(sens):
-                continue
-
             records.append(
                 {
                     "Subject": subject,
@@ -303,12 +338,15 @@ def load_sensitivity_info(
                 }
             )
 
-    if not records: 
+    if not records:
         return pd.DataFrame(columns=["Subject", "Session", "ContactName", "ContactSensitivityMap"])
     df = pd.DataFrame.from_records(records)
 
-    # Aggregate across hemispheres
-    df = (df.groupby(["Subject", "Session", "ContactName"], as_index=False)
+    # Sum LH and RH sensitivity maps element-wise into a single (32492,) bilateral
+    # vector per contact. Sort by Hemi first so the order is deterministic (L then R)
+    # before stacking, which matters if any caller inspects per-hemisphere contributions.
+    df = df.sort_values("Hemi")
+    df = (df.groupby(["Subject", "Session", "ContactName"], as_index=False, sort=False)
           .agg(ContactSensitivityMap=("ContactSensitivityMap", lambda x: np.sum(np.stack(x.tolist()), axis=0))))
 
     return df
@@ -325,7 +363,7 @@ def preprocess_and_compute_psd_ieeg(
     overlap_sec: float = 1.0,
 ) -> tuple[np.ndarray, np.ndarray]:
     """
-    Full iEEG preprocessing and PSD computation .
+    Full iEEG preprocessing and PSD computation.
 
     Following the MNI Open iEEG Atlas procedure, the pipeline consists of:
     - Band-pass filtering
@@ -356,7 +394,8 @@ def preprocess_and_compute_psd_ieeg(
     # Downsample
     if fs != fs_target:
         g = np.gcd(int(fs), int(fs_target))
-        data, fs = resample_poly(data, fs_target // g, fs // g, axis=-1), fs_target
+        data = resample_poly(data, int(fs_target) // g, int(fs) // g, axis=-1)
+        fs = fs_target
 
     # Demean
     data -= data.mean(axis=-1, keepdims=True)
@@ -383,73 +422,62 @@ def preprocess_and_compute_psd_ieeg(
 
 def extract_band_power(pxx_raw: np.ndarray, freq: np.ndarray, band: tuple[float, float], relative: bool = True) -> np.ndarray:
     """
-    Integrates power in a specific band. Returns Log-Power.
-    """
-    # Create mask
-    idx_band = np.logical_and(freq >= band[0], freq <= band[1])
-    
-    # Integrate raw power (Area under the curve using Simpson's rule)
-    bp = simpson(pxx_raw[..., idx_band], x=freq[idx_band], axis=-1)
-    
-    if relative:
-        # Divide by total integral of the passed spectrum
-        total_power = simpson(pxx_raw, x=freq, axis=-1)
-        bp /= (total_power + 1e-12)
+    Integrate PSD over a frequency band and return log10 power.
 
-    # Return Log10 power (Standard for physiology)
+    Args:
+        pxx_raw: PSD array of shape (..., n_frequencies).
+        freq: Frequency axis in Hz, shape (n_frequencies,).
+        band: (fmin, fmax) band limits in Hz.
+        relative: If True, divide band power by total power before log.
+
+    Returns:
+        Log10 band power, shape (...,).
+    """
+    idx_band = (freq >= band[0]) & (freq <= band[1])
+    bp = simpson(pxx_raw[..., idx_band], x=freq[idx_band], axis=-1)
+    if relative:
+        bp /= simpson(pxx_raw, x=freq, axis=-1) + 1e-12
     return np.log10(bp + 1e-12)
 
 
 def compute_psd_vectorized(data: np.ndarray, fs: float, fmin: float = 0.5, fmax: float = 80.0) -> tuple[np.ndarray, np.ndarray]:
     """
-    Vectorized PSD calculation for iEEG.
-    data: (n_channels, n_times) array
-    """
-    # Compute PSD across the last axis for all channels simultaneously
-    f, pxx = welch(data, fs=fs, nperseg=2 * fs, noverlap=1 * fs, window="hamming", axis=-1)
-    
-    # Slice frequency range
-    mask = (f >= fmin) & (f <= fmax)
-    f_band = f[mask]
-    pxx_band = pxx[..., mask]
+    Compute relative PSD for all channels simultaneously (no preprocessing).
 
-    # Normalize by Total Power (to preserve 1/f slope info relative to total energy)
-    total_power = np.sum(pxx, axis=-1, keepdims=True)
-    pxx_rel = pxx_band / (total_power + 1e-12)
-    
-    return f_band, pxx_rel
+    Unlike ``preprocess_and_compute_psd_ieeg``, this function skips filtering,
+    downsampling, and demeaning — use it when the data are already preprocessed.
+
+    Args:
+        data: Array of shape (n_channels, n_times).
+        fs: Sampling frequency in Hz.
+        fmin: Lower frequency bound in Hz.
+        fmax: Upper frequency bound in Hz.
+
+    Returns:
+        f_band: Frequencies within [fmin, fmax], shape (n_frequencies,).
+        pxx_rel: PSD normalised by total power, shape (n_channels, n_frequencies).
+    """
+    f, pxx = welch(data, fs=fs, nperseg=int(2 * fs), noverlap=int(fs), window="hamming", axis=-1)
+    mask = (f >= fmin) & (f <= fmax)
+    pxx_rel = pxx[..., mask] / (np.sum(pxx, axis=-1, keepdims=True) + 1e-12)
+    return f[mask], pxx_rel
 
 
 def plot_surface_sphere(p, channel_position: list | np.ndarray, channel_color: np.ndarray, screenshot_path) -> None:
-    for i, pos in enumerate(channel_position):
-        val = channel_color[i]
-        rgba = val
-        rgb = rgba[:3]
-        sphere = vtkSphereSource()
-        sphere.SetCenter(*pos)
-        sphere.SetRadius(1.5)
-        sphere.Update()
-        actor = p.renderers[0][0].AddActor()
-        actor.SetMapper(inputData=sphere.GetOutput())
-        actor.GetProperty().SetColor(*rgb)
-        actor.GetProperty().SetOpacity(1.0)
-        actor.RotateX(-90)
-        actor.RotateZ(90)
-
-    # Add colored spheres
-    for i, pos in enumerate(channel_position):
-        val = channel_color[i]
-        rgba = val
-        rgb = rgba[:3]
-        sphere = vtkSphereSource()
-        sphere.SetCenter(*pos)
-        sphere.SetRadius(1.5)
-        sphere.Update()
-        actor = p.renderers[1][0].AddActor()
-        actor.SetMapper(inputData=sphere.GetOutput())
-        actor.GetProperty().SetColor(*rgb)
-        actor.GetProperty().SetOpacity(1.0)
-        actor.RotateX(-90)
-        actor.RotateZ(90)
-        actor.RotateZ(180)
+    # renderer index → extra Z rotation applied after the standard -90X/+90Z pair
+    renderers = [(p.renderers[0][0], 0), (p.renderers[1][0], 180)]
+    for renderer, extra_z in renderers:
+        for pos, color in zip(channel_position, channel_color):
+            sphere = vtkSphereSource()
+            sphere.SetCenter(*pos)
+            sphere.SetRadius(1.5)
+            sphere.Update()
+            actor = renderer.AddActor()
+            actor.SetMapper(inputData=sphere.GetOutput())
+            actor.GetProperty().SetColor(*color[:3])
+            actor.GetProperty().SetOpacity(1.0)
+            actor.RotateX(-90)
+            actor.RotateZ(90)
+            if extra_z:
+                actor.RotateZ(extra_z)
     p.screenshot(screenshot_path, transparent_bg=True)

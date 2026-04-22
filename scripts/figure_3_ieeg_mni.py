@@ -81,6 +81,14 @@ def get_parser():
         type=str,
         help="Absolute path to the ieeg derivatives folder (e.g., /data/mica/...)"
     )
+    optional = parser.add_argument_group("\nOPTIONAL ARGUMENTS")
+    optional.add_argument(
+        "-hemi",
+        type=str,
+        default="RH",
+        choices=["both", "LH", "RH"],
+        help="Hemisphere for analysis: 'both', 'LH', or 'RH' (default: RH)"
+    )
     return parser
 
 
@@ -328,10 +336,8 @@ def frequency_band_analysis(df_data, surf32k_rh_infl, df_yeo_surf, sampling_freq
         # Pearson
         r, _ = spearmanr(x_stats, y_stats)
         r_null = []
-        # Generate surrogates for the specific mask
-        for y_surr_full in msr.randomize(y_stats):
-            # Apply same valid mask filter
-            r_null.append(spearmanr(x_stats, y_surr_full[valid_data_mask])[0])
+        for y_surr in msr.randomize(y):
+            r_null.append(spearmanr(x_stats, zscore(y_surr[valid_data_mask]))[0])
         r_null = np.asarray(r_null)
         p_perm = np.mean(np.abs(r_null) >= np.abs(r))
         logger.info(f"[Figure 3A] Band {band}: power vs MPC-gradient | Spearman r={r:.3f}, Moran permutation p={p_perm:.3e} (n_perm=100, n_electrodes={valid_data_mask.sum()})")

@@ -280,6 +280,7 @@ def main():
     logger.info(f"Channel data: {df_channel_data['Subject'].nunique()} subjects, {len(df_channel_data)} bipolar channels")
 
     # Align sensitivity maps by contact name
+    df_channel_data[['ContactName1', 'ContactName2']] = df_channel_data[['ContactName1', 'ContactName2']].apply(lambda c: c.str.upper())
     df1 = df_channel_data.merge(df_sensitivity, left_on=['Subject', 'Session', 'ContactName1'], right_on=['Subject', 'Session', 'ContactName'], how='left').rename(columns={'ContactSensitivityMap': 'Sens1'})
     df2 = df1.merge(df_sensitivity, left_on=['Subject', 'Session', 'ContactName2'], right_on=['Subject', 'Session', 'ContactName'], how='left').rename(columns={'ContactSensitivityMap': 'Sens2'})
     df2['SensitivityMap_bip'] = df2['Sens1'] - df2['Sens2']

@@ -1,4 +1,11 @@
 .vscode
 src/__pycache__
+scripts/__pycache__
+__pycache__/
+**.pyc
 data/dataframes/figure_3_channel_data_df.pkl
 env_salience/
+site/
+.claude
+.github
+
