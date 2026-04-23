@@ -197,7 +197,7 @@ def frequency_band_analysis_sensitivity(df_channel: pd.DataFrame, surf32k_lh_inf
         layout = [['hemi1', 'hemi2']]
         view = [['lateral', 'medial']]
         screenshot_path = project_root / f"results/figures/figure_3b_ieeg_mica_{band}_map_{hemi}.svg"
-        p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 500), zoom=1.4, color_bar='bottom', share='both',
+        p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 500), zoom=1.4, share='both',
             nan_color=(0, 0, 0, 1), cmap="coolwarm", color_range='sym', transparent_bg=True, screenshot=True, filename=screenshot_path)
 
         # Pearson
