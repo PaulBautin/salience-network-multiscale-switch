@@ -192,7 +192,7 @@ def main():
     screenshot_path = project_root / "results/figures/figure_1a_brain.svg"
     logger.info(f"Generating brain hemispheres screenshot at {screenshot_path}")
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['t1_gradient1_SalVentAttn'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
-        nan_color=(220, 220, 220, 1), cmap='coolwarm', color_range=(-3,3), transparent_bg=True, screenshot=True, filename=screenshot_path)
+        nan_color=(220, 220, 220, 1), cmap='coolwarm', color_range=(-3,3), transparent_bg=True, screenshot=True, filename=screenshot_path, cb_numberOfLabels=0)
 
 
 if __name__ == "__main__":
