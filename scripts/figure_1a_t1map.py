@@ -41,7 +41,7 @@ from src.logging_utils import setup_manuscript_logger
 logger = logging.getLogger(__name__)
 
 # Matplotlib globals
-plt.rcParams['font.size'] = 12
+plt.rcParams['font.size'] = 16
 plt.rcParams['svg.fonttype'] = 'none'
 
 
