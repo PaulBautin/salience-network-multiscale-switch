@@ -22,9 +22,11 @@
 #   results/figures/figure_2b_brain_SC_diff_{network}.svg
 #   data/dataframes/df_2b_label_{hemisphere}.csv  (parcel-level cache)
 #
+# Requires figure_1a_t1map.py to have been run first (produces
+#   data/dataframes/figure_1a_pni_to_mics.csv and data/dataframes/df_1a_<hemi>.tsv).
+#
 # Example:
-#   python scripts/figure_2_distance.py \
-#     -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+#   python scripts/figure_2_distance.py
 #
 # If working on remote server add before command: xvfb-run -s "-screen 0 1920x1080x24" 
 # ---------------------------------------------------------------------------------------
@@ -34,7 +36,6 @@
 #########################################################################################
 
 
-#### imports
 import argparse
 import logging
 from pathlib import Path
@@ -77,8 +78,6 @@ def get_parser() -> argparse.ArgumentParser:
         description="Compute structural connectivity differences between MPC-gradient extremes in the salience network (Fig 2A) and across all Yeo networks (Fig 2B).",
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    mandatory = parser.add_argument_group("MANDATORY ARGUMENTS")
-    mandatory.add_argument("-pni_deriv", type=str, required=True, help="Absolute path to the PNI derivatives folder (e.g., /data/mica/mica3/...)")
     optional = parser.add_argument_group("OPTIONAL ARGUMENTS")
     optional.add_argument(
         "-hemi",
@@ -100,7 +99,7 @@ def load_label_atlas(micapipe: Path) -> pd.DataFrame:
     Parameters
     ----------
     micapipe : Path
-        Root path of the micapipe repository (used to locate the LUT file).
+        Project root; used to locate the LUT file at data/parcellations/lut/.
 
     Returns
     -------
@@ -157,7 +156,6 @@ def load_connectomes(files: list, df_label: pd.DataFrame, log_transform: bool = 
         data = nib.load(f).darrays[0].data  # type: ignore
         data = data[np.ix_(valid_idx, valid_idx)]
         data[data <= 0] = np.nan
-        # remove LH to RH connections if split_hemi is True
         if split_hemi:
             data_lh, data_rh, lh_idx, rh_idx = split_by_hemisphere(df_label, data)
             data = np.full((data.shape[0], data.shape[0]), np.nan)
@@ -172,10 +170,10 @@ def load_connectomes(files: list, df_label: pd.DataFrame, log_transform: bool = 
     mean_conn[nan_mask] = np.nan
     A_400 = np.nan_to_num(mean_conn, nan=0.0)
 
-    A_400 = np.triu(A_400, k=1)  # Extract the upper triangular part of the matrix
-    A_400 = A_400 + A_400.T  # Reapply symmetry
+    A_400 = np.triu(A_400, k=1)
+    A_400 = A_400 + A_400.T
     if log_transform:
-        A_400 = np.log1p(A_400)  # Log-transform to normalize the data and reduce the dynamic range of connectivity values
+        A_400 = np.log1p(A_400)
     return A_400
 
 
@@ -239,8 +237,24 @@ def split_by_hemisphere(df_label: pd.DataFrame, matrix: np.ndarray) -> tuple[np.
 
 def compute_navigation(df_label: pd.DataFrame, A_400: np.ndarray, A_400_euclidean: np.ndarray) -> np.ndarray:
     """
-    Compute greedy navigation separately for LH and RH
-    and reassemble into a full matrix.
+    Compute greedy navigation path lengths separately per hemisphere and reassemble.
+
+    Converts SC weights to lengths, runs BCT navigation_wu on each hemisphere,
+    then converts the resulting path-length matrix back to lengths.
+
+    Parameters
+    ----------
+    df_label : pd.DataFrame
+        Parcel metadata with a 'hemisphere' column used to split the matrix.
+    A_400 : np.ndarray, shape (n_cortex, n_cortex)
+        Symmetric SC matrix (log-transformed streamline counts).
+    A_400_euclidean : np.ndarray, shape (n_cortex, n_cortex)
+        Euclidean distance matrix; NaN for cross-hemisphere pairs.
+
+    Returns
+    -------
+    PL : np.ndarray, shape (n_cortex, n_cortex)
+        Navigation path-length matrix expressed as lengths (0 for unreachable pairs).
     """
     A_len = bct.other.weight_conversion(A_400, "lengths")
 
@@ -291,7 +305,6 @@ def compute_pvals_spin(x: np.ndarray, y_surf: np.ndarray, df_yeo_surf: pd.DataFr
     """
     y_lh, y_rh = y_surf[:32492], y_surf[32492:]
     y_rotated = np.hstack(spin_model.randomize(y_lh, y_rh))
-    # Compute perm pval
     r_spin = np.empty(n_rand)
     for j, perm in enumerate(y_rotated):
         perm_label = reduce_by_labels(perm, df_yeo_surf["mics"].values, target_labels=df_label["mics"].values, red_op="mean")
@@ -358,11 +371,33 @@ def struct_conn_metric_analysis(df_label: pd.DataFrame, df_yeo_surf: pd.DataFram
                                 df_pni: pd.DataFrame, project_root: Path, spin_model: SpinPermutations, network: str = "SalVentAttn",
                                 n_rand: int = 100, hemisphere: str = "both") -> None:
     """
-    Analysis linking SN qt1-MPC gradients and SC. 
-    Computes SN MPC-g1 connectivity fingerprints correlation with FC-g1 across different connectivity measures (SC, Nav, Dist).
+    Figure 2A: correlate MPC-gradient-driven SC fingerprints with the FC gradient across three metrics.
 
-    Computes qT1-MPC gradients in Salience, identifies top/bottom quantile parcels, 
-    computes SC differences between those parcels and the rest of the brain and correlates those SC differences with the whole-brain FC gradient. 
+    Identifies top/bottom quantile parcels of the T1-MPC gradient within `network`,
+    computes their mean connectivity difference to all other parcels using SC,
+    navigation path length, and Euclidean distance, then correlates each difference
+    vector with the whole-brain FC gradient (spin-test corrected).
+
+    Parameters
+    ----------
+    df_label : pd.DataFrame
+        Parcel-level metadata (Schaefer-400).
+    df_yeo_surf : pd.DataFrame
+        Per-vertex surface DataFrame (fsLR-32k) with T1-MPC gradient column.
+    surf32k_lh_infl, surf32k_rh_infl :
+        Inflated fsLR-32k surfaces for brain-map screenshots.
+    df_pni : pd.DataFrame
+        Subject manifest with columns path_sc, path_dist, path_t1_profile.
+    project_root : Path
+        Repository root used to resolve output paths.
+    spin_model : SpinPermutations
+        Pre-fitted spin-permutation model.
+    network : str, optional
+        Yeo network to use as the gradient anchor (default: 'SalVentAttn').
+    n_rand : int, optional
+        Number of spin permutations (default: 100).
+    hemisphere : str, optional
+        Hemisphere filter: 'both', 'LH', or 'RH' (default: 'both').
     """
     # load connectomes
     A_sc = load_connectomes(df_pni["path_sc"].to_list(), df_label, log_transform=True, split_hemi=True)
@@ -424,7 +459,6 @@ def struct_conn_metric_analysis(df_label: pd.DataFrame, df_yeo_surf: pd.DataFram
         save_brain_map(surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf[f"{name}_diff"].values,
                        array_name="overlay", filename=project_root / f"results/figures/figure_2a_brain_{name}_diff.svg")
 
-        # Bar plot with average A_400_diff per metric aranged by FC G1 value
         df_plot = df_label.loc[other_idx, ["network", "network_int", f"{name}_diff", "fc_g1", "fc_g1_network"]].dropna(subset=[f"{name}_diff"]).sort_values("fc_g1_network")
         palette = {net: yeo7_rgba[int(net_idx)] for net, net_idx in (df_plot[["network", "network_int"]].drop_duplicates().itertuples(index=False))}
         sns.barplot(x=df_plot["network"], y=f"{name}_diff", hue="network", data=df_plot, palette=palette, ax=axes[1, i], legend=False)
@@ -432,7 +466,6 @@ def struct_conn_metric_analysis(df_label: pd.DataFrame, df_yeo_surf: pd.DataFram
         axes[1, i].set_ylabel("SC$_{top}$ - SC$_{bottom}$")
         axes[1, i].tick_params(axis="x", labelrotation=90)
         axes[1, i].set_ylim(-1.5, 1.5)
-        # align barplot with scatter plot x-axis shape
         axes[1, i].set_aspect(1)
         axes[1, i].set(xlabel=None)
         axes[1, i].yaxis.set_major_locator(mpl.ticker.MaxNLocator(integer=True))
@@ -468,10 +501,37 @@ def struct_conn_network_analysis(df_label: pd.DataFrame, df_yeo_surf: pd.DataFra
                                  df_pni: pd.DataFrame, project_root: Path, spin_model: SpinPermutations, networks: list[str] = ["SalVentAttn", "Limbic"],
                                  n_rand: int = 100, hemisphere: str = "both") -> pd.DataFrame:
     """
-    Analysis linking network specific qt1-MPC gradients and SC. Tests SN MPC-g1 connectivity fingerprints correlation with FC-g1 compared to other networks.
+    Figure 2B: replicate the SC-fingerprint/FC-gradient correlation for each Yeo network.
 
-    Computes qT1-MPC gradients per network, identifies top/bottom quantile parcels within each network,
-    computes SC differences between those parcels and the rest of the brain and correlates those SC differences with the whole-brain FC gradient.
+    For each network in `networks`, computes the T1-MPC gradient, identifies
+    top/bottom quantile parcels, computes their SC difference to all other parcels,
+    and correlates with the whole-brain FC gradient (spin-test corrected).
+
+    Parameters
+    ----------
+    df_label : pd.DataFrame
+        Parcel-level metadata (Schaefer-400).
+    df_yeo_surf : pd.DataFrame
+        Per-vertex surface DataFrame (fsLR-32k).
+    surf32k_lh_infl, surf32k_rh_infl :
+        Inflated fsLR-32k surfaces for brain-map screenshots.
+    df_pni : pd.DataFrame
+        Subject manifest with columns path_sc, path_t1_profile.
+    project_root : Path
+        Repository root used to resolve output paths.
+    spin_model : SpinPermutations
+        Pre-fitted spin-permutation model.
+    networks : list of str, optional
+        Yeo networks to analyse (default: SalVentAttn + Limbic).
+    n_rand : int, optional
+        Number of spin permutations (default: 100).
+    hemisphere : str, optional
+        Hemisphere filter: 'both', 'LH', or 'RH' (default: 'both').
+
+    Returns
+    -------
+    df_label : pd.DataFrame
+        Parcel-level DataFrame with per-network SC-difference columns appended.
     """
     # load connectomes
     A_400_sc = load_connectomes(df_pni["path_sc"].tolist(), df_label, log_transform=True)
@@ -561,7 +621,6 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
 
-    # Setup Paths dynamically
     script_path = Path(__file__).resolve()
     project_root = script_path.parent.parent
 
@@ -574,19 +633,16 @@ def main():
     logger.info(f"Script path: {script_path}")
     logger.info(f"Project root: {project_root}")
 
-    # load surfaces
     surf32k_lh_infl = read_surface(project_root / "data/surfaces/fsLR-32k.L.inflated.surf.gii", itype="gii")
     surf32k_rh_infl = read_surface(project_root / "data/surfaces/fsLR-32k.R.inflated.surf.gii", itype="gii")
     surf_32k = load_conte69(join=True)
 
-    # Define subjects and spin permutation model first
     df_pni = pd.read_csv(project_root / "data/dataframes/figure_1a_pni_to_mics.csv")
     n_rand = 100
     spin_model = SpinPermutations(n_rep=n_rand, random_state=42)
     sphere_lh, sphere_rh = load_conte69(as_sphere=True, with_normals=False, join=False)
     spin_model.fit(sphere_lh, sphere_rh)
 
-    # load atlases
     df_yeo_surf = load_yeo_atlas(micapipe=project_root, surf_32k=surf_32k)
     path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
     if not path_df_1a.exists():
@@ -595,12 +651,11 @@ def main():
     df_yeo_surf = pd.read_csv(path_df_1a)
     df_label = load_label_atlas(micapipe=project_root)
 
-    ######### Analysis
-    # Part A -- SC, navigation, distance
+    # Figure 2A: SC / navigation / distance metrics for SalVentAttn
     struct_conn_metric_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl,
                                 df_pni, project_root, spin_model, network="SalVentAttn",
                                 n_rand=n_rand, hemisphere=args.hemi)
-    # Part B -- per network analysis
+    # Figure 2B: replicate per Yeo network
     network = ["Limbic", "Default", "Cont", "SalVentAttn", "DorsAttn", "Vis", "SomMot"]
     df_label = struct_conn_network_analysis(df_label, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl,
                                             df_pni, project_root, spin_model, networks=network,

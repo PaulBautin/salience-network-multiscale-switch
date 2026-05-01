@@ -30,17 +30,16 @@ Key dependencies: `numpy`, `pandas`, `nibabel`, `matplotlib`, `scipy`, `brainspa
 
 ## Running Scripts
 
-All figure scripts are run from the **project root** and require paths to external neuroimaging derivative datasets (not included in this repo). Each script uses `argparse` and accepts `-pni_deriv` and/or `-mics_deriv` flags pointing to `micapipe_v0.2.0` derivative directories:
+Scripts are run from the **project root**. Figure 1a requires paths to external derivative datasets; downstream scripts read cached outputs produced by figure 1a:
 
 ```bash
-# Figure 1a – T1 microstructural gradient
+# Figure 1a – T1 microstructural gradient (must run first)
 python scripts/figure_1a_t1map.py \
   -pni_deriv /path/to/BIDS_PNI/derivatives/micapipe_v0.2.0 \
   -mics_deriv /path/to/BIDS_MICs/derivatives/micapipe_v0.2.0
 
-# Figure 2 – Distance/connectivity analysis
-python scripts/figure_2_distance.py \
-  -pni_deriv /path/to/BIDS_PNI/derivatives/micapipe_v0.2.0
+# Figure 2 – Distance/connectivity analysis (requires figure 1a outputs)
+python scripts/figure_2_distance.py
 
 # Figure 3 – iEEG (MNI and MICA datasets)
 python scripts/figure_3_ieeg_mni.py

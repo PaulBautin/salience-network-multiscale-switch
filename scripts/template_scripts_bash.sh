@@ -12,3 +12,23 @@ python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scri
   -pni_deriv /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0 \
   -mics_deriv /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0 \
   -hemi LH
+
+# Figure 1b - Contextualisation of local microstructural heterogeneity of the salience network
+# using BigBrain and Ahead datasets
+# 
+#
+# example:
+python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py \
+  -hemi LH
+
+# Figure 1C - Local cortical type heterogeneity of the salience network
+#
+# Loads the cached gradient dataframe produced by figure_1a_t1map.py, overlays
+# von Economo-Koskinas cortical types, and tests whether each Yeo network is
+# enriched or depleted for each type relative to a spin-permutation null.
+#
+# Requires figure_1a_t1map.py to have been run first (produces df_1a_<hemi>.tsv).
+#
+# example:
+python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1c_cortical_types.py \
+  -hemi LH

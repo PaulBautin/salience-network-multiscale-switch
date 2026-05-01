@@ -2,8 +2,9 @@
 # -*- coding: utf-8
 #########################################################################################
 #
-# Contextualisation of local microstructural heterogeneity of the salience network
+# Figure 1b - Contextualisation of local microstructural heterogeneity of the salience network
 # using BigBrain and Ahead datasets
+# 
 #
 # example:
 # python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py \
@@ -47,7 +48,7 @@ from src.logging_utils import setup_manuscript_logger
 logger = logging.getLogger(__name__)
 
 
-plt.rcParams['font.size'] = 12
+plt.rcParams['font.size'] = 16
 plt.rcParams['svg.fonttype'] = 'none'
 
 def get_parser() -> argparse.ArgumentParser:
@@ -93,8 +94,7 @@ def context_analysis(df_yeo_surf: pd.DataFrame, surf_32k, modalities: list[str],
         pv_rand = np.mean(np.abs(r_rand) >= np.abs(r_obs))
         logger.info(f"[Figure 1B] {label}: MPC-gradient vs {label} | Spearman r={r_obs:.3f}, Moran permutation p={pv_rand:.3e} (n_perm={n_rep})")
         stats_text = f"$r={r_obs:.2f}$\n$p_{{perm}}={pv_rand:.2e}$"
-        ax.text(0.05, 0.95, stats_text, transform=ax.transAxes, 
-                     va='top', fontweight='bold')
+        ax.text(0.05, 0.95, stats_text, transform=ax.transAxes, va='top', fontweight='bold', fontsize=12)
         ax.set_ylim([-4,4])
         ax.set_xlim([-3,3])
         ax.set_yticks([-2, 2])
@@ -119,13 +119,14 @@ def context_analysis(df_yeo_surf: pd.DataFrame, surf_32k, modalities: list[str],
 
     # Half-circle polar coordinates
     N = len(r_vals)
-    theta = np.linspace(-np.pi /2 + np.pi/N*0.8, np.pi /2, N, endpoint=False)
+    theta = np.linspace(-np.pi /2 + np.pi/N*0.8, np.pi /2, N, endpoint=False)[::-1]
     radii = np.abs(r_vals)
 
     fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(6, 8))
     bars = ax.bar(theta, radii, width=np.pi/N*0.8, align="center", alpha=0.8)
     ax.set_thetamax(90)
     ax.set_thetamin(-90)
+    ax.tick_params(axis='y', labelsize=12) 
     ax.set_rticks([0.0, 0.1, 0.2, 0.3])
 
     # Color by sign
@@ -148,8 +149,8 @@ def main():
     logger = setup_manuscript_logger("figure_1b_contextualisation", project_root, args)
     logger.info(f"Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels")
     logger.info(f"Network        : SalVentAttn (Salience/Ventral Attention)")
-    logger.info(f"Modalities     : T1map (in-vivo MRI), BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)")
-    logger.info(f"Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)")
+    logger.info(f"Modalities     : BigBrain (cell staining), T1map (in-vivo MRI), Bielschowsky (myelin), Parvalbumin (AHEAD)")
+    logger.info(f"Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)")
 
     logger.info(f"Script path: {script_path}")
     logger.info(f"Project root: {project_root}")
@@ -170,23 +171,23 @@ def main():
     df_yeo_surf = pd.read_csv(path_df_1a)
 
     ######### Part 2 -- Contextualisation
-    screenshot_path = project_root / "results/figures/figure_1b_brain_t1map.svg"
-    plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['T1map'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
-        nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path)
     # Use 'both' to match original behavior: old loaders had no hemisphere filter
     net_mask = compute_network_mask(df_yeo_surf, 'SalVentAttn', 'both')
     df_yeo_surf.loc[net_mask, 'BigBrain'] = load_bigbrain(project_root, net_mask)
     screenshot_path = project_root / "results/figures/figure_1b_brain_bigbrain.svg"
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['BigBrain'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
-        nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path)
+        nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path, cb__numberOfLabels=0)
+    screenshot_path = project_root / "results/figures/figure_1b_brain_t1map.svg"
+    plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['T1map'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
+        nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path, cb__numberOfLabels=0)
     df_yeo_surf.loc[net_mask, 'Bielschowsky'] = load_ahead_biel(project_root, net_mask)
     screenshot_path = project_root / "results/figures/figure_1b_brain_biel.svg"
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['Bielschowsky'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
-        nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path)
+        nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path, cb__numberOfLabels=0)
     df_yeo_surf.loc[net_mask, 'Parvalbumin'] = load_ahead_parva(project_root, net_mask)
     screenshot_path = project_root / "results/figures/figure_1b_brain_parva.svg"
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['Parvalbumin'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
-        nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path)
+        nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path, cb__numberOfLabels=0)
 
     context_analysis(df_yeo_surf, surf_32k, modalities=["BigBrain", "T1map", "Bielschowsky", "Parvalbumin"], n_rep=100, hemisphere=args.hemi, project_root=project_root)
 

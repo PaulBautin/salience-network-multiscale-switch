@@ -8,7 +8,7 @@ yeo7_rgb = np.array(
         [255, 180, 80],    # Frontoparietal
         [230, 90, 100],    # Default Mode
         [0, 170, 50],      # Dorsal Attention
-        [240, 255, 200],   # Limbic
+        [219, 219, 186],   # Limbic
         [210, 100, 255],   # Ventral Attention
         [100, 160, 220],   # Somatomotor
         [170, 70, 200],    # Visual
