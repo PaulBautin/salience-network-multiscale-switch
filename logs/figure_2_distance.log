@@ -1314,3 +1314,73 @@ Computing T1 gradients...
 Gradient lambdas: [0.07344272 0.05529549 0.04809588 0.0435903  0.03001434 0.0273776
  0.02260602 0.01944088 0.0163148  0.0152269 ]
 [Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.098, spin-test p=5.700e-01 (n_perm=100)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-06 18:02:16
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.0708263  0.05405954 0.04503244 0.04056304 0.02899092 0.02586057
+ 0.02214779 0.01962161 0.0157827  0.01373012]
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.138, spin-test p=2.300e-01 (n_perm=100)
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.346, spin-test p=2.100e-01 (n_perm=100)
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.324, spin-test p=2.000e-02 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06516006 0.05653902 0.04581069 0.04080638 0.02931633 0.02492859
+ 0.02136095 0.0178442  0.01564446 0.01361706]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=-0.030, spin-test p=7.200e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07204047 0.05656013 0.04666427 0.04255703 0.02975948 0.02755896
+ 0.02247702 0.01929613 0.01592395 0.01449997]
+[Figure 2B] Default: SC top-bottom diff vs FC-G1 | Spearman r=0.042, spin-test p=7.700e-01 (n_perm=100)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.0717987  0.05763997 0.04789907 0.04145564 0.03155435 0.02791096
+ 0.0220491  0.01885234 0.01661488 0.01485813]
+[Figure 2B] Cont: SC top-bottom diff vs FC-G1 | Spearman r=0.143, spin-test p=4.200e-01 (n_perm=100)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07084963 0.05406798 0.04501774 0.0405614  0.0290008  0.02586281
+ 0.0221464  0.01962877 0.01578127 0.01373173]
+[Figure 2B] SalVentAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.125, spin-test p=2.700e-01 (n_perm=100)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07197557 0.05408443 0.04584807 0.03995834 0.02981795 0.02646873
+ 0.0224574  0.01918263 0.01622144 0.01437073]
+[Figure 2B] DorsAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.181, spin-test p=2.600e-01 (n_perm=100)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07237302 0.05387199 0.04772576 0.04441361 0.0308927  0.02821247
+ 0.02235588 0.01949337 0.01689779 0.0154425 ]
+[Figure 2B] Vis: SC top-bottom diff vs FC-G1 | Spearman r=0.032, spin-test p=9.200e-01 (n_perm=100)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07347102 0.05529081 0.04812217 0.04360169 0.03001749 0.02738062
+ 0.02261239 0.01945517 0.01631816 0.01523465]
+[Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.097, spin-test p=5.800e-01 (n_perm=100)

@@ -396,3 +396,54 @@ Final array shape: (18, 14, 1141)
 Generating Yeo 7 network sanity check at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_sanitycheck_yeo7_5k.svg
 Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
 Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-05-06 18:01:15
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7593)
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-05-06 18:01:48
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7593)
+Participants   : N=18 (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)
+T1 profiles    : acq-T1map, fsLR-5k surface, 14 intracortical depths
+MPC            : fsLR-5k vertex-level MPC matrix
+Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, fsLR-5k
+Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07083741 0.05404679 0.04497286 0.04054512 0.02898253 0.02584977
+ 0.02212978 0.01962527 0.01578009 0.01372482]
+Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
