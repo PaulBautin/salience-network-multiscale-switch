@@ -21,3 +21,13 @@ One row per fsLR-32k surface vertex. Returned by `load_yeo_atlas()` and extended
 | `salience_border` | `float` | `1.0` at vertices on the `SalVentAttn` network boundary; `NaN` elsewhere. |
 
 Analysis columns (e.g. `T1map`, `BigBrain`, `t1_gradient1`) are appended by individual loaders.
+
+## Modules
+
+| Module | Description |
+|--------|-------------|
+| [`atlas_load`](atlas_load.md) | Atlas and surface DataFrame construction; histological profile loaders |
+| [`gradient_computation`](gradient_computation.md) | MPC gradient computation via diffusion map embedding |
+| [`ieeg_processing`](ieeg_processing.md) | iEEG signal preprocessing, PSD estimation, and surface mapping |
+| [`logging_utils`](logging_utils.md) | Timestamped file + console logging for manuscript scripts |
+| [`plot_colors`](plot_colors.md) | Yeo 7-network and cortical-type color definitions; matplotlib colormap registration |

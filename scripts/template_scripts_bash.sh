@@ -32,3 +32,8 @@ python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scri
 # example:
 python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1c_cortical_types.py \
   -hemi LH
+
+# example:
+python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py \
+  -ieeg_deriv /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA \
+  -hemi LH

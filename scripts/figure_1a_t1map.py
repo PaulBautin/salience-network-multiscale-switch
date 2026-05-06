@@ -34,7 +34,7 @@ from brainspace.mesh.mesh_io import read_surface
 from brainspace.datasets import load_conte69
 from brainspace.plotting import plot_hemispheres
 
-from src.atlas_load import load_yeo_atlas, load_t1_salience_profiles, compute_t1map, compute_network_mask
+from src.atlas_load import load_yeo_atlas, load_yeo_surf_5k, load_t1_salience_profiles, compute_t1map, compute_network_mask
 from src.gradient_computation import compute_t1_gradient
 from src.logging_utils import setup_manuscript_logger
 
@@ -155,7 +155,7 @@ def main():
     # load atlases
     df_yeo_surf = load_yeo_atlas(micapipe=project_root, surf_32k=surf_32k)
 
-    ######### Part 1 -- T1 map
+    ######### Part 1 -- T1 map fslr32k
     path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
     if path_df_1a.exists():
         logger.info(f"Found existing dataframe at {path_df_1a}. Loading...")
@@ -183,6 +183,36 @@ def main():
         df_yeo_surf.loc[net_mask, 't1_gradient1_SalVentAttn'] = compute_t1_gradient(t1_salience_profiles)
         df_yeo_surf.loc[net_mask, 'T1map'] = compute_t1map(t1_salience_profiles)
         df_yeo_surf.to_csv(path_df_1a, index=False)
+
+    ######### Part 2 -- T1 map fslr5k
+    path_df_1a_5k = project_root / f'data/dataframes/df_1a_{args.hemi}_fslr5k.tsv'
+    df_yeo_surf_5k = load_yeo_surf_5k(project_root)
+    if path_df_1a_5k.exists():
+        logger.info(f"Found existing dataframe at {path_df_1a_5k}. Loading...")
+        df_pni_5k = pd.read_csv(project_root / "data/dataframes/figure_1a_pni_to_mics_5k.csv")
+        net_mask_5k = compute_network_mask(df_yeo_surf_5k, 'SalVentAttn', args.hemi)
+        t1_salience_profiles_5k = load_t1_salience_profiles(df_pni_5k['path_t1_profile_5k'].tolist(), net_mask_5k)
+        df_yeo_surf_5k = pd.read_csv(path_df_1a_5k)
+    else:
+        df_pni_5k = pd.read_csv(project_root / 'data/dataframes/MICA_PNI.csv')[['ID_PNI', 'session', 'ID_MICs']].drop_duplicates()
+        df_pni_5k = df_pni_5k[(df_pni_5k['ID_PNI'].str.contains('PNC', na=False)) & (df_pni_5k['session'].str.contains('a1', na=False)) & (df_pni_5k['ID_MICs'].str.contains('HC', na=False))]
+        df_pni_5k['path_t1_profile_5k'] = df_pni_5k.apply(lambda row: list(pni_deriv.glob(f'sub-{row["ID_PNI"]}/ses-{row["session"]}/mpc/acq-T1map/sub-{row["ID_PNI"]}_ses-{row["session"]}_surf-fsLR-5k_desc-intensity_profiles.shape.gii')), axis=1)
+        df_pni_5k['path_mpc_5k'] = df_pni_5k.apply(lambda row: list(pni_deriv.glob(f'sub-{row["ID_PNI"]}/ses-{row["session"]}/mpc/acq-T1map/sub-{row["ID_PNI"]}_ses-{row["session"]}_surf-fsLR-5k_desc-MPC.shape.gii')), axis=1)
+        df_pni_5k['path_sc_5k'] = df_pni_5k.apply(lambda row: list(mics_deriv.glob(f'sub-{row["ID_MICs"]}/ses-01/dwi/connectomes/sub-{row["ID_MICs"]}_ses-01_surf-fsLR-5k_desc-iFOD2-40M-SIFT2_full-connectome.shape.gii')), axis=1)
+        df_pni_5k['path_dist_5k'] = df_pni_5k.apply(lambda row: list(pni_deriv.glob(f'sub-{row["ID_PNI"]}/ses-{row["session"]}/dist/sub-{row["ID_PNI"]}_ses-{row["session"]}_surf-fsLR-5k_GD.shape.gii')), axis=1)
+        df_pni_5k = df_pni_5k.explode('path_t1_profile_5k').explode('path_mpc_5k').explode('path_sc_5k').explode('path_dist_5k').dropna(subset=['path_t1_profile_5k', 'path_mpc_5k', 'path_sc_5k', 'path_dist_5k'])
+        logger.info(f"Participants   : N={len(df_pni_5k)} (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)")
+        logger.info(f"T1 profiles    : acq-T1map, fsLR-5k surface, 14 intracortical depths")
+        logger.info(f"MPC            : fsLR-5k vertex-level MPC matrix")
+        logger.info(f"Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, fsLR-5k")
+        logger.info(f"Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment")
+
+        df_pni_5k.to_csv(project_root / "data/dataframes/figure_1a_pni_to_mics_5k.csv", index=False)
+        net_mask_5k = compute_network_mask(df_yeo_surf_5k, 'SalVentAttn', args.hemi)
+        t1_salience_profiles_5k = load_t1_salience_profiles(df_pni_5k['path_t1_profile_5k'].tolist(), net_mask_5k)
+        df_yeo_surf_5k.loc[net_mask_5k, 't1_gradient1_SalVentAttn'] = compute_t1_gradient(t1_salience_profiles_5k)
+        df_yeo_surf_5k.loc[net_mask_5k, 'T1map'] = compute_t1map(t1_salience_profiles_5k)
+        df_yeo_surf_5k.to_csv(path_df_1a_5k, index=False)
     
     # plot figures
     screenshot_path = project_root / "results/figures/figure_1a_profiles.svg"

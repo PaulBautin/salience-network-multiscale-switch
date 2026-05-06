@@ -138,20 +138,19 @@ def load_yeo_atlas(micapipe: Path, surf_32k) -> pd.DataFrame:
     return df_yeo_surf
 
 
-def load_yeo_surf_5k(micapipe: str) -> pd.DataFrame:
-    #### load yeo atlas 7 network fslr5k
-    atlas_yeo_lh_5k = nib.load(micapipe + '/parcellations/schaefer-400_fslr-5k_lh.label.gii').darrays[0].data + 1000
-    atlas_yeo_rh_5k = nib.load(micapipe + '/parcellations/schaefer-400_fslr-5k_rh.label.gii').darrays[0].data + 1800
+def load_yeo_surf_5k(micapipe: Path) -> pd.DataFrame:
+    atlas_yeo_lh_5k = nib.load(micapipe / 'data/parcellations/schaefer-400_fslr-5k_lh.label.gii').darrays[0].data + 1000
+    atlas_yeo_rh_5k = nib.load(micapipe / 'data/parcellations/schaefer-400_fslr-5k_rh.label.gii').darrays[0].data + 1800
     atlas_yeo_rh_5k[atlas_yeo_rh_5k == 1800] = 2000
     yeo_surf_5k = np.concatenate((atlas_yeo_lh_5k, atlas_yeo_rh_5k), axis=0).astype(float)
     df_yeo_surf_5k = pd.DataFrame(data={'mics': yeo_surf_5k})
 
-    df_label = pd.read_csv(micapipe + '/parcellations/lut/lut_schaefer-400_mics.csv')
-    df_label_sub = pd.read_csv(micapipe + '/parcellations/lut/lut_subcortical-cerebellum_mics.csv')
+    df_label = pd.read_csv(micapipe / 'data/parcellations/lut/lut_schaefer-400_mics.csv')
+    df_label_sub = pd.read_csv(micapipe / 'data/parcellations/lut/lut_subcortical-cerebellum_mics.csv')
     df_label = pd.concat([df_label_sub, df_label])
     df_label['network'] = df_label['label'].str.extract(r'(Vis|Default|Cont|DorsAttn|Limbic|SalVentAttn|SomMot|medial_wall)')
     df_label['hemisphere'] = df_label['label'].str.extract(r'(LH|RH)')
-    df_yeo_surf_5k = df_yeo_surf_5k.merge(df_label[['mics', 'hemisphere','network', 'label']], on='mics', validate="many_to_one", how='left')
+    df_yeo_surf_5k = df_yeo_surf_5k.merge(df_label[['mics', 'hemisphere', 'network', 'label']], on='mics', validate="many_to_one", how='left')
     return df_yeo_surf_5k
 
 
@@ -271,4 +270,5 @@ def load_ahead_parva(micapipe: Path, mask: np.ndarray) -> np.ndarray:
     data_parva = nib.load(micapipe / 'data/parcellations/sub-Ahead-Parvalbumin_surf-fsLR-32k_desc-intensity_profiles.shape.gii').darrays[0].data
     salience_parva = data_parva[:, mask]
     return zscore(np.mean(salience_parva, axis=0), nan_policy='omit')
+
 

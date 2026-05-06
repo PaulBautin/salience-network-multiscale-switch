@@ -57,8 +57,8 @@ All scripts are run from the **project root**. Pass `-h` to any script for the f
 | `scripts/figure_1a_t1map.py` | 1a — T1 microstructural gradient | `-pni_deriv` (req), `-mics_deriv` (req), `-hemi` (opt) |
 | `scripts/figure_1b_contextualisation.py` | 1b — Multi-modal contextualization | `-hemi` (opt) |
 | `scripts/figure_1c_cortical_types.py` | 1c — Cortical types | `-pni_deriv` (opt) |
-| `scripts/figure_2_distance.py` | 2 — Structural connectivity at gradient extremes | `-pni_deriv` (req) |
-| `scripts/figure_3_ieeg_mni.py` | 3 — iEEG MNI open atlas | `-pni_deriv` (opt), `-ieeg_deriv` (opt) |
+| `scripts/figure_2_distance.py` | 2 — SC/GD/MPC differences at gradient extremes | `-hemi` (opt) |
+| `scripts/figure_3_ieeg_mni.py` | 3 — iEEG MNI open atlas | `-pni_deriv` (req), `-ieeg_deriv` (req, `.mat` file), `-hemi` (opt) |
 | `scripts/figure_3_ieeg_mica.py` | 3 — iEEG MICA dataset | `-ieeg_deriv` (req), `-hemi` (opt) |
 
 **Example — Figure 1a**

@@ -50,6 +50,7 @@ nav:
     - gradient_computation: api/gradient_computation.md
     - ieeg_processing: api/ieeg_processing.md
     - logging_utils: api/logging_utils.md
+    - plot_colors: api/plot_colors.md
   - Methods:
     - Data Acquisition: methods/datasets.md
     - Analysis Methods: methods/analysis.md

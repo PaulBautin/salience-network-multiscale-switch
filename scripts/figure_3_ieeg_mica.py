@@ -40,29 +40,33 @@ import matplotlib as mpl
 
 
 
+import seaborn as sns
+
 from brainspace.plotting import plot_surf
 from brainspace.mesh.mesh_io import read_surface
 from brainspace.mesh import  mesh_elements
-from brainspace.datasets import load_conte69
+from brainspace.datasets import load_conte69, load_gradient
 from brainspace.null_models import moran
 from scipy.stats import spearmanr
 
 
-from vtkmodules.vtkFiltersSources import vtkSphereSource
 import re
 import matplotlib as mp
+import matplotlib.patches as patches
 from scipy.stats import zscore
+from scipy.ndimage import rotate
 
 import logging
 
-from src.atlas_load import load_yeo_atlas
+from src.atlas_load import load_yeo_atlas, convert_states_str2int
 from src.ieeg_processing import load_sensitivity_info, load_original_data_files, preprocess_and_compute_psd_ieeg, extract_band_power
+from src.plot_colors import yeo7_rgba, yeo7_rgb
 from src.logging_utils import setup_manuscript_logger
 
 logger = logging.getLogger(__name__)
 
 
-plt.rcParams['font.size'] = 12
+plt.rcParams['font.size'] = 16
 plt.rcParams['svg.fonttype'] = 'none'
 plt.rcParams['text.usetex'] = False
 
@@ -156,7 +160,8 @@ def frequency_band_analysis_sensitivity(df_channel: pd.DataFrame, surf32k_lh_inf
     ax.set_xticklabels(xtick_labels)
     for x in xticks:
         ax.axvline(x=x, color="grey", linestyle="--", alpha=0.4)
-    plt.savefig(project_root / f"results/figures/figure_3b_ieeg_mica_psd_{hemi}.svg")
+    plt.tight_layout()
+    plt.savefig(project_root / f"results/figures/figure_3b_ieeg_mica_psd_{hemi}.svg", bbox_inches='tight')
 
     # Process Bands
     fig, axes = plt.subplots(1, len(band_order), figsize=(20, 4.5), sharex=True, sharey=True)
@@ -168,16 +173,30 @@ def frequency_band_analysis_sensitivity(df_channel: pd.DataFrame, surf32k_lh_inf
         surf_map = (z @ sens) / (np.sum(sens, axis=0) + 1e-12)
         surf_map[np.sum(sens, axis=0) == 0] = np.nan
 
-        # Plot Surface Map
+        # Plot Surface Whole Brain Sensitivity Map
         surf_map[df_yeo_surf.hemisphere.isna()[hemi_offset:hemi_offset + N_LH]] = np.nan
         surf_hemi_infl.append_array(surf_map, name="overlay2")
         surfs = {'hemi1': surf_hemi_infl, 'hemi2': surf_hemi_infl}
         layout = [['hemi1', 'hemi2']]
         view = [['lateral', 'medial']]
-        # p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 600), zoom=1.3, color_bar='bottom', share='both',
-        #     nan_color=(0, 0, 0, 1), cmap="Purples", transparent_bg=True, return_plotter=True)
-        # p.show()
+        screenshot_path = project_root / f"results/figures/figure_3b_ieeg_mica_sensitivity_map_{hemi}.svg"
+        p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 600), zoom=1.3, color_bar='bottom', share='both',
+            nan_color=(220, 220, 220, 1), cmap="Purples", transparent_bg=True, screenshot=True, filename=screenshot_path)
 
+        
+        # Plot SalVentAttn network sensitivity on surface
+        surf_map_sal = surf_map.copy()
+        surf_map_sal[~mask[hemi_offset:hemi_offset + N_LH]] = np.nan
+        surf_map_sal = surf_map_sal[hemi_offset:hemi_offset + N_LH]
+        surf_hemi_infl.append_array(surf_map_sal, name="overlay2")
+        surfs = {'hemi1': surf_hemi_infl, 'hemi2': surf_hemi_infl}
+        layout = [['hemi1', 'hemi2']]
+        view = [['lateral', 'medial']]
+        screenshot_path = project_root / f"results/figures/figure_3b_ieeg_mica_sensitivity_map_{hemi}_salience.svg"
+        p = plot_surf(surfs, layout=layout, view=view, array_name="overlay2", size=(1200, 600), zoom=1.3, color_bar='bottom', share='both',
+            nan_color=(220, 220, 220, 1), cmap="Purples", transparent_bg=True, screenshot=True, filename=screenshot_path)
+
+        
         # Correlation Analysis
         x_raw = surf_map[mask[hemi_offset:hemi_offset + N_LH]]
         y = df_yeo_surf['t1_gradient1_SalVentAttn'].values[hemi_offset:hemi_offset + N_LH][mask[hemi_offset:hemi_offset + N_LH]]
@@ -224,7 +243,163 @@ def frequency_band_analysis_sensitivity(df_channel: pd.DataFrame, surf32k_lh_inf
     plt.tight_layout()
     plt.savefig(project_root / f"results/figures/figure_3b_ieeg_mica_band_power_corr_{hemi}.svg")
     return band_maps
-        
+
+
+def salience_network_electrophysiological_similarity(
+    df_channel: pd.DataFrame,
+    surf32k_lh_infl,
+    surf32k_rh_infl,
+    df_yeo_surf: pd.DataFrame,
+    project_root: Path,
+    hemi: str = 'RH',
+) -> None:
+    N_LH = 32492
+    hemi_offset = N_LH if hemi == 'RH' else 0
+    surf_hemi_infl = surf32k_rh_infl if hemi == 'RH' else surf32k_lh_infl
+    df_hemi = df_yeo_surf.iloc[hemi_offset:hemi_offset + N_LH].reset_index(drop=True)
+
+    # Compute channel-level PSD
+    lengths = [len(sig) for sig in df_channel['Data']]
+    min_len = min(lengths)
+    data_matrix = np.vstack([np.asarray(sig)[:min_len] for sig in df_channel['Data']])
+    fs = df_channel['SamplingRate'].iloc[0]
+    _, pxx_raw = preprocess_and_compute_psd_ieeg(data_matrix, fs)  # (n_channels, n_freqs)
+
+    # Project channel PSD to surface vertices via sensitivity-weighted average
+    sens = np.nan_to_num(np.vstack(df_channel['SensitivityMap_bip'].values), nan=0.0)  # (n_channels, 32492)
+    sens_sum = np.sum(sens, axis=0)  # (32492,)
+    surf_psd = (pxx_raw.T @ sens) / (sens_sum + 1e-12)  # (n_freqs, 32492)
+    covered = sens_sum > 0
+    surf_psd[:, ~covered] = np.nan
+
+    # (32492, n_freqs) vertex-level PSD
+    surf_psd_v = surf_psd.T
+
+    # SalVentAttn vertices and T1 gradient quantiles
+    sal_mask = (df_hemi['network'] == 'SalVentAttn').values
+    grad = df_hemi['t1_gradient1_SalVentAttn'].values
+    grad_sal_finite = grad[sal_mask & np.isfinite(grad)]
+    low_q, high_q = np.nanquantile(grad_sal_finite, [0.25, 0.75])
+    top_mask = sal_mask & (grad >= high_q) & covered
+    bot_mask = sal_mask & (grad <= low_q) & covered
+
+    logger.info(f"[Figure 3B] SalVentAttn top-Q vertices: {top_mask.sum()}, bottom-Q: {bot_mask.sum()}")
+
+    # Z-score each vertex's PSD across frequencies for Pearson correlation
+    psd_mean = np.nanmean(surf_psd_v, axis=1, keepdims=True)
+    psd_std = np.nanstd(surf_psd_v, axis=1, keepdims=True)
+    surf_psd_z = np.where(covered[:, None], (surf_psd_v - psd_mean) / (psd_std + 1e-12), 0.0)
+
+    n_freqs = surf_psd_z.shape[1]
+    P_top = surf_psd_z[top_mask]  # (n_top, n_freqs)
+    P_bot = surf_psd_z[bot_mask]  # (n_bot, n_freqs)
+
+    # Mean absolute Pearson correlation of each vertex PSD with top/bottom SalVentAttn PSDs
+    A_top = np.mean(np.abs(surf_psd_z @ P_top.T) / n_freqs, axis=1)  # (32492,)
+    A_bot = np.mean(np.abs(surf_psd_z @ P_bot.T) / n_freqs, axis=1)  # (32492,)
+
+    # ES defined for non-SalVentAttn, non-medial-wall vertices with coverage
+    other_mask = covered & (df_hemi['network'] != 'SalVentAttn') & (df_hemi['network'] != 'medial_wall')
+    logger.info(f"[Figure 3B] Other-network covered vertices: {other_mask.sum()}")
+    es_map = np.full(N_LH, np.nan)
+    es_map[other_mask] = zscore(A_top[other_mask] - A_bot[other_mask])
+
+    # FC gradient at each surface vertex (same negation convention as figure_2)
+    fc_raw = load_gradient("fc", join=True)
+    fc_g1_hemi = -fc_raw[hemi_offset:hemi_offset + N_LH]
+    es_valid = es_map[other_mask]
+    fc_valid = zscore(fc_g1_hemi[other_mask], nan_policy='omit')
+
+    r, p_val = spearmanr(es_valid, fc_valid, nan_policy='omit')
+    logger.info(f"[Figure 3B] ES vs FC-gradient | Spearman r={r:.3f}, p={p_val:.3e} (n_vertices={other_mask.sum()})")
+
+    # Network metadata
+    network_color_map = {
+        'Cont': yeo7_rgba[0], 'Default': yeo7_rgba[1], 'DorsAttn': yeo7_rgba[2],
+        'Limbic': yeo7_rgba[3], 'SalVentAttn': yeo7_rgba[4], 'SomMot': yeo7_rgba[5], 'Vis': yeo7_rgba[6],
+    }
+    networks = df_hemi['network'].values[other_mask]
+    df_es = pd.DataFrame({'ES': es_valid, 'fc_g1': fc_valid, 'network': networks})
+    df_es['colors'] = [network_color_map[n] for n in networks]
+    df_net = (df_es.groupby('network')
+              .agg(ES=('ES', 'mean'), fc_g1=('fc_g1', 'mean'))
+              .reset_index().sort_values('fc_g1'))
+    df_net['colors'] = [network_color_map[n] for n in df_net['network']]
+
+
+    # Plot A (scatter) + B (barplot)
+    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+    axes[0].scatter(df_es['ES'], df_es['fc_g1'],
+                    color=np.stack(df_es['colors'].to_numpy()), s=10, alpha=0.9, rasterized=True)
+    sns.regplot(x='ES', y='fc_g1', data=df_es, scatter=False, color='black',
+                line_kws={'linewidth': 1}, ax=axes[0])
+    axes[0].text(0.05, 0.95, f"r = {r:.2f}\np = {p_val:.2e}", transform=axes[0].transAxes, va='top')
+    axes[0].set_xlabel("ES$_{top}$ - ES$_{bottom}$", fontsize=16)
+    axes[0].set_ylabel('FC gradient 1', fontsize=16)
+    axes[0].set_xlim([-3, 3])
+    axes[0].set_ylim([-3, 3])
+    axes[0].set_aspect('equal')
+    axes[1].barh(df_net['network'], df_net['ES'],
+                 color=df_net['colors'], edgecolor='black', alpha=0.8)
+    axes[1].axvline(0, color='black', linewidth=1)
+    axes[1].set_xlabel("Mean ES$_{top}$ - ES$_{bottom}$", fontsize=16)
+    axes[1].yaxis.set_label_position('right')
+    axes[1].yaxis.tick_right()
+    plt.tight_layout()
+    plt.savefig(project_root / f"results/figures/figure_3b_ieeg_mica_es_scatter_{hemi}.svg")
+    plt.close()
+
+    # Connectivity matrix sorted by network (channel-level PSD Pearson correlation)
+    # Assign each channel to its peak-sensitivity vertex's network, exclude medial_wall
+    peak_idx = np.argmax(sens, axis=1)  # (n_channels,)
+    channel_networks = df_hemi['network'].values[peak_idx]
+    valid_mask = channel_networks != 'medial_wall'
+    channel_networks_valid = channel_networks[valid_mask]
+
+    pxx_z = zscore(pxx_raw[valid_mask], axis=0)
+    A_psd = np.corrcoef(pxx_z)
+
+    sort_idx = np.argsort(channel_networks_valid)
+    A_sorted = A_psd[sort_idx][:, sort_idx]
+    sorted_networks = channel_networks_valid[sort_idx]
+
+    boundaries = np.where(sorted_networks[:-1] != sorted_networks[1:])[0] + 1
+    boundaries = np.insert(boundaries, 0, 0)
+    b_ext = np.append(boundaries, len(channel_networks_valid))
+
+    mpc_fig = A_sorted.copy()
+    mpc_fig[np.tri(mpc_fig.shape[0], mpc_fig.shape[0]) == 1] = np.nan
+    mpc_fig = rotate(mpc_fig, angle=-45, order=0, cval=np.nan)
+
+    fig, ax = plt.subplots()
+    for i, b in enumerate(boundaries):
+        net_name = sorted_networks[b]
+        color = network_color_map.get(net_name, yeo7_rgb[7])
+        rect = patches.Rectangle(
+            (len(channel_networks_valid) / 2 * np.sqrt(2), b * np.sqrt(2)),
+            b_ext[i + 1] - b_ext[i], b_ext[i + 1] - b_ext[i],
+            linewidth=2, edgecolor=color, facecolor='none', angle=45
+        )
+        ax.add_patch(rect)
+
+    mpc_fig[mpc_fig > 1] = 1
+    plt.imshow(mpc_fig, cmap='coolwarm', origin='upper')
+    plt.axis('off')
+    plt.tight_layout()
+    plt.savefig(project_root / f"results/figures/figure_3b_ieeg_mica_corr_{hemi}.svg")
+    plt.close()
+
+    # Plot ES surface map
+    surf_hemi_infl.append_array(es_map, name='es_smooth')
+    surfs = {'hemi1': surf_hemi_infl, 'hemi2': surf_hemi_infl}
+    layout = [['hemi1', 'hemi2']]
+    view = [['lateral', 'medial']]
+    plot_surf(surfs, layout=layout, view=view, array_name='es_smooth',
+              size=(1200, 500), zoom=1.4, color_bar='bottom', share='both',
+              nan_color=(220, 220, 220, 1), cmap='coolwarm', color_range='sym',
+              transparent_bg=True, screenshot=True,
+              filename=str(project_root / f"results/figures/figure_3b_ieeg_mica_es_map_{hemi}.svg"))
+
 
 def main():
     # Setup Relative Paths
@@ -287,7 +462,10 @@ def main():
     df2['SensitivityMap_bip'] = df2['SensitivityMap_bip'].map(lambda x: np.abs(x) if isinstance(x, np.ndarray) else np.zeros(32492))
 
     # Perform frequency band analysis and correlate with T1 gradient in the SalVentAttn network
-    frequency_band_analysis_sensitivity(df2, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf, project_root, hemi=args.hemi)
+    # frequency_band_analysis_sensitivity(df2, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf, project_root, hemi=args.hemi)
+
+    # Electrophysiological similarity: compare whole-brain spectral fingerprints to SalVentAttn gradient extremes
+    salience_network_electrophysiological_similarity(df2, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf, project_root, hemi=args.hemi)
 
 
 if __name__ == "__main__":

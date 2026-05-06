@@ -88,21 +88,22 @@ python scripts/figure_1c_cortical_types.py -pni_deriv /path/to/BIDS_PNI/derivati
 
 ## Figure 2
 
-**`scripts/figure_2_distance.py`** — Tests whether structural connectivity (SC), navigation path length, and Euclidean distance differ between parcels at the high vs. low end of the MPC gradient, within and across all 7 Yeo networks.
+**`scripts/figure_2_distance.py`** — Tests whether structural connectivity (SC), geodesic distance (GD), and microstructure profile covariance (MPC) differ between vertices at the high vs. low end of the MPC gradient, within and across all 7 Yeo networks. All analysis runs at fsLR-5k resolution (9,684 vertices).
+
+Requires `figure_1a_t1map.py` to have been run first (produces `data/dataframes/figure_1a_pni_to_mics.csv`).
 
 ```bash
-python scripts/figure_2_distance.py \
-  -pni_deriv /path/to/BIDS_PNI/derivatives/micapipe_v0.2.0
+python scripts/figure_2_distance.py -hemi LH
 ```
 
 | Flag | Required | Default | Description |
 |------|----------|---------|-------------|
-| `-pni_deriv` | yes | — | Path to PNI micapipe derivatives directory |
+| `-hemi` | no | `both` | Hemisphere: `both`, `LH`, or `RH` |
 
 **Outputs**
 
 - `results/figures/figure_2a_distance_metric.svg`
-- `results/figures/figure_2a_brain_{SC,Nav,Dist}_diff.svg`
+- `results/figures/figure_2a_brain_{SC,GD,MPC}_diff.svg`
 - `results/figures/figure_2b_distance_network.svg`
 - `results/figures/figure_2b_brain_SC_diff_<network>.svg`
 - `data/dataframes/df_2b_label_<hemi>.csv` (cache)
@@ -116,13 +117,14 @@ python scripts/figure_2_distance.py \
 ```bash
 python scripts/figure_3_ieeg_mni.py \
   -pni_deriv /path/to/BIDS_PNI/derivatives/micapipe_v0.2.0 \
-  -ieeg_deriv /path/to/ieeg/derivatives
+  -ieeg_deriv /path/to/MNI_ieeg/MatlabFile.mat
 ```
 
 | Flag | Required | Default | Description |
 |------|----------|---------|-------------|
-| `-pni_deriv` | no | — | Path to PNI micapipe derivatives |
-| `-ieeg_deriv` | no | — | Path to MNI iEEG derivatives |
+| `-pni_deriv` | yes | — | Path to PNI micapipe derivatives directory |
+| `-ieeg_deriv` | yes | — | Path to the MNI iEEG atlas MATLAB file (`.mat`) |
+| `-hemi` | no | `RH` | Hemisphere: `both`, `LH`, or `RH` |
 
 **Outputs** — `results/figures/figure_3a_ieeg_mni_*.svg`
 
