@@ -447,3 +447,221 @@ Gradient lambdas: [0.07083741 0.05404679 0.04497286 0.04054512 0.02898253 0.0258
  0.02212978 0.01962527 0.01578009 0.01372482]
 Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
 Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-05-13 15:33:20
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7593)
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-05-13 15:50:43
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7593)
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-05-13 15:51:03
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7593)
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-05-13 15:52:24
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7593)
+Participants   : N=18 (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)
+T1 profiles    : acq-T1map, fsLR-5k surface, 14 intracortical depths
+MPC            : fsLR-5k vertex-level MPC matrix
+Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, fsLR-5k
+Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07078151 0.05399757 0.0449834  0.04051554 0.02896496 0.02584065
+ 0.02210985 0.01960838 0.01577678 0.01372448]
+Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-05-13 16:25:27
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7593)
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-05-13 16:36:42
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7593)
+Participants   : N=0 (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)
+T1 profiles    : acq-T1map, fsLR-5k surface, 14 intracortical depths
+MPC            : fsLR-5k vertex-level MPC matrix
+Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, fsLR-5k
+Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-05-13 16:37:50
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7593)
+Participants   : N=0 (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)
+T1 profiles    : acq-T1map, fsLR-5k surface, 14 intracortical depths
+MPC            : fsLR-5k vertex-level MPC matrix
+Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, fsLR-5k
+Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-05-13 16:40:38
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing dataframe at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7593)
+Participants   : N=0 (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)
+T1 profiles    : acq-T1map, fsLR-5k surface, 14 intracortical depths
+MPC            : fsLR-5k vertex-level MPC matrix
+Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, fsLR-5k
+Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-05-13 16:46:38
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Participants   : N=18 (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)
+T1 profiles    : acq-T1map, fsLR-32k surface, 14 intracortical depths
+Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, atlas-schaefer-400
+MPC            : partial correlation controlling for mean profile, Fisher z-transformed
+Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 7593)
+Computing T1 gradients...
+Gradient lambdas: [0.07770251 0.05959682 0.0489509  0.04444199 0.03090061 0.02865794
+ 0.02397013 0.02069129 0.01643607 0.01523863]
+Participants   : N=18 (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)
+T1 profiles    : acq-T1map, fsLR-5k surface, 14 intracortical depths
+MPC            : fsLR-5k vertex-level MPC matrix
+Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, fsLR-5k
+Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07093016 0.05406264 0.04506597 0.04055764 0.02899969 0.02586683
+ 0.02214852 0.01964467 0.01578598 0.01373235]
+Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg

@@ -28,8 +28,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.9050967"
-     inkscape:cx="807.64851"
-     inkscape:cy="472.32522"
+     inkscape:cx="651.31162"
+     inkscape:cy="570.65726"
      inkscape:window-width="2560"
      inkscape:window-height="1347"
      inkscape:window-x="0"
@@ -483,7 +483,7 @@
        xlink:href="figures/figure_1b_correlations_circle.svg"
        id="image79800"
        x="-20.775963"
-       y="65.84787" />
+       y="62.1437" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
@@ -492,7 +492,7 @@
        xlink:href="figures/figure_1b_correlations.svg"
        id="image76679"
        x="63.821003"
-       y="76.91877" />
+       y="72.685432" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
@@ -501,12 +501,12 @@
        xlink:href="figures/figure_1a_brain.svg"
        id="use96320"
        x="-0.029697578"
-       y="4.9789386" />
+       y="3.9206052" />
     <ellipse
        style="fill:#666666;fill-opacity:0.00104675;stroke:#484848;stroke-width:0.204743;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-07-5"
        cx="85.453362"
-       cy="47.838051"
+       cy="46.779716"
        rx="12.605778"
        ry="12.425904" />
     <image
@@ -519,7 +519,7 @@
        x="-0.029697578"
        y="4.9789386"
        clip-path="url(#clipPath97042)"
-       transform="matrix(2.4563829,0,0,2.4563829,-129.34548,13.953568)" />
+       transform="matrix(2.4563829,0,0,2.4563829,-129.34548,12.895234)" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
@@ -530,19 +530,19 @@
        x="-0.029697578"
        y="4.9789386"
        clip-path="url(#clipPath97064)"
-       transform="matrix(2.4904201,0,0,2.4904201,-166.24824,2.1298492)" />
+       transform="matrix(2.4904201,0,0,2.4904201,-166.24824,1.0715158)" />
     <ellipse
        style="fill:#666666;fill-opacity:0.00104675;stroke:#484848;stroke-width:0.204743;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-0-8-5-9-3-4-4"
        cx="119.06544"
-       cy="47.835388"
+       cy="46.777054"
        rx="12.572202"
        ry="12.428796" />
     <ellipse
        style="fill:#666666;fill-opacity:0.00104675;stroke:#484848;stroke-width:0.204743;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-0-6"
        cx="50.675022"
-       cy="47.6763"
+       cy="46.617966"
        rx="12.605778"
        ry="12.586435" />
     <image
@@ -555,9 +555,10 @@
        x="-0.029697578"
        y="4.9789386"
        clip-path="url(#clipPath96838)"
-       transform="matrix(2.474966,0,0,2.474966,-9.1315739,-12.444896)" />
+       transform="matrix(2.474966,0,0,2.474966,-9.1315739,-13.50323)" />
     <a
-       id="a95967">
+       id="a95967"
+       transform="translate(0,-1.0583333)">
       <ellipse
          style="fill:#666666;fill-opacity:0.00104675;stroke:#484848;stroke-width:0.204743;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="path771365-0-8-8"
@@ -574,28 +575,28 @@
        xlink:href="figures/figure_1c_brain_economo.svg"
        id="image83124"
        x="0.1680035"
-       y="200.48749" />
+       y="193.07925" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.209706;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 70.013103,91.814689 C 42.700647,91.766841 42.700647,91.766841 42.700647,91.766841"
+       d="M 70.013103,87.581353 C 42.700647,87.533505 42.700647,87.533505 42.700647,87.533505"
        id="path771502-5-4"
        inkscape:transform-center-x="-13.659256"
        inkscape:transform-center-y="-0.027708798" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.21;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 69.996772,119.73309 c -7.931394,-0.0313 -7.931394,-0.0313 -7.931394,-0.0313"
+       d="m 69.996772,115.49973 c -7.931394,-0.0313 -7.931394,-0.0313 -7.931394,-0.0313"
        id="path771502-5-4-9"
        inkscape:transform-center-x="-3.9665755"
        inkscape:transform-center-y="-0.018134891" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.21;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 70.015729,147.66769 c -7.900278,-0.0313 -7.900278,-0.0313 -7.900278,-0.0313"
+       d="m 70.015729,143.43433 c -7.900278,-0.0313 -7.900278,-0.0313 -7.900278,-0.0313"
        id="path771502-5-4-9-4"
        inkscape:transform-center-x="-3.951014"
        inkscape:transform-center-y="-0.018146947" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.201119;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 70.033893,175.65938 c -26.837177,-0.0448 -26.837177,-0.0448 -26.837177,-0.0448"
+       d="m 70.033893,171.42602 c -26.837177,-0.0448 -26.837177,-0.0448 -26.837177,-0.0448"
        id="path771502-5-4-9-4-1"
        inkscape:transform-center-x="-13.421563"
        inkscape:transform-center-y="-0.025949164" />
@@ -607,7 +608,7 @@
        xlink:href="figures/figure_1b_brain_t1map.svg"
        id="image75029"
        x="100.44246"
-       y="107.69143" />
+       y="103.98727" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
@@ -616,7 +617,7 @@
        xlink:href="figures/figure_1b_brain_bigbrain.svg"
        id="image74847"
        x="100.44246"
-       y="80.067802" />
+       y="76.892799" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
@@ -625,7 +626,7 @@
        xlink:href="figures/figure_1b_brain_parva.svg"
        id="image74665"
        x="100.44246"
-       y="163.64874" />
+       y="159.94463" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
@@ -634,7 +635,7 @@
        xlink:href="figures/figure_1b_brain_biel.svg"
        id="image74465"
        x="100.44246"
-       y="135.67009" />
+       y="131.96597" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
@@ -643,7 +644,7 @@
        xlink:href="figures/figure_1a_profiles.svg"
        id="image5651"
        x="143.7944"
-       y="7.1402149" />
+       y="6.0818815" />
     <text
        xml:space="preserve"
        style="font-size:6.35px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;stroke-width:0.264583"
@@ -664,267 +665,256 @@
        style="fill:#0909e2;fill-opacity:0.00104675;stroke:#000000;stroke-width:0.152493;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365"
        cx="87.487076"
-       cy="13.774233"
+       cy="12.7159"
        r="5.0423107" />
     <circle
        style="fill:#0909e2;fill-opacity:0.00104675;stroke:#000000;stroke-width:0.152493;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-0"
        cx="56.826248"
-       cy="15.858834"
+       cy="14.800502"
        r="5.0423107" />
     <circle
        style="fill:#0909e2;fill-opacity:0.00104675;stroke:#000000;stroke-width:0.152493;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-0-8"
        cx="10.824864"
-       cy="24.373955"
+       cy="23.31562"
        r="5.0423107" />
     <circle
        style="fill:#0909e2;fill-opacity:0.00104675;stroke:#000000;stroke-width:0.152493;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-0-8-5-9-3-4"
        cx="114.57906"
-       cy="18.327297"
+       cy="17.268963"
        r="5.0423107" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.0937605;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 10.678973,29.060951 c 0.378375,8.187471 0.378375,8.187471 0.378375,8.187471"
+       d="m 10.678973,28.002617 c 0.378375,8.187471 0.378375,8.187471 0.378375,8.187471"
        id="path771502" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.124345;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 56.494215,20.819352 c 0.347799,15.665123 0.347799,15.665123 0.347799,15.665123"
+       d="m 56.494215,19.761018 c 0.347799,15.665123 0.347799,15.665123 0.347799,15.665123"
        id="path771502-8" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.127052;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 87.421634,18.862249 c 0.34509,16.483173 0.34509,16.483173 0.34509,16.483173"
+       d="m 87.421634,17.803915 c 0.34509,16.483173 0.34509,16.483173 0.34509,16.483173"
        id="path771502-8-0" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.114437;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 114.40525,23.472397 c 0.35768,12.90074 0.35768,12.90074 0.35768,12.90074"
+       d="m 114.40525,22.414063 c 0.35768,12.90074 0.35768,12.90074 0.35768,12.90074"
        id="path771502-8-0-3" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
        x="50.643169"
-       y="63.066269"
+       y="62.007935"
        id="text337525-6"><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="50.643169"
-         y="63.066269"
+         y="62.007935"
          id="tspan772051">Dorsal anterior </tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="50.643169"
-         y="66.451981"
+         y="65.393646"
          id="tspan773725">cingulate cortex (dACC)</tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="50.643169"
-         y="69.837692"
+         y="68.779358"
          id="tspan772727" /></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
        x="17.676373"
-       y="63.281281"
+       y="62.222946"
        id="text337525-6-0"><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="17.676373"
-         y="63.281281"
+         y="62.222946"
          id="tspan773725-1">Anterior Insula</tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="17.676373"
-         y="66.666992"
+         y="65.608658"
          id="tspan777386">(aINS)</tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="17.676373"
-         y="70.052704"
+         y="68.99437"
          id="tspan772727-8" /></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
        x="85.542282"
-       y="63.281281"
+       y="62.222946"
        id="text337525-6-0-3"><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="85.542282"
-         y="63.281281"
+         y="62.222946"
          id="tspan773725-1-4">Precuneus</tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="85.542282"
-         y="66.666992"
+         y="65.608658"
          id="tspan777386-9">(PCU)</tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="85.542282"
-         y="70.052704"
+         y="68.99437"
          id="tspan772727-8-2" /></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
        x="118.83084"
-       y="63.281281"
+       y="62.222946"
        id="text337525-6-0-3-7"><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="118.83084"
-         y="63.281281"
+         y="62.222946"
          id="tspan777386-9-2">Inferior parietal </tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="118.83084"
-         y="66.666992"
+         y="65.608658"
          id="tspan100275">lobule (IPL)</tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="118.83084"
-         y="70.052704"
+         y="68.99437"
          id="tspan772727-8-2-5" /></text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.75751px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.139185;stroke-linecap:butt;stroke-linejoin:round"
        x="138.2601"
-       y="30.621052"
+       y="29.562717"
        id="text20871-9">min</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.75751px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.139185;stroke-linecap:butt;stroke-linejoin:round"
        x="138.2601"
-       y="12.171771"
+       y="11.113439"
        id="text20871-9-6">max</text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.33371px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333333px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
        x="1.1819797"
        y="5.0275502"
        id="text41577-9"><tspan
          sodipodi:role="line"
          id="tspan41575-3"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.33371px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333333px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.270857"
          x="1.1819797"
-         y="5.0275502">A | Principal qT1 MPC gradient of the salience network (LH)</tspan></text>
+         y="5.0275502">A | Principal qT1 MPC gradient of the salience network</tspan></text>
     <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.33371px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
-       x="1.6600591"
-       y="74.916313"
-       id="text41577-9-3"><tspan
-         sodipodi:role="line"
-         id="tspan41575-3-7"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.33371px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.270857"
-         x="1.6600591"
-         y="74.916313">B | Histological contextualization of the salience network principal gradient (LH) </tspan></text>
-    <text
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-anchor:middle;stroke-width:0.232755;stroke-linecap:butt;stroke-linejoin:round"
-       x="-152.0567"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-anchor:middle;stroke-width:0.232755;stroke-linecap:butt;stroke-linejoin:round"
+       x="-146.76511"
        y="3.5720179"
        transform="rotate(-90)"
        id="text408259">Spearman's |r|</text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.234262;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 42.722397,91.84163 C 11.74748,133.95183 11.74748,133.95183 11.74748,133.95183"
+       d="M 42.722397,87.608294 C 11.74748,129.71847 11.74748,129.71847 11.74748,129.71847"
        id="path771502-5"
        inkscape:transform-center-x="-15.463796"
        inkscape:transform-center-y="-21.079685" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.234262;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 62.2275,147.66862 C 11.78554,133.94549 11.78554,133.94549 11.78554,133.94549"
+       d="M 62.2275,143.43526 C 11.78554,129.71213 11.78554,129.71213 11.78554,129.71213"
        id="path771502-5-3"
        inkscape:transform-center-x="-25.235376"
        inkscape:transform-center-y="6.8306465" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.234262;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 62.064497,119.69709 C 11.767538,133.94248 11.767538,133.94248 11.767538,133.94248"
+       d="M 62.064497,115.46373 C 11.767538,129.70912 11.767538,129.70912 11.767538,129.70912"
        id="path771502-5-2"
        inkscape:transform-center-x="-25.144874"
        inkscape:transform-center-y="-7.1566187" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.234262;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 43.335579,175.65382 C 11.801443,133.96073 11.801443,133.96073 11.801443,133.96073"
+       d="M 43.335579,171.42046 C 11.801443,129.72737 11.801443,129.72737 11.801443,129.72737"
        id="path771502-5-7"
        inkscape:transform-center-x="-15.797367"
        inkscape:transform-center-y="20.830867" />
     <text
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;stroke-width:0.136716;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;stroke-width:0.136716;stroke-linecap:butt;stroke-linejoin:round"
        x="100.19328"
-       y="81.694725"
+       y="78.519722"
        id="text20850-8">BigBrain column avg. Merker stain - Cell body density</text>
     <text
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;stroke-width:0.136716;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;stroke-width:0.136716;stroke-linecap:butt;stroke-linejoin:round"
        x="100.19328"
-       y="109.67338"
+       y="105.9692"
        id="text20850-8-4">MICA-PNI column avg. T1map - qT1</text>
     <text
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;stroke-width:0.136716;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;stroke-width:0.136716;stroke-linecap:butt;stroke-linejoin:round"
        x="100.19328"
-       y="137.65205"
+       y="133.94794"
        id="text20850-8-4-5">AHEAD column avg. Bielschowsky - Fiber density</text>
     <text
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;stroke-width:0.136716;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;stroke-width:0.136716;stroke-linecap:butt;stroke-linejoin:round"
        x="100.19328"
-       y="165.63072"
+       y="161.92661"
        id="text20850-8-4-5-9">AHEAD column avg. Parvalbumin - Interneuron density</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.64864px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.137386;stroke-linecap:butt;stroke-linejoin:round"
        transform="rotate(-0.2922558)"
        id="text472897-2"
-       x="139.58263"
-       y="221.59027">Kon</text>
+       x="139.62044"
+       y="214.18204">Kon</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.64864px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.137386;stroke-linecap:butt;stroke-linejoin:round"
        transform="rotate(-0.2922558)"
        id="text472897-2-7"
-       x="139.59352"
-       y="219.45726">Eu-III</text>
+       x="139.63133"
+       y="212.04903">Eu-III</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.64864px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.137386;stroke-linecap:butt;stroke-linejoin:round"
        transform="rotate(-0.2922558)"
        id="text472897-2-7-6"
-       x="139.60443"
-       y="217.31654">Eu-II</text>
+       x="139.64224"
+       y="209.90831">Eu-II</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.64864px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.137386;stroke-linecap:butt;stroke-linejoin:round"
        transform="rotate(-0.2922558)"
        id="text472897-2-7-6-7"
-       x="139.61534"
-       y="215.17583">Eu-I</text>
+       x="139.65315"
+       y="207.76759">Eu-I</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.64864px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.137386;stroke-linecap:butt;stroke-linejoin:round"
        transform="rotate(-0.2922558)"
        id="text472897-2-7-6-7-7"
-       x="139.77663"
-       y="210.70558">Ag</text>
+       x="139.81444"
+       y="203.29735">Ag</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.64864px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.137386;stroke-linecap:butt;stroke-linejoin:round"
        transform="rotate(-0.2922558)"
        id="text472897-2-7-6-7-7-2"
-       x="139.62723"
-       y="212.84462">Dys</text>
+       x="139.66504"
+       y="205.43639">Dys</text>
     <circle
        style="fill:#0909e2;fill-opacity:0.00104675;stroke:#000000;stroke-width:0.152493;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-1"
        cx="87.835396"
-       cy="209.13174"
+       cy="201.72351"
        r="5.0423107" />
     <circle
        style="fill:#0909e2;fill-opacity:0.00104675;stroke:#000000;stroke-width:0.152493;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-0-87"
        cx="57.174557"
-       cy="211.21637"
+       cy="203.80814"
        r="5.0423107" />
     <circle
        style="fill:#0909e2;fill-opacity:0.00104675;stroke:#000000;stroke-width:0.152493;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-0-8-0"
        cx="11.173174"
-       cy="219.73148"
+       cy="212.32324"
        r="5.0423107" />
     <circle
        style="fill:#0909e2;fill-opacity:0.00104675;stroke:#000000;stroke-width:0.152493;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-0-8-0-3-7-2-5"
        cx="115.01398"
-       cy="213.75041"
+       cy="206.34218"
        r="5.0423107" />
     <image
        x="57.36166"
@@ -935,7 +925,7 @@
        id="image79922-2-1"
        style="stroke-linecap:butt;stroke-linejoin:round"
        clip-path="url(#clipPath96311-5)"
-       transform="matrix(0.26040651,0,0,0.25743616,-181.07176,-5.1670922)" />
+       transform="matrix(0.26040651,0,0,0.25743616,-181.07176,-12.575427)" />
     <image
        x="41.454124"
        y="726.44397"
@@ -945,7 +935,7 @@
        id="image79922-9-1"
        style="stroke-linecap:butt;stroke-linejoin:round"
        clip-path="url(#clipPath90511-8)"
-       transform="matrix(0.26110198,0,0,0.26070133,-101.4468,26.271132)" />
+       transform="matrix(0.26110198,0,0,0.26070133,-101.4468,18.862794)" />
     <image
        x="-6.7921548"
        y="1072.3201"
@@ -955,7 +945,7 @@
        id="image79922-9-6-0"
        style="stroke-linecap:butt;stroke-linejoin:round"
        clip-path="url(#clipPath90679-0)"
-       transform="matrix(0.26110198,0,0,0.25737628,-131.08971,-55.127855)" />
+       transform="matrix(0.26110198,0,0,0.25737628,-131.08971,-62.536193)" />
     <image
        x="16.724791"
        y="426.6539"
@@ -965,138 +955,138 @@
        id="image79922-1-3"
        style="stroke-linecap:butt;stroke-linejoin:round"
        clip-path="url(#clipPath90237-3)"
-       transform="matrix(0.26110198,0,0,0.25940448,-12.866605,84.113141)" />
+       transform="matrix(0.26110198,0,0,0.25940448,-12.866605,76.704803)" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.0937605;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 11.027282,224.41837 c 0.378376,8.18748 0.378376,8.18748 0.378376,8.18748"
+       d="m 11.027282,217.00999 c 0.378376,8.18748 0.378376,8.18748 0.378376,8.18748"
        id="path771502-0" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.124345;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 56.842525,216.17679 c 0.347799,15.66511 0.347799,15.66511 0.347799,15.66511"
+       d="m 56.842525,208.76841 c 0.347799,15.66511 0.347799,15.66511 0.347799,15.66511"
        id="path771502-8-04" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.127052;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 87.769943,214.21968 c 0.345091,16.48317 0.345091,16.48317 0.345091,16.48317"
+       d="m 87.769943,206.8113 c 0.345091,16.48317 0.345091,16.48317 0.345091,16.48317"
        id="path771502-8-0-5" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.114437;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 114.75355,218.82982 c 0.35769,12.90075 0.35769,12.90075 0.35769,12.90075"
+       d="m 114.75355,211.42144 c 0.35769,12.90075 0.35769,12.90075 0.35769,12.90075"
        id="path771502-8-0-3-4" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
        x="50.991478"
-       y="258.42371"
+       y="251.01541"
        id="text337525-6-2"><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="50.991478"
-         y="258.42371"
+         y="251.01541"
          id="tspan772051-4">Dorsal anterior </tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="50.991478"
-         y="261.80942"
+         y="254.40112"
          id="tspan773725-9">cingulate cortex (dACC)</tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="50.991478"
-         y="265.19513"
+         y="257.78683"
          id="tspan772727-9" /></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
        x="18.024683"
-       y="258.6387"
+       y="251.23041"
        id="text337525-6-0-9"><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="18.024683"
-         y="258.6387"
+         y="251.23041"
          id="tspan773725-1-49">Anterior Insula</tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="18.024683"
-         y="262.02441"
+         y="254.61612"
          id="tspan777386-8">(aINS)</tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="18.024683"
-         y="265.41013"
+         y="258.00183"
          id="tspan772727-8-1" /></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
        x="85.890594"
-       y="258.6387"
+       y="251.23041"
        id="text337525-6-0-3-6"><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="85.890594"
-         y="258.6387"
+         y="251.23041"
          id="tspan773725-1-4-3">Precuneus</tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="85.890594"
-         y="262.02441"
+         y="254.61612"
          id="tspan777386-9-9">(PCU)</tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="85.890594"
-         y="265.41013"
+         y="258.00183"
          id="tspan772727-8-2-3" /></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
        x="119.17915"
-       y="258.6387"
+       y="251.23041"
        id="text337525-6-0-3-7-3"><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="119.17915"
-         y="258.6387"
+         y="251.23041"
          id="tspan777386-9-2-4">Inferior parietal </tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="119.17915"
-         y="262.02441"
+         y="254.61612"
          id="tspan100275-6">lobule (IPL)</tspan><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.70857px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.270857"
          x="119.17915"
-         y="265.41013"
+         y="258.00183"
          id="tspan772727-8-2-5-1" /></text>
     <ellipse
        style="fill:#666666;fill-opacity:0.00104675;stroke:#484848;stroke-width:0.204743;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-0-6-5"
        cx="50.940582"
-       cy="243.23289"
+       cy="235.82466"
        rx="12.605778"
        ry="12.586435" />
     <ellipse
        style="fill:#666666;fill-opacity:0.00104675;stroke:#484848;stroke-width:0.204743;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-07-5-6"
        cx="85.60717"
-       cy="243.27629"
+       cy="235.86806"
        rx="12.605778"
        ry="12.425904" />
     <ellipse
        style="fill:#666666;fill-opacity:0.00104675;stroke:#484848;stroke-width:0.204743;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-0-8-8-1"
        cx="17.85421"
-       cy="243.40306"
+       cy="235.99483"
        rx="12.605778"
        ry="12.523825" />
     <ellipse
        style="fill:#666666;fill-opacity:0.00104675;stroke:#484848;stroke-width:0.204743;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path771365-0-8-5-9-3-4-4-7"
        cx="119.38996"
-       cy="243.15604"
+       cy="235.7478"
        rx="12.572202"
        ry="12.428796" />
     <g
        id="g522271"
-       transform="matrix(2.5592788,0,0,2.5440476,87.682663,-538.7617)"
+       transform="matrix(2.5592788,0,0,2.5440476,87.682663,-546.17008)"
        style="stroke-width:0.0802391;stroke-miterlimit:4;stroke-dasharray:none">
       <g
          id="g472814-3"
@@ -1121,7 +1111,7 @@
     </g>
     <g
        id="g522280"
-       transform="matrix(2.5592788,0,0,2.5592788,-64.929786,-685.98973)"
+       transform="matrix(2.5592788,0,0,2.5592788,-64.929786,-693.39811)"
        style="stroke-width:0.08;stroke-miterlimit:4;stroke-dasharray:none">
       <g
          id="g472814-3-5"
@@ -1146,7 +1136,7 @@
     </g>
     <g
        id="g522289"
-       transform="matrix(2.5592788,0,0,2.5592788,-547.72638,-571.36212)"
+       transform="matrix(2.5592788,0,0,2.5592788,-547.72638,-578.7705)"
        style="stroke-width:0.08;stroke-miterlimit:4;stroke-dasharray:none">
       <g
          id="g472814-3-5-9"
@@ -1171,7 +1161,7 @@
     </g>
     <g
        id="g522298"
-       transform="matrix(2.5566836,0,0,2.5592788,-668.91076,-701.28175)"
+       transform="matrix(2.5566836,0,0,2.5592788,-668.91076,-708.69013)"
        style="stroke-width:0.0800406;stroke-miterlimit:4;stroke-dasharray:none">
       <g
          id="g472814-3-5-9-8"
@@ -1197,54 +1187,54 @@
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.75751px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.139185;stroke-linecap:butt;stroke-linejoin:round"
        x="205.46594"
-       y="99.619156"
+       y="96.97332"
        id="text20871-9-3">min</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.75751px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.139185;stroke-linecap:butt;stroke-linejoin:round"
        x="205.36943"
-       y="85.899635"
+       y="82.195465"
        id="text20871-9-6-1">max</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.75751px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.139185;stroke-linecap:butt;stroke-linejoin:round"
        x="205.46594"
-       y="127.25072"
+       y="124.07574"
        id="text20871-9-3-8">min</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.75751px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.139185;stroke-linecap:butt;stroke-linejoin:round"
        x="205.36943"
-       y="113.5312"
+       y="109.29788"
        id="text20871-9-6-1-0">max</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.75751px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.139185;stroke-linecap:butt;stroke-linejoin:round"
        x="205.46594"
-       y="155.25946"
+       y="152.0845"
        id="text20871-9-3-8-1">min</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.75751px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.139185;stroke-linecap:butt;stroke-linejoin:round"
        x="205.36943"
-       y="141.53995"
+       y="137.30667"
        id="text20871-9-6-1-0-7">max</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.75751px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.139185;stroke-linecap:butt;stroke-linejoin:round"
        x="205.46594"
-       y="183.25916"
+       y="180.0842"
        id="text20871-9-3-8-1-9">min</text>
     <text
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.75751px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.139185;stroke-linecap:butt;stroke-linejoin:round"
        x="205.36943"
-       y="169.53964"
+       y="165.30637"
        id="text20871-9-6-1-0-7-1">max</text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.33371px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333333px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
        x="1.2308297"
-       y="200.29181"
+       y="193.41273"
        id="text41577-9-3-1"><tspan
          sodipodi:role="line"
          id="tspan41575-3-7-2"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.33371px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.270857"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333333px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.270857"
          x="1.2308297"
-         y="200.29181">C | Salience network cortical type composition (both hemispheres) </tspan></text>
+         y="193.41273">C | Salience network cortical type composition </tspan></text>
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
@@ -1253,7 +1243,7 @@
        xlink:href="figures/figure_1c_type_salience.svg"
        id="image83957"
        x="146.68123"
-       y="202.00197" />
+       y="194.59373" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
@@ -1264,6 +1254,17 @@
        x="-0.029697578"
        y="4.9789386"
        clip-path="url(#clipPath96940)"
-       transform="matrix(2.4540197,0,0,2.4540197,-88.714548,8.6715686)" />
+       transform="matrix(2.4540197,0,0,2.4540197,-88.714548,7.6132352)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333333px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.270857;stroke-linecap:butt;stroke-linejoin:round"
+       x="1.6600591"
+       y="72.270477"
+       id="text41577-9-3"><tspan
+         sodipodi:role="line"
+         id="tspan41575-3-7"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333333px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.270857"
+         x="1.6600591"
+         y="72.270477">B | Histological contextualization of the salience network principal gradient </tspan></text>
   </g>
 </svg>

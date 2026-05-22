@@ -1384,3 +1384,1884 @@ Computing T1 gradients...
 Gradient lambdas: [0.07347102 0.05529081 0.04812217 0.04360169 0.03001749 0.02738062
  0.02261239 0.01945517 0.01631816 0.01523465]
 [Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.097, spin-test p=5.800e-01 (n_perm=100)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 11:20:15
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07087723 0.0540358  0.04499906 0.04055646 0.02899275 0.02588653
+ 0.0221246  0.01962911 0.01578507 0.01373022]
+[SC] brain map: 4268 gray vertices = 1141 network+medialwall + 3127 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.125, spin-test p=2.700e-01 (n_perm=100)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.345, spin-test p=2.100e-01 (n_perm=100)
+[MPC] brain map: 2309 gray vertices = 1141 network+medialwall + 1168 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.325, spin-test p=2.000e-02 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.0651408  0.05660505 0.04586172 0.04082949 0.02931929 0.0249473
+ 0.02137161 0.01784391 0.01564912 0.01362356]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=-0.030, spin-test p=7.200e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07203062 0.05654844 0.04664597 0.04257333 0.02972982 0.02755249
+ 0.02246427 0.01929234 0.015918   0.01449455]
+[Figure 2B] Default: SC top-bottom diff vs FC-G1 | Spearman r=0.038, spin-test p=7.700e-01 (n_perm=100)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07186517 0.05769115 0.04794612 0.04147452 0.03156129 0.02793797
+ 0.02206052 0.01885899 0.0166239  0.01485976]
+[Figure 2B] Cont: SC top-bottom diff vs FC-G1 | Spearman r=0.147, spin-test p=4.000e-01 (n_perm=100)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07078234 0.0539864  0.04494231 0.04050436 0.0289653  0.02584827
+ 0.02212584 0.01960933 0.01577778 0.01372373]
+[Figure 2B] SalVentAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.138, spin-test p=2.300e-01 (n_perm=100)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07205483 0.05408208 0.04590319 0.03998047 0.02981294 0.02646573
+ 0.02246009 0.01919567 0.01622642 0.01437072]
+[Figure 2B] DorsAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.177, spin-test p=2.600e-01 (n_perm=100)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07242638 0.0538837  0.04776225 0.04444571 0.03089623 0.02820489
+ 0.02234743 0.01948861 0.01689388 0.01544139]
+[Figure 2B] Vis: SC top-bottom diff vs FC-G1 | Spearman r=0.027, spin-test p=9.300e-01 (n_perm=100)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07343051 0.05526526 0.04816817 0.04356838 0.02999439 0.02739202
+ 0.02260534 0.01944189 0.01631626 0.01522764]
+[Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.097, spin-test p=5.800e-01 (n_perm=100)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 12:09:42
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.0708591  0.05406021 0.04511987 0.04054989 0.02898686 0.02586099
+ 0.02215385 0.01962899 0.01578381 0.01373541]
+[SC] brain map: 2935 gray vertices = 1141 network+medialwall + 1794 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.155, spin-test p=2.300e-01 (n_perm=100)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.345, spin-test p=2.100e-01 (n_perm=100)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.385, spin-test p=1.000e-02 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.0650876  0.05648084 0.04580654 0.04076463 0.02929571 0.02491237
+ 0.02134425 0.01783783 0.01564025 0.01360477]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=-0.007, spin-test p=9.700e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.0719822  0.05650039 0.04661246 0.04253912 0.0297342  0.02755212
+ 0.0224832  0.01928079 0.01591893 0.01449264]
+[Figure 2B] Default: SC top-bottom diff vs FC-G1 | Spearman r=0.040, spin-test p=8.000e-01 (n_perm=100)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07174625 0.05764222 0.04786192 0.04144963 0.03157502 0.02788031
+ 0.02201525 0.01884083 0.01660728 0.01485002]
+[Figure 2B] Cont: SC top-bottom diff vs FC-G1 | Spearman r=0.237, spin-test p=1.600e-01 (n_perm=100)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07082504 0.0540109  0.04500256 0.04050308 0.02897612 0.02582968
+ 0.02213336 0.019622   0.01577902 0.01372741]
+[Figure 2B] SalVentAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.139, spin-test p=2.800e-01 (n_perm=100)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.0720083  0.05406862 0.04582781 0.03993788 0.02979705 0.02646303
+ 0.02244797 0.01918537 0.01622542 0.0143596 ]
+[Figure 2B] DorsAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.141, spin-test p=5.400e-01 (n_perm=100)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07242982 0.05385573 0.04779192 0.04442426 0.03089301 0.02822122
+ 0.02236429 0.01948878 0.01689772 0.01544692]
+[Figure 2B] Vis: SC top-bottom diff vs FC-G1 | Spearman r=0.041, spin-test p=8.200e-01 (n_perm=100)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07336821 0.05524618 0.04804675 0.04346184 0.02999055 0.02736831
+ 0.02258002 0.01942911 0.01630788 0.0152177 ]
+[Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.121, spin-test p=4.200e-01 (n_perm=100)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 12:51:56
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 13:04:05
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07076308 0.05394888 0.04497167 0.04049976 0.02894903 0.02585389
+ 0.02212654 0.01960576 0.01577099 0.01372147]
+[SC] brain map: 2950 gray vertices = 1141 network+medialwall + 1809 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.153, spin-test p=2.400e-01 (n_perm=100)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.322, spin-test p=2.400e-01 (n_perm=100)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=1.000e-02 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06507701 0.05650862 0.04581366 0.04076367 0.02930576 0.02493154
+ 0.02135839 0.01783679 0.01564264 0.01361509]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=0.027, spin-test p=7.900e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07200454 0.05658643 0.04666686 0.04260707 0.02975538 0.02756632
+ 0.02248215 0.01930628 0.0159264  0.0144989 ]
+[Figure 2B] Default: SC top-bottom diff vs FC-G1 | Spearman r=0.060, spin-test p=7.100e-01 (n_perm=100)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07191422 0.05772193 0.04794374 0.04151422 0.03161777 0.02794876
+ 0.02206574 0.01887394 0.01662653 0.01486795]
+[Figure 2B] Cont: SC top-bottom diff vs FC-G1 | Spearman r=0.223, spin-test p=2.300e-01 (n_perm=100)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07088256 0.05404159 0.04500208 0.04054187 0.02898076 0.02586267
+ 0.02213834 0.01962516 0.01578363 0.01372654]
+[Figure 2B] SalVentAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.154, spin-test p=2.400e-01 (n_perm=100)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07205074 0.05402998 0.04583569 0.03994322 0.02981307 0.0264527
+ 0.02245562 0.01918877 0.01622616 0.01436747]
+[Figure 2B] DorsAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.138, spin-test p=4.900e-01 (n_perm=100)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07236424 0.05383368 0.04775119 0.04440586 0.03086714 0.02820965
+ 0.02235361 0.01947389 0.01688572 0.01543873]
+[Figure 2B] Vis: SC top-bottom diff vs FC-G1 | Spearman r=0.023, spin-test p=9.500e-01 (n_perm=100)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07339145 0.05525847 0.04814437 0.04357144 0.02999996 0.02738496
+ 0.02260641 0.01944648 0.01631385 0.01522389]
+[Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.121, spin-test p=4.000e-01 (n_perm=100)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 13:22:42
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07080982 0.05403803 0.04502628 0.04052964 0.02900981 0.02587343
+ 0.02214274 0.01963185 0.0157845  0.01373315]
+[SC] brain map: 2950 gray vertices = 1141 network+medialwall + 1809 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.155, spin-test p=2.400e-01 (n_perm=100)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.325, spin-test p=2.300e-01 (n_perm=100)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=1.000e-02 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06508302 0.05654637 0.04577474 0.04079999 0.02929928 0.02492598
+ 0.02135138 0.01783863 0.01564291 0.01361165]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=0.032, spin-test p=7.600e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07198468 0.05658637 0.04663386 0.0425314  0.02973284 0.02755299
+ 0.02247195 0.01929784 0.01592542 0.01450251]
+[Figure 2B] Default: SC top-bottom diff vs FC-G1 | Spearman r=0.059, spin-test p=7.100e-01 (n_perm=100)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07185028 0.05766131 0.04792255 0.04146929 0.03157618 0.02793375
+ 0.02204493 0.01886005 0.01661456 0.01485982]
+[Figure 2B] Cont: SC top-bottom diff vs FC-G1 | Spearman r=0.221, spin-test p=2.300e-01 (n_perm=100)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07078057 0.05398569 0.04499513 0.04052796 0.02898065 0.0258479
+ 0.02213086 0.01962291 0.0157808  0.0137278 ]
+[Figure 2B] SalVentAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.154, spin-test p=2.400e-01 (n_perm=100)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07211254 0.05410512 0.04589927 0.03998202 0.02983225 0.02648601
+ 0.02246091 0.01921006 0.01623295 0.01437872]
+[Figure 2B] DorsAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.175, spin-test p=3.800e-01 (n_perm=100)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07243126 0.05387748 0.04778646 0.04445314 0.03089586 0.0282105
+ 0.02236674 0.01949409 0.01689854 0.01544471]
+[Figure 2B] Vis: SC top-bottom diff vs FC-G1 | Spearman r=0.027, spin-test p=9.400e-01 (n_perm=100)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07342224 0.05526718 0.0480876  0.04356762 0.02999688 0.02737189
+ 0.02260449 0.01944531 0.0163117  0.01522174]
+[Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.121, spin-test p=4.000e-01 (n_perm=100)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 13:46:56
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07076555 0.05403092 0.04497943 0.04050242 0.02895958 0.02582516
+ 0.02213392 0.01962106 0.01578355 0.01372512]
+[SC] brain map: 2950 gray vertices = 1141 network+medialwall + 1809 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.154, spin-test p=2.400e-01 (n_perm=100)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.324, spin-test p=2.400e-01 (n_perm=100)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=1.000e-02 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.065116   0.05651908 0.04587174 0.04080923 0.02931142 0.02493835
+ 0.02135867 0.01784245 0.01564582 0.01361497]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=0.024, spin-test p=8.000e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 13:56:17
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 14:02:01
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.0708587  0.05400129 0.04496618 0.04054033 0.02898358 0.02584472
+ 0.02212947 0.01963066 0.01577811 0.01372533]
+[SC] brain map: 2950 gray vertices = 1141 network+medialwall + 1809 connectivity-sparse
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 14:10:02
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 14:11:40
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07081398 0.05399708 0.04494754 0.0405319  0.02896375 0.02584992
+ 0.02212893 0.01962225 0.01577476 0.01372461]
+[SC] brain map: 2950 gray vertices = 1141 network+medialwall + 1809 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.152, spin-test p=2.400e-01 (n_perm=100)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.325, spin-test p=2.300e-01 (n_perm=100)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=1.000e-02 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06511329 0.05653623 0.045854   0.04082021 0.02931151 0.02493594
+ 0.02136554 0.01784556 0.01565017 0.01362001]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=0.031, spin-test p=7.700e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07209571 0.05661474 0.04666166 0.0425484  0.02974883 0.02755977
+ 0.02245595 0.01929237 0.01592796 0.01450011]
+[Figure 2B] Default: SC top-bottom diff vs FC-G1 | Spearman r=0.049, spin-test p=7.600e-01 (n_perm=100)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.0718938  0.0576798  0.0479632  0.04148601 0.03159169 0.02792735
+ 0.0220619  0.0188614  0.01662262 0.01486384]
+[Figure 2B] Cont: SC top-bottom diff vs FC-G1 | Spearman r=0.223, spin-test p=2.300e-01 (n_perm=100)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07076804 0.05399802 0.04494543 0.0405189  0.02898602 0.02584258
+ 0.02213807 0.01961888 0.01577635 0.01372324]
+[Figure 2B] SalVentAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.155, spin-test p=2.400e-01 (n_perm=100)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07196841 0.0540427  0.04573457 0.03994128 0.02982513 0.02646383
+ 0.02244244 0.01917594 0.016224   0.01435581]
+[Figure 2B] DorsAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.175, spin-test p=3.800e-01 (n_perm=100)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.0723584  0.05377465 0.04771344 0.04442226 0.03087348 0.02819282
+ 0.02234968 0.01948109 0.01689003 0.01543891]
+[Figure 2B] Vis: SC top-bottom diff vs FC-G1 | Spearman r=0.029, spin-test p=9.300e-01 (n_perm=100)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07343802 0.05525393 0.04807765 0.04354042 0.02997259 0.0273761
+ 0.02259301 0.01944031 0.01631248 0.01522301]
+[Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.121, spin-test p=4.000e-01 (n_perm=100)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 14:27:50
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 14:39:49
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07083738 0.05403758 0.04500608 0.0405286  0.02898209 0.02585799
+ 0.0221356  0.01961875 0.01578164 0.01372902]
+[SC] brain map: 2950 gray vertices = 1141 network+medialwall + 1809 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.152, spin-test p=2.400e-01 (n_perm=100)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.325, spin-test p=2.300e-01 (n_perm=100)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=1.000e-02 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06513566 0.05656093 0.04583819 0.04081797 0.02931272 0.02493672
+ 0.02136462 0.01784013 0.01564767 0.01361884]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=0.028, spin-test p=7.700e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07198895 0.0565725  0.04664482 0.04255414 0.02974732 0.02755529
+ 0.02246857 0.01930058 0.01592229 0.01449596]
+[Figure 2B] Default: SC top-bottom diff vs FC-G1 | Spearman r=0.059, spin-test p=7.100e-01 (n_perm=100)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07184436 0.05766338 0.04791278 0.04145143 0.03156514 0.02792387
+ 0.02204943 0.01884719 0.01661889 0.01486089]
+[Figure 2B] Cont: SC top-bottom diff vs FC-G1 | Spearman r=0.223, spin-test p=2.300e-01 (n_perm=100)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07086496 0.0540536  0.04501031 0.04053871 0.02898024 0.02585677
+ 0.02213071 0.01962405 0.01578158 0.01372715]
+[Figure 2B] SalVentAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.154, spin-test p=2.400e-01 (n_perm=100)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07202815 0.0540815  0.04585743 0.03999678 0.02983075 0.02647588
+ 0.02245865 0.01918987 0.01622818 0.01437179]
+[Figure 2B] DorsAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.175, spin-test p=3.800e-01 (n_perm=100)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07244895 0.053881   0.04775613 0.04443972 0.03091297 0.02821244
+ 0.02236428 0.0194925  0.01690004 0.01544617]
+[Figure 2B] Vis: SC top-bottom diff vs FC-G1 | Spearman r=0.028, spin-test p=9.400e-01 (n_perm=100)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07337602 0.05522757 0.04805733 0.043555   0.02998576 0.02736006
+ 0.02259769 0.01942742 0.01630849 0.01522438]
+[Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.121, spin-test p=4.000e-01 (n_perm=100)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 14:53:52
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 14:54:09
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07082832 0.05400097 0.04498371 0.04054165 0.02897518 0.02586043
+ 0.02213639 0.01962531 0.01578447 0.01373962]
+[SC] brain map: 2950 gray vertices = 1141 network+medialwall + 1809 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.155, spin-test p=2.400e-01 (n_perm=100)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.323, spin-test p=2.400e-01 (n_perm=100)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=1.000e-02 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06517029 0.05659583 0.04586218 0.04083153 0.02931928 0.02494144
+ 0.02136262 0.01784197 0.01564739 0.01361723]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=0.027, spin-test p=7.700e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07203328 0.05660308 0.0466883  0.04260544 0.02976442 0.02756458
+ 0.02248161 0.01930769 0.01593017 0.01450771]
+[Figure 2B] Default: SC top-bottom diff vs FC-G1 | Spearman r=0.049, spin-test p=7.600e-01 (n_perm=100)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.0718451  0.0576547  0.04793644 0.04147687 0.03158711 0.02792258
+ 0.02205122 0.01885549 0.01663061 0.01486249]
+[Figure 2B] Cont: SC top-bottom diff vs FC-G1 | Spearman r=0.223, spin-test p=2.300e-01 (n_perm=100)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07088057 0.05405924 0.0449983  0.0405413  0.02900768 0.02586012
+ 0.02214029 0.01962782 0.0157832  0.01373168]
+[Figure 2B] SalVentAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.153, spin-test p=2.400e-01 (n_perm=100)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07205341 0.05404834 0.04590106 0.03993895 0.02981563 0.02647853
+ 0.02246254 0.01919273 0.0162344  0.01436871]
+[Figure 2B] DorsAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.138, spin-test p=4.900e-01 (n_perm=100)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07238618 0.0538515  0.04774839 0.0444213  0.03089031 0.02819239
+ 0.02235698 0.01948586 0.016893   0.01544082]
+[Figure 2B] Vis: SC top-bottom diff vs FC-G1 | Spearman r=0.029, spin-test p=9.300e-01 (n_perm=100)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07339761 0.05528683 0.04815092 0.04358451 0.02999815 0.02737055
+ 0.02260554 0.01944666 0.01631304 0.01522602]
+[Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.121, spin-test p=4.000e-01 (n_perm=100)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 15:04:45
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.0707854  0.05400694 0.04497807 0.04050698 0.02897892 0.0258468
+ 0.02213457 0.01961713 0.0157775  0.01372271]
+[SC] brain map: 2950 gray vertices = 1141 network+medialwall + 1809 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.153, spin-test p=2.400e-01 (n_perm=100)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.322, spin-test p=2.400e-01 (n_perm=100)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=1.000e-02 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06512668 0.05654471 0.04582837 0.04080357 0.02930677 0.02493754
+ 0.02137131 0.01784323 0.01565235 0.01361897]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=0.024, spin-test p=8.000e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07209432 0.05659302 0.04662259 0.04256871 0.02975323 0.02755914
+ 0.02247734 0.01930341 0.01592503 0.01449344]
+[Figure 2B] Default: SC top-bottom diff vs FC-G1 | Spearman r=0.050, spin-test p=7.500e-01 (n_perm=100)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07175314 0.05761086 0.04790338 0.04149897 0.0315544  0.02793531
+ 0.02204711 0.01885095 0.01661476 0.0148581 ]
+[Figure 2B] Cont: SC top-bottom diff vs FC-G1 | Spearman r=0.223, spin-test p=2.300e-01 (n_perm=100)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07085214 0.05405212 0.04496804 0.04054214 0.02897582 0.02585491
+ 0.02213724 0.01962196 0.01578751 0.0137294 ]
+[Figure 2B] SalVentAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.153, spin-test p=2.400e-01 (n_perm=100)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.0720196  0.0541081  0.04588563 0.03997955 0.02985399 0.02646915
+ 0.02245788 0.01919411 0.01623036 0.01437508]
+[Figure 2B] DorsAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.174, spin-test p=3.800e-01 (n_perm=100)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07235182 0.05388568 0.04774325 0.04440197 0.03091861 0.02820648
+ 0.02235485 0.01948819 0.01689582 0.01544537]
+[Figure 2B] Vis: SC top-bottom diff vs FC-G1 | Spearman r=0.028, spin-test p=9.400e-01 (n_perm=100)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07340829 0.05524744 0.0480723  0.04357241 0.03000597 0.02737869
+ 0.02259557 0.01944332 0.01631279 0.01522497]
+[Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.121, spin-test p=4.000e-01 (n_perm=100)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 15:26:49
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=100, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07082314 0.05400783 0.04496945 0.04051039 0.02897725 0.02585856
+ 0.02213351 0.0196244  0.01578222 0.01372835]
+[SC] brain map: 2950 gray vertices = 1141 network+medialwall + 1809 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.154, spin-test p=2.400e-01 (n_perm=100)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.322, spin-test p=2.400e-01 (n_perm=100)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=1.000e-02 (n_perm=100)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06509886 0.05653081 0.0458125  0.0407862  0.02931889 0.02493407
+ 0.02134651 0.01784261 0.01564568 0.01361098]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=0.036, spin-test p=7.500e-01 (n_perm=100)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 15:34:48
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07083557 0.05395601 0.04491473 0.04046934 0.02896814 0.02585134
+ 0.02212806 0.01962535 0.01578124 0.01372635]
+[SC] brain map: 2950 gray vertices = 1141 network+medialwall + 1809 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.153, spin-test p=3.480e-01 (n_perm=1000)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.322, spin-test p=2.260e-01 (n_perm=1000)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=6.000e-03 (n_perm=1000)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06510354 0.05656178 0.04584921 0.04082547 0.02932037 0.02493518
+ 0.02136052 0.01784009 0.01565193 0.01361886]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=0.031, spin-test p=8.010e-01 (n_perm=1000)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07195904 0.05656341 0.0466412  0.04256807 0.02973773 0.02756239
+ 0.02247261 0.01930125 0.01592634 0.01449675]
+[Figure 2B] Default: SC top-bottom diff vs FC-G1 | Spearman r=0.060, spin-test p=6.630e-01 (n_perm=1000)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07175904 0.0576547  0.04788173 0.04146389 0.03158252 0.02791631
+ 0.02203705 0.01885384 0.0166127  0.0148566 ]
+[Figure 2B] Cont: SC top-bottom diff vs FC-G1 | Spearman r=0.223, spin-test p=1.690e-01 (n_perm=1000)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07080504 0.05401814 0.04498204 0.04054386 0.02897828 0.02586029
+ 0.02214866 0.01962333 0.015782   0.01372499]
+[Figure 2B] SalVentAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.155, spin-test p=3.410e-01 (n_perm=1000)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07209697 0.05413826 0.04587183 0.04004898 0.0298257  0.02651824
+ 0.02248407 0.019211   0.01624122 0.0143798 ]
+[Figure 2B] DorsAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.175, spin-test p=3.160e-01 (n_perm=1000)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07233925 0.05384942 0.04772683 0.04439911 0.0308973  0.02820238
+ 0.02236545 0.01949332 0.0168967  0.01544626]
+[Figure 2B] Vis: SC top-bottom diff vs FC-G1 | Spearman r=0.024, spin-test p=9.110e-01 (n_perm=1000)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07331767 0.05524585 0.04807717 0.04355285 0.03000883 0.02737113
+ 0.02260699 0.01945283 0.01631216 0.0152257 ]
+[Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.121, spin-test p=4.110e-01 (n_perm=1000)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 15:53:12
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07079429 0.0540386  0.04497347 0.04053322 0.02898615 0.02584912
+ 0.02214782 0.01962588 0.01578387 0.01372796]
+[SC] brain map: 2950 gray vertices = 1141 network+medialwall + 1809 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.154, spin-test p=3.450e-01 (n_perm=1000)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.322, spin-test p=2.260e-01 (n_perm=1000)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=6.000e-03 (n_perm=1000)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06508311 0.05652077 0.04580942 0.04077299 0.0293024  0.02492779
+ 0.02135652 0.01783649 0.01563969 0.01361333]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=0.026, spin-test p=8.470e-01 (n_perm=1000)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07204336 0.05661748 0.04679041 0.04259975 0.02975859 0.02756417
+ 0.0224813  0.01930135 0.01592676 0.01450472]
+[Figure 2B] Default: SC top-bottom diff vs FC-G1 | Spearman r=0.060, spin-test p=6.630e-01 (n_perm=1000)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.0718369  0.05762552 0.04794655 0.04146259 0.03157929 0.02792173
+ 0.02202848 0.01886021 0.01661861 0.01486074]
+[Figure 2B] Cont: SC top-bottom diff vs FC-G1 | Spearman r=0.223, spin-test p=1.690e-01 (n_perm=1000)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07085662 0.05406134 0.04501545 0.04049434 0.02899412 0.02587092
+ 0.02214285 0.01964056 0.01578468 0.01372996]
+[Figure 2B] SalVentAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.152, spin-test p=3.500e-01 (n_perm=1000)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07189011 0.05406869 0.04581301 0.0399105  0.02980942 0.02646111
+ 0.02244823 0.01918142 0.01622213 0.01436932]
+[Figure 2B] DorsAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.175, spin-test p=3.170e-01 (n_perm=1000)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07244193 0.05386387 0.04779721 0.04443248 0.0309099  0.02821274
+ 0.0223542  0.01948975 0.01690051 0.01544786]
+[Figure 2B] Vis: SC top-bottom diff vs FC-G1 | Spearman r=0.027, spin-test p=9.090e-01 (n_perm=1000)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07327787 0.05515366 0.04807217 0.04349439 0.02998643 0.02735673
+ 0.02258682 0.01943513 0.01630221 0.01521849]
+[Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.121, spin-test p=4.090e-01 (n_perm=1000)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-07 16:15:14
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07079769 0.05401405 0.04496769 0.04052743 0.02896524 0.02584589
+ 0.0221295  0.01962007 0.0157791  0.01371173]
+[SC] brain map: 2950 gray vertices = 1141 network+medialwall + 1809 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.153, spin-test p=3.480e-01 (n_perm=1000)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.322, spin-test p=2.260e-01 (n_perm=1000)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=6.000e-03 (n_perm=1000)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06510051 0.05657246 0.04582049 0.04081043 0.02931718 0.02494076
+ 0.0213574  0.01784523 0.01564488 0.01361384]
+[Figure 2B] Limbic: SC top-bottom diff vs FC-G1 | Spearman r=0.028, spin-test p=8.320e-01 (n_perm=1000)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07198076 0.0565909  0.04657663 0.04256907 0.02974759 0.02757385
+ 0.02248579 0.01929712 0.01592571 0.01449905]
+[Figure 2B] Default: SC top-bottom diff vs FC-G1 | Spearman r=0.059, spin-test p=6.610e-01 (n_perm=1000)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07172028 0.05760099 0.04786445 0.04140921 0.0315522  0.02790752
+ 0.02204058 0.01884377 0.01660918 0.01485161]
+[Figure 2B] Cont: SC top-bottom diff vs FC-G1 | Spearman r=0.223, spin-test p=1.690e-01 (n_perm=1000)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07071977 0.05397567 0.04495766 0.04050063 0.02897344 0.0258407
+ 0.0221259  0.01961803 0.01577189 0.01372444]
+[Figure 2B] SalVentAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.168, spin-test p=2.960e-01 (n_perm=1000)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07197531 0.05406866 0.04581402 0.03993919 0.02982485 0.02646385
+ 0.02246062 0.01918664 0.01622792 0.01436681]
+[Figure 2B] DorsAttn: SC top-bottom diff vs FC-G1 | Spearman r=0.175, spin-test p=3.160e-01 (n_perm=1000)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07241526 0.05382881 0.04770013 0.04440305 0.03089837 0.02818221
+ 0.02234849 0.0194658  0.01688733 0.01543852]
+[Figure 2B] Vis: SC top-bottom diff vs FC-G1 | Spearman r=0.021, spin-test p=9.210e-01 (n_perm=1000)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07336251 0.05519619 0.04805209 0.04352429 0.02997875 0.02735288
+ 0.02259273 0.01943277 0.01630461 0.01521577]
+[Figure 2B] SomMot: SC top-bottom diff vs FC-G1 | Spearman r=0.121, spin-test p=4.090e-01 (n_perm=1000)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-08 11:15:17
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07084845 0.05407565 0.04497842 0.04050057 0.02898292 0.02583986
+ 0.0221431  0.01961979 0.01578202 0.01372575]
+[SC] brain map: 2950 gray vertices = 1141 network+medialwall + 1809 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.154, spin-test p=3.450e-01 (n_perm=1000)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.322, spin-test p=2.260e-01 (n_perm=1000)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=6.000e-03 (n_perm=1000)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06507422 0.05650096 0.04581276 0.04078772 0.02930512 0.02493788
+ 0.02135652 0.01783094 0.01564032 0.01361601]
+[Figure 2B] Limbic: MPC top-bottom diff vs FC-G1 | Spearman r=-0.371, spin-test p=1.300e-02 (n_perm=1000)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07201472 0.05657273 0.04664533 0.04257405 0.02972832 0.02755351
+ 0.02245996 0.01929264 0.01592559 0.01449368]
+[Figure 2B] Default: MPC top-bottom diff vs FC-G1 | Spearman r=0.368, spin-test p=1.000e-02 (n_perm=1000)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07184503 0.05768675 0.04792109 0.04149383 0.03157421 0.02792025
+ 0.02204877 0.01885768 0.01661707 0.01486524]
+[Figure 2B] Cont: MPC top-bottom diff vs FC-G1 | Spearman r=0.352, spin-test p=1.300e-02 (n_perm=1000)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07083917 0.05403708 0.04501311 0.04053763 0.02897116 0.02585516
+ 0.02214073 0.01962715 0.01578335 0.01372728]
+[Figure 2B] SalVentAttn: MPC top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=6.000e-03 (n_perm=1000)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07204071 0.05414245 0.04592506 0.03997285 0.02981041 0.02645921
+ 0.02246112 0.01918449 0.01624317 0.01437005]
+[Figure 2B] DorsAttn: MPC top-bottom diff vs FC-G1 | Spearman r=0.309, spin-test p=1.900e-02 (n_perm=1000)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07239506 0.05382052 0.04775708 0.04441847 0.03090002 0.02820082
+ 0.02235845 0.01948199 0.01690191 0.01544925]
+[Figure 2B] Vis: MPC top-bottom diff vs FC-G1 | Spearman r=-0.364, spin-test p=9.000e-03 (n_perm=1000)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07336661 0.05524644 0.04808295 0.04356148 0.02998886 0.027366
+ 0.02260343 0.01943309 0.01630681 0.0152183 ]
+[Figure 2B] SomMot: MPC top-bottom diff vs FC-G1 | Spearman r=0.208, spin-test p=1.470e-01 (n_perm=1000)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-13 15:51:43
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-13 15:59:33
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-13 16:05:26
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-13 16:09:43
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07080107 0.05404731 0.04500934 0.04054566 0.0289878  0.02585557
+ 0.02214699 0.01962996 0.01578227 0.01373053]
+[SC] brain map: 3586 gray vertices = 1141 network+medialwall + 2445 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.166, spin-test p=2.830e-01 (n_perm=1000)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.323, spin-test p=2.260e-01 (n_perm=1000)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=6.000e-03 (n_perm=1000)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06506013 0.05649216 0.04577269 0.04079898 0.02931675 0.02493835
+ 0.02135243 0.01783531 0.01564123 0.01361033]
+[Figure 2B] Limbic: MPC top-bottom diff vs FC-G1 | Spearman r=-0.377, spin-test p=1.300e-02 (n_perm=1000)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07210157 0.05663643 0.046712   0.04261063 0.02978273 0.02757765
+ 0.02248999 0.01931257 0.01593705 0.01451226]
+[Figure 2B] Default: MPC top-bottom diff vs FC-G1 | Spearman r=0.368, spin-test p=1.000e-02 (n_perm=1000)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07179409 0.05767039 0.04787141 0.04143982 0.03162124 0.02791485
+ 0.0220487  0.0188544  0.01660996 0.01486435]
+[Figure 2B] Cont: MPC top-bottom diff vs FC-G1 | Spearman r=0.352, spin-test p=1.300e-02 (n_perm=1000)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07082808 0.0540302  0.04503768 0.04051778 0.02898817 0.02585341
+ 0.02213418 0.01962048 0.01577998 0.01372478]
+[Figure 2B] SalVentAttn: MPC top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=6.000e-03 (n_perm=1000)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07207967 0.05413198 0.04588608 0.03994314 0.02982305 0.02647589
+ 0.02245657 0.0191973  0.01622895 0.01437148]
+[Figure 2B] DorsAttn: MPC top-bottom diff vs FC-G1 | Spearman r=0.309, spin-test p=1.900e-02 (n_perm=1000)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.0724443  0.05386701 0.04775046 0.04444809 0.03090231 0.02821318
+ 0.02235991 0.0194913  0.01689564 0.01544519]
+[Figure 2B] Vis: MPC top-bottom diff vs FC-G1 | Spearman r=-0.364, spin-test p=9.000e-03 (n_perm=1000)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-13 16:25:52
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07092404 0.05405128 0.04502363 0.04057563 0.02899456 0.02586622
+ 0.02214964 0.01962353 0.01578516 0.01373631]
+[SC] brain map: 3586 gray vertices = 1141 network+medialwall + 2445 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.164, spin-test p=2.860e-01 (n_perm=1000)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.325, spin-test p=2.240e-01 (n_perm=1000)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=6.000e-03 (n_perm=1000)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06506934 0.05649657 0.0458091  0.04078558 0.02928077 0.0249117
+ 0.0213534  0.01783332 0.01563961 0.01361441]
+[Figure 2B] Limbic: MPC top-bottom diff vs FC-G1 | Spearman r=-0.380, spin-test p=1.300e-02 (n_perm=1000)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07203503 0.05659211 0.04667657 0.042585   0.02973732 0.02758266
+ 0.02247441 0.01930388 0.01593351 0.01449836]
+[Figure 2B] Default: MPC top-bottom diff vs FC-G1 | Spearman r=0.368, spin-test p=1.000e-02 (n_perm=1000)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07179548 0.05766068 0.04791773 0.04145773 0.03157626 0.02791471
+ 0.02204984 0.01885307 0.01661888 0.01486234]
+[Figure 2B] Cont: MPC top-bottom diff vs FC-G1 | Spearman r=0.352, spin-test p=1.300e-02 (n_perm=1000)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.0707219  0.05403503 0.04498056 0.04049377 0.02895515 0.02584947
+ 0.02213705 0.01962072 0.01577447 0.01372149]
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-13 16:52:58
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07083978 0.05408691 0.04504439 0.04049876 0.02899189 0.02586124
+ 0.0221417  0.01962438 0.01578618 0.01372994]
+[SC] brain map: 3586 gray vertices = 1141 network+medialwall + 2445 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.164, spin-test p=2.900e-01 (n_perm=1000)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.321, spin-test p=2.280e-01 (n_perm=1000)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=6.000e-03 (n_perm=1000)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06502945 0.05651846 0.04584793 0.0408089  0.02928621 0.02492726
+ 0.02135204 0.01783817 0.01564371 0.01361469]
+[Figure 2B] Limbic: MPC top-bottom diff vs FC-G1 | Spearman r=-0.377, spin-test p=1.300e-02 (n_perm=1000)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07206226 0.05667503 0.04672069 0.04263001 0.0297747  0.02759893
+ 0.02248746 0.01931424 0.01593353 0.01450928]
+[Figure 2B] Default: MPC top-bottom diff vs FC-G1 | Spearman r=0.368, spin-test p=1.000e-02 (n_perm=1000)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07180052 0.05764897 0.04794999 0.04146797 0.03157987 0.02793913
+ 0.02206192 0.01887303 0.01661772 0.01486381]
+[Figure 2B] Cont: MPC top-bottom diff vs FC-G1 | Spearman r=0.352, spin-test p=1.300e-02 (n_perm=1000)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07089302 0.0540644  0.04501777 0.04054777 0.02898545 0.02585886
+ 0.02214064 0.01962882 0.01578645 0.01372816]
+[Figure 2B] SalVentAttn: MPC top-bottom diff vs FC-G1 | Spearman r=0.384, spin-test p=6.000e-03 (n_perm=1000)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.0720125  0.05406786 0.04585001 0.03996584 0.0298338  0.0264598
+ 0.02244964 0.0191923  0.01623048 0.0143667 ]
+[Figure 2B] DorsAttn: MPC top-bottom diff vs FC-G1 | Spearman r=0.309, spin-test p=1.900e-02 (n_perm=1000)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07243096 0.05383842 0.04781935 0.04442314 0.03090479 0.02819925
+ 0.02235986 0.01947706 0.01689693 0.01543616]
+[Figure 2B] Vis: MPC top-bottom diff vs FC-G1 | Spearman r=-0.364, spin-test p=9.000e-03 (n_perm=1000)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.0733644  0.05525639 0.04809826 0.04362226 0.0299942  0.02738478
+ 0.02261747 0.0194503  0.01631512 0.01522322]
+[Figure 2B] SomMot: MPC top-bottom diff vs FC-G1 | Spearman r=0.207, spin-test p=1.470e-01 (n_perm=1000)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-13 17:21:26
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-13 17:31:55
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-13 17:36:26
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.0708499  0.0540238  0.04501624 0.04052802 0.02897673 0.02586337
+ 0.02215123 0.01962997 0.01578354 0.01373065]
+[SC] brain map: 3586 gray vertices = 1141 network+medialwall + 2445 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.166, spin-test p=2.830e-01 (n_perm=1000)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.324, spin-test p=2.250e-01 (n_perm=1000)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.404, spin-test p=4.000e-03 (n_perm=1000)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06506757 0.05649891 0.04577619 0.04079362 0.02929718 0.02491549
+ 0.02134461 0.01782165 0.01563921 0.01361118]
+[Figure 2B] Limbic: MPC top-bottom diff vs FC-G1 | Spearman r=-0.390, spin-test p=1.400e-02 (n_perm=1000)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.0721323  0.05662227 0.04669335 0.04262305 0.02979531 0.02758946
+ 0.02249336 0.0193072  0.01593179 0.01451358]
+[Figure 2B] Default: MPC top-bottom diff vs FC-G1 | Spearman r=0.385, spin-test p=7.000e-03 (n_perm=1000)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07183632 0.0576929  0.04797082 0.04147096 0.03156318 0.0279169
+ 0.02205276 0.01885223 0.01661447 0.01486075]
+[Figure 2B] Cont: MPC top-bottom diff vs FC-G1 | Spearman r=0.365, spin-test p=1.300e-02 (n_perm=1000)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07083018 0.05402013 0.04498098 0.04051738 0.0289775  0.02585763
+ 0.02213031 0.01962548 0.01578122 0.01372698]
+[Figure 2B] SalVentAttn: MPC top-bottom diff vs FC-G1 | Spearman r=0.403, spin-test p=4.000e-03 (n_perm=1000)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07194756 0.05402085 0.04577572 0.03993631 0.02980319 0.02645251
+ 0.02243648 0.0191698  0.01622427 0.01436433]
+[Figure 2B] DorsAttn: MPC top-bottom diff vs FC-G1 | Spearman r=0.328, spin-test p=1.700e-02 (n_perm=1000)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07238976 0.05387379 0.04778669 0.04437792 0.03089519 0.02821191
+ 0.02235757 0.01949003 0.01689307 0.01543875]
+[Figure 2B] Vis: MPC top-bottom diff vs FC-G1 | Spearman r=-0.371, spin-test p=1.000e-02 (n_perm=1000)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07329866 0.05525481 0.04805117 0.04347551 0.02998156 0.02737237
+ 0.02258974 0.01942293 0.01630331 0.01521864]
+[Figure 2B] SomMot: MPC top-bottom diff vs FC-G1 | Spearman r=0.213, spin-test p=1.390e-01 (n_perm=1000)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-13 19:03:13
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07076421 0.05399609 0.04497941 0.04047767 0.02897188 0.0258491
+ 0.02212703 0.0196184  0.01577426 0.01372132]
+[SC] brain map: 2541 gray vertices = 1141 network+medialwall + 1400 connectivity-sparse
+[Figure 2A] SC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.138, spin-test p=3.910e-01 (n_perm=1000)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=-0.325, spin-test p=2.240e-01 (n_perm=1000)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn top-bottom diff vs FC-G1 | Spearman r=0.404, spin-test p=4.000e-03 (n_perm=1000)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06503606 0.05648573 0.0458043  0.04078554 0.02931056 0.02492739
+ 0.02135404 0.01783271 0.01563995 0.01361545]
+[Figure 2B] Limbic: MPC top-bottom diff vs FC-G1 | Spearman r=-0.391, spin-test p=1.400e-02 (n_perm=1000)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07207326 0.05658793 0.04667721 0.04257075 0.02975531 0.02756751
+ 0.022481   0.01929887 0.01592804 0.01450079]
+[Figure 2B] Default: MPC top-bottom diff vs FC-G1 | Spearman r=0.385, spin-test p=7.000e-03 (n_perm=1000)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07174442 0.05761182 0.04789091 0.04145812 0.03159008 0.02790083
+ 0.02203743 0.01885287 0.01661502 0.01485867]
+[Figure 2B] Cont: MPC top-bottom diff vs FC-G1 | Spearman r=0.369, spin-test p=1.100e-02 (n_perm=1000)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07083557 0.05402516 0.04508956 0.04053157 0.02896908 0.02586301
+ 0.02213629 0.01960064 0.01578764 0.01373322]
+[Figure 2B] SalVentAttn: MPC top-bottom diff vs FC-G1 | Spearman r=0.404, spin-test p=4.000e-03 (n_perm=1000)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07204376 0.0541193  0.04586371 0.04003446 0.02983759 0.02646818
+ 0.02246175 0.01920171 0.01623007 0.01437288]
+[Figure 2B] DorsAttn: MPC top-bottom diff vs FC-G1 | Spearman r=0.328, spin-test p=1.700e-02 (n_perm=1000)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07235636 0.05383054 0.04772473 0.0444032  0.03088474 0.02818807
+ 0.02234948 0.01948777 0.01688958 0.01543576]
+[Figure 2B] Vis: MPC top-bottom diff vs FC-G1 | Spearman r=-0.371, spin-test p=1.000e-02 (n_perm=1000)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07336262 0.05523219 0.04810609 0.04355375 0.02999869 0.02737233
+ 0.02260071 0.01943818 0.01631166 0.01522238]
+[Figure 2B] SomMot: MPC top-bottom diff vs FC-G1 | Spearman r=0.213, spin-test p=1.390e-01 (n_perm=1000)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-20 10:13:50
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07076703 0.05401907 0.04499232 0.0405282  0.02897623 0.02585399
+ 0.0221351  0.01962271 0.01578049 0.01372412]
+[SC] brain map: 2502 gray vertices = 1141 network+medialwall + 1361 connectivity-sparse
+[Figure 2A] SC: SalVentAttn decile regression slope vs FC-G1 | Spearman r=0.168, spin-test p=1.360e-01 (n_perm=1000)
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn decile regression slope vs FC-G1 | Spearman r=-0.317, spin-test p=2.240e-01 (n_perm=1000)
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn decile regression slope vs FC-G1 | Spearman r=0.400, spin-test p=4.000e-03 (n_perm=1000)
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06512834 0.05652525 0.04583104 0.04081537 0.02932097 0.02494302
+ 0.02136614 0.01784464 0.01564962 0.01361739]
+[Figure 2B] Limbic: MPC decile regression slope vs FC-G1 | Spearman r=-0.391, spin-test p=1.300e-02 (n_perm=1000)
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.0720394  0.05656498 0.0466277  0.04257074 0.02976542 0.02756664
+ 0.02246555 0.01930513 0.01592478 0.01450109]
+[Figure 2B] Default: MPC decile regression slope vs FC-G1 | Spearman r=0.386, spin-test p=7.000e-03 (n_perm=1000)
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07182801 0.05765144 0.04793346 0.04149806 0.03157942 0.02793401
+ 0.02205042 0.01885861 0.01662579 0.01486413]
+[Figure 2B] Cont: MPC decile regression slope vs FC-G1 | Spearman r=0.367, spin-test p=1.200e-02 (n_perm=1000)
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07080159 0.05404667 0.04498838 0.04057359 0.02900654 0.02587487
+ 0.02213343 0.0196296  0.01578196 0.01372625]
+[Figure 2B] SalVentAttn: MPC decile regression slope vs FC-G1 | Spearman r=0.400, spin-test p=4.000e-03 (n_perm=1000)
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07198544 0.05407008 0.04583377 0.03994275 0.02982053 0.02647203
+ 0.02246127 0.01918781 0.01622723 0.01437119]
+[Figure 2B] DorsAttn: MPC decile regression slope vs FC-G1 | Spearman r=0.329, spin-test p=1.600e-02 (n_perm=1000)
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07233612 0.05382182 0.04775456 0.04435928 0.0308771  0.02819829
+ 0.02234978 0.01947994 0.01688801 0.01543136]
+[Figure 2B] Vis: MPC decile regression slope vs FC-G1 | Spearman r=-0.371, spin-test p=1.100e-02 (n_perm=1000)
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07347679 0.05526039 0.04811235 0.04358632 0.02999858 0.02738102
+ 0.02260189 0.0194497  0.01631535 0.01522567]
+[Figure 2B] SomMot: MPC decile regression slope vs FC-G1 | Spearman r=0.215, spin-test p=1.380e-01 (n_perm=1000)
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-20 11:53:39
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07081544 0.05401593 0.04497309 0.04052983 0.02896459 0.02584542
+ 0.02213034 0.01961998 0.01577171 0.01372508]
+[SC] brain map: 2092 gray vertices = 1141 network+medialwall + 951 connectivity-sparse
+[Figure 2A] SC: SalVentAttn decile regression slope vs FC-G1 | Spearman r=0.284, spin-test p=3.900e-02 (n_perm=1000) | one-sample t=-29.99, p=6.700e-187
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn decile regression slope vs FC-G1 | Spearman r=-0.158, spin-test p=5.730e-01 (n_perm=1000) | one-sample t=90.73, p=0.000e+00
+[MPC] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn decile regression slope vs FC-G1 | Spearman r=0.410, spin-test p=5.000e-03 (n_perm=1000) | one-sample t=-6.21, p=5.485e-10
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06511019 0.05649247 0.04580978 0.04079806 0.02929341 0.02492464
+ 0.02135714 0.01783867 0.01564356 0.01361282]
+[Figure 2B] Limbic: MPC decile regression slope vs FC-G1 | Spearman r=-0.400, spin-test p=1.100e-02 (n_perm=1000) | one-sample t=7.97, p=1.837e-15
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07199208 0.05659078 0.04668113 0.04256046 0.02973526 0.02756326
+ 0.02247716 0.01930545 0.01593135 0.01450008]
+[Figure 2B] Default: MPC decile regression slope vs FC-G1 | Spearman r=0.403, spin-test p=7.000e-03 (n_perm=1000) | one-sample t=-4.31, p=1.675e-05
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07182104 0.05765788 0.04797586 0.0414503  0.03157284 0.02792721
+ 0.02206018 0.01886103 0.01662117 0.01486909]
+[Figure 2B] Cont: MPC decile regression slope vs FC-G1 | Spearman r=0.379, spin-test p=1.100e-02 (n_perm=1000) | one-sample t=-6.37, p=1.999e-10
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07068    0.05401689 0.04493448 0.04049518 0.02897536 0.02583952
+ 0.02212204 0.01960429 0.01577352 0.01372149]
+[Figure 2B] SalVentAttn: MPC decile regression slope vs FC-G1 | Spearman r=0.410, spin-test p=5.000e-03 (n_perm=1000) | one-sample t=-6.20, p=5.800e-10
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07200747 0.05408395 0.04579503 0.0399316  0.02983626 0.02647028
+ 0.02245812 0.01918432 0.01622881 0.01437159]
+[Figure 2B] DorsAttn: MPC decile regression slope vs FC-G1 | Spearman r=0.333, spin-test p=1.800e-02 (n_perm=1000) | one-sample t=-12.73, p=9.241e-37
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07240482 0.05385812 0.04772559 0.04443873 0.03091176 0.02821219
+ 0.02235877 0.01948973 0.01689706 0.01544414]
+[Figure 2B] Vis: MPC decile regression slope vs FC-G1 | Spearman r=-0.373, spin-test p=9.000e-03 (n_perm=1000) | one-sample t=15.17, p=3.339e-51
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07338674 0.05528293 0.04811804 0.04361531 0.02999595 0.02739089
+ 0.02260003 0.01944141 0.01631652 0.01522546]
+[Figure 2B] SomMot: MPC decile regression slope vs FC-G1 | Spearman r=0.220, spin-test p=1.380e-01 (n_perm=1000) | one-sample t=-28.39, p=4.507e-168
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-20 15:30:50
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07087255 0.05403121 0.04501476 0.04053355 0.02897951 0.02585973
+ 0.02213844 0.01962559 0.01578197 0.01372775]
+[SC] brain map: 2092 gray vertices = 1141 network+medialwall + 951 connectivity-sparse
+[Figure 2A] SC: SalVentAttn decile regression slope vs FC-G1 | Spearman r=0.284, spin-test p=3.900e-02 (n_perm=1000) | one-sample t=-29.93, p=3.565e-186
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn decile regression slope vs FC-G1 | Spearman r=-0.157, spin-test p=5.720e-01 (n_perm=1000) | one-sample t=90.48, p=0.000e+00
+[MPC] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn decile regression slope vs FC-G1 | Spearman r=0.410, spin-test p=5.000e-03 (n_perm=1000) | one-sample t=-6.21, p=5.488e-10
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06510697 0.05658603 0.04584913 0.04084128 0.02930921 0.02493947
+ 0.0213645  0.01784737 0.01564975 0.01361951]
+[Figure 2B] Limbic: MPC decile regression slope vs FC-G1 | Spearman r=-0.398, spin-test p=1.100e-02 (n_perm=1000) | one-sample t=8.03, p=1.133e-15
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07207627 0.05656737 0.04665545 0.04264636 0.02977318 0.02757089
+ 0.02248328 0.01930859 0.01593511 0.01450477]
+[Figure 2B] Default: MPC decile regression slope vs FC-G1 | Spearman r=0.403, spin-test p=7.000e-03 (n_perm=1000) | one-sample t=-4.30, p=1.707e-05
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07182039 0.05768342 0.04794948 0.04146872 0.03158397 0.02788067
+ 0.02205353 0.01886168 0.01661927 0.0148543 ]
+[Figure 2B] Cont: MPC decile regression slope vs FC-G1 | Spearman r=0.379, spin-test p=1.100e-02 (n_perm=1000) | one-sample t=-6.37, p=2.016e-10
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07083224 0.0539903  0.04500329 0.04053841 0.02898527 0.025857
+ 0.02212153 0.01962555 0.01577748 0.01372467]
+[Figure 2B] SalVentAttn: MPC decile regression slope vs FC-G1 | Spearman r=0.410, spin-test p=5.000e-03 (n_perm=1000) | one-sample t=-6.21, p=5.681e-10
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.0720079  0.0540737  0.0458575  0.03997123 0.02981251 0.02647188
+ 0.02245343 0.01918397 0.01622822 0.01436836]
+[Figure 2B] DorsAttn: MPC decile regression slope vs FC-G1 | Spearman r=0.333, spin-test p=1.800e-02 (n_perm=1000) | one-sample t=-12.73, p=9.585e-37
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.0724107  0.05389792 0.04779056 0.04449255 0.03092377 0.02823551
+ 0.02236605 0.0194971  0.01690789 0.01545666]
+[Figure 2B] Vis: MPC decile regression slope vs FC-G1 | Spearman r=-0.373, spin-test p=9.000e-03 (n_perm=1000) | one-sample t=15.16, p=3.599e-51
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07334765 0.0552436  0.04805994 0.04352269 0.02996823 0.02736702
+ 0.02259906 0.01943343 0.01631692 0.01521992]
+[Figure 2B] SomMot: MPC decile regression slope vs FC-G1 | Spearman r=0.220, spin-test p=1.380e-01 (n_perm=1000) | one-sample t=-28.39, p=4.495e-168
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-21 10:09:59
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07085404 0.05406303 0.04500732 0.0405638  0.02898594 0.02586588
+ 0.02214606 0.01963567 0.01578655 0.01373233]
+[SC] brain map: 2092 gray vertices = 1141 network+medialwall + 951 connectivity-sparse
+[Figure 2A] SC: SalVentAttn decile regression slope vs FC-G1 | Spearman r=0.284, spin-test p=4.000e-02 (n_perm=1000) | one-sample t=-29.89, p=1.072e-185
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn decile regression slope vs FC-G1 | Spearman r=-0.158, spin-test p=5.710e-01 (n_perm=1000) | one-sample t=90.32, p=0.000e+00
+[MPC] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn decile regression slope vs FC-G1 | Spearman r=0.410, spin-test p=5.000e-03 (n_perm=1000) | one-sample t=-6.21, p=5.529e-10
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06507196 0.05652495 0.04582632 0.04079762 0.02930515 0.02492829
+ 0.0213565  0.0178312  0.01564295 0.01361175]
+[Figure 2B] Limbic: MPC decile regression slope vs FC-G1 | Spearman r=-0.397, spin-test p=1.100e-02 (n_perm=1000) | one-sample t=8.06, p=8.519e-16
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07215394 0.05658717 0.04674121 0.04262688 0.02975937 0.0275823
+ 0.0224808  0.01930994 0.01593839 0.01450683]
+[Figure 2B] Default: MPC decile regression slope vs FC-G1 | Spearman r=0.403, spin-test p=7.000e-03 (n_perm=1000) | one-sample t=-4.30, p=1.756e-05
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07179082 0.05761645 0.04788224 0.04145854 0.03157188 0.02791528
+ 0.02204883 0.01885417 0.01661914 0.01486282]
+[Figure 2B] Cont: MPC decile regression slope vs FC-G1 | Spearman r=0.379, spin-test p=1.100e-02 (n_perm=1000) | one-sample t=-6.37, p=2.025e-10
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07080311 0.05401033 0.04500665 0.04052457 0.02897958 0.02585267
+ 0.02213997 0.01962344 0.01578184 0.01372639]
+[Figure 2B] SalVentAttn: MPC decile regression slope vs FC-G1 | Spearman r=0.410, spin-test p=5.000e-03 (n_perm=1000) | one-sample t=-6.21, p=5.505e-10
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07201847 0.05405264 0.04579017 0.03992386 0.02978559 0.02645961
+ 0.02243093 0.01917743 0.01621681 0.01436299]
+[Figure 2B] DorsAttn: MPC decile regression slope vs FC-G1 | Spearman r=0.333, spin-test p=1.800e-02 (n_perm=1000) | one-sample t=-12.73, p=9.510e-37
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07239462 0.05385743 0.04784229 0.04443411 0.03091422 0.02822181
+ 0.0223572  0.01949445 0.0169002  0.0154466 ]
+[Figure 2B] Vis: MPC decile regression slope vs FC-G1 | Spearman r=-0.373, spin-test p=9.000e-03 (n_perm=1000) | one-sample t=15.18, p=2.889e-51
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.0734261  0.055256   0.04810948 0.04356558 0.02999955 0.02737717
+ 0.02260301 0.01943692 0.01631569 0.01522791]
+[Figure 2B] SomMot: MPC decile regression slope vs FC-G1 | Spearman r=0.220, spin-test p=1.380e-01 (n_perm=1000) | one-sample t=-28.40, p=4.283e-168
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-21 11:36:32
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07084521 0.05398799 0.04501935 0.04056782 0.02897729 0.02584918
+ 0.02213962 0.01962965 0.01578064 0.01372665]
+[SC] brain map: 2092 gray vertices = 1141 network+medialwall + 951 connectivity-sparse
+[Figure 2A] SC: SalVentAttn gradient regression slope vs FC-G1 | Spearman r=0.299, spin-test p=2.700e-02 (n_perm=1000) | one-sample t=-0.50, p=6.194e-01
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn gradient regression slope vs FC-G1 | Spearman r=-0.151, spin-test p=5.840e-01 (n_perm=1000) | one-sample t=85.93, p=0.000e+00
+[MPC] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn gradient regression slope vs FC-G1 | Spearman r=0.412, spin-test p=5.000e-03 (n_perm=1000) | one-sample t=-6.06, p=1.440e-09
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06510332 0.0565538  0.04582523 0.04080167 0.02930641 0.02493578
+ 0.02135524 0.01784076 0.01564616 0.01361592]
+[Figure 2B] Limbic: MPC gradient regression slope vs FC-G1 | Spearman r=-0.404, spin-test p=1.100e-02 (n_perm=1000) | one-sample t=7.96, p=2.007e-15
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07203512 0.05662832 0.04667843 0.04259536 0.02979179 0.02755235
+ 0.02248991 0.01931022 0.01593422 0.01450547]
+[Figure 2B] Default: MPC gradient regression slope vs FC-G1 | Spearman r=0.404, spin-test p=7.000e-03 (n_perm=1000) | one-sample t=-4.19, p=2.781e-05
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07177577 0.05764554 0.04791616 0.04148724 0.03157088 0.0279128
+ 0.0220398  0.01884452 0.01661503 0.01485445]
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-21 12:49:44
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-21 12:51:40
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-21 13:00:02
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-21 13:00:44
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07084639 0.05401182 0.04497207 0.04052471 0.02898512 0.02586302
+ 0.02212462 0.01962945 0.0157814  0.01371839]
+[SC] brain map: 2064 gray vertices = 1141 network+medialwall + 923 connectivity-sparse
+[Figure 2A] SC: SalVentAttn gradient regression slope vs FC-G1 | Spearman r=0.284, spin-test p=4.000e-02 (n_perm=1000) | one-sample t=-29.96, p=1.741e-186
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn gradient regression slope vs FC-G1 | Spearman r=-0.158, spin-test p=5.690e-01 (n_perm=1000) | one-sample t=90.25, p=0.000e+00
+[MPC] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn gradient regression slope vs FC-G1 | Spearman r=0.410, spin-test p=5.000e-03 (n_perm=1000) | one-sample t=-6.21, p=5.648e-10
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06510154 0.05656863 0.04582816 0.040837   0.02931677 0.02494534
+ 0.02137062 0.01784713 0.01565294 0.01361775]
+[Figure 2B] Limbic: MPC gradient regression slope vs FC-G1 | Spearman r=-0.400, spin-test p=1.100e-02 (n_perm=1000) | one-sample t=7.96, p=1.889e-15
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07201431 0.05661132 0.04666214 0.04259066 0.02974164 0.02757208
+ 0.02247866 0.01930503 0.01592883 0.01450355]
+[Figure 2B] Default: MPC gradient regression slope vs FC-G1 | Spearman r=0.403, spin-test p=7.000e-03 (n_perm=1000) | one-sample t=-4.30, p=1.714e-05
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07179221 0.05760508 0.04788646 0.04146487 0.03156932 0.02791252
+ 0.02204688 0.01885089 0.01661146 0.01486044]
+[Figure 2B] Cont: MPC gradient regression slope vs FC-G1 | Spearman r=0.379, spin-test p=1.100e-02 (n_perm=1000) | one-sample t=-6.37, p=2.015e-10
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07082413 0.05404109 0.04503316 0.04057404 0.02899023 0.02587458
+ 0.02213026 0.01963178 0.01578406 0.01372914]
+[Figure 2B] SalVentAttn: MPC gradient regression slope vs FC-G1 | Spearman r=0.410, spin-test p=5.000e-03 (n_perm=1000) | one-sample t=-6.22, p=5.395e-10
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.0719729  0.05406928 0.04586284 0.03994996 0.02980973 0.02647469
+ 0.02245552 0.01918239 0.01622733 0.01436164]
+[Figure 2B] DorsAttn: MPC gradient regression slope vs FC-G1 | Spearman r=0.333, spin-test p=1.800e-02 (n_perm=1000) | one-sample t=-12.73, p=8.865e-37
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07232481 0.05387319 0.04772055 0.04441467 0.03088488 0.02819457
+ 0.02235404 0.01947567 0.01688646 0.01544253]
+[Figure 2B] Vis: MPC gradient regression slope vs FC-G1 | Spearman r=-0.373, spin-test p=9.000e-03 (n_perm=1000) | one-sample t=15.16, p=3.895e-51
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07337435 0.05523916 0.04803656 0.04354119 0.02999405 0.02737298
+ 0.02259832 0.01942884 0.01630415 0.01521947]
+[Figure 2B] SomMot: MPC gradient regression slope vs FC-G1 | Spearman r=0.220, spin-test p=1.380e-01 (n_perm=1000) | one-sample t=-28.40, p=4.168e-168

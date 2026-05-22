@@ -93,11 +93,13 @@ def context_analysis(df_yeo_surf: pd.DataFrame, surf_32k, modalities: list[str],
         r_rand = np.asarray([spearmanr(x, d, nan_policy='omit')[0] for d in rand])
         pv_rand = np.mean(np.abs(r_rand) >= np.abs(r_obs))
         logger.info(f"[Figure 1B] {label}: MPC-gradient vs {label} | Spearman r={r_obs:.3f}, Moran permutation p={pv_rand:.3e} (n_perm={n_rep})")
-        stats_text = f"$r={r_obs:.2f}$\n$p_{{perm}}={pv_rand:.2e}$"
+        stats_text = f"$r={r_obs:.2f}$\n$p={pv_rand:.3f}$"
         ax.text(0.05, 0.95, stats_text, transform=ax.transAxes, va='top', fontweight='bold', fontsize=12)
         ax.set_ylim([-4,4])
         ax.set_xlim([-3,3])
         ax.set_yticks([-2, 2])
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
     ax.set_xlabel('MPC gradient')
     plt.tight_layout()
     plt.savefig(project_root / "results/figures/figure_1b_correlations.svg")

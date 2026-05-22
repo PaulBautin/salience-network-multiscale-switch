@@ -8,7 +8,7 @@ yeo7_rgb = np.array(
         [255, 180, 80],    # Frontoparietal
         [230, 90, 100],    # Default Mode
         [0, 170, 50],      # Dorsal Attention
-        [219, 219, 186],   # Limbic
+        [182, 176, 102],   # Limbic
         [210, 100, 255],   # Ventral Attention
         [100, 160, 220],   # Somatomotor
         [170, 70, 200],    # Visual
@@ -21,6 +21,16 @@ yeo7_alpha = np.ones((yeo7_rgb.shape[0], 1))
 yeo7_rgba = np.hstack((yeo7_rgb, yeo7_alpha))
 yeo7_cmap = mpl.colors.ListedColormap(yeo7_rgba, name="CustomCmap_yeo")
 mpl.colormaps.register(yeo7_cmap)
+
+yeo7_abbrev = {
+    "Cont":       "FPN",
+    "Default":    "DMN",
+    "DorsAttn":   "DAN",
+    "Limbic":     "Lim",
+    "SalVentAttn": "Sal",
+    "SomMot":     "SM",
+    "Vis":        "Vis",
+}
 
 
 # Von Economo – cortical types

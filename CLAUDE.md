@@ -6,8 +6,8 @@ What this repo does: See `README.md` for full detail.
 Primary language(s): Python (≥ 3.10).
 Key external tools: micapipe, brainspace.
 Key inputs: micapipe derivatives (MPC profiles, DWI connectomes), iEEG BIDS dataset, BigBrain dataset, AHEAD dataset. 
-Key output: SVG figures + intermediate TSV/CSV dataframes cached in `data/dataframes/`.
-Intended users: Neuroimaging researchers. Repo is public, citable, and must be fully reproducible.
+Key output: SVG figures in `results/figures` + intermediate TSV/CSV dataframes cached in `data/dataframes/`.
+Intended users: Neuroimaging researchers. Repo is public, citable, and must be fully reproducible. Meaning that after completing any feature or significant change, update the relevant .md files in the /docs folder to reflect what changed before finishing the task".
 
 ## Environment Setup
 
@@ -79,6 +79,6 @@ Most analyses use **fsLR-32k** space (64,984 vertices total: 32,492 LH + 32,492 
 - iEEG DataFrames: one row per channel, with `Subject`, `Session`, `ChannelName`, and signal/PSD columns.
 
 ### External data not in repo
-- PNI/MICs micapipe derivatives (T1 profiles, structural connectomes, tractography)
+- PNI/MICs micapipe derivatives (T1 profiles, structural connectomes, tractography) at `/data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0`
 - BIDS iEEG dataset at `/host/verges/tank/data/BIDS_iEEG/`
 - Baillarger/Intrusion MYATLAS parcellations (hardcoded paths in `atlas_load.py`)

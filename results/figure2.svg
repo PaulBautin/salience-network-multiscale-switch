@@ -29,9 +29,9 @@
      showgrid="false"
      showguides="false"
      height="296mm"
-     inkscape:zoom="1.28"
-     inkscape:cx="332.42188"
-     inkscape:cy="372.26562"
+     inkscape:zoom="0.90509668"
+     inkscape:cx="64.633979"
+     inkscape:cy="561.81843"
      inkscape:window-width="2560"
      inkscape:window-height="1347"
      inkscape:window-x="0"
@@ -573,8 +573,8 @@
        height="130.94847"
        xlink:href="figures/figure_2a_distance_metric.svg"
        id="image2133"
-       x="0.49021891"
-       y="24.552734" />
+       x="0.55214018"
+       y="17.673559" />
     <text
        fill="#000000"
        x="56.130974"
@@ -587,15 +587,15 @@
        style="stroke-width:0.052838" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
        x="0.53146946"
        y="4.1417646"
        id="text41577-9"><tspan
          sodipodi:role="line"
          id="tspan41575-3"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
          x="0.53146946"
-         y="4.1417646">A | White matter embedding of salience network microstructure gradient extremes</tspan></text>
+         y="4.1417646">A | Connectivity embedding of salience network microstructure gradient extremes</tspan></text>
     <text
        xml:space="preserve"
        transform="scale(0.26458333)"
@@ -604,223 +604,215 @@
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="60.781811"
-       height="25.325768"
-       xlink:href="figures/figure_2a_brain_SC_diff.svg"
-       id="image6343"
-       x="8.70403"
-       y="9.3154392" />
-    <image
-       preserveAspectRatio="none"
-       inkscape:svg-dpi="96"
-       width="60.87812"
-       height="25.365896"
-       xlink:href="figures/figure_2a_brain_Dist_diff.svg"
-       id="image6707"
-       x="80.492615"
-       y="9.3842926" />
-    <image
-       preserveAspectRatio="none"
-       inkscape:svg-dpi="96"
-       width="203.17041"
-       height="126.98151"
-       xlink:href="figures/figure_2b_distance_network.svg"
+       width="209.11812"
+       height="130.69882"
+       xlink:href="figures/figure_2b_distance_network_MPC.svg"
        id="image8184"
-       x="0.38742957"
-       y="155.10802" />
+       x="0.55214018"
+       y="149.2872" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
-       x="0.53147274"
-       y="158.87561"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
+       x="0.16353354"
+       y="153.05479"
        id="text41577"><tspan
          sodipodi:role="line"
          id="tspan41575"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-         x="0.53147274"
-         y="158.87561">B | White matter embedding of each network microstructure gradient extremes</tspan></text>
-    <rect
-       style="fill:#dbdbba;fill-opacity:1;stroke-width:0.187089"
-       id="rect251904"
-       width="2"
-       height="4"
-       x="161.21626"
-       y="234.22426" />
-    <rect
-       style="fill:#e7646e;fill-opacity:1;stroke-width:0.187089;stroke-linecap:butt;stroke-linejoin:round"
-       id="rect251904-3"
-       width="2"
-       height="4"
-       x="161.21626"
-       y="238.22426" />
-    <rect
-       style="fill:#ffb656;fill-opacity:1;stroke-width:0.187089;stroke-linecap:butt;stroke-linejoin:round"
-       id="rect251904-3-2"
-       width="2"
-       height="4"
-       x="161.21626"
-       y="242.22426" />
-    <rect
-       style="fill:#0faf3d;fill-opacity:1;stroke-width:0.187089;stroke-linecap:butt;stroke-linejoin:round"
-       id="rect251904-3-2-5"
-       width="2"
-       height="4"
-       x="161.21626"
-       y="246.22426" />
-    <rect
-       style="fill:#b258cd;fill-opacity:1;stroke-width:0.187089;stroke-linecap:butt;stroke-linejoin:round"
-       id="rect251904-3-2-5-4"
-       width="2"
-       height="4"
-       x="161.21626"
-       y="254.22427" />
-    <rect
-       style="fill:#70a7de;fill-opacity:1;stroke-width:0.187089;stroke-linecap:butt;stroke-linejoin:round"
-       id="rect251904-3-2-5-4-3"
-       width="2"
-       height="4"
-       x="161.21626"
-       y="258.2243" />
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+         x="0.16353354"
+         y="153.05479">B | Connectivity embedding of each network microstructure gradient extremes</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:2.59297px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
        x="163.87773"
-       y="237.23695"
+       y="231.41614"
        id="text337525"><tspan
          sodipodi:role="line"
          id="tspan337523"
-         style="stroke-width:0.264583"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
          x="163.87773"
-         y="237.23695">Limbic</tspan></text>
+         y="231.41614">Limbic (Lim)</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:2.59297px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-size:2.59297px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;fill:#808080;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
+       x="3.3269353"
+       y="277.97137"
+       id="text337525-3"><tspan
+         sodipodi:role="line"
+         id="tspan337523-8"
+         style="fill:#808080;stroke-width:0.264583"
+         x="3.3269353"
+         y="277.97137">r = Pearson correlation; p = Spin test p-values; Gray band = 95% CI.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.59297px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#808080;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
+       x="4.5934834"
+       y="146.80072"
+       id="text337525-3-9"><tspan
+         sodipodi:role="line"
+         id="tspan406849"
+         x="4.5934834"
+         y="146.80072">top = 25% top values of salience network MPC gradient; bottom = 25% bottom values of salience network MPC gradient</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
+       x="161.36943"
+       y="227.1048"
+       id="text337525-57"><tspan
+         sodipodi:role="line"
+         id="tspan337523-1"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+         x="161.36943"
+         y="227.1048">Networks</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
        x="163.87773"
-       y="245.2811"
+       y="239.46036"
        id="text337525-59"><tspan
          sodipodi:role="line"
          id="tspan337523-5"
-         style="stroke-width:0.264583"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
          x="163.87773"
-         y="245.2811">Control</tspan></text>
+         y="239.46036">Control (FPN)</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:2.59297px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
        x="163.87773"
-       y="249.30318"
+       y="243.48259"
        id="text337525-59-8"><tspan
          sodipodi:role="line"
          id="tspan337523-5-3"
-         style="stroke-width:0.264583"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
          x="163.87773"
-         y="249.30318">DorsAttn</tspan></text>
+         y="243.48259">DorsAttn (DAN)</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:2.59297px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
        x="163.87773"
-       y="257.32526"
+       y="251.50462"
        id="text337525-59-8-3"><tspan
          sodipodi:role="line"
          id="tspan337523-5-3-1"
-         style="stroke-width:0.264583"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
          x="163.87773"
-         y="257.32526">Visual</tspan></text>
-    <rect
-       style="fill:#d56fff;fill-opacity:1;stroke-width:0.187089;stroke-linecap:butt;stroke-linejoin:round"
-       id="rect251904-3-2-5-4-6"
-       width="2"
-       height="4"
-       x="161.21626"
-       y="250.22427" />
+         y="251.50462">Visual (Vis)</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:2.59297px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
        x="163.87773"
-       y="253.32523"
+       y="247.50462"
        id="text337525-59-8-3-1"><tspan
          sodipodi:role="line"
          id="tspan337523-5-3-1-7"
-         style="stroke-width:0.264583"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
          x="163.87773"
-         y="253.32523">SalVentAttn</tspan></text>
+         y="247.50462">SalVentAttn (Sal)</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:2.59297px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
        x="163.87773"
-       y="261.34732"
+       y="255.52657"
        id="text337525-59-8-3-9"><tspan
          sodipodi:role="line"
          id="tspan337523-5-3-1-9"
-         style="stroke-width:0.264583"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
          x="163.87773"
-         y="261.34732">SomMot</tspan></text>
+         y="255.52657">SomMot (SM)</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:2.59297px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
        x="163.87773"
-       y="241.25903"
+       y="235.4382"
        id="text337525-5"><tspan
          sodipodi:role="line"
          id="tspan337523-6"
-         style="stroke-width:0.264583"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
          x="163.87773"
-         y="241.25903">Default</tspan></text>
-    <text
-       id="text67413-3"
-       x="32.030025"
-       y="31.162933"
-       style="font-size:2.23823px;stroke-width:0.186519"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.61127px;line-height:normal;font-family:'Open Sans';stroke-width:0.186519"
-         x="32.030025 33.463165 38.202213 38.880531 39.720779 40.399097 41.832237"
-         y="31.002644"
-         id="tspan67409-7">SC - SC</tspan><tspan
-         style="font-style:oblique;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.82789px;line-height:normal;font-family:'DejaVu Sans';stroke-width:0.186519"
-         x="35.135498 35.852196 36.970531 43.504574 44.664856 45.783188 46.499886 47.216583 48.334915"
-         y="31.431053"
-         id="tspan67411-2">topbottom</tspan></text>
-    <text
-       id="text186270-3"
-       x="97.613724"
-       y="30.983141"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.61016px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.18644;stroke-linecap:butt;stroke-linejoin:round"><tspan
-         sodipodi:role="line"
-         id="tspan106168"
-         x="97.613724"
-         y="30.983141"
-         dy="0 0 0 0 0 -0.20670573">GD<tspan
-   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.82704px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
-   id="tspan108816"
-   dy="0.20670573">top</tspan> - GD<tspan
-   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.82704px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
-   id="tspan109808"
-   dy="0.20670573">bottom</tspan></tspan></text>
+         y="235.4382">Default (DMN)</tspan></text>
     <text
        id="text67413-3-1"
-       x="61.078564"
+       x="65.054939"
        y="9.1728935"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.186519;stroke-linecap:butt;stroke-linejoin:round"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.186519"
-         x="39.726734"
+         x="43.703114"
          y="9.0126028"
          id="tspan67409-7-4">Structural connectivity (SC)</tspan></text>
     <text
        id="text67413-3-1-7"
-       x="122.14618"
+       x="122.9537"
        y="9.1728935"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.186519;stroke-linecap:butt;stroke-linejoin:round"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.186519"
-         x="108.98582"
+         x="109.79333"
          y="9.0126028"
          id="tspan67409-7-4-0">Geodesic distance (GD)</tspan></text>
     <text
+       id="text67413-3-1-7-2"
+       x="122.9537"
+       y="106.28304"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.186519;stroke-linecap:butt;stroke-linejoin:round"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.186519"
+         x="109.79333"
+         y="106.12275"
+         id="tspan67409-7-4-0-2"
+         dy="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.29232603 0 0 -0.29232603 0 0 0 0.29232603 0 0 0 0 0 -0.29232603">Average connectivty difference per network (C<tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan318888">top</tspan> - C<tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan322364">bottom</tspan>)</tspan></text>
+    <text
        id="text67413-3-1-7-9"
-       x="192.22212"
+       x="190.10599"
        y="9.1728907"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.186519;stroke-linecap:butt;stroke-linejoin:round"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.186519"
-         x="178.21687"
+         x="176.10074"
          y="9.0126028"
          id="tspan67409-7-4-0-1">Microstructure profile cov. (MPC)</tspan></text>
+    <circle
+       style="fill:#b9b36c;fill-opacity:1;stroke:#b9b36c;stroke-width:0.25;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
+       id="path127016"
+       cx="162.19679"
+       cy="230.26138"
+       r="1" />
+    <circle
+       style="fill:#e7646e;fill-opacity:1;stroke:#e7646e;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
+       id="path127016-8"
+       cx="162.19679"
+       cy="234.30388"
+       r="1" />
+    <circle
+       style="fill:#ffb656;fill-opacity:1;stroke:#ffb656;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
+       id="path127016-8-9"
+       cx="162.19679"
+       cy="238.34642"
+       r="1" />
+    <circle
+       style="fill:#0faf3d;fill-opacity:1;stroke:#0faf3d;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
+       id="path127016-8-9-0"
+       cx="162.19679"
+       cy="242.3891"
+       r="1" />
+    <circle
+       style="fill:#d56fff;fill-opacity:1;stroke:#d56fff;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
+       id="path127016-8-9-0-2"
+       cx="162.19679"
+       cy="246.43167"
+       r="1" />
+    <circle
+       style="fill:#b258cd;fill-opacity:1;stroke:#b258cd;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
+       id="path127016-8-9-0-2-4"
+       cx="162.19679"
+       cy="250.47417"
+       r="1" />
+    <circle
+       style="fill:#70a7de;fill-opacity:1;stroke:#70a7de;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
+       id="path127016-8-9-0-2-4-7"
+       cx="162.19679"
+       cy="254.51656"
+       r="1" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
@@ -828,21 +820,72 @@
        height="25.365896"
        xlink:href="figures/figure_2a_brain_MPC_diff.svg"
        id="image42142"
-       x="146.08751"
-       y="9.9942036" />
+       x="145.68321"
+       y="12.755898" />
+    <image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="60.781811"
+       height="25.325768"
+       xlink:href="figures/figure_2a_brain_SC_diff.svg"
+       id="image6343"
+       x="13.276896"
+       y="12.728354" />
+    <image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="60.847729"
+       height="25.365896"
+       xlink:href="figures/figure_2a_brain_GD_diff.svg"
+       id="image6707"
+       x="79.316933"
+       y="12.651865" />
+    <text
+       id="text67413-3"
+       x="31.824175"
+       y="13.17126"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#4d4d4d;stroke-width:0.186519;stroke-linecap:butt;stroke-linejoin:round"><tspan
+         sodipodi:role="line"
+         id="tspan224017"
+         x="31.824175"
+         y="13.17126"
+         dy="0 0 0.29232603 0 0 -0.29232603 0 0 0 0 0.29232603"
+         style="fill:#4d4d4d">SC<tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan237034">top</tspan> - SC<tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan240500">bottom</tspan></tspan></text>
+    <text
+       id="text186270-3"
+       x="97.696053"
+       y="13.173973"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.61016px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#4d4d4d;stroke-width:0.18644;stroke-linecap:butt;stroke-linejoin:round"><tspan
+         sodipodi:role="line"
+         id="tspan106168"
+         x="97.696053"
+         y="13.173973"
+         dy="0 0 0 0 0 -0.20670573"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#4d4d4d">GD<tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#4d4d4d"
+   id="tspan108816"
+   dy="0.20670573">top</tspan> - GD<tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#4d4d4d"
+   id="tspan109808"
+   dy="0.20670573">bottom</tspan></tspan></text>
     <text
        id="text186126-1"
-       x="165.08377"
-       y="31.245277"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.61016px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.18644;stroke-linecap:butt;stroke-linejoin:round"><tspan
+       x="161.85889"
+       y="13.173973"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.61016px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#4d4d4d;stroke-width:0.18644;stroke-linecap:butt;stroke-linejoin:round"><tspan
          sodipodi:role="line"
          id="tspan67130"
-         x="165.08377"
-         y="31.245277"
-         dy="0 0 0 0.20670573 0 0 -0.20670573 0 0 0 0 0 0.20670573">MPC<tspan
-   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.82704px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
-   id="tspan83054">top</tspan> - MPC<tspan
-   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.82704px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
-   id="tspan79314">bottom</tspan></tspan></text>
+         x="161.85889"
+         y="13.173973"
+         dy="0 0 0 0.20670573 0 0 -0.20670573 0 0 0 0 0 0.20670573"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#4d4d4d">MPC<tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan256528">top</tspan> - MPC<tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan258978">bottom</tspan></tspan></text>
   </g>
 </svg>
