@@ -52,8 +52,8 @@ connectivity).
 
 For SC, a group-representative binary mask $G$ is built to identify structurally
 sparse vertices for visualization. Let $A^{(s)} \in \mathbb{R}^{n \times n}$ be the
-SC matrix for subject $s$ and $D \in \mathbb{R}^{n \times n}$ the mean geodesic
-distance matrix.
+SC matrix for subject $s$ and $D \in \mathbb{R}^{n \times n}$ the mean tract
+distance matrix (mean streamline length from tractography, `path_sc_dist_5k`).
 
 Edge consistency and mean weight across subjects:
 

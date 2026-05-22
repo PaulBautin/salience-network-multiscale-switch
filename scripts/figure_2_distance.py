@@ -161,7 +161,7 @@ def fcn_group_bins(
     adj : np.ndarray, shape (n, n, n_sub)
         Per-subject SC matrices (binary or weighted).
     dist : np.ndarray, shape (n, n)
-        Pairwise geodesic distance matrix.
+        Pairwise tract distance matrix (mean streamline length from tractography).
     hemiid : np.ndarray of bool, shape (n,)
         Hemisphere indicator: False = left hemisphere, True = right hemisphere.
     nbins : int
