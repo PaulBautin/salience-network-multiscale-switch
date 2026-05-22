@@ -80,18 +80,57 @@ where $D_b$ is the count of present edges in bin $b$ across all subjects and
 $D_{\text{total}} = \sum_b D_b$. Within each bin the $k_b$ edges with the highest
 $C_{ij}$ are retained.
 
-```
-for compartment in [within-hemi, between-hemi]:
-    D_total = total present edges across all subjects in compartment
-    for bin b in 1..10:
-        k_b = round(D_total / N_S * D_b / D_total)
-        keep top-k_b edges by consistency C_ij
-G = union of retained edges, symmetrised
-A_group = log1p(G ⊙ W̄)   # binary mask × mean weight, then log1p
+The binary mask $G > 0$ identifies group-consensus structural edges; vertices
+with no consensus connections are connectivity-sparse by the group criterion.
+
+<details>
+<summary>Implementation — <code>fcn_group_bins</code></summary>
+
+```python
+def fcn_group_bins(adj, dist, hemiid, nbins):
+    if hemiid.ndim == 1:
+        hemiid = hemiid[:, np.newaxis]
+    n, nsub = adj.shape[0], adj.shape[-1]
+    nonzero_dist = dist[np.nonzero(dist)]
+    distbins = np.linspace(nonzero_dist.min(), nonzero_dist.max(), nbins + 1)
+    distbins[-1] += 1
+
+    C = np.sum(adj > 0, axis=2)
+    W = np.sum(adj, axis=2) / np.where(C > 0, C, np.nan)
+    W = np.nan_to_num(W, nan=0.0)
+
+    inter_hemi_mask = np.dot(hemiid, ~hemiid.T)
+    inter_hemi_mask = np.logical_or(inter_hemi_mask, inter_hemi_mask.T)
+
+    Grp = np.zeros((n, n, 2))
+    for j in range(2):                             # j=0: between-hemi, j=1: within-hemi
+        inter_hemi = ~inter_hemi_mask if j else inter_hemi_mask
+        m = dist * inter_hemi
+        D = (adj > 0) * (dist * np.triu(inter_hemi))[..., np.newaxis]
+        D = D[np.nonzero(D)]
+        if len(D) == 0:
+            continue
+        tgt = len(D) / nsub                        # average edges per subject
+
+        G = np.zeros((n, n))
+        for i_bin in range(nbins):
+            mask = np.where(np.triu(
+                (m >= distbins[i_bin]) & (m < distbins[i_bin + 1]), 1))
+            if len(mask[0]) == 0:
+                continue
+            n_D_bin = np.sum((D >= distbins[i_bin]) & (D < distbins[i_bin + 1]))
+            frac = int(np.round(tgt * n_D_bin / len(D)))
+            c = C[mask]
+            idx = np.argsort(c)[::-1]
+            G[mask[0][idx[:frac]], mask[1][idx[:frac]]] = 1
+        Grp[:, :, j] = G
+
+    G = np.sum(Grp, 2)
+    G = G + G.T
+    return G
 ```
 
-Vertices with $A_{\text{group},ij} = 0$ for all $j$ are flagged as connectivity-sparse
-and shown in grey on brain maps.
+</details>
 
 ---
 
@@ -125,16 +164,53 @@ $$\mu^{(s)}_{\cdot,j} = \alpha^{(s)}_j + \beta^{(s)}_j\,\mathbf{r} + \varepsilon
 The slope $\beta^{(s)}_j$ is the change in connectivity to vertex $j$ per unit
 increase in gradient rank for subject $s$.
 
-```
-for subject s in 1..N_S:
-    load C^(s)  shape (n_cortex, n_cortex)
-    for bin k in 1..K:
-        μ[k, :] = mean(C^(s)[B_k, V_other], axis=0)   # (n_other,)
-    β^(s) = OLS slope of μ[:,j] ~ r  for all j         # (n_other,)
+<details>
+<summary>Implementation — <code>compute_decile_slope_subjects</code></summary>
 
-mean_β = mean over subjects of β^(s)                   # (n_other,)
-SE_β   = std(β^(s), ddof=1) / sqrt(N_S)               # (n_other,)
+```python
+def compute_decile_slope_subjects(files, gradient_values_cortex,
+                                  network_mask_cortex, other_idx_cortex,
+                                  df_yeo_surf_5k, n_bins=10,
+                                  split_hemi=False, log_transform=False):
+    cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values
+    hemi = df_yeo_surf_5k.loc[cortex_mask, "hemisphere"].values
+    n_other = int(other_idx_cortex.sum())
+    bin_masks = compute_decile_bins(gradient_values_cortex, network_mask_cortex, n_bins)
+    x_rank = np.arange(n_bins, dtype=float)
+
+    subject_slopes = []
+    for f in files:
+        data = nib.load(f).darrays[0].data.astype(float)
+        data = data[np.ix_(cortex_mask, cortex_mask)]
+        data = np.triu(data, 1) + data.T
+        data[data == 0] = np.nan
+        if split_hemi:
+            same_hemi = hemi[:, None] == hemi[None, :]
+            data[~same_hemi] = np.nan
+        if log_transform:
+            data = np.log1p(np.maximum(data, 0))
+
+        bin_means = np.full((n_bins, n_other), np.nan)
+        for k, bm in enumerate(bin_masks):
+            if bm.any():
+                bin_means[k] = np.nanmean(data[np.ix_(bm, other_idx_cortex)], axis=0)
+
+        slopes = np.full(n_other, np.nan)
+        for j in range(n_other):
+            col = bin_means[:, j]
+            valid = ~np.isnan(col)
+            if valid.sum() >= 2:
+                slopes[j] = np.polyfit(x_rank[valid], col[valid], 1)[0]
+        subject_slopes.append(slopes)
+
+    arr = np.stack(subject_slopes, axis=0)
+    mean_slopes = np.nanmean(arr, axis=0)
+    n_valid = (~np.isnan(arr)).sum(axis=0).astype(float)
+    se_slopes = np.nanstd(arr, axis=0, ddof=1) / np.sqrt(np.maximum(n_valid, 1))
+    return mean_slopes, se_slopes
 ```
+
+</details>
 
 ### Step 3 — Group summary and z-scoring
 
