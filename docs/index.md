@@ -26,8 +26,12 @@ python scripts/figure_1a_t1map.py \
 ## Documentation
 
 - [Usage](usage.md) — CLI reference for all figure scripts
-- [API Reference](api.md) — `src/` module and function documentation
-- [Methods](methods.md) — Acquisition parameters and analysis methods
+- [API Reference](api/overview.md) — `src/` module and function documentation
+- [Data Acquisition](methods/datasets.md) — MRI and iEEG acquisition parameters
+- [Shared Methods](methods/shared.md) — MPC gradient and spatial statistics
+- [Figure 1 Methods](methods/figure_1.md) — Microstructural heterogeneity
+- [Figure 2 Methods](methods/figure_2.md) — Connectivity fingerprints
+- [Figure 3 Methods](methods/figure_3.md) — iEEG frequency mapping
 
 ## Repository layout
 
