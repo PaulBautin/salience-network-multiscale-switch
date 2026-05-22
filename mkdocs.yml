@@ -53,7 +53,10 @@ nav:
     - plot_colors: api/plot_colors.md
   - Methods:
     - Data Acquisition: methods/datasets.md
-    - Analysis Methods: methods/analysis.md
+    - Shared Methods: methods/shared.md
+    - Figure 1 — Microstructural heterogeneity: methods/figure_1.md
+    - Figure 2 — Connectivity fingerprints: methods/figure_2.md
+    - Figure 3 — iEEG mapping: methods/figure_3.md
 
 docs_dir: docs
 
