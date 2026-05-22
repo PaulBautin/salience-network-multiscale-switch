@@ -50,10 +50,20 @@ connectivity).
 
 ## Group-representative SC (Betzel et al. 2018)
 
-For SC, a group-representative binary mask $G$ is built to identify structurally
-sparse vertices for visualization. Let $A^{(s)} \in \mathbb{R}^{n \times n}$ be the
-SC matrix for subject $s$ and $D \in \mathbb{R}^{n \times n}$ the mean tract
-distance matrix (mean streamline length from tractography, `path_sc_dist_5k`).
+For SC, a group-representative binary mask $G$ is built using distance-dependent
+consensus thresholding. Tractography systematically over-represents short-range
+connections because short streamlines are geometrically easier to reconstruct;
+a naive consistency threshold would therefore bias the group network toward
+short-range edges. Distance-dependent thresholding corrects this by selecting
+the most reproducible connections **within each distance stratum**, so the group
+network preserves the empirical connection-length distribution rather than
+collapsing toward short-range edges. This matters here because the analysis
+directly tests whether MPC-gradient extremes differ in their long-range
+structural connectivity.
+
+Let $A^{(s)} \in \mathbb{R}^{n \times n}$ be the SC matrix for subject $s$ and
+$D \in \mathbb{R}^{n \times n}$ the mean tract distance matrix (mean streamline
+length from tractography, `path_sc_dist_5k`).
 
 Edge consistency and mean weight across subjects:
 
