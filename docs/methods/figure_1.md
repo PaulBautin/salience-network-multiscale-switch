@@ -35,11 +35,12 @@ network vertices (colour-coded by gradient value).
 
 ## Figure 1b — Histological contextualisation
 
-The in-vivo T1 gradient is compared with three post-mortem histological modalities
-mapped to the fsLR-32k surface:
+The in-vivo T1 gradient is compared with four modalities mapped to the
+fsLR-32k surface:
 
 | Modality | Source | Measure |
 |----------|--------|---------|
+| T1map | MICA-PNI 7 T dataset, fsLR-32k | Mean qT1 intensity across subjects and depths |
 | BigBrain | BigBrain open-access (100 µm) | Inverted cell-body staining intensity |
 | Bielschowsky | AHEAD dataset (200 µm) | Nerve-fibre staining intensity |
 | Parvalbumin | AHEAD dataset (200 µm) | Interneuron staining intensity |
