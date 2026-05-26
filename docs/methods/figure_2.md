@@ -24,10 +24,9 @@ described in [Shared Methods — Spin-test permutations](shared.md#spin-test-per
 |--------|---------|
 | $\mathcal{V}_\mathcal{N}$ | Network vertices at fsLR-5k (e.g. SalVentAttn), $n_\mathcal{N}$ total |
 | $\mathcal{V}_{\text{other}}$ | Non-target-network cortical vertices, $n_{\text{other}}$ total |
-| $g_v$ | Z-scored first MPC gradient value at vertex $v \in \mathcal{V}_\mathcal{N}$ |
-| $C^{(s)}_{v,j}$ | Connectivity from network vertex $v$ to target vertex $j$ for subject $s$ |
-| $K = 10$ | Number of equal-quantile gradient decile bins |
-| $\rho^{(s)}_j$ | Spearman rank correlation between bin rank and bin-mean connectivity, for subject $s$ and target $j$ |
+| $\tilde{g}_v$ | Mean-centred MPC gradient at network vertex $v$ ($\tilde{g}_v = g_v - \bar{g}$) |
+| $w^{(s)}_{v,j}$ | Connectivity weight from network vertex $v$ to target vertex $j$ for subject $s$ |
+| $P^{(s)}_j$ | Per-subject gradient projection at target vertex $j$ |
 | $N_S$ | Number of subjects |
 
 ---
@@ -135,111 +134,89 @@ def fcn_group_bins(adj, dist, hemiid, nbins):
 
 ---
 
-## Decile Spearman correlation
+## Connectivity-weighted gradient projection
 
-### Step 1 — Decile binning
+### Connectivity weights per metric
 
-Network vertices are partitioned into $K = 10$ equal-quantile bins by $g_v$:
+| Metric | Weight $w^{(s)}_{v,j}$ | Rationale |
+|--------|------------------------|-----------|
+| **SC** | log1p(SIFT2 streamlines) | structural connection strength |
+| **GD** | $1 / \text{geodesic distance}_{v,j}$ | spatial proximity (within-hemisphere only) |
+| **MPC** | Fisher-z partial correlation | microstructural similarity |
 
-$$q_k = \text{quantile}(g_v,\; v \in \mathcal{V}_\mathcal{N},\; k/K), \quad k = 0,\ldots,K$$
+Zero entries are set to NaN before weighting (absent edge, not zero weight).
 
-$$B_k = \{v \in \mathcal{V}_\mathcal{N} \mid q_{k-1} \leq g_v < q_k\}, \quad B_K \text{ uses } \leq q_K$$
+### Projection formula
 
-Each bin has $|B_k| \approx n_\mathcal{N} / K$ vertices. Bin rank is 0-indexed:
-$r_k \in \{0,\ldots,9\}$.
+For each subject $s$ and target vertex $j \in \mathcal{V}_{\text{other}}$:
 
-Binning suppresses single-vertex outlier leverage that arises in vertex-level regression and
-avoids the need for a sparsity mask.
+$$P^{(s)}_j = \frac{\displaystyle\sum_{v \in \mathcal{V}_\mathcal{N}} w^{(s)}_{v,j}\,\tilde{g}_v}
+                   {\displaystyle\sum_{v \in \mathcal{V}_\mathcal{N}} w^{(s)}_{v,j}}$$
 
-### Step 2 — Per-subject Spearman rank correlation
+$P^{(s)}_j$ is the connectivity-weighted centroid of the mean-centred MPC gradient: it quantifies
+which part of the gradient axis vertex $j$ preferentially connects to within the network.
 
-For each subject $s$ and target vertex $j \in \mathcal{V}_{\text{other}}$, the mean
-connectivity from each gradient bin is:
+- Positive $P^{(s)}_j$: $j$ connects preferentially to the transmodal (high-gradient) end.
+- Negative $P^{(s)}_j$: $j$ connects preferentially to the sensory (low-gradient) end.
+- $P^{(s)}_j \approx 0$: $j$'s connections are evenly spread across the gradient.
 
-$$\mu^{(s)}_{k,j} = \frac{1}{|\{v \in B_k : C^{(s)}_{v,j} \neq \text{NaN}\}|} \sum_{v \in B_k} C^{(s)}_{v,j}$$
+No binning, no hyperparameter $K$. The full continuous gradient is used as a weight.
 
-The per-subject statistic is the Spearman rank correlation between bin rank and bin-mean connectivity:
+### Subject averaging and z-scoring
 
-$$\rho^{(s)}_j = \text{Spearman}\!\left(\mathbf{r},\; \boldsymbol{\mu}^{(s)}_{\cdot,j}\right)$$
+The group mean and SE are computed across subjects with valid projections:
 
-where $\mathbf{r} = [0,1,\ldots,K-1]^\top$ and bins with $\mu^{(s)}_{k,j} = \text{NaN}$
-(all edges absent) are excluded. A minimum of 4 valid bins is required.
+$$\bar{P}_j = \frac{1}{N_S}\sum_s P^{(s)}_j, \qquad
+\widehat{\text{SE}}(\bar{P}_j) = \frac{\text{std}(P^{(s)}_j)}{\sqrt{N_S}}$$
 
-$\rho^{(s)}_j \in [-1, 1]$ directly quantifies the monotone trend: positive values indicate
-that higher-gradient bins connect more strongly to vertex $j$. The rank-based statistic requires
-no distributional assumptions and no weighting scheme — it is robust to the right-skewed,
-zero-inflated SC values and Fisher-z MPC values that arise at fsLR-5k resolution.
+**Coverage threshold:** vertices where fewer than $0.5 \cdot N_S$ subjects yield a finite
+$P^{(s)}_j$ are set to NaN.
+
+For brain-map visualization, $\bar{P}$ is z-scored across surviving $j \in \mathcal{V}_{\text{other}}$:
+
+$$z_j = \frac{\bar{P}_j - \overline{\bar{P}}}{\text{std}(\bar{P})}$$
 
 <details>
-<summary>Implementation — <code>compute_decile_slope_subjects</code></summary>
+<summary>Implementation — <code>compute_gradient_projection_subjects</code></summary>
 
 ```python
-def compute_decile_slope_subjects(files, gradient_values_cortex,
-                                  network_mask_cortex, other_idx_cortex,
-                                  df_yeo_surf_5k, n_bins=10,
-                                  split_hemi=False, log_transform=False):
-    cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values
-    hemi = df_yeo_surf_5k.loc[cortex_mask, "hemisphere"].values
-    n_other = int(other_idx_cortex.sum())
-    bin_masks = compute_decile_bins(gradient_values_cortex, network_mask_cortex, n_bins)
-    x_rank = np.arange(n_bins, dtype=float)
+def compute_gradient_projection_subjects(files, gradient_values_cortex,
+                                         network_mask_cortex, other_idx_cortex,
+                                         df_yeo_surf_5k, split_hemi=False,
+                                         log_transform=False, invert_weights=False):
+    g_v = gradient_values_cortex[network_mask_cortex].astype(np.float32)
+    g_v -= np.nanmean(g_v)                                # mean-centre
 
-    subject_slopes = []
+    subject_projs = []
     for f in files:
-        data = nib.load(f).darrays[0].data.astype(float)
+        data = nib.load(f).darrays[0].data.astype(np.float32)
         data = data[np.ix_(cortex_mask, cortex_mask)]
         data = np.triu(data, 1) + data.T
         data[data == 0] = np.nan
-        if split_hemi:
-            same_hemi = hemi[:, None] == hemi[None, :]
-            data[~same_hemi] = np.nan
-        if log_transform:
-            data = np.log1p(np.maximum(data, 0))
+        # ... split_hemi / log_transform ...
+        C_sub = data[np.ix_(network_mask_cortex, other_idx_cortex)]
+        del data                                          # release full matrix
 
-        bin_means = np.full((n_bins, n_other), np.nan)
-        for k, bm in enumerate(bin_masks):
-            if bm.any():
-                bin_means[k] = np.nanmean(data[np.ix_(bm, other_idx_cortex)], axis=0)
+        if invert_weights:
+            C_sub = np.where(C_sub > 0, 1.0 / C_sub, np.nan).astype(np.float32)
 
-        slopes = np.full(n_other, np.nan)
-        for j in range(n_other):
-            col = bin_means[:, j]
-            valid = ~np.isnan(col)
-            if valid.sum() >= 4:
-                slopes[j] = spearmanr(x_rank[valid], col[valid])[0]
-        subject_slopes.append(slopes)
+        num = np.nansum(g_v[:, None] * C_sub, axis=0)    # (n_other,)
+        den = np.nansum(C_sub, axis=0)
+        subject_projs.append(np.where(den > 0, num / den, np.nan))
 
-    arr = np.stack(subject_slopes, axis=0)
-    mean_slopes = np.nanmean(arr, axis=0)
-    n_valid = (~np.isnan(arr)).sum(axis=0).astype(float)
-    se_slopes = np.nanstd(arr, axis=0, ddof=1) / np.sqrt(np.maximum(n_valid, 1))
-    return mean_slopes, se_slopes
+    arr = np.stack(subject_projs, axis=0)
+    mean_proj = np.nanmean(arr, axis=0)
+    # ... coverage threshold, SE ...
+    return mean_proj, se_proj
 ```
 
 </details>
-
-### Step 3 — Group summary and z-scoring
-
-Let $n^{(j)}_S \leq N_S$ be the number of subjects for which $\rho^{(s)}_j$ is not NaN
-(i.e. at least 4 valid bins existed). The group mean and SE are:
-
-$$\bar{\rho}_j = \frac{1}{n^{(j)}_S}\sum_{s:\,\rho^{(s)}_j \neq \text{NaN}}\rho^{(s)}_j, \qquad \widehat{\text{SE}}(\bar{\rho}_j) = \frac{\text{std}_{n^{(j)}_S - 1}(\rho^{(s)}_j)}{\sqrt{n^{(j)}_S}}$$
-
-**Subject-coverage threshold:** vertices where $n^{(j)}_S < 0.5 \cdot N_S$ are set to NaN
-and excluded from z-scoring and the FC-gradient correlation. This prevents sparsely
-connected vertices (valid in fewer than half of subjects) from contributing to the map.
-
-For brain-map visualization, $\bar{\rho}$ is z-scored across surviving $j \in \mathcal{V}_{\text{other}}$:
-
-$$z_j = \frac{\bar{\rho}_j - \overline{\bar{\rho}}}{\text{std}(\bar{\rho})}$$
-
-Vertices in $\mathcal{V}_\mathcal{N}$, medial-wall vertices, and coverage-thresholded vertices are set to NaN.
 
 ---
 
 ## Correlation with FC gradient and statistical tests
 
-The z-scored slope map $\mathbf{z}$ is correlated with the whole-brain principal
+The z-scored projection map $\mathbf{z}$ is correlated with the whole-brain principal
 FC gradient $\mathbf{g}^{\text{FC}}$ (fsLR-5k) restricted to $\mathcal{V}_{\text{other}}$:
 
 $$r = \text{Spearman}(\mathbf{z},\; \mathbf{g}^{\text{FC}})$$
@@ -254,16 +231,3 @@ $$p_{\text{spin}} = \frac{1}{1000}\left|\{p : |r_p| \geq |r|\}\right|$$
 A two-tailed test is used because the sign of the gradient is arbitrary (diffusion
 maps do not have a canonical orientation); the test is conservative relative to a
 one-tailed alternative.
-
-### Confidence interval — Fisher z-transform
-
-A 95 % confidence interval for Spearman $r$ is computed via the Fisher
-$z$-transform:
-
-$$z_r = \text{arctanh}(r), \qquad \text{SE}(z_r) = \frac{1}{\sqrt{n_{\text{vert}} - 3}}$$
-
-$$\text{CI}_{95} = \left[\tanh\!\left(z_r - 1.96\,\text{SE}\right),\; \tanh\!\left(z_r + 1.96\,\text{SE}\right)\right]$$
-
-where $n_{\text{vert}} = |\mathcal{V}_{\text{other}}|$ is the number of vertices
-entering the correlation. The CI and the number of subjects $N_S$ are reported
-alongside $r$ in figure annotations and log output.
