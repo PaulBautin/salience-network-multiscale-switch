@@ -11,7 +11,7 @@ Scripts cache intermediate results as TSV/CSV in `data/dataframes/` and skip rec
 | [`figure_1a_t1map.py`](#figure-1a) | 1a | T1 microstructural gradient within the salience network |
 | [`figure_1b_contextualisation.py`](#figure-1b) | 1b | Multi-modal contextualization of the T1 gradient |
 | [`figure_1c_cortical_types.py`](#figure-1c) | 1c | Von Economo cortical type distribution |
-| [`figure_2_distance.py`](#figure-2) | 2 | Structural connectivity at MPC gradient extremes |
+| [`figure_2_distance.py`](#figure-2) | 2 | Connectivity-weighted MPC gradient projection correlated with the FC gradient |
 | [`figure_3_ieeg_mni.py`](#figure-3-mni) | 3 | iEEG spectral analysis — MNI open atlas |
 | [`figure_3_ieeg_mica.py`](#figure-3-mica) | 3 | iEEG spectral analysis — MICA dataset |
 
@@ -88,7 +88,7 @@ python scripts/figure_1c_cortical_types.py -pni_deriv /path/to/BIDS_PNI/derivati
 
 ## Figure 2
 
-**`scripts/figure_2_distance.py`** — Tests whether structural connectivity (SC), geodesic distance (GD), and microstructure profile covariance (MPC) differ between vertices at the high vs. low end of the MPC gradient, within and across all 7 Yeo networks. All analysis runs at fsLR-5k resolution (9,684 vertices).
+**`scripts/figure_2_distance.py`** — Computes the connectivity-weighted MPC gradient projection per other-network vertex (SC, GD, and MPC weights) and correlates the z-scored projection maps with the whole-brain FC gradient (Spearman, spin-test corrected). Figure 2B replicates the MPC projection across all 7 Yeo networks. All analysis runs at fsLR-5k resolution (9,684 vertices).
 
 Requires `figure_1a_t1map.py` to have been run first (produces `data/dataframes/figure_1a_pni_to_mics.csv`).
 
@@ -103,9 +103,9 @@ python scripts/figure_2_distance.py -hemi LH
 **Outputs**
 
 - `results/figures/figure_2a_distance_metric.svg`
-- `results/figures/figure_2a_brain_{SC,GD,MPC}_diff.svg`
-- `results/figures/figure_2b_distance_network.svg`
-- `results/figures/figure_2b_brain_SC_diff_<network>.svg`
+- `results/figures/figure_2a_brain_{SC,GD,MPC}_rho.svg`
+- `results/figures/figure_2b_distance_network_{measure}.svg`
+- `results/figures/figure_2b_brain_{measure}_rho_<network>.svg`
 - `data/dataframes/df_2b_label_<hemi>.csv` (cache)
 
 ---

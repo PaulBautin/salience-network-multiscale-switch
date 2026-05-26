@@ -184,6 +184,7 @@ def compute_gradient_projection_subjects(files, gradient_values_cortex,
                                          network_mask_cortex, other_idx_cortex,
                                          df_yeo_surf_5k, split_hemi=False,
                                          log_transform=False, invert_weights=False):
+    cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values  # (9684,) → (n_cortex,)
     g_v = gradient_values_cortex[network_mask_cortex].astype(np.float32)
     g_v -= np.nanmean(g_v)                                # mean-centre
 
