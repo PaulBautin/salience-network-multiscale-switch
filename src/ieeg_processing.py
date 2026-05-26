@@ -463,6 +463,36 @@ def compute_psd_vectorized(data: np.ndarray, fs: float, fmin: float = 0.5, fmax:
     return f[mask], pxx_rel
 
 
+def compute_gradient_quantiles(
+    df_surf: pd.DataFrame,
+    channel_indices: np.ndarray,
+    gradient_col: str,
+    quantiles: tuple[float, float] = (0.25, 0.75),
+) -> np.ndarray:
+    """Assign gradient quantile labels to channels.
+
+    Marks the surface vertices covered by *channel_indices* as bottom-quantile
+    (-1) or top-quantile (+1) based on their gradient value, writing the result
+    into a ``'quantiles'`` column on *df_surf* in-place.  Returns the
+    per-channel quantile label array.
+
+    Args:
+        df_surf: Surface DataFrame containing *gradient_col*.
+        channel_indices: Integer vertex indices of each channel on the 32k surface.
+        gradient_col: Name of the gradient column in *df_surf*.
+        quantiles: (low, high) thresholds as fractions (default: 25th/75th percentile).
+
+    Returns:
+        np.ndarray: Quantile label per channel (-1, 0, or 1; NaN where unassigned).
+    """
+    low_q, high_q = np.nanquantile(df_surf[gradient_col], list(quantiles))
+    channel_mask = np.zeros(len(df_surf), dtype=bool)
+    channel_mask[channel_indices] = True
+    df_surf.loc[channel_mask & (df_surf[gradient_col] <= low_q), "quantiles"] = -1
+    df_surf.loc[channel_mask & (df_surf[gradient_col] >= high_q), "quantiles"] = 1
+    return df_surf["quantiles"].iloc[channel_indices].values
+
+
 def plot_surface_sphere(p, channel_position: list | np.ndarray, channel_color: np.ndarray, screenshot_path) -> None:
     # renderer index → extra Z rotation applied after the standard -90X/+90Z pair
     renderers = [(p.renderers[0][0], 0), (p.renderers[1][0], 180)]

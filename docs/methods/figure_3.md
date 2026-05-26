@@ -51,6 +51,17 @@ Channel coordinates are provided in MNI152 stereotactic space. Each channel is
 mapped to the nearest fsLR-32k surface vertex. Band power values are averaged
 across channels assigned to the same vertex.
 
+The target network for gradient stratification is configurable via the `-network`
+flag (default: `SalVentAttn`). Any of the seven Yeo networks (`Vis`, `SomMot`,
+`DorsAttn`, `SalVentAttn`, `Limbic`, `Cont`, `Default`) can be selected, enabling
+whole-brain or network-specific analyses without code changes.
+
+Channels at the bottom 25% and top 25% of the T1 gradient within the target network
+are labelled via `compute_gradient_quantiles()` (see [API docs](../api/ieeg_processing.md)).
+The electrophysiological similarity difference (ES\_top − ES\_bottom) between
+these two groups is then correlated with the BigBrain G2 gradient across all
+non-target-network channels.
+
 ### MICA iEEG dataset (Figure 3b)
 
 Subject-specific electrode sensitivity maps (leadfield-derived, from the

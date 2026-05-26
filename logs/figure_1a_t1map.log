@@ -665,3 +665,39 @@ Gradient lambdas: [0.07093016 0.05406264 0.04506597 0.04055764 0.02899969 0.0258
  0.02214852 0.01964467 0.01578598 0.01373235]
 Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
 Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-05-25 11:03:21
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Participants   : N=18 (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)
+T1 profiles    : acq-T1map, fsLR-32k surface, 14 intracortical depths
+Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, atlas-schaefer-400
+MPC            : partial correlation controlling for mean profile, Fisher z-transformed
+Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 3502)
+Computing T1 gradients...
+Gradient lambdas: [0.0786548  0.05896968 0.04766791 0.04249254 0.03045548 0.02802966
+ 0.02300251 0.0193299  0.01624541 0.01505676]
+Participants   : N=18 (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)
+T1 profiles    : acq-T1map, fsLR-5k surface, 14 intracortical depths
+MPC            : fsLR-5k vertex-level MPC matrix
+Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, fsLR-5k
+Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 530)
+Computing T1 gradients...
+Gradient lambdas: [0.07050374 0.05314297 0.04361    0.03822655 0.02862562 0.02536979
+ 0.02190412 0.01905447 0.01577816 0.01395284]
+Generating brain qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg

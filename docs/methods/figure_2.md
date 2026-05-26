@@ -27,6 +27,7 @@ described in [Shared Methods — Spin-test permutations](shared.md#spin-test-per
 | $g_v$ | Z-scored first MPC gradient value at vertex $v \in \mathcal{V}_\mathcal{N}$ |
 | $C^{(s)}_{v,j}$ | Connectivity from network vertex $v$ to target vertex $j$ for subject $s$ |
 | $K = 10$ | Number of equal-quantile gradient decile bins |
+| $\rho^{(s)}_j$ | Spearman rank correlation between bin rank and bin-mean connectivity, for subject $s$ and target $j$ |
 | $N_S$ | Number of subjects |
 
 ---
@@ -134,7 +135,7 @@ def fcn_group_bins(adj, dist, hemiid, nbins):
 
 ---
 
-## Decile OLS regression
+## Decile Spearman correlation
 
 ### Step 1 — Decile binning
 
@@ -145,24 +146,29 @@ $$q_k = \text{quantile}(g_v,\; v \in \mathcal{V}_\mathcal{N},\; k/K), \quad k = 
 $$B_k = \{v \in \mathcal{V}_\mathcal{N} \mid q_{k-1} \leq g_v < q_k\}, \quad B_K \text{ uses } \leq q_K$$
 
 Each bin has $|B_k| \approx n_\mathcal{N} / K$ vertices. Bin rank is 0-indexed:
-$r_k = k - 1 \in \{0,\ldots,9\}$.
+$r_k \in \{0,\ldots,9\}$.
 
-Binning before regression suppresses single-vertex outlier leverage that arises
-in continuous-gradient OLS and avoids the need for a sparsity mask.
+Binning suppresses single-vertex outlier leverage that arises in vertex-level regression and
+avoids the need for a sparsity mask.
 
-### Step 2 — Per-subject OLS
+### Step 2 — Per-subject Spearman rank correlation
 
 For each subject $s$ and target vertex $j \in \mathcal{V}_{\text{other}}$, the mean
 connectivity from each gradient bin is:
 
-$$\mu^{(s)}_{k,j} = \frac{1}{|B_k|} \sum_{v \in B_k} C^{(s)}_{v,j}, \quad k = 1,\ldots,K$$
+$$\mu^{(s)}_{k,j} = \frac{1}{|\{v \in B_k : C^{(s)}_{v,j} \neq \text{NaN}\}|} \sum_{v \in B_k} C^{(s)}_{v,j}$$
 
-OLS fits a line of mean connectivity against bin rank:
+The per-subject statistic is the Spearman rank correlation between bin rank and bin-mean connectivity:
 
-$$\mu^{(s)}_{\cdot,j} = \alpha^{(s)}_j + \beta^{(s)}_j\,\mathbf{r} + \varepsilon, \quad \mathbf{r} = [0,1,\ldots,9]^\top$$
+$$\rho^{(s)}_j = \text{Spearman}\!\left(\mathbf{r},\; \boldsymbol{\mu}^{(s)}_{\cdot,j}\right)$$
 
-The slope $\beta^{(s)}_j$ is the change in connectivity to vertex $j$ per unit
-increase in gradient rank for subject $s$.
+where $\mathbf{r} = [0,1,\ldots,K-1]^\top$ and bins with $\mu^{(s)}_{k,j} = \text{NaN}$
+(all edges absent) are excluded. A minimum of 4 valid bins is required.
+
+$\rho^{(s)}_j \in [-1, 1]$ directly quantifies the monotone trend: positive values indicate
+that higher-gradient bins connect more strongly to vertex $j$. The rank-based statistic requires
+no distributional assumptions and no weighting scheme — it is robust to the right-skewed,
+zero-inflated SC values and Fisher-z MPC values that arise at fsLR-5k resolution.
 
 <details>
 <summary>Implementation — <code>compute_decile_slope_subjects</code></summary>
@@ -199,8 +205,8 @@ def compute_decile_slope_subjects(files, gradient_values_cortex,
         for j in range(n_other):
             col = bin_means[:, j]
             valid = ~np.isnan(col)
-            if valid.sum() >= 2:
-                slopes[j] = np.polyfit(x_rank[valid], col[valid], 1)[0]
+            if valid.sum() >= 4:
+                slopes[j] = spearmanr(x_rank[valid], col[valid])[0]
         subject_slopes.append(slopes)
 
     arr = np.stack(subject_slopes, axis=0)
@@ -214,13 +220,20 @@ def compute_decile_slope_subjects(files, gradient_values_cortex,
 
 ### Step 3 — Group summary and z-scoring
 
-$$\bar{\beta}_j = \frac{1}{N_S}\sum_{s=1}^{N_S}\beta^{(s)}_j, \qquad \widehat{\text{SE}}(\bar{\beta}_j) = \frac{\text{std}_{N_S-1}(\beta^{(s)}_j)}{\sqrt{N_S}}$$
+Let $n^{(j)}_S \leq N_S$ be the number of subjects for which $\rho^{(s)}_j$ is not NaN
+(i.e. at least 4 valid bins existed). The group mean and SE are:
 
-For brain-map visualization, $\bar{\beta}$ is z-scored across $j \in \mathcal{V}_{\text{other}}$:
+$$\bar{\rho}_j = \frac{1}{n^{(j)}_S}\sum_{s:\,\rho^{(s)}_j \neq \text{NaN}}\rho^{(s)}_j, \qquad \widehat{\text{SE}}(\bar{\rho}_j) = \frac{\text{std}_{n^{(j)}_S - 1}(\rho^{(s)}_j)}{\sqrt{n^{(j)}_S}}$$
 
-$$z_j = \frac{\bar{\beta}_j - \overline{\bar{\beta}}}{\text{std}(\bar{\beta})}$$
+**Subject-coverage threshold:** vertices where $n^{(j)}_S < 0.5 \cdot N_S$ are set to NaN
+and excluded from z-scoring and the FC-gradient correlation. This prevents sparsely
+connected vertices (valid in fewer than half of subjects) from contributing to the map.
 
-Vertices in $\mathcal{V}_\mathcal{N}$ and medial-wall vertices are set to NaN.
+For brain-map visualization, $\bar{\rho}$ is z-scored across surviving $j \in \mathcal{V}_{\text{other}}$:
+
+$$z_j = \frac{\bar{\rho}_j - \overline{\bar{\rho}}}{\text{std}(\bar{\rho})}$$
+
+Vertices in $\mathcal{V}_\mathcal{N}$, medial-wall vertices, and coverage-thresholded vertices are set to NaN.
 
 ---
 
@@ -231,13 +244,26 @@ FC gradient $\mathbf{g}^{\text{FC}}$ (fsLR-5k) restricted to $\mathcal{V}_{\text
 
 $$r = \text{Spearman}(\mathbf{z},\; \mathbf{g}^{\text{FC}})$$
 
+### Significance — spin permutations (two-tailed)
+
 Significance is assessed with 1000 spin permutations (see
 [Shared Methods](shared.md#spin-test-permutations-whole-brain)):
 
 $$p_{\text{spin}} = \frac{1}{1000}\left|\{p : |r_p| \geq |r|\}\right|$$
 
-A one-sample t-test against $\mu_0 = 0$ is additionally applied to the
-distribution of finite $\bar{\beta}_j$ values to assess whether the
-gradient-driven connectivity pattern is systematically non-zero:
+A two-tailed test is used because the sign of the gradient is arbitrary (diffusion
+maps do not have a canonical orientation); the test is conservative relative to a
+one-tailed alternative.
 
-$$t = \frac{\overline{\bar{\beta}}}{\widehat{\text{SE}}(\bar{\beta})}, \quad \text{df} = n_{\text{other}} - 1$$
+### Confidence interval — Fisher z-transform
+
+A 95 % confidence interval for Spearman $r$ is computed via the Fisher
+$z$-transform:
+
+$$z_r = \text{arctanh}(r), \qquad \text{SE}(z_r) = \frac{1}{\sqrt{n_{\text{vert}} - 3}}$$
+
+$$\text{CI}_{95} = \left[\tanh\!\left(z_r - 1.96\,\text{SE}\right),\; \tanh\!\left(z_r + 1.96\,\text{SE}\right)\right]$$
+
+where $n_{\text{vert}} = |\mathcal{V}_{\text{other}}|$ is the number of vertices
+entering the correlation. The CI and the number of subjects $N_S$ are reported
+alongside $r$ in figure annotations and log output.

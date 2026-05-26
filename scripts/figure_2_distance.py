@@ -2,31 +2,33 @@
 # -*- coding: utf-8
 #########################################################################################
 #
-# Figure 2 - Structural connectivity at MPC gradient extremes
+# Figure 2 - Gradient-driven connectivity fingerprints
 #
-# Tests whether structural connectivity differs between vertices at the high vs. low
-# ends of the MPC (T1) gradient computed in Figure 1a, within the Salience/Ventral
-# Attention network and across all 7 Yeo networks.
+# Tests whether the MPC (T1) gradient within the Salience/Ventral Attention network
+# predicts how vertices connect to the rest of the brain. Network vertices are binned
+# into K=10 equal-quantile decile bins by gradient rank; per-subject Spearman ρ
+# between bin rank and mean connectivity to every other-network vertex quantifies the
+# monotone trend. The group-average z-scored ρ map is then correlated with the
+# whole-brain FC gradient (spin-test corrected).
 #
-# All connectivity matrices (SC, Dist, MPC) are loaded at native fsLR-5k resolution
+# All connectivity matrices (SC, GD, MPC) are loaded at fsLR-5k resolution
 # (9684 vertices) and all analysis runs at that vertex level.
 #
-# Figure 2A: For the SalVentAttn network, computes connectivity differences between
-#            MPC-gradient-extreme vertices using three metrics (structural connectivity,
-#            geodesic distance, MPC) and correlates those differences with the
-#            whole brain FC gradient.
-# Figure 2B: Replicates the SC-difference analysis for each of the 7 Yeo networks
-#            and correlates the results with the whole brain FC gradient.
+# Figure 2A: For the SalVentAttn network, computes per-subject Spearman decile ρ
+#            using three metrics (structural connectivity, geodesic distance, MPC)
+#            and correlates the group ρ map with the whole-brain FC gradient.
+# Figure 2B: Replicates the MPC fingerprint analysis for each of the 7 Yeo networks
+#            and correlates each ρ map with the whole-brain FC gradient.
 #
 # Outputs:
 #   results/figures/figure_2a_distance_metric.svg
-#   results/figures/figure_2a_brain_{SC,Dist,MPC}_diff.svg
-#   results/figures/figure_2b_distance_network.svg
-#   results/figures/figure_2b_brain_{measure}_diff_{network}.svg
+#   results/figures/figure_2a_brain_{SC,GD,MPC}_rho.svg
+#   results/figures/figure_2b_distance_network_{measure}.svg
+#   results/figures/figure_2b_brain_{measure}_rho_{network}.svg
 #   data/dataframes/df_2b_label_{hemisphere}.csv  (vertex-level cache)
 #
 # Requires figure_1a_t1map.py to have been run first (produces
-#   data/dataframes/figure_1a_pni_to_mics.csv).
+#   data/dataframes/figure_1a_pni_to_mics_5k.csv).
 #
 # Example:
 #   python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py -hemi LH
@@ -56,7 +58,7 @@ from brainspace.plotting.utils import _gen_grid as _orig_gen_grid
 from brainspace.mesh.mesh_io import read_surface
 from brainspace.null_models import SpinPermutations
 
-from scipy.stats import spearmanr, zscore
+from scipy.stats import spearmanr, zscore, rankdata
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -348,129 +350,6 @@ def compute_pvals_spin(x: np.ndarray, y_surf_5k: np.ndarray,
     return r_spin
 
 
-def compute_top_bottom_diff(conn: np.ndarray, top_idx: np.ndarray, bottom_idx: np.ndarray,
-                            other_idx: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Compute z-scored top–bottom connectivity difference.
-
-    Absent connectivity (0 in conn) is treated as 0 when one group connects and
-    the other does not — preserving the asymmetric signal. Diff is NaN only when
-    both groups have no connection to a target vertex.
-    """
-    conn = conn.copy()
-    conn[conn <= 0] = np.nan
-    top = np.nanmean(conn[top_idx][:, other_idx], axis=0)
-    bottom = np.nanmean(conn[bottom_idx][:, other_idx], axis=0)
-    both_nan = np.isnan(top) & np.isnan(bottom)
-    diff = np.nan_to_num(top, nan=0.0) - np.nan_to_num(bottom, nan=0.0)
-    diff[both_nan] = np.nan
-    return zscore(diff, nan_policy="omit"), top, bottom
-
-
-def compute_regression_slope_group(conn: np.ndarray, bin_masks: list,
-                                   other_idx: np.ndarray) -> np.ndarray:
-    """Fit connectivity ~ decile_rank OLS on a pre-averaged group matrix.
-
-    Kept for reference; production code now uses compute_regression_slope_subjects.
-    Returns z-scored OLS slopes, shape (n_other,).
-    """
-    conn = conn.copy()
-    conn[conn <= 0] = np.nan
-    n_bins = len(bin_masks)
-    n_other = int(other_idx.sum())
-    bin_means = np.full((n_bins, n_other), np.nan)
-    for k, bm in enumerate(bin_masks):
-        if bm.any():
-            bin_means[k] = np.nanmean(conn[bm][:, other_idx], axis=0)
-    x = np.arange(n_bins, dtype=float)
-    slopes = np.full(n_other, np.nan)
-    for j in range(n_other):
-        col = bin_means[:, j]
-        valid = ~np.isnan(col)
-        if valid.sum() >= 2:
-            slopes[j] = np.polyfit(x[valid], col[valid], 1)[0]
-    return zscore(slopes, nan_policy="omit")
-
-
-def compute_regression_slope_subjects(
-    files: list,
-    gradient_values_cortex: np.ndarray,
-    network_mask_cortex: np.ndarray,
-    other_idx_cortex: np.ndarray,
-    df_yeo_surf_5k: pd.DataFrame,
-    split_hemi: bool = False,
-    log_transform: bool = False,
-) -> tuple[np.ndarray, np.ndarray]:
-    """Per-subject OLS regression of connectivity ~ continuous T1 gradient.
-
-    For each subject, regresses connectivity[network_vertices, j] ~ gradient[network_vertices]
-    for all target vertices j simultaneously using the vectorized OLS normal equation.
-    Streams one subject at a time (peak memory: one cortex×cortex matrix).
-    Returns (mean_slopes, se_slopes) — raw unz-scored values of shape (n_other,).
-    """
-    cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values
-    hemi = df_yeo_surf_5k.loc[cortex_mask, "hemisphere"].values
-    n_other = int(other_idx_cortex.sum())
-
-    x_net = gradient_values_cortex[network_mask_cortex]         # (n_network,)
-    if x_net.size < 2 or np.all(np.isnan(x_net)):
-        return np.full(n_other, np.nan), np.full(n_other, np.nan)
-
-    subject_slopes = []
-
-    for f in files:
-        data = nib.load(f).darrays[0].data.astype(float)        # (9684, 9684)
-        data = data[np.ix_(cortex_mask, cortex_mask)]            # cortex-only
-        data = np.triu(data, 1) + data.T                         # reconstruct symmetric
-        data[data == 0] = np.nan
-        if split_hemi:
-            same_hemi = hemi[:, None] == hemi[None, :]
-            data[~same_hemi] = np.nan
-        if log_transform:
-            data = np.log1p(np.maximum(data, 0))
-
-        Y = data[np.ix_(network_mask_cortex, other_idx_cortex)]  # (n_network, n_other)
-
-        # Mask rows where x_net has NaN
-        x_nan = np.isnan(x_net)
-        x_clean = x_net[~x_nan]
-        Y_clean = Y[~x_nan, :]                                   # (n_clean, n_other)
-        X_base = np.column_stack([np.ones(x_clean.size), x_clean])  # (n_clean, 2)
-
-        slopes = np.full(n_other, np.nan)
-
-        # Fast path: columns with no NaN in Y — solve all at once
-        y_nan_cols = np.any(np.isnan(Y_clean), axis=0)           # (n_other,)
-        clean_cols = ~y_nan_cols
-        if clean_cols.any():
-            XtX = X_base.T @ X_base                              # (2, 2)
-            XtY = X_base.T @ Y_clean[:, clean_cols]             # (2, n_clean_cols)
-            try:
-                beta = np.linalg.solve(XtX, XtY)                 # (2, n_clean_cols)
-                slopes[clean_cols] = beta[1, :]
-            except np.linalg.LinAlgError:
-                pass
-
-        # Slow path: columns with NaN — per-column lstsq with row masking
-        for j in np.where(y_nan_cols)[0]:
-            y_col = Y_clean[:, j]
-            row_valid = ~np.isnan(y_col)
-            if row_valid.sum() < 2:
-                continue
-            try:
-                beta_j, _, _, _ = np.linalg.lstsq(X_base[row_valid], y_col[row_valid], rcond=None)
-                slopes[j] = beta_j[1]
-            except np.linalg.LinAlgError:
-                pass
-
-        subject_slopes.append(slopes)
-
-    arr = np.stack(subject_slopes, axis=0)                       # (n_subj, n_other)
-    mean_slopes = np.nanmean(arr, axis=0)
-    n_valid = (~np.isnan(arr)).sum(axis=0).astype(float)
-    se_slopes = np.nanstd(arr, axis=0, ddof=1) / np.sqrt(np.maximum(n_valid, 1))
-    return mean_slopes, se_slopes
-
-
 def compute_decile_slope_subjects(
     files: list,
     gradient_values_cortex: np.ndarray,
@@ -481,14 +360,19 @@ def compute_decile_slope_subjects(
     split_hemi: bool = False,
     log_transform: bool = False,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Per-subject decile OLS regression of connectivity ~ gradient decile rank.
+    """Per-subject Spearman rank correlation of bin-mean connectivity ~ gradient decile rank.
 
-    For each subject bins network vertices into n_bins equal-quantile gradient
-    bins, computes mean connectivity from each bin to every other-network vertex,
-    then regresses mean connectivity on bin rank (0..n_bins-1).
-    Bin averaging suppresses single-vertex outlier leverage that concentrates signal
-    in continuous-gradient regression and avoids the need for a sparsity mask.
-    Returns (mean_slopes, se_slopes), shape (n_other,).
+    For each subject bins network vertices into n_bins equal-quantile gradient bins, computes
+    mean connectivity from each bin to every other-network vertex, then summarises the monotone
+    trend via Spearman ρ between bin rank (0..n_bins-1) and the bin means.
+
+    Spearman ρ is rank-based and requires no weighting or distributional assumptions, making it
+    appropriate for the right-skewed, zero-inflated SC values and Fisher-z MPC values that arise
+    at fsLR-5k resolution. A minimum of 4 valid (non-NaN) bins is required before ρ is computed.
+
+    Vertices where fewer than 50% of subjects contribute a valid ρ are set to NaN.
+    Returns (mean_rho, se_rho), shape (n_other,), using 'slopes' as the internal variable name
+    for API compatibility with downstream callers.
     """
     cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values
     hemi = df_yeo_surf_5k.loc[cortex_mask, "hemisphere"].values
@@ -515,51 +399,37 @@ def compute_decile_slope_subjects(
                 bin_means[k] = np.nanmean(data[np.ix_(bm, other_idx_cortex)], axis=0)
 
         slopes = np.full(n_other, np.nan)
-        for j in range(n_other):
+        nan_cols = np.any(np.isnan(bin_means), axis=0)  # (n_other,)
+
+        # Fast path: columns with no NaN — rank all at once, then vectorized Pearson
+        clean = ~nan_cols
+        if clean.any():
+            ranks = rankdata(bin_means[:, clean], axis=0)       # (n_bins, n_clean)
+            x_c = x_rank - x_rank.mean()                        # (n_bins,)
+            y_c = ranks - ranks.mean(axis=0)                    # (n_bins, n_clean)
+            denom = np.linalg.norm(x_c) * np.linalg.norm(y_c, axis=0)
+            slopes[clean] = (x_c @ y_c) / np.where(denom > 0, denom, np.nan)
+
+        # Slow path: columns with NaN — per-column with row masking
+        for j in np.where(nan_cols)[0]:
             col = bin_means[:, j]
             valid = ~np.isnan(col)
-            if valid.sum() >= 2:
-                slopes[j] = np.polyfit(x_rank[valid], col[valid], 1)[0]
+            if valid.sum() >= 4:
+                slopes[j] = spearmanr(x_rank[valid], col[valid])[0]
 
         subject_slopes.append(slopes)
 
     arr = np.stack(subject_slopes, axis=0)           # (n_subj, n_other)
     mean_slopes = np.nanmean(arr, axis=0)
     n_valid = (~np.isnan(arr)).sum(axis=0).astype(float)
+    mean_slopes[n_valid < len(files) * 0.5] = np.nan  # require ≥50% subject coverage
     se_slopes = np.nanstd(arr, axis=0, ddof=1) / np.sqrt(np.maximum(n_valid, 1))
     return mean_slopes, se_slopes
 
 
-def compute_quantile_mask(values: np.ndarray, mask: np.ndarray,
-                          q: tuple[float, float] = (0.25, 0.75)) -> np.ndarray:
-    """Kept for reference.
-
-    Label vertices as high (+1) or low (-1) gradient quantile extremes.
-
-    Parameters
-    ----------
-    values : np.ndarray, shape (n_vertices,)
-        Gradient values at the vertex level.
-    mask : np.ndarray of bool, shape (n_vertices,)
-        Boolean mask selecting vertices to include (e.g., a single network).
-    q : tuple of float, optional
-        Lower and upper quantile thresholds (default: (0.25, 0.75)).
-
-    Returns
-    -------
-    out : np.ndarray of int, shape (n_vertices,)
-        Array with values in {-1, 0, +1}.
-    """
-    low, high = np.nanquantile(values[mask], q)
-    out = np.full(values.shape, 0)
-    out[mask & (values <= low)] = -1
-    out[mask & (values >= high)] = 1
-    return out
-
-
 def compute_decile_bins(values: np.ndarray, mask: np.ndarray,
                         n_bins: int = 10) -> list:
-    """Kept for reference. Partition masked vertices into n_bins equal-quantile bins.
+    """Partition masked vertices into n_bins equal-quantile bins.
 
     Returns a list of n_bins boolean arrays (over the full vertex space) where
     each array selects vertices whose gradient value falls in that decile.
@@ -661,39 +531,43 @@ def _prepare_network_gradient(
 
 
 def _slope_and_correlate(
-    df: pd.DataFrame, files: list, cfg: dict, diff_col: str,
+    df: pd.DataFrame, files: list, cfg: dict, rho_col: str,
     gradient_values_cortex: np.ndarray, network_mask_cortex: np.ndarray,
     other_idx: np.ndarray,
     spin_model: SpinPermutations, n_rand: int,
     group_threshold_mask: np.ndarray | None = None,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, float, float, float, float]:
-    """Per-subject continuous-gradient OLS slope, stored in df, correlated with FC gradient.
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, float, float, float, float, int]:
+    """Per-subject Spearman decile ρ, stored in df, correlated with FC gradient.
 
-    Streams subjects one at a time via compute_regression_slope_subjects.
-    Modifies df in-place (stores z-scored mean slopes in diff_col, SE in diff_col+'_se').
-    Returns (x_norm, y_norm, mask_label, spearman_r, spin_pval, t_stat, t_pval).
+    Streams subjects via compute_decile_slope_subjects.
+    Modifies df in-place (stores z-scored mean ρ in rho_col, SE in rho_col+'_se').
+    Returns (x_norm, y_norm, mask_label, spearman_r, spin_pval, ci_lo, ci_hi, n_subjects).
     """
-    from scipy.stats import ttest_1samp
-
     cortex_mask = df["hemisphere"].notna().values
     mean_slopes, se_slopes = compute_decile_slope_subjects(
         files, gradient_values_cortex, network_mask_cortex, other_idx[cortex_mask], df,
         split_hemi=cfg["split_hemi"], log_transform=cfg["log_transform"],
     )
 
-    df.loc[other_idx, diff_col] = zscore(mean_slopes, nan_policy="omit")
-    df.loc[other_idx, f"{diff_col}_se"] = se_slopes
+    df.loc[other_idx, rho_col] = zscore(mean_slopes, nan_policy="omit")
+    df.loc[other_idx, f"{rho_col}_se"] = se_slopes
 
-    x = df[diff_col].values
+    x = df[rho_col].values
     y = df["fc_g1"].values
     mask_label = ~np.isnan(x) & ~np.isnan(y)
+    n_vert = int(mask_label.sum())
     x_norm, y_norm = zscore(x[mask_label]), zscore(y[mask_label])
     corr, _ = spearmanr(x_norm, y_norm)
     r_spin = compute_pvals_spin(x, y, df, spin_model, n_rand)
     pv_spin = np.mean(np.abs(r_spin) >= np.abs(corr))
-    finite_slopes = mean_slopes[np.isfinite(mean_slopes)]
-    t_stat, t_pval = ttest_1samp(finite_slopes, popmean=0)
-    return x_norm, y_norm, mask_label, corr, pv_spin, t_stat, t_pval
+
+    # Fisher-z 95 % CI for Spearman r
+    z = np.arctanh(corr)
+    se_z = 1.0 / np.sqrt(max(n_vert - 3, 1))
+    ci_lo, ci_hi = float(np.tanh(z - 1.96 * se_z)), float(np.tanh(z + 1.96 * se_z))
+
+    n_subjects = len(files)
+    return x_norm, y_norm, mask_label, corr, pv_spin, ci_lo, ci_hi, n_subjects
 
 
 def struct_conn_metric_analysis(df_yeo_surf_5k: pd.DataFrame,
@@ -704,10 +578,10 @@ def struct_conn_metric_analysis(df_yeo_surf_5k: pd.DataFrame,
     """
     Figure 2A: correlate MPC-gradient-driven connectivity fingerprints with the FC gradient.
 
-    Loads SC, Dist, and MPC at fsLR-5k. Identifies top/bottom quantile vertices of the
-    T1-MPC gradient within `network`, computes their mean connectivity difference to all
-    other-network vertices, then correlates each difference vector with the whole-brain
-    FC gradient (spin-test corrected).
+    Loads SC, GD, and MPC at fsLR-5k. Partitions T1-MPC gradient vertices within `network`
+    into K=10 equal-quantile decile bins, computes per-subject Spearman ρ between bin rank
+    and mean connectivity to all other-network vertices, then correlates the group-average
+    z-scored ρ map with the whole-brain FC gradient (spin-test corrected).
 
     Parameters
     ----------
@@ -754,7 +628,7 @@ def struct_conn_metric_analysis(df_yeo_surf_5k: pd.DataFrame,
                              gridspec_kw={"height_ratios": [2, 1]}, sharey="row")
 
     for i, (name, mcfg) in enumerate(metric_configs_2a.items()):
-        diff_col = f"{name}_diff"
+        rho_col = f"{name}_rho"
         # For SC: build a (n_other,) mask — True where the other-network vertex has at least one
         # group-consensus edge. sc_threshold is cortex-indexed; other_cortex selects other-network columns.
         if mcfg["sc_threshold"] is not None:
@@ -762,60 +636,66 @@ def struct_conn_metric_analysis(df_yeo_surf_5k: pd.DataFrame,
             gt_mask_other = mcfg["sc_threshold"][:, other_cortex].any(axis=0)  # (n_other,)
         else:
             gt_mask_other = None
-        x_norm, y_norm, mask_label, corr, pv_spin, t_stat, t_pval = _slope_and_correlate(
-            df_yeo_surf_5k, mcfg["files"], mcfg["cfg"], diff_col,
+        x_norm, y_norm, mask_label, corr, pv_spin, ci_lo, ci_hi, n_subjects = _slope_and_correlate(
+            df_yeo_surf_5k, mcfg["files"], mcfg["cfg"], rho_col,
             gradient_values_cortex, network_mask_cortex, other_idx,
             spin_model, n_rand, group_threshold_mask=gt_mask_other)
 
         cortex_count = int(df_yeo_surf_5k["hemisphere"].notna().sum())
-        n_nan_diff = int(df_yeo_surf_5k[diff_col].isna().sum())
+        n_nan_rho = int(df_yeo_surf_5k[rho_col].isna().sum())
         n_network_gray = cortex_count - int(other_idx.sum())
-        n_sparsity_gray = n_nan_diff - n_network_gray
+        n_sparsity_gray = n_nan_rho - n_network_gray
         logger.info(
-            f"[{name}] brain map: {n_nan_diff} gray vertices = "
+            f"[{name}] brain map: {n_nan_rho} gray vertices = "
             f"{n_network_gray} network+medialwall + {n_sparsity_gray} connectivity-sparse"
         )
 
         save_brain_map(surf5k_lh_infl, surf5k_rh_infl,
-                       df_yeo_surf_5k[diff_col].values,
+                       df_yeo_surf_5k[rho_col].values,
                        array_name="overlay",
-                       filename=project_root / f"results/figures/figure_2a_brain_{name}_diff.svg",
+                       filename=project_root / f"results/figures/figure_2a_brain_{name}_rho.svg",
                        hemisphere=hemisphere)
 
-        # Bar plot: mean regression slope per network sorted by FC gradient
-        df_plot = (df_yeo_surf_5k.loc[other_idx, ["network", "network_int", diff_col, "fc_g1_network"]]
-                   .dropna(subset=[diff_col])
+        # Bar plot: mean Spearman ρ per network sorted by FC gradient
+        df_plot = (df_yeo_surf_5k.loc[other_idx, ["network", "network_int", rho_col, "fc_g1_network"]]
+                   .dropna(subset=[rho_col])
                    .sort_values("fc_g1_network"))
         df_plot = df_plot.copy()
         df_plot["network_abbrev"] = df_plot["network"].map(yeo7_abbrev)
         palette = {yeo7_abbrev.get(net, net): yeo7_rgba[int(net_idx)] for net, net_idx in
                    df_plot[["network", "network_int"]].drop_duplicates().itertuples(index=False)}
-        sns.barplot(x=df_plot["network_abbrev"], y=diff_col, hue="network_abbrev",
+        sns.barplot(x=df_plot["network_abbrev"], y=rho_col, hue="network_abbrev",
                     data=df_plot, palette=palette, ax=axes[1, i], legend=False,
                     order=df_plot["network_abbrev"].unique())
         axes[1, i].axhline(0, color="black", linewidth=1, linestyle="--")
-        axes[1, i].set_ylabel("C slope (gradient)")
+        axes[1, i].set_ylabel(f"{name} Spearman ρ (z)")
         axes[1, i].set_ylim(-1.5, 1.5)
         axes[1, i].set_aspect(1)
         axes[1, i].set(xlabel=None)
         axes[1, i].yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
 
-        logger.info(f"[Figure 2A] {name}: SalVentAttn gradient regression slope vs FC-G1 | Spearman r={corr:.3f}, spin-test p={pv_spin:.3e} (n_perm={n_rand}) | one-sample t={t_stat:.2f}, p={t_pval:.3e}")
+        logger.info(
+            f"[Figure 2A] {name}: SalVentAttn Spearman decile ρ vs FC-G1 | "
+            f"Spearman r={corr:.3f} [{ci_lo:.3f}, {ci_hi:.3f}], "
+            f"spin-test p={pv_spin:.3e} (n_perm={n_rand}), n={n_subjects} subjects"
+        )
 
         colors = [yeo7_rgb[int(k)] for k in df_yeo_surf_5k["network_int"].values[mask_label]]
         axes[0, i].scatter(x_norm, y_norm, s=5, alpha=0.7, c=colors, rasterized=True)
         sns.regplot(x=x_norm, y=y_norm, scatter=False, color="black",
                     line_kws={"linewidth": 1}, ax=axes[0, i])
-        axes[0, i].text(0.05, 0.95, f"r = {corr:.2f}\np = {pv_spin:.3f}",
-                        transform=axes[0, i].transAxes, va="top")
+        axes[0, i].text(0.05, 0.95,
+                        f"r = {corr:.2f} [{ci_lo:.2f}, {ci_hi:.2f}]\n"
+                        f"p$_{{spin}}$ = {pv_spin:.3f}  n={n_subjects}",
+                        transform=axes[0, i].transAxes, va="top", fontsize=12)
         axes[0, i].set_xlim(-3, 3)
         axes[0, i].set_ylim(-2.5, 2.5)
         axes[0, i].set_aspect("equal", adjustable="box")
 
-    axes[0, 0].set_xlabel("SC slope (gradient)")
-    axes[0, 1].set_xlabel("GD slope (gradient)")
-    axes[0, 2].set_xlabel("MPC slope (gradient)")
-    axes[0, 0].set_ylabel("FC gradient 1")
+    axes[0, 0].set_xlabel("SC Spearman ρ per gradient decile (z)")
+    axes[0, 1].set_xlabel("GD Spearman ρ per gradient decile (z)")
+    axes[0, 2].set_xlabel("MPC Spearman ρ per gradient decile (z)")
+    axes[0, 0].set_ylabel("Principal FC gradient")
     sns.despine(fig=fig)
     plt.tight_layout()
     plt.savefig(project_root / "results/figures/figure_2a_distance_metric.svg")
@@ -839,9 +719,10 @@ def struct_conn_network_analysis(df_yeo_surf_5k: pd.DataFrame,
     """
     Figure 2B: replicate the connectivity-fingerprint/FC-gradient correlation for each Yeo network.
 
-    All analysis at fsLR-5k. For each network, computes the T1-MPC gradient, identifies
-    top/bottom quantile vertices, computes their connectivity difference to all other-network
-    vertices, and correlates with the whole-brain FC gradient (spin-test corrected).
+    All analysis at fsLR-5k. For each network, computes the T1-MPC gradient, partitions
+    gradient vertices into K=10 equal-quantile decile bins, computes per-subject Spearman ρ
+    between bin rank and mean connectivity to all other-network vertices, and correlates the
+    group-average z-scored ρ map with the whole-brain FC gradient (spin-test corrected).
 
     Parameters
     ----------
@@ -885,32 +766,39 @@ def struct_conn_network_analysis(df_yeo_surf_5k: pd.DataFrame,
         logger.info(f"Processing network: {network}")
         gradient_values_cortex, network_mask_cortex, other_idx = _prepare_network_gradient(
             df_yeo_surf_5k, network, df_pni, hemisphere)
-        diff_col = f"{network}_{measure}_diff"
-        x_norm, y_norm, mask_label, corr, pv_spin, t_stat, t_pval = _slope_and_correlate(
-            df_yeo_surf_5k, files, cfg, diff_col,
+        rho_col = f"{network}_{measure}_rho"
+        x_norm, y_norm, mask_label, corr, pv_spin, ci_lo, ci_hi, n_subjects = _slope_and_correlate(
+            df_yeo_surf_5k, files, cfg, rho_col,
             gradient_values_cortex, network_mask_cortex, other_idx,
             spin_model, n_rand)
 
         save_brain_map(surf5k_lh_infl, surf5k_rh_infl,
-                       df_yeo_surf_5k[diff_col].values,
+                       df_yeo_surf_5k[rho_col].values,
                        array_name="overlay2",
-                       filename=project_root / f"results/figures/figure_2b_brain_{measure}_diff_{network}.svg",
+                       filename=project_root / f"results/figures/figure_2b_brain_{measure}_rho_{network}.svg",
                        hemisphere=hemisphere)
 
-        logger.info(f"[Figure 2B] {network}: {measure} gradient regression slope vs FC-G1 | Spearman r={corr:.3f}, spin-test p={pv_spin:.3e} (n_perm={n_rand}) | one-sample t={t_stat:.2f}, p={t_pval:.3e}")
+        logger.info(
+            f"[Figure 2B] {network}: {measure} Spearman decile ρ vs FC-G1 | "
+            f"Spearman r={corr:.3f} [{ci_lo:.3f}, {ci_hi:.3f}], "
+            f"spin-test p={pv_spin:.3e} (n_perm={n_rand}), n={n_subjects} subjects"
+        )
 
         colors = [yeo7_rgb[int(k)] for k in df_yeo_surf_5k["network_int"].values[mask_label]]
         axes[i].scatter(x_norm, y_norm, s=5, alpha=0.7, c=colors, rasterized=True)
         sns.regplot(x=x_norm, y=y_norm, scatter=False, color="black",
                     line_kws={"linewidth": 1}, ax=axes[i])
-        axes[i].text(0.05, 0.95, f"r = {corr:.2f}\np = {pv_spin:.3f}",
-                     transform=axes[i].transAxes, va="top")
+        axes[i].text(0.05, 0.95,
+                     f"r = {corr:.2f} [{ci_lo:.2f}, {ci_hi:.2f}]\n"
+                     f"p$_{{spin}}$ = {pv_spin:.3f}  n={n_subjects}",
+                     transform=axes[i].transAxes, va="top", fontsize=12)
         net_color = yeo7_rgb[int(df_yeo_surf_5k.loc[
             df_yeo_surf_5k["network"] == network, "network_int"].values[0])]
-        axes[i].set_title(network, fontdict={"color": net_color})
-        axes[i].set_xlabel(f"{measure} slope (gradient)")
+        net_abbrev = yeo7_abbrev.get(network, network)
+        axes[i].set_title(net_abbrev, fontdict={"color": net_color})
+        axes[i].set_xlabel(f"{measure} Spearman ρ per gradient decile (z)")
         if i % n_col == 0:
-            axes[i].set_ylabel("FC gradient 1")
+            axes[i].set_ylabel("Principal FC gradient")
         axes[i].set_xlim(-3, 3)
         axes[i].set_ylim(-3, 3)
         axes[i].set_aspect("equal", adjustable="box")

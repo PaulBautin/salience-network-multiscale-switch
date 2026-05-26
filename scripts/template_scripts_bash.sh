@@ -33,7 +33,30 @@ python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scri
 python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1c_cortical_types.py \
   -hemi LH
 
+# Figure 2 - Structural connectivity at MPC gradient extremes
+#
+# Tests SC/geodesic distance/MPC differences between gradient-high and gradient-low
+# vertices within each Yeo network. Requires df_1a_<hemi>.tsv from figure_1a_t1map.py.
+#
+# example:
+python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py \
+  -hemi LH
+
+# Figure 3a - MNI open iEEG atlas
+#
+# Maps electrophysiological similarity differences between gradient-top and
+# gradient-bottom channels onto the cortical surface and correlates with BigBrain G2.
+# Requires df_1a_<hemi>.tsv produced by figure_1a_t1map.py.
+#
+# example:
+python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mni.py \
+  -ieeg_deriv /local_raid/data/pbautin/downloads/MNI_ieeg/MatlabFile.mat \
+  -hemi RH \
+  -network SalVentAttn
+
+# Figure 3b - MICA iEEG dataset
+#
 # example:
 python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py \
   -ieeg_deriv /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA \
-  -hemi LH
+  -hemi RH

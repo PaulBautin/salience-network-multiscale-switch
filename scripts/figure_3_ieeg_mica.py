@@ -59,7 +59,7 @@ from scipy.ndimage import rotate
 import logging
 
 from src.atlas_load import load_yeo_atlas, convert_states_str2int
-from src.ieeg_processing import load_sensitivity_info, load_original_data_files, preprocess_and_compute_psd_ieeg, extract_band_power
+from src.ieeg_processing import load_sensitivity_info, load_original_data_files, preprocess_and_compute_psd_ieeg, extract_band_power, compute_gradient_quantiles
 from src.plot_colors import yeo7_rgba, yeo7_rgb
 from src.logging_utils import setup_manuscript_logger
 
@@ -93,10 +93,17 @@ def get_parser() -> argparse.ArgumentParser:
         choices=["both", "LH", "RH"],
         help="Hemisphere for analysis: 'both', 'LH', or 'RH' (default: RH)"
     )
+    optional.add_argument(
+        "-network",
+        type=str,
+        default="SalVentAttn",
+        choices=["Vis", "SomMot", "DorsAttn", "SalVentAttn", "Limbic", "Cont", "Default"],
+        help="Yeo 7-network to use as the analysis target (default: SalVentAttn)"
+    )
     return parser
 
 
-def frequency_band_analysis_sensitivity(df_channel: pd.DataFrame, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf: pd.DataFrame, project_root: Path, hemi: str = 'RH') -> None:
+def frequency_band_analysis_sensitivity(df_channel: pd.DataFrame, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf: pd.DataFrame, project_root: Path, hemi: str = 'RH', network: str = 'SalVentAttn') -> None:
     freq_bands = {"delta": (0.5, 4), "theta": (4, 8), "alpha": (8, 13), "beta": (13, 30), "gamma": (30, 80)}
     band_order = ["delta", "theta", "alpha", "beta", "gamma"]
     band_colors = ['#1f77b4', '#9467bd', '#e377c2', '#2ca02c', '#17becf']
@@ -111,16 +118,14 @@ def frequency_band_analysis_sensitivity(df_channel: pd.DataFrame, surf32k_lh_inf
     n_vertices = surf_combined.GetPoints().shape[0]
     fs = df_channel['SamplingRate'].iloc[0]
 
-    # Define Analysis Mask: SalVent network for the specified hemisphere
+    # Define analysis mask: target network for the specified hemisphere
     if hemi in ('LH', 'RH'):
-        mask = ((df_yeo_surf['hemisphere'] == hemi) & (df_yeo_surf['network'] == 'SalVentAttn')).values
+        mask = ((df_yeo_surf['hemisphere'] == hemi) & (df_yeo_surf['network'] == network)).values
     else:
-        mask = (df_yeo_surf['network'] == 'SalVentAttn').values
+        mask = (df_yeo_surf['network'] == network).values
 
-    # Find top and bottom 25% of vertices in the SalVentAttn network based on the T1 gradient
-    low_q, high_q = np.nanquantile(df_yeo_surf.loc[mask, "t1_gradient1_SalVentAttn"], [0.25, 0.75])
-    df_yeo_surf.loc[mask & (df_yeo_surf["t1_gradient1_SalVentAttn"] <= low_q), "quantiles"] = -1
-    df_yeo_surf.loc[mask & (df_yeo_surf["t1_gradient1_SalVentAttn"] >= high_q), "quantiles"] = 1
+    gradient_col = f't1_gradient1_{network}'
+    compute_gradient_quantiles(df_yeo_surf, np.where(mask)[0], gradient_col)
 
     # Pre-calculate Moran Weights
     w = mesh_elements.get_ring_distance(surf_hemi, n_ring=1, mask=mask[hemi_offset:hemi_offset + N_LH])
@@ -142,7 +147,7 @@ def frequency_band_analysis_sensitivity(df_channel: pd.DataFrame, surf32k_lh_inf
 
     # Plot all PSDs colored by gradient value
     fig, ax = plt.subplots(figsize=(6, 4))
-    grad = df_yeo_surf['t1_gradient1_SalVentAttn'].values[hemi_offset:hemi_offset + N_LH][mask[hemi_offset:hemi_offset + N_LH]]
+    grad = df_yeo_surf[gradient_col].values[hemi_offset:hemi_offset + N_LH][mask[hemi_offset:hemi_offset + N_LH]]
     surf_map_sal = surf_map[:, mask[hemi_offset:hemi_offset + N_LH]].T
     custom_cmap = plt.get_cmap(name="coolwarm")
     norm = mp.colors.Normalize(vmin=-1, vmax=1)
@@ -184,7 +189,7 @@ def frequency_band_analysis_sensitivity(df_channel: pd.DataFrame, surf32k_lh_inf
             nan_color=(220, 220, 220, 1), cmap="Purples", transparent_bg=True, screenshot=True, filename=screenshot_path)
 
         
-        # Plot SalVentAttn network sensitivity on surface
+        # Plot target network sensitivity on surface
         surf_map_sal = surf_map.copy()
         surf_map_sal[~mask[hemi_offset:hemi_offset + N_LH]] = np.nan
         surf_map_sal = surf_map_sal[hemi_offset:hemi_offset + N_LH]
@@ -199,7 +204,7 @@ def frequency_band_analysis_sensitivity(df_channel: pd.DataFrame, surf32k_lh_inf
         
         # Correlation Analysis
         x_raw = surf_map[mask[hemi_offset:hemi_offset + N_LH]]
-        y = df_yeo_surf['t1_gradient1_SalVentAttn'].values[hemi_offset:hemi_offset + N_LH][mask[hemi_offset:hemi_offset + N_LH]]
+        y = df_yeo_surf[gradient_col].values[hemi_offset:hemi_offset + N_LH][mask[hemi_offset:hemi_offset + N_LH]]
         # Filter: Only correlate vertices that had signal
         valid_data_mask = (x_raw != 0) & np.isfinite(x_raw) & np.isfinite(y)
         # Z-score for statistics
@@ -252,6 +257,7 @@ def salience_network_electrophysiological_similarity(
     df_yeo_surf: pd.DataFrame,
     project_root: Path,
     hemi: str = 'RH',
+    network: str = 'SalVentAttn',
 ) -> None:
     N_LH = 32492
     hemi_offset = N_LH if hemi == 'RH' else 0
@@ -275,15 +281,15 @@ def salience_network_electrophysiological_similarity(
     # (32492, n_freqs) vertex-level PSD
     surf_psd_v = surf_psd.T
 
-    # SalVentAttn vertices and T1 gradient quantiles
-    sal_mask = (df_hemi['network'] == 'SalVentAttn').values
-    grad = df_hemi['t1_gradient1_SalVentAttn'].values
+    # Target network vertices and T1 gradient quantiles
+    sal_mask = (df_hemi['network'] == network).values
+    grad = df_hemi[f't1_gradient1_{network}'].values
     grad_sal_finite = grad[sal_mask & np.isfinite(grad)]
     low_q, high_q = np.nanquantile(grad_sal_finite, [0.25, 0.75])
     top_mask = sal_mask & (grad >= high_q) & covered
     bot_mask = sal_mask & (grad <= low_q) & covered
 
-    logger.info(f"[Figure 3B] SalVentAttn top-Q vertices: {top_mask.sum()}, bottom-Q: {bot_mask.sum()}")
+    logger.info(f"[Figure 3B] {network} top-Q vertices: {top_mask.sum()}, bottom-Q: {bot_mask.sum()}")
 
     # Z-score each vertex's PSD across frequencies for Pearson correlation
     psd_mean = np.nanmean(surf_psd_v, axis=1, keepdims=True)
@@ -294,12 +300,12 @@ def salience_network_electrophysiological_similarity(
     P_top = surf_psd_z[top_mask]  # (n_top, n_freqs)
     P_bot = surf_psd_z[bot_mask]  # (n_bot, n_freqs)
 
-    # Mean absolute Pearson correlation of each vertex PSD with top/bottom SalVentAttn PSDs
+    # Mean absolute Pearson correlation of each vertex PSD with top/bottom target-network PSDs
     A_top = np.mean(np.abs(surf_psd_z @ P_top.T) / n_freqs, axis=1)  # (32492,)
     A_bot = np.mean(np.abs(surf_psd_z @ P_bot.T) / n_freqs, axis=1)  # (32492,)
 
-    # ES defined for non-SalVentAttn, non-medial-wall vertices with coverage
-    other_mask = covered & (df_hemi['network'] != 'SalVentAttn') & (df_hemi['network'] != 'medial_wall')
+    # ES defined for non-target-network, non-medial-wall vertices with coverage
+    other_mask = covered & (df_hemi['network'] != network) & (df_hemi['network'] != 'medial_wall')
     logger.info(f"[Figure 3B] Other-network covered vertices: {other_mask.sum()}")
     es_map = np.full(N_LH, np.nan)
     es_map[other_mask] = zscore(A_top[other_mask] - A_bot[other_mask])
@@ -416,7 +422,8 @@ def main():
     logger.info(f"PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum")
     logger.info(f"Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz")
     logger.info(f"Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)")
-    logger.info(f"Surface space  : fsLR-32k {args.hemi}, Schaefer-400, Yeo SalVentAttn network")
+    logger.info(f"Surface space  : fsLR-32k {args.hemi}, Schaefer-400, Yeo 7-network labels")
+    logger.info(f"Analysis network: {args.network}")
 
     logger.info(f"Script path: {script_path}")
     logger.info(f"Project root: {project_root}")
@@ -461,11 +468,11 @@ def main():
     df2['SensitivityMap_bip'] = df2['Sens1'] - df2['Sens2']
     df2['SensitivityMap_bip'] = df2['SensitivityMap_bip'].map(lambda x: np.abs(x) if isinstance(x, np.ndarray) else np.zeros(32492))
 
-    # Perform frequency band analysis and correlate with T1 gradient in the SalVentAttn network
-    # frequency_band_analysis_sensitivity(df2, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf, project_root, hemi=args.hemi)
+    # Perform frequency band analysis and correlate with T1 gradient in the target network
+    # frequency_band_analysis_sensitivity(df2, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf, project_root, hemi=args.hemi, network=args.network)
 
-    # Electrophysiological similarity: compare whole-brain spectral fingerprints to SalVentAttn gradient extremes
-    salience_network_electrophysiological_similarity(df2, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf, project_root, hemi=args.hemi)
+    # Electrophysiological similarity: compare whole-brain spectral fingerprints to target-network gradient extremes
+    salience_network_electrophysiological_similarity(df2, surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf, project_root, hemi=args.hemi, network=args.network)
 
 
 if __name__ == "__main__":

@@ -3265,3 +3265,142 @@ Computing T1 gradients...
 Gradient lambdas: [0.07337435 0.05523916 0.04803656 0.04354119 0.02999405 0.02737298
  0.02259832 0.01942884 0.01630415 0.01521947]
 [Figure 2B] SomMot: MPC gradient regression slope vs FC-G1 | Spearman r=0.220, spin-test p=1.380e-01 (n_perm=1000) | one-sample t=-28.40, p=4.168e-168
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-25 16:02:18
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07075694 0.05396632 0.04488848 0.04045961 0.02895737 0.02584575
+ 0.02211822 0.01961801 0.01577327 0.01371775]
+[SC] brain map: 2064 gray vertices = 1141 network+medialwall + 923 connectivity-sparse
+[Figure 2A] SC: SalVentAttn WLS decile slope vs FC-G1 | Spearman r=0.270 [0.249, 0.291], spin-test p=4.900e-02 (n_perm=1000), n=18 subjects
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn WLS decile slope vs FC-G1 | Spearman r=-0.182 [-0.203, -0.159], spin-test p=4.990e-01 (n_perm=1000), n=18 subjects
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-25 16:23:37
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07077362 0.05401442 0.04498161 0.04052052 0.02895809 0.02585378
+ 0.022136   0.01962202 0.01577434 0.0137235 ]
+[SC] brain map: 2068 gray vertices = 1141 network+medialwall + 927 connectivity-sparse
+[Figure 2A] SC: SalVentAttn WLS decile slope vs FC-G1 | Spearman r=0.333 [0.312, 0.353], spin-test p=2.100e-02 (n_perm=1000), n=18 subjects
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn WLS decile slope vs FC-G1 | Spearman r=-0.106 [-0.128, -0.083], spin-test p=6.620e-01 (n_perm=1000), n=18 subjects
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-25 16:42:36
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07073858 0.05398896 0.04494037 0.04045217 0.02894325 0.02584482
+ 0.02213008 0.0196085  0.01577327 0.01371777]
+[SC] brain map: 2068 gray vertices = 1141 network+medialwall + 927 connectivity-sparse
+[Figure 2A] SC: SalVentAttn Spearman decile ρ vs FC-G1 | Spearman r=0.336 [0.316, 0.356], spin-test p=1.800e-02 (n_perm=1000), n=18 subjects
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn Spearman decile ρ vs FC-G1 | Spearman r=-0.103 [-0.126, -0.081], spin-test p=6.660e-01 (n_perm=1000), n=18 subjects
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-25 16:56:53
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07080699 0.05401634 0.04500112 0.04052146 0.02897919 0.02584638
+ 0.0221371  0.01962088 0.01578095 0.01372515]
+[SC] brain map: 2303 gray vertices = 1141 network+medialwall + 1162 connectivity-sparse
+[Figure 2A] SC: SalVentAttn Spearman decile ρ vs FC-G1 | Spearman r=0.331 [0.311, 0.352], spin-test p=2.100e-02 (n_perm=1000), n=18 subjects
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn Spearman decile ρ vs FC-G1 | Spearman r=-0.104 [-0.126, -0.081], spin-test p=6.540e-01 (n_perm=1000), n=18 subjects
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn Spearman decile ρ vs FC-G1 | Spearman r=0.397 [0.378, 0.416], spin-test p=5.000e-03 (n_perm=1000), n=18 subjects
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06513548 0.05653076 0.04582312 0.04078093 0.02930625 0.0249291
+ 0.02135636 0.01784157 0.01564862 0.01361844]
+[Figure 2B] Limbic: MPC Spearman decile ρ vs FC-G1 | Spearman r=-0.391 [-0.410, -0.372], spin-test p=1.400e-02 (n_perm=1000), n=18 subjects
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07204868 0.05657543 0.04666178 0.04255857 0.02972242 0.02754944
+ 0.02247273 0.01930176 0.01592401 0.01449321]
+[Figure 2B] Default: MPC Spearman decile ρ vs FC-G1 | Spearman r=0.399 [0.378, 0.419], spin-test p=6.000e-03 (n_perm=1000), n=18 subjects
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07181807 0.05764198 0.04792574 0.04148359 0.03157066 0.02792285
+ 0.02205029 0.0188544  0.01661865 0.01486175]
+[Figure 2B] Cont: MPC Spearman decile ρ vs FC-G1 | Spearman r=0.368 [0.348, 0.387], spin-test p=1.300e-02 (n_perm=1000), n=18 subjects
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07077197 0.05400119 0.04489212 0.04051799 0.02895288 0.02584823
+ 0.02213698 0.01961942 0.01577354 0.01372222]
+[Figure 2B] SalVentAttn: MPC Spearman decile ρ vs FC-G1 | Spearman r=0.397 [0.378, 0.416], spin-test p=5.000e-03 (n_perm=1000), n=18 subjects
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.0721044  0.05409247 0.04586351 0.03997771 0.02981537 0.02646684
+ 0.02244573 0.01918907 0.01623901 0.01437108]
+[Figure 2B] DorsAttn: MPC Spearman decile ρ vs FC-G1 | Spearman r=0.335 [0.315, 0.355], spin-test p=1.700e-02 (n_perm=1000), n=18 subjects
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07237669 0.05383381 0.04775289 0.04442366 0.03088625 0.02818523
+ 0.02235568 0.01950009 0.01688891 0.01543533]
+[Figure 2B] Vis: MPC Spearman decile ρ vs FC-G1 | Spearman r=-0.362 [-0.382, -0.342], spin-test p=1.100e-02 (n_perm=1000), n=18 subjects
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07338832 0.05526483 0.04813266 0.0435549  0.02999604 0.02736936
+ 0.02261051 0.01943421 0.01631272 0.01522521]
+[Figure 2B] SomMot: MPC Spearman decile ρ vs FC-G1 | Spearman r=0.205 [0.182, 0.227], spin-test p=1.410e-01 (n_perm=1000), n=18 subjects

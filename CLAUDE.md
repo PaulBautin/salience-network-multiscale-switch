@@ -44,7 +44,6 @@ python scripts/figure_2_distance.py -hemi LH
 
 # Figure 3 – iEEG (MNI and MICA datasets)
 python scripts/figure_3_ieeg_mni.py \
-  -pni_deriv /path/to/BIDS_PNI/derivatives/micapipe_v0.2.0 \
   -ieeg_deriv /path/to/MNI_ieeg/MatlabFile.mat
 python scripts/figure_3_ieeg_mica.py \
   -ieeg_deriv /path/to/BIDS_iEEG/derivatives/electroMICA

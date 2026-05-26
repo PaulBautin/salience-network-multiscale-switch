@@ -145,6 +145,34 @@ Uses Welch's method with a 2-second Hamming window and 1-second overlap. PSD is 
 
 ---
 
+### `compute_gradient_quantiles`
+
+```python
+compute_gradient_quantiles(
+    df_surf: pd.DataFrame,
+    channel_indices: np.ndarray,
+    gradient_col: str,
+    quantiles: tuple[float, float] = (0.25, 0.75),
+) -> np.ndarray
+```
+
+Assign gradient quantile labels to channels and update the surface DataFrame in-place.
+
+Marks vertices covered by `channel_indices` as bottom-quantile (`-1`) or top-quantile (`+1`) based on their gradient value, writing results into a `'quantiles'` column on `df_surf`. Used by both MNI and MICA iEEG scripts to stratify channels by their position along the T1 microstructural gradient.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `df_surf` | `pd.DataFrame` | Surface DataFrame containing `gradient_col`. Modified in-place. |
+| `channel_indices` | `np.ndarray` | Integer vertex indices of each channel on the 32k surface. |
+| `gradient_col` | `str` | Name of the gradient column in `df_surf`. |
+| `quantiles` | `tuple[float, float]` | `(low, high)` quantile thresholds as fractions. Default `(0.25, 0.75)`. |
+
+**Returns** `np.ndarray` — quantile label per channel (`-1`, `0`, or `1`; `NaN` where unassigned).
+
+---
+
 ### `plot_surface_sphere`
 
 ```python
