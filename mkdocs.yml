@@ -48,6 +48,7 @@ nav:
     - Overview: api/overview.md
     - atlas_load: api/atlas_load.md
     - gradient_computation: api/gradient_computation.md
+    - connectome_processing: api/connectome_processing.md
     - ieeg_processing: api/ieeg_processing.md
     - logging_utils: api/logging_utils.md
     - plot_colors: api/plot_colors.md

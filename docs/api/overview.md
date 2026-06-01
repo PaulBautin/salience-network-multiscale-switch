@@ -28,6 +28,7 @@ Analysis columns (e.g. `T1map`, `BigBrain`, `t1_gradient1`) are appended by indi
 |--------|-------------|
 | [`atlas_load`](atlas_load.md) | Atlas and surface DataFrame construction; histological profile loaders |
 | [`gradient_computation`](gradient_computation.md) | MPC gradient computation via diffusion map embedding |
+| [`connectome_processing`](connectome_processing.md) | Connectome I/O and the gradient-weighted connectivity projection (Figure 2) |
 | [`ieeg_processing`](ieeg_processing.md) | iEEG signal preprocessing, PSD estimation, and surface mapping |
 | [`logging_utils`](logging_utils.md) | Timestamped file + console logging for manuscript scripts |
 | [`plot_colors`](plot_colors.md) | Yeo 7-network and cortical-type color definitions; matplotlib colormap registration |

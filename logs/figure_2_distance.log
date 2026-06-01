@@ -4125,3 +4125,15 @@ Gradient lambdas: [0.07340507 0.05527629 0.0480732  0.04355676 0.02999789 0.0273
 [Figure 2B | MPC] processing network: SalVentAttn
 [Figure 2B | SalVentAttn | MPC] r_group=-0.420 [-0.458, -0.381] t=-20.06 p=2.842e-13 | p_moran=0.000e+00 (primary) p_spin=7.136e-03 (n_perm=1000) | r_partial=+nan p_partial=nan n=18
 [Figure 2B | MPC] processing network: DorsAttn
+[Figure 2B | DorsAttn | MPC] r_group=-0.264 [-0.300, -0.227] t=-14.58 p=4.873e-11 | p_moran=0.000e+00 (primary) p_spin=1.356e-02 (n_perm=1000) | r_partial=+nan p_partial=nan n=18
+[Figure 2B | MPC] processing network: Vis
+[Figure 2B | Vis | MPC] r_group=-0.354 [-0.381, -0.326] t=-24.78 p=8.762e-15 | p_moran=0.000e+00 (primary) p_spin=0.000e+00 (n_perm=1000) | r_partial=+nan p_partial=nan n=18
+[Figure 2B | MPC] processing network: SomMot
+[Figure 2B | SomMot | MPC] r_group=-0.504 [-0.535, -0.471] t=-27.22 p=1.843e-15 | p_moran=0.000e+00 (primary) p_spin=0.000e+00 (n_perm=1000) | r_partial=+nan p_partial=nan n=18
+[Figure 2B FDR | MPC | Limbic] q_moran=0.000e+00 q_spin=1.151e-02
+[Figure 2B FDR | MPC | Default] q_moran=0.000e+00 q_spin=0.000e+00
+[Figure 2B FDR | MPC | Cont] q_moran=0.000e+00 q_spin=2.613e-02
+[Figure 2B FDR | MPC | SalVentAttn] q_moran=0.000e+00 q_spin=1.151e-02
+[Figure 2B FDR | MPC | DorsAttn] q_moran=0.000e+00 q_spin=1.582e-02
+[Figure 2B FDR | MPC | Vis] q_moran=0.000e+00 q_spin=0.000e+00
+[Figure 2B FDR | MPC | SomMot] q_moran=0.000e+00 q_spin=0.000e+00

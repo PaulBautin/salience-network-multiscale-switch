@@ -1,7 +1,7 @@
 # Figure 2 — Gradient-weighted connectivity projection
 
 **Script:** `scripts/figure_2_distance.py`
-**Module:** `src/connectome_processing.py`
+**Module:** [`src/connectome_processing`](../api/connectome_processing.md)
 
 Figure 2 tests whether the microstructural (MPC) gradient within the salience
 network predicts how its vertices connect to the rest of the brain, and whether
@@ -208,22 +208,8 @@ Fisher-z + t-test as the primary stat. Reported as $r_{\mathrm{partial}}$ /
 $p_{\mathrm{partial}}$ in the log. Skipped for MPC (rank statistic is
 degree-invariant).
 
----
-
-## Implementation (`src/connectome_processing.py`)
-
-| Function | Role |
-|----------|------|
-| `load_subject_matrix(path, cortex_mask)` | Generic GIFTI loader; symmetrises, restricts to cortex |
-| `fcn_group_bins(adj, dist, hemiid, nbins)` | Betzel distance-stratified consensus (binary mask) |
-| `build_consensus_mask(sc_files, dist_files, df, nbins=10)` | Returns the consensus mask **plus** the per-subject SC matrices |
-| `prepare_weights(W_raw, modality, hemi, sn_mask, mask_G=None)` | Modality-aware preprocessing → weight matrix with NaN exclusions |
-| `compute_projection_score(W, g_fc, sn, other)` | Vectorised weighted-mean $P_i$ (SC, GD) |
-| `compute_projection_score_rank(W, g_fc, sn, other)` | Per-row Spearman across targets (MPC variant) |
-| `compute_projection_subjects(...)` | Per-subject loop + Fisher-z aggregation; returns `r_subjects`, `r_group`, `t`, `p`, CI, plus the per-subject `mean_GD` and `degree` arrays |
-| `compute_partial_correlation_subjects(result, g_mpc)` | Regress out `meanGD + degree`; same aggregation |
-| `compute_spin_null_projection(g_mpc, sn, cortex_mask, result, spin_model, n_rand)` | Spin null + two-tailed empirical $p_{\mathrm{spin}}$ |
-| `compute_tertile_contrast(P_mean, g_mpc)` | Supplementary tertile summary for visualisation |
+The functions implementing each step above are documented in the API reference:
+[`src/connectome_processing`](../api/connectome_processing.md).
 
 ---
 
