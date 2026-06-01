@@ -17,8 +17,8 @@
 # (default-mode) end. Per subject, r_s = Spearman_i(g_MPC[i], P_s[i]) across network
 # vertices. Group inference is a two-stage random-effects test: Fisher-z(r_s) then a
 # one-sample t-test against zero across the 18 subjects, with a spin-permutation null
-# (Alexander-Bloch 2018) and partial-correlation control for mean weighted distance to
-# targets and total weighted degree.
+# (Alexander-Bloch 2018) and a Moran spectral-randomization null (within-network,
+# SAC-preserving).
 #
 # Modality routing:
 #   - SC : per-subject SIFT2 weights masked by the Betzel distance-stratified consensus
@@ -32,13 +32,13 @@
 # All matrices loaded at fsLR-5k (9684 vertices). Subject is the unit of inference.
 #
 # Figure 2A: SalVentAttn × {SC, GD, MPC} - projection map + group r/p per modality.
-# Figure 2B: All 7 Yeo networks × {SC, MPC} - replicates the test per network.
+# Figure 2B: All 7 Yeo networks × {SC} - replicates the test per network.
 #
 # Outputs:
 #   results/figures/figure_2a_distance_metric.svg
 #   results/figures/figure_2a_brain_{SC,GD,MPC}_rho.svg
-#   results/figures/figure_2b_distance_network_{measure}.svg
-#   results/figures/figure_2b_brain_{measure}_rho_{network}.svg
+#   results/figures/figure_2b_distance_network_SC.svg
+#   results/figures/figure_2b_brain_SC_rho_{network}.svg
 #   data/dataframes/df_2b_label_{hemisphere}.csv  (vertex-level cache; new schema)
 #
 # Requires figure_1a_t1map.py to have been run first (produces
@@ -71,8 +71,6 @@ from brainspace.plotting.utils import _gen_grid as _orig_gen_grid
 from brainspace.mesh.mesh_io import read_surface
 from brainspace.null_models import SpinPermutations
 
-from scipy.stats import spearmanr
-
 import matplotlib.pyplot as plt
 
 from src.atlas_load import (
@@ -84,7 +82,7 @@ from src.plot_colors import yeo7_rgb, yeo7_abbrev
 from src.logging_utils import setup_manuscript_logger
 from src.connectome_processing import (
     build_consensus_mask, compute_projection_subjects,
-    compute_partial_correlation_subjects, compute_spin_null_projection,
+    compute_spin_null_projection,
     compute_moran_null_projection, compute_dominant_target_network,
     benjamini_hochberg, load_subject_matrix,
 )
@@ -160,9 +158,6 @@ def _prepare_network_gradient(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Compute (cache-aware) the T1 MPC gradient for `network`; return masks + values.
 
-    Orientation is anchored deterministically: high gradient = transmodal pole
-    (positive Spearman correlation with mean qT1 across cortical depths and subjects).
-
     Returns
     -------
     g_mpc_at_sn : np.ndarray, shape (n_sn,)
@@ -181,10 +176,6 @@ def _prepare_network_gradient(
             df_pni["path_t1_profile_5k"].tolist(), net_mask_full_for_grad
         )
         grad = compute_t1_gradient(t1_profiles)
-        ref_qt1 = np.nanmean(t1_profiles, axis=(0, 1))
-        m = ~np.isnan(grad) & ~np.isnan(ref_qt1)
-        if spearmanr(grad[m], ref_qt1[m])[0] < 0:
-            grad = -grad
         df.loc[net_mask_full_for_grad, grad_col] = grad
 
     net_mask_full = cortex_mask & (df["network"] == network).values
@@ -217,9 +208,8 @@ def _run_projection(
     spin_model: SpinPermutations, n_rand: int,
     *, mask_G: np.ndarray | None = None,
     sc_subjects: list[np.ndarray] | None = None,
-    dist_files: list | None = None,
 ) -> dict:
-    """One-stop: per-subject projection + partial correlation + Moran + spin nulls.
+    """One-stop: per-subject projection + Moran + spin nulls.
 
     Moran is the primary spatial null (within-SN, preserves SAC of g_MPC).
     Spin is a secondary cortex-wide conservative check.
@@ -229,10 +219,9 @@ def _run_projection(
         g_fc_cortex=g_fc_cortex, g_mpc_cortex_at_sn=g_mpc_at_sn,
         sn_mask_cortex=sn_mask_cortex, other_mask_cortex=other_mask_cortex,
         df_yeo_surf_5k=df,
-        mask_G=mask_G, sc_subjects=sc_subjects, dist_files=dist_files,
+        mask_G=mask_G, sc_subjects=sc_subjects,
         target_network_labels=target_network_labels,
     )
-    partial = compute_partial_correlation_subjects(result, g_mpc_at_sn)
 
     gd_among_sn = gd_cortex[np.ix_(sn_mask_cortex, sn_mask_cortex)]
     moran = compute_moran_null_projection(
@@ -242,7 +231,7 @@ def _run_projection(
     spin = compute_spin_null_projection(
         g_mpc_at_sn, sn_mask_cortex, cortex_mask_full, result, spin_model, n_rand,
     )
-    return {**result, **partial, **moran, **spin}
+    return {**result, **moran, **spin}
 
 
 def _embed_in_full_cortex(
@@ -334,7 +323,6 @@ def struct_conn_metric_analysis(
             target_network_labels=target_net_labels,
             spin_model=spin_model, n_rand=n_rand,
             mask_G=mcfg["mask_G"], sc_subjects=mcfg["sc_subjects"],
-            dist_files=df_pni["path_dist_5k"].tolist(),
         )
 
         logger.info(
@@ -342,9 +330,7 @@ def struct_conn_metric_analysis(
             f"[{res['ci_low']:+.3f}, {res['ci_high']:+.3f}] "
             f"t={res['t']:+.2f} p={res['p']:.3e} | "
             f"p_moran={res['p_moran']:.3e} (primary) p_spin={res['p_spin']:.3e} "
-            f"(n_perm={n_rand}) | "
-            f"r_partial={res['r_group_partial']:+.3f} p_partial={res['p_partial']:.3e} "
-            f"n={res['n']}"
+            f"(n_perm={n_rand}) | n={res['n']}"
         )
 
         P_full = _embed_in_full_cortex(res["P_mean"], sn_mask_cortex, cortex_mask_full)
@@ -374,7 +360,6 @@ def struct_conn_metric_analysis(
                     f"r = {res['r_group']:+.2f}\n"
                     f"p$_{{moran}}$ = {res['p_moran']:.3f}\n"
                     f"p$_{{spin}}$ = {res['p_spin']:.3f}\n"
-                    f"p$_{{partial}}$ = {res['p_partial']:.3f}\n"
                     f"n = {res['n']}",
                     transform=ax_top.transAxes, va="top", fontsize=11)
         ax_top.set_xlabel(f"MPC gradient ({network})")
@@ -459,7 +444,6 @@ def struct_conn_network_analysis(
             target_network_labels=target_net_labels,
             spin_model=spin_model, n_rand=n_rand,
             mask_G=m_mask_G, sc_subjects=m_sc_subjects,
-            dist_files=df_pni["path_dist_5k"].tolist(),
         )
 
         logger.info(
@@ -467,9 +451,7 @@ def struct_conn_network_analysis(
             f"[{res['ci_low']:+.3f}, {res['ci_high']:+.3f}] "
             f"t={res['t']:+.2f} p={res['p']:.3e} | "
             f"p_moran={res['p_moran']:.3e} (primary) p_spin={res['p_spin']:.3e} "
-            f"(n_perm={n_rand}) | "
-            f"r_partial={res['r_group_partial']:+.3f} p_partial={res['p_partial']:.3e} "
-            f"n={res['n']}"
+            f"(n_perm={n_rand}) | n={res['n']}"
         )
 
         P_full = _embed_in_full_cortex(res["P_mean"], sn_mask_cortex, cortex_mask_full)
@@ -551,7 +533,6 @@ def main():
     logger.info("GD weights     : 1/GD (within-hemisphere)")
     logger.info("MPC variant    : per-vertex Spearman across targets (rank version)")
     logger.info("Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)")
-    logger.info("Confound       : partial correlation on mean weighted distance + degree")
     logger.info(f"Script path: {script_path}")
     logger.info(f"Project root: {project_root}")
 
@@ -597,21 +578,13 @@ def main():
         network="SalVentAttn", n_rand=n_rand, hemisphere=args.hemi,
     )
 
-    # SC is the primary modality (axonal, independent of the MPC gradient); MPC is
-    # produced as a supplement (it shares the microstructural backbone with the gradient
-    # and FC-G1, so it is interpreted with that circularity caveat).
+    # SC is the primary modality (axonal, independent of the MPC gradient).
     networks = ["Limbic", "Default", "Cont", "SalVentAttn", "DorsAttn", "Vis", "SomMot"]
     df_yeo_surf_5k = struct_conn_network_analysis(
         df_yeo_surf_5k, surf5k_lh_infl, surf5k_rh_infl,
         df_pni, project_root, spin_model_5k,
         mask_G=mask_G, sc_subjects=sc_subjects, gd_cortex=gd_cortex,
         networks=networks, n_rand=n_rand, hemisphere=args.hemi, measure="SC",
-    )
-    df_yeo_surf_5k = struct_conn_network_analysis(
-        df_yeo_surf_5k, surf5k_lh_infl, surf5k_rh_infl,
-        df_pni, project_root, spin_model_5k,
-        mask_G=mask_G, sc_subjects=sc_subjects, gd_cortex=gd_cortex,
-        networks=networks, n_rand=n_rand, hemisphere=args.hemi, measure="MPC",
     )
 
     df_yeo_surf_5k.to_csv(project_root / f"data/dataframes/df_2b_label_{args.hemi}.csv", index=False)

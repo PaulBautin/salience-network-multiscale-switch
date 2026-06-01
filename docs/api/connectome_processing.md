@@ -1,6 +1,6 @@
 # `src/connectome_processing`
 
-Connectome I/O and the gradient-weighted connectivity projection used in [Figure 2](../methods/figure_2.md). All matrices are handled at fsLR-5k resolution (9,684 vertices); micapipe stores fsLR-5k connectomes as upper-triangular GIFTIs, which are symmetrised on load. See [Figure 2 Methods](../methods/figure_2.md) for the statistical derivation of the projection score, the spin/Moran nulls, and the confound model.
+Connectome I/O and the gradient-weighted connectivity projection used in [Figure 2](../methods/figure_2.md). All matrices are handled at fsLR-5k resolution (9,684 vertices); micapipe stores fsLR-5k connectomes as upper-triangular GIFTIs, which are symmetrised on load. See [Figure 2 Methods](../methods/figure_2.md) for the statistical derivation of the projection score and the spin/Moran nulls.
 
 ### `load_subject_matrix`
 
@@ -158,7 +158,6 @@ compute_projection_subjects(
     df_yeo_surf_5k: pd.DataFrame,
     *, mask_G: np.ndarray | None = None,
     sc_subjects: list[np.ndarray] | None = None,
-    dist_files: list | None = None,
     target_network_labels: np.ndarray | None = None,
     min_valid: int = 10,
 ) -> dict
@@ -180,32 +179,10 @@ Loops over subjects, computes each subject's projection score and its Spearman a
 | `df_yeo_surf_5k` | `pd.DataFrame` | Provides hemisphere info. |
 | `mask_G` | `np.ndarray` of `bool` | Betzel consensus mask (SC only). Optional. |
 | `sc_subjects` | `list[np.ndarray]` | Pre-loaded SC matrices, avoiding re-reads. Optional. |
-| `dist_files` | `list` | Per-subject geodesic distance files for the mean-GD confound (SC + GD). Optional. |
 | `target_network_labels` | `np.ndarray` | Enables per-target-network weight summaries. Optional. |
 | `min_valid` | `int` | Minimum finite targets per vertex. Default `10`. |
 
-**Returns** `dict` — keys include `P_mean`, `P_subjects_sn`, `P_subjects_full`, `r_subjects`, `mean_GD_subjects`, `degree_subjects`, `target_net_weights`, `target_network_names`, and the Fisher-z aggregates `r_group`, `t`, `p`, `ci_low`, `ci_high`, `n`.
-
----
-
-### `compute_partial_correlation_subjects`
-
-```python
-compute_partial_correlation_subjects(result: dict, g_mpc_cortex_at_sn: np.ndarray) -> dict
-```
-
-Confound control: regress each subject's projection score on `[mean_GD, degree, 1]` and correlate the residuals with the MPC gradient, aggregated with the same Fisher-z + t-test.
-
-Returns a `NaN`-filled dict when `mean_GD_subjects` is all-`NaN` (the MPC rank variant has no meaningful distance/degree analog).
-
-**Parameters**
-
-| Name | Type | Description |
-|------|------|-------------|
-| `result` | `dict` | Output of `compute_projection_subjects`. |
-| `g_mpc_cortex_at_sn` | `np.ndarray`, shape `(n_sn,)` | MPC gradient at source-network vertices. |
-
-**Returns** `dict` — `r_subjects_partial` plus `_partial`-suffixed aggregates (`r_group_partial`, `t_partial`, `p_partial`, `ci_low_partial`, `ci_high_partial`, `n_partial`).
+**Returns** `dict` — keys include `P_mean`, `P_subjects_sn`, `P_subjects_full`, `r_subjects`, `target_net_weights`, `target_network_names`, and the Fisher-z aggregates `r_group`, `t`, `p`, `ci_low`, `ci_high`, `n`.
 
 ---
 

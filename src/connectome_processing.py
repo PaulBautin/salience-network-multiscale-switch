@@ -9,8 +9,8 @@ network vertex i,
     T_i  = { j : w_ij > 0, j not in network, j != i }
 
 with per-subject inference (Fisher-z then one-sample t-test across subjects), a
-spin-test null (Alexander-Bloch 2018), and partial-correlation confound control
-(mean weighted distance to targets, weighted degree).
+spin-test null (Alexander-Bloch 2018), and a Moran spectral-randomization null
+(within-network, spatial-autocorrelation-preserving).
 
 Three modalities are supported, with modality-specific weight preprocessing:
     - SC (structural connectivity): Betzel distance-stratified consensus mask is
@@ -377,7 +377,6 @@ def compute_projection_subjects(
     df_yeo_surf_5k: pd.DataFrame,
     *, mask_G: np.ndarray | None = None,
     sc_subjects: list[np.ndarray] | None = None,
-    dist_files: list | None = None,
     target_network_labels: np.ndarray | None = None,
     min_valid: int = 10,
 ) -> dict:
@@ -400,8 +399,6 @@ def compute_projection_subjects(
         Betzel consensus mask (SC only).
     sc_subjects : list of (n_cortex, n_cortex), optional
         Pre-loaded SC matrices (avoids re-reading from disk).
-    dist_files : list of paths, optional
-        Per-subject geodesic distance files (used for mean-GD confound, SC + GD).
     min_valid : int
 
     Returns
@@ -411,8 +408,6 @@ def compute_projection_subjects(
         P_subjects_full : (n_sub, n_cortex_full=9684) per-subject P_s expanded to full vertex space, NaN outside SN.
         P_subjects_sn  : (n_sub, n_sn) per-subject projection (SN-only).
         r_subjects : (n_sub,) per-subject Spearman(g_MPC, P_s).
-        mean_GD_subjects : (n_sub, n_sn) weighted-mean distance to targets per SN vertex.
-        degree_subjects : (n_sub, n_sn) weighted degree to non-SN cortex per SN vertex.
         target_net_weights : (n_networks, n_sn) group-mean weighted connectivity from each SN vertex to each target network (None if target_network_labels not supplied).
         target_network_names : list of str, names matching the first axis of target_net_weights.
         + Fisher-z aggregate keys: r_group, t, p, ci_low, ci_high, n.
@@ -429,8 +424,6 @@ def compute_projection_subjects(
     r_subjects = np.full(n_sub, np.nan)
     P_subjects_full = np.full((n_sub, N_TOTAL_5K), np.nan)
     P_subjects_sn = np.full((n_sub, n_sn), np.nan)
-    mean_GD_subjects = np.full((n_sub, n_sn), np.nan)
-    degree_subjects = np.full((n_sub, n_sn), np.nan)
 
     if target_network_labels is not None:
         target_net_names = [n for n in pd.unique(target_network_labels[other_mask_cortex])
@@ -472,18 +465,6 @@ def compute_projection_subjects(
         if finite.sum() >= min_valid:
             r_subjects[s] = spearmanr(g_mpc_sn[finite], P_s[finite])[0]
 
-        if modality in ("SC", "GD") and dist_files is not None:
-            gd_raw = load_subject_matrix(dist_files[s], cortex_mask)
-            W_sub = W[np.ix_(sn_mask_cortex, other_mask_cortex)]
-            gd_sub = gd_raw[np.ix_(sn_mask_cortex, other_mask_cortex)].astype(np.float64)
-            valid = np.isfinite(W_sub) & (W_sub > 0) & (gd_sub > 0)
-            W_for_d = np.where(valid, W_sub, 0.0)
-            gd_for_d = np.where(valid, gd_sub, 0.0)
-            num_d = (W_for_d * gd_for_d).sum(axis=1)
-            den_d = W_for_d.sum(axis=1)
-            mean_GD_subjects[s] = np.where(den_d > 0, num_d / den_d, np.nan)
-            degree_subjects[s] = den_d
-
         if target_net_weights_subjects is not None:
             W_sn_rows = W[sn_mask_cortex]
             W_pos = np.where(np.isfinite(W_sn_rows) & (W_sn_rows > 0), W_sn_rows, 0.0)
@@ -521,62 +502,9 @@ def compute_projection_subjects(
         "P_subjects_full": P_subjects_full,
         "P_subjects_sn": P_subjects_sn,
         "r_subjects": r_subjects,
-        "mean_GD_subjects": mean_GD_subjects,
-        "degree_subjects": degree_subjects,
         "target_net_weights": target_net_weights,
         "target_network_names": target_net_names,
         **agg,
-    }
-
-
-# ---------------------------------------------------------------------------
-# Partial correlation (mean-distance + degree confound)
-# ---------------------------------------------------------------------------
-
-def compute_partial_correlation_subjects(
-    result: dict, g_mpc_cortex_at_sn: np.ndarray,
-) -> dict:
-    """Regress P_s on [mean_GD_s, degree_s, 1] per subject; correlate residuals with g_MPC.
-
-    Skipped (returns NaN-filled dict) if mean_GD_subjects is all-NaN (MPC rank
-    variant doesn't have a meaningful distance / degree analog).
-    """
-    r_subjects = result["r_subjects"]
-    P = result["P_subjects_sn"]
-    GD = result["mean_GD_subjects"]
-    K = result["degree_subjects"]
-    n_sub, n_sn = P.shape
-
-    if not np.isfinite(GD).any():
-        nan_arr = np.full(n_sub, np.nan)
-        return {"r_subjects_partial": nan_arr, **{
-            f"{k}_partial": np.nan for k in ("r_group", "t", "p", "ci_low", "ci_high")
-        }, "n_partial": 0}
-
-    g_mpc_sn = g_mpc_cortex_at_sn.astype(np.float64)
-    valid_g_mpc = np.isfinite(g_mpc_sn)
-
-    r_partial = np.full(n_sub, np.nan)
-    for s in range(n_sub):
-        valid = (valid_g_mpc & np.isfinite(P[s]) & np.isfinite(GD[s]) & np.isfinite(K[s])
-                 & (K[s] > 0))
-        if valid.sum() < 10:
-            continue
-        X = np.column_stack([np.ones(valid.sum()), GD[s, valid], K[s, valid]])
-        y = P[s, valid]
-        beta, *_ = np.linalg.lstsq(X, y, rcond=None)
-        resid = y - X @ beta
-        r_partial[s] = spearmanr(g_mpc_sn[valid], resid)[0]
-
-    agg = _fisher_z_group(r_partial)
-    return {
-        "r_subjects_partial": r_partial,
-        "r_group_partial": agg["r_group"],
-        "t_partial": agg["t"],
-        "p_partial": agg["p"],
-        "ci_low_partial": agg["ci_low"],
-        "ci_high_partial": agg["ci_high"],
-        "n_partial": agg["n"],
     }
 
 

@@ -9,14 +9,16 @@ whether that connectivity tracks the whole-brain sensory–transmodal axis given
 the principal functional connectivity (FC) gradient. Panel 2A reports the result
 for the SN across three connectivity modalities — structural connectivity (SC),
 geodesic distance (GD), and microstructural profile covariance (MPC) — and panel
-2B replicates it across all seven Yeo networks. SC, which indexes axonal
-connectivity and is independent of the MPC gradient, is the primary modality; the
-MPC-weighted variant is reported as a supplement because correlating an
-MPC-derived gradient with the FC gradient through MPC weights partly reflects the
-shared microstructural backbone of cortical hierarchy (microstructure–function
-coupling) rather than network-specific connectivity. All analyses were performed
+2B replicates the structural-connectivity result across all seven Yeo networks. SC,
+which indexes axonal connectivity and is independent of the MPC gradient, is the
+primary modality and the one carried through to the across-network replication; the
+MPC-weighted variant is reported only for the SN in panel 2A as a supplement,
+because correlating an MPC-derived gradient with the FC gradient through MPC weights
+partly reflects the shared microstructural backbone of cortical hierarchy
+(microstructure–function coupling) rather than network-specific connectivity. All
+analyses were performed
 at fsLR-5k resolution (9,684 vertices: 4,842 per hemisphere), which keeps the
-whole-brain connectivity matrices in memory. The anchoring within-network MPC
+whole-brain connectivity matrices in memory. The within-network MPC
 gradient was computed with the shared diffusion-map pipeline
 ([Shared Methods — MPC gradient computation](shared.md#mpc-gradient-computation))
 applied to fsLR-5k qT1 profiles and Procrustes-aligned across subjects.
@@ -84,19 +86,6 @@ and this per-vertex value was then correlated with $g^{\mathrm{MPC}}$ as above,
 preserving the directional interpretation without relying on the sign of the
 weights.
 
-## Gradient orientation
-
-Diffusion-map eigenvectors are sign-arbitrary, so the polarity of the
-within-network MPC gradient was fixed deterministically against an external
-microstructural reference, independent of the FC test. The gradient was oriented
-so that it correlated positively with mean qT1 intensity (`acq-T1map`, averaged
-across subjects and the 14 intracortical depths). Because qT1 rises from
-myelinated sensory and granular cortex toward agranular transmodal cortex, this
-convention fixes high $g^{\mathrm{MPC}}$ as transmodal and low as
-sensory/granular. The FC gradient was likewise sign-fixed so that its
-transmodal/default-mode pole is high. The resulting signed correlation is directly
-interpretable, while statistical significance was assessed two-tailed.
-
 ## Group inference and spatial null
 
 Per-subject correlations were transformed to Fisher z and tested against zero with
@@ -118,10 +107,5 @@ preserves the empirical spatial autocorrelation of the gradient and restricts th
 null entirely to the source network, is also available as a tighter,
 footprint-matched alternative.
 
-As a confound check, each subject's projection score was regressed on the weighted
-mean geodesic distance to its targets and its weighted degree, and the residual
-was re-correlated with the MPC gradient; the partial correlation was aggregated
-with the same Fisher-z one-sample t-test. This step was skipped for the
-degree-invariant MPC rank variant. Group-level summaries ($\bar r$, t, p,
-$p_{\mathrm{spin}}$, and the partial-correlation values) were written to
-`logs/figure_2_distance.log`.
+Group-level summaries ($\bar r$, t, p, $p_{\mathrm{spin}}$, and
+$p_{\mathrm{moran}}$) were written to `logs/figure_2_distance.log`.
