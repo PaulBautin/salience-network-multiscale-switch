@@ -2,35 +2,44 @@
 # -*- coding: utf-8
 #########################################################################################
 #
-# Figure 2 - Gradient-driven connectivity fingerprints
+# Figure 2 - Gradient-weighted connectivity projection
 #
-# Tests whether the MPC (T1) gradient within the Salience/Ventral Attention network
-# predicts where those vertices send their connections. For each other-network vertex j
-# and subject s, the connectivity-weighted MPC gradient projection is:
+# Tests whether the MPC (T1) gradient within a network predicts where those vertices
+# connect, and whether that organisation mirrors the whole-brain sensory→transmodal
+# (principal FC) gradient. For each network vertex i and subject s the projection score
+# is the connectivity-weighted mean of the FC gradient across that vertex's targets:
 #
-#   proj_{s,j} = Σ_v w_{v,j} * g_v  /  Σ_v w_{v,j}
+#   P_s[i] = sum_{j in T_i,s} w_ij * g_FC[j] / sum_{j in T_i,s} w_ij ,
+#   T_i,s  = { j : w_ij > 0, j not in network, j != i }
 #
-# where g_v is the mean-centred MPC gradient of network vertex v and w_{v,j} is the
-# connectivity weight (SC streamlines, 1/GD, or MPC partial-correlation). This is the
-# gradient centroid of the network as "seen" from vertex j through each modality.
-# The group-mean z-scored projection map is then correlated with the whole-brain FC
-# gradient (Spearman, spin-test corrected).
+# A high P_s[i] means SN vertex i preferentially couples with targets at the high
+# (task-positive) end of the FC gradient; low P_s[i] means coupling with the low
+# (default-mode) end. Per subject, r_s = Spearman_i(g_MPC[i], P_s[i]) across network
+# vertices. Group inference is a two-stage random-effects test: Fisher-z(r_s) then a
+# one-sample t-test against zero across the 18 subjects, with a spin-permutation null
+# (Alexander-Bloch 2018) and partial-correlation control for mean weighted distance to
+# targets and total weighted degree.
 #
-# All connectivity matrices (SC, GD, MPC) are loaded at fsLR-5k resolution
-# (9684 vertices) and all analysis runs at that vertex level.
+# Modality routing:
+#   - SC : per-subject SIFT2 weights masked by the Betzel distance-stratified consensus
+#          mask (built once across all subjects, removes non-reproducible / sparsity-
+#          driven edges while preserving long-range edges); log10(SC*G/eps) on positives.
+#   - GD : 1/GD (proximity), within-hemisphere only.
+#   - MPC: rank variant (per-network-vertex Spearman across targets, then
+#          Spearman across network vertices). Weighted-mean is ill-defined for MPC's
+#          negative partial-correlation values.
 #
-# Figure 2A: For the SalVentAttn network, computes the gradient projection using three
-#            connectivity weights (SC, GD inverse, MPC) and correlates each map with
-#            the whole-brain FC gradient.
-# Figure 2B: Replicates the MPC gradient projection for each of the 7 Yeo networks
-#            and correlates each projection map with the whole-brain FC gradient.
+# All matrices loaded at fsLR-5k (9684 vertices). Subject is the unit of inference.
+#
+# Figure 2A: SalVentAttn × {SC, GD, MPC} - projection map + group r/p per modality.
+# Figure 2B: All 7 Yeo networks × {SC, MPC} - replicates the test per network.
 #
 # Outputs:
 #   results/figures/figure_2a_distance_metric.svg
 #   results/figures/figure_2a_brain_{SC,GD,MPC}_rho.svg
 #   results/figures/figure_2b_distance_network_{measure}.svg
 #   results/figures/figure_2b_brain_{measure}_rho_{network}.svg
-#   data/dataframes/df_2b_label_{hemisphere}.csv  (vertex-level cache)
+#   data/dataframes/df_2b_label_{hemisphere}.csv  (vertex-level cache; new schema)
 #
 # Requires figure_1a_t1map.py to have been run first (produces
 #   data/dataframes/figure_1a_pni_to_mics_5k.csv).
@@ -48,6 +57,7 @@
 
 import argparse
 import logging
+from functools import partial
 from pathlib import Path
 
 import nibabel as nib
@@ -55,387 +65,59 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from functools import partial
-
 from brainspace.plotting import plot_surf
 import brainspace.plotting.surface_plotting as _bsp_sp
 from brainspace.plotting.utils import _gen_grid as _orig_gen_grid
 from brainspace.mesh.mesh_io import read_surface
 from brainspace.null_models import SpinPermutations
 
-from scipy.stats import spearmanr, zscore
+from scipy.stats import spearmanr
 
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-import matplotlib.ticker as ticker
 
-from src.atlas_load import load_yeo_surf_5k, load_t1_salience_profiles, convert_states_str2int, compute_network_mask
+from src.atlas_load import (
+    load_yeo_surf_5k, load_t1_salience_profiles,
+    convert_states_str2int, compute_network_mask,
+)
 from src.gradient_computation import compute_t1_gradient
-from src.plot_colors import yeo7_rgba, yeo7_rgb, yeo7_abbrev
+from src.plot_colors import yeo7_rgb, yeo7_abbrev
 from src.logging_utils import setup_manuscript_logger
+from src.connectome_processing import (
+    build_consensus_mask, compute_projection_subjects,
+    compute_partial_correlation_subjects, compute_spin_null_projection,
+    compute_moran_null_projection, compute_dominant_target_network,
+    benjamini_hochberg, load_subject_matrix,
+)
 
 logger = logging.getLogger(__name__)
 
-# Matplotlib globals
 plt.rcParams["font.size"] = 16
 plt.rcParams["svg.fonttype"] = "none"
 plt.rcParams["text.usetex"] = False
 
-N_LH_5K = 4842  # fsLR-5k left-hemisphere vertex count
+N_LH_5K = 4842
+N_TOTAL_5K = 9684
 
 
 def get_parser() -> argparse.ArgumentParser:
-    """Configure and return the argument parser."""
     parser = argparse.ArgumentParser(
-        description="Compute structural connectivity differences between MPC-gradient extremes in the salience network (Fig 2A) and across all Yeo networks (Fig 2B).",
+        description="Per-network gradient-weighted connectivity projection at fsLR-5k. "
+                    "Tests whether the within-network MPC gradient predicts each "
+                    "vertex's expected FC-gradient position across its connectivity targets.",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     optional = parser.add_argument_group("OPTIONAL ARGUMENTS")
     optional.add_argument(
-        "-hemi",
-        type=str,
-        default="both",
-        choices=["both", "LH", "RH"],
+        "-hemi", type=str, default="both", choices=["both", "LH", "RH"],
         help="Hemisphere for analysis: 'both', 'LH', or 'RH' (default: both)"
     )
     return parser
 
 
-def load_connectomes_5k(files: list, df_yeo_surf_5k: pd.DataFrame,
-                        split_hemi: bool = True, log_transform: bool = False) -> np.ndarray:
-    """
-    Load fsLR-5k connectivity GIFTIs (shape 9684×9684) and return subject-averaged matrix.
-
-    Each GIFTI contains one darray of shape (9684, 9684). Masks to cortical vertices,
-    zeros inter-hemispheric edges when split_hemi=True, and optionally applies log1p.
-
-    Parameters
-    ----------
-    files : list of str
-        Paths to fsLR-5k connectivity GIFTI files, one per subject.
-    df_yeo_surf_5k : pd.DataFrame
-        5k surface DataFrame with a 'hemisphere' column to identify cortical vertices.
-    split_hemi : bool, optional
-        Zero out inter-hemispheric connections (default True).
-    log_transform : bool, optional
-        Apply log1p to the averaged matrix (default False).
-
-    Returns
-    -------
-    A : np.ndarray, shape (n_cortex_5k, n_cortex_5k)
-        Symmetric, subject-averaged connectivity matrix for cortical 5k vertices.
-    """
-    if not files:
-        raise FileNotFoundError("No connectome files found.")
-
-    cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values  # (9684,)
-    hemi = df_yeo_surf_5k.loc[cortex_mask, "hemisphere"].values
-
-    conn_stack = []
-    for f in files:
-        data = nib.load(f).darrays[0].data.astype(float)      # (9684, 9684)
-        data = data[np.ix_(cortex_mask, cortex_mask)]          # cortex-only
-        data = np.triu(data, 1) + data.T                       # micapipe stores upper triangle only
-        data[data == 0] = np.nan                               # remove diagonal/absent edges; keep negative MPC correlations
-        if split_hemi:
-            same_hemi = hemi[:, None] == hemi[None, :]
-            data[~same_hemi] = np.nan
-        conn_stack.append(data)
-
-    conn = np.stack(conn_stack, axis=0)
-    nan_mask = np.mean(np.isnan(conn), axis=0) > 0.5
-    mean_conn = np.nanmean(conn, axis=0)
-    mean_conn[nan_mask] = np.nan
-    A = np.nan_to_num(mean_conn, nan=0.0)
-    A = np.triu(A, k=1)
-    A = A + A.T
-    if log_transform:
-        A = np.log1p(A)
-    return A
-
-
-def fcn_group_bins(
-    adj: np.ndarray, dist: np.ndarray, hemiid: np.ndarray, nbins: int
-) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Distance-dependent group-representative SC thresholding (Betzel et al. 2018).
-
-    Generates a group-representative structural connectivity matrix by preserving
-    within- and between-hemisphere connection-length distributions.
-
-    Parameters
-    ----------
-    adj : np.ndarray, shape (n, n, n_sub)
-        Per-subject SC matrices (binary or weighted).
-    dist : np.ndarray, shape (n, n)
-        Pairwise tract distance matrix (mean streamline length from tractography).
-    hemiid : np.ndarray of bool, shape (n,)
-        Hemisphere indicator: False = left hemisphere, True = right hemisphere.
-    nbins : int
-        Number of distance bins.
-
-    Returns
-    -------
-    G : np.ndarray, shape (n, n)
-        Symmetric binary group-consensus matrix (distance-dependent thresholding).
-    Gc : np.ndarray, shape (n, n)
-        Symmetric binary group-consensus matrix (consistency-based thresholding).
-
-    References
-    ----------
-    Betzel, R. F., Griffa, A., Hagmann, P., & Miic, B. (2018).
-    Distance-dependent consensus thresholds for generating group-representative
-    structural brain networks. Network Neuroscience, 1–22.
-    """
-    assert adj.shape[0] == adj.shape[1], "adj must be square in its first two dims"
-    if hemiid.ndim == 1:
-        hemiid = hemiid[:, np.newaxis]
-
-    n, nsub = adj.shape[0], adj.shape[-1]
-    nonzero_dist = dist[np.nonzero(dist)]
-    distbins = np.linspace(nonzero_dist.min(), nonzero_dist.max(), nbins + 1)
-    distbins[-1] += 1
-
-    C = np.sum(adj > 0, axis=2)
-    W = np.sum(adj, axis=2) / np.where(C > 0, C, np.nan)
-    W = np.nan_to_num(W, nan=0.0)
-
-    inter_hemi_mask = np.dot(hemiid, ~hemiid.T)
-    inter_hemi_mask = np.logical_or(inter_hemi_mask, inter_hemi_mask.T)
-
-    Grp = np.zeros((n, n, 2))
-    Gc_arr = np.zeros((n, n, 2))
-
-    for j in range(2):
-        inter_hemi = ~inter_hemi_mask if j else inter_hemi_mask
-        m = dist * inter_hemi
-        D = (adj > 0) * (dist * np.triu(inter_hemi))[..., np.newaxis]
-        D = D[np.nonzero(D)]
-        if len(D) == 0:
-            continue
-        tgt = len(D) / nsub
-
-        G = np.zeros((n, n))
-        for i_bin in range(nbins):
-            mask = np.where(np.triu((m >= distbins[i_bin]) & (m < distbins[i_bin + 1]), 1))
-            if len(mask[0]) == 0:
-                continue
-            n_D_bin = np.sum((D >= distbins[i_bin]) & (D < distbins[i_bin + 1]))
-            frac = int(np.round(tgt * n_D_bin / len(D)))
-            c = C[mask]
-            idx = np.argsort(c)[::-1]
-            G[mask[0][idx[:frac]], mask[1][idx[:frac]]] = 1
-        Grp[:, :, j] = G
-
-        I = np.where(np.triu(inter_hemi, 1))
-        w = W[I]
-        idx = np.argsort(w)[::-1]
-        w_mat = np.zeros((n, n))
-        nnz = int(G.sum())
-        if nnz > 0:
-            w_mat[I[0][idx[:nnz]], I[1][idx[:nnz]]] = 1
-        Gc_arr[:, :, j] = w_mat
-
-    G = np.sum(Grp, 2)
-    G = G + G.T
-    Gc = np.sum(Gc_arr, 2)
-    Gc = Gc + Gc.T
-    return G, Gc
-
-
-def load_connectome_5k_dist_threshold(
-    sc_files: list, dist_files: list, df_yeo_surf_5k: pd.DataFrame,
-    nbins: int = 10, log_transform: bool = False
-) -> np.ndarray:
-    """
-    Load fsLR-5k SC GIFTIs and apply distance-dependent group consensus thresholding.
-
-    Implements the Betzel et al. (2018) distance-dependent consensus method, which
-    preserves within- and between-hemisphere connection-length distributions when
-    selecting group-representative edges across subjects.
-
-    After binary thresholding, edges are weighted by the per-subject average SC.
-
-    Parameters
-    ----------
-    sc_files : list of str
-        Paths to fsLR-5k SC GIFTI files, one per subject.
-    dist_files : list of str
-        Paths to fsLR-5k edge-length GIFTI files, one per subject. Mean tract
-        distance across all subjects is used as the reference distance matrix.
-    df_yeo_surf_5k : pd.DataFrame
-        5k surface DataFrame with 'hemisphere' column to identify cortical vertices.
-    nbins : int, optional
-        Number of distance bins for the Betzel thresholding (default: 10).
-    log_transform : bool, optional
-        Apply log1p to edge weights after thresholding (default: False).
-
-    Returns
-    -------
-    A : np.ndarray, shape (n_cortex_5k, n_cortex_5k)
-        Symmetric, distance-thresholded group-representative SC matrix for cortical
-        5k vertices, weighted by per-subject average streamline count.
-    """
-    if not sc_files:
-        raise FileNotFoundError("No SC files provided.")
-    if not dist_files:
-        raise FileNotFoundError("No distance files provided.")
-
-    cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values
-    hemi = df_yeo_surf_5k.loc[cortex_mask, "hemisphere"].values
-    hemiid = (hemi == "RH")  # False = LH, True = RH
-
-    sc_stack = []
-    for f in sc_files:
-        data = nib.load(f).darrays[0].data.astype(float)
-        data = data[np.ix_(cortex_mask, cortex_mask)]
-        data = np.triu(data, 1) + data.T  # micapipe stores upper triangle only
-        data[data < 0] = 0.0
-        sc_stack.append(data)
-    adj = np.stack(sc_stack, axis=-1)  # (n_cortex, n_cortex, n_sub)
-
-    dist_stack = []
-    for f in dist_files:
-        d = nib.load(f).darrays[0].data.astype(float)
-        d = d[np.ix_(cortex_mask, cortex_mask)]
-        d = np.triu(d, 1) + d.T  # micapipe stores upper triangle only
-        d[d < 0] = 0.0
-        dist_stack.append(d)
-    dist = np.mean(np.stack(dist_stack, axis=0), axis=0)
-
-    C = np.sum(adj > 0, axis=2)
-    W = np.sum(adj, axis=2) / np.where(C > 0, C, np.nan)
-    W = np.nan_to_num(W, nan=0.0)
-
-    G, _ = fcn_group_bins(adj, dist, hemiid, nbins)
-
-    A = G * W
-    A = np.triu(A, k=1)
-    A = A + A.T
-    if log_transform:
-        A = np.log1p(A)
-    return A
-
-
-def compute_pvals_spin(x: np.ndarray, y_surf_5k: np.ndarray,
-                       df_yeo_surf_5k: pd.DataFrame,
-                       spin_model: SpinPermutations, n_rand: int) -> np.ndarray:
-    """
-    Compute spin-permutation null Spearman correlations between 5k diff and rotated FC gradient.
-
-    Rotates the 5k FC gradient `n_rand` times directly in fsLR-5k space, then correlates
-    each rotation with `x`.
-
-    Parameters
-    ----------
-    x : np.ndarray, shape (9684,)
-        Connectivity-difference values at fsLR-5k (NaN outside the target region).
-    y_surf_5k : np.ndarray, shape (9684,)
-        Per-vertex 5k FC gradient values to rotate (NaN at medial wall).
-    df_yeo_surf_5k : pd.DataFrame
-        5k surface DataFrame (unused internally; kept for API consistency).
-    spin_model : SpinPermutations
-        Pre-fitted spin-permutation model (fitted on fsLR-5k spheres).
-    n_rand : int
-        Number of spin permutations.
-
-    Returns
-    -------
-    r_spin : np.ndarray, shape (n_rand,)
-    """
-    medial_wall_mask = np.isnan(y_surf_5k)
-    y_lh, y_rh = y_surf_5k[:4842], y_surf_5k[4842:]
-    y_rotated = np.hstack(spin_model.randomize(y_lh, y_rh))
-    r_spin = np.empty(n_rand)
-    for j, perm in enumerate(y_rotated):
-        perm = perm.copy()
-        perm[medial_wall_mask] = np.nan
-        mask = ~np.isnan(x) & ~np.isnan(perm)
-        r_spin[j] = spearmanr(zscore(x[mask]), zscore(perm[mask]))[0]
-    return r_spin
-
-
-def compute_gradient_projection_subjects(
-    files: list,
-    gradient_values_cortex: np.ndarray,
-    network_mask_cortex: np.ndarray,
-    other_idx_cortex: np.ndarray,
-    df_yeo_surf_5k: pd.DataFrame,
-    split_hemi: bool = False,
-    log_transform: bool = False,
-    invert_weights: bool = False,
-) -> tuple[np.ndarray, np.ndarray]:
-    """Connectivity-weighted MPC gradient projection onto other-network vertices.
-
-    For each subject s and target vertex j:
-
-        proj_{s,j} = Σ_v w_{v,s,j} * g_v  /  Σ_v w_{v,s,j}
-
-    where g_v is the mean-centred MPC gradient of network vertex v and w_{v,s,j} is
-    the connectivity weight (raw for SC/MPC; 1/GD for geodesic distance when
-    invert_weights=True so that closer vertices carry more weight).
-
-    This is the gradient-weighted connectivity centroid: it asks what gradient
-    position vertex j preferentially connects to within the network.  No binning,
-    no hyperparameter K.  Full connectivity matrices are loaded as float32 and the
-    large array is released immediately after extracting the (n_net × n_other)
-    submatrix.
-
-    Returns (mean_proj, se_proj), shape (n_other,).
-    Vertices where fewer than 50 % of subjects yield a finite projection are NaN.
-    """
-    cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values
-    hemi = df_yeo_surf_5k.loc[cortex_mask, "hemisphere"].values
-    n_other = int(other_idx_cortex.sum())
-    n_subjects = len(files)
-
-    # Mean-centre gradient so projection captures differential connectivity
-    g_v = gradient_values_cortex[network_mask_cortex].astype(np.float32)
-    g_v -= np.nanmean(g_v)
-
-    subject_projs = []
-    for f in files:
-        # Load as float32 to halve peak memory relative to float64
-        data = nib.load(f).darrays[0].data.astype(np.float32)
-        data = data[np.ix_(cortex_mask, cortex_mask)]
-        data = np.triu(data, 1) + data.T
-        data[data == 0] = np.nan
-        if split_hemi:
-            same_hemi = hemi[:, None] == hemi[None, :]
-            data[~same_hemi] = np.nan
-        if log_transform:
-            data = np.log1p(np.maximum(data, 0))
-
-        # Extract (n_net × n_other) and release the full cortex matrix immediately
-        C_sub = data[np.ix_(network_mask_cortex, other_idx_cortex)]  # (n_net, n_other)
-        del data
-
-        if invert_weights:
-            C_sub = np.where(C_sub > 0, 1.0 / C_sub, np.nan).astype(np.float32)
-
-        # Weighted projection: vectorised nansum avoids Python loop over vertices
-        num = np.nansum(g_v[:, None] * C_sub, axis=0)   # (n_other,)
-        den = np.nansum(C_sub, axis=0)                   # (n_other,)
-        proj = np.where(den > 0, num / den, np.nan)
-        subject_projs.append(proj)
-
-    arr = np.stack(subject_projs, axis=0)                # (n_subjects, n_other)
-    n_valid = (~np.isnan(arr)).sum(axis=0).astype(float)
-    mean_proj = np.nanmean(arr, axis=0)
-    mean_proj[n_valid < n_subjects * 0.5] = np.nan
-    se_proj = np.nanstd(arr, axis=0, ddof=1) / np.sqrt(np.maximum(n_valid, 1))
-    return mean_proj, se_proj
-
-
-def save_brain_map(surf_lh, surf_rh, values: np.ndarray, array_name: str, filename: Path,
-                   hemisphere: str = "both") -> None:
-    """Append `values` to fsLR-5k inflated surfaces and save a brain-map screenshot.
-
-    Parameters
-    ----------
-    values : np.ndarray, shape (9684,)
-        Per-vertex values for the full fsLR-5k surface (first N_LH_5K = LH, rest = RH).
-    """
+def save_brain_map(surf_lh, surf_rh, values: np.ndarray, array_name: str,
+                   filename: Path, hemisphere: str = "both",
+                   color_range=(-3, 3)) -> None:
+    """Append per-vertex values to fsLR-5k inflated surfaces and save a screenshot."""
     surf_lh.append_array(values[:N_LH_5K], name=array_name)
     surf_rh.append_array(values[N_LH_5K:], name=array_name)
     surfs = {"rh1": surf_rh, "lh1": surf_lh}
@@ -451,15 +133,18 @@ def save_brain_map(surf_lh, surf_rh, values: np.ndarray, array_name: str, filena
             surfs, layout=layout, view=view,
             array_name=array_name, size=(1200, 500), zoom=1.4, color_bar="bottom",
             share="both", nan_color=(220, 220, 220, 1), cmap="coolwarm",
-            color_range=(-3, 3), transparent_bg=True, screenshot=True, filename=filename,
+            color_range=color_range, transparent_bg=True, screenshot=True, filename=filename,
             cb__numberOfLabels=3,
             cb__labelTextProperty={'fontSize': 36, 'bold': False})
+    except (AttributeError, RuntimeError) as e:
+        logger.warning(f"save_brain_map: rendering failed for {filename.name} "
+                       f"({type(e).__name__}: {e}). Skipping screenshot.")
     finally:
         _bsp_sp._gen_grid = _orig_gen_grid
 
 
 def _load_fc_gradient(project_root: Path, df: pd.DataFrame) -> pd.DataFrame:
-    """Load fsLR-5k FC gradient GIFTIs and attach fc_g1/fc_g1_network/network_int to a copy of df."""
+    """Load fsLR-5k FC gradient GIFTIs and attach fc_g1, fc_g1_network, network_int."""
     fc_lh = nib.load(project_root / "data/parcellations/fc_gradient_fslr-5k_lh.shape.gii").darrays[0].data
     fc_rh = nib.load(project_root / "data/parcellations/fc_gradient_fslr-5k_rh.shape.gii").darrays[0].data
     df = df.copy()
@@ -473,318 +158,381 @@ def _load_fc_gradient(project_root: Path, df: pd.DataFrame) -> pd.DataFrame:
 def _prepare_network_gradient(
     df: pd.DataFrame, network: str, df_pni: pd.DataFrame, hemisphere: str,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Ensure T1 gradient exists for network; extract continuous gradient values.
+    """Compute (cache-aware) the T1 MPC gradient for `network`; return masks + values.
 
-    Modifies df in-place (adds gradient column if absent).
+    Orientation is anchored deterministically: high gradient = transmodal pole
+    (positive Spearman correlation with mean qT1 across cortical depths and subjects).
+
     Returns
     -------
-    gradient_values_cortex : np.ndarray, shape (n_cortex,)
-        Continuous gradient values for all cortex vertices; NaN outside the network.
-    network_mask_cortex : np.ndarray of bool, shape (n_cortex,)
-        True for network vertices with a valid (non-NaN) gradient value.
-    other_idx : np.ndarray of bool, shape (9684,)
-        True for non-target-network cortical vertices (full vertex space).
+    g_mpc_at_sn : np.ndarray, shape (n_sn,)
+        MPC gradient values at source-network vertices, in cortex order.
+    sn_mask_cortex : np.ndarray of bool, shape (n_cortex,)
+        Source-network vertices with a valid (non-NaN) gradient value.
+    other_mask_cortex : np.ndarray of bool, shape (n_cortex,)
+        Target-set mask (cortex, non-network, hemisphere-filtered).
     """
     cortex_mask = df["hemisphere"].notna().values
+
     grad_col = f"t1_gradient1_{network}"
     if grad_col not in df.columns:
-        net_mask_5k = compute_network_mask(df, network, hemisphere)
-        t1_profiles = load_t1_salience_profiles(df_pni["path_t1_profile_5k"].tolist(), net_mask_5k)
-        df.loc[net_mask_5k, grad_col] = compute_t1_gradient(t1_profiles)
+        net_mask_full_for_grad = compute_network_mask(df, network, hemisphere)
+        t1_profiles = load_t1_salience_profiles(
+            df_pni["path_t1_profile_5k"].tolist(), net_mask_full_for_grad
+        )
+        grad = compute_t1_gradient(t1_profiles)
+        ref_qt1 = np.nanmean(t1_profiles, axis=(0, 1))
+        m = ~np.isnan(grad) & ~np.isnan(ref_qt1)
+        if spearmanr(grad[m], ref_qt1[m])[0] < 0:
+            grad = -grad
+        df.loc[net_mask_full_for_grad, grad_col] = grad
 
-    net_mask = cortex_mask & (df["network"] == network).values
+    net_mask_full = cortex_mask & (df["network"] == network).values
     if hemisphere == "LH":
-        net_mask = net_mask & (df["hemisphere"] == "LH").values
+        net_mask_full &= (df["hemisphere"] == "LH").values
     elif hemisphere == "RH":
-        net_mask = net_mask & (df["hemisphere"] == "RH").values
+        net_mask_full &= (df["hemisphere"] == "RH").values
 
     grad_full = df[grad_col].values.astype(float)
-    gradient_values_cortex = grad_full[cortex_mask]                         # (n_cortex,)
-    network_mask_cortex = net_mask[cortex_mask] & ~np.isnan(gradient_values_cortex)
+    grad_cortex = grad_full[cortex_mask]
+    sn_mask_cortex = net_mask_full[cortex_mask] & ~np.isnan(grad_cortex)
 
     if hemisphere == "both":
-        other_idx = cortex_mask & (df["network"] != network).values
+        other_mask_full = cortex_mask & (df["network"] != network).values
     else:
-        other_idx = (cortex_mask & (df["network"] != network).values
-                     & (df["hemisphere"] == hemisphere).values)
-    return gradient_values_cortex, network_mask_cortex, other_idx
+        other_mask_full = (cortex_mask & (df["network"] != network).values
+                           & (df["hemisphere"] == hemisphere).values)
+    other_mask_cortex = other_mask_full[cortex_mask]
+
+    g_mpc_at_sn = grad_cortex[sn_mask_cortex]
+    return g_mpc_at_sn, sn_mask_cortex, other_mask_cortex
 
 
-def _slope_and_correlate(
-    df: pd.DataFrame, files: list, cfg: dict, rho_col: str,
-    gradient_values_cortex: np.ndarray, network_mask_cortex: np.ndarray,
-    other_idx: np.ndarray,
+def _run_projection(
+    modality: str, files: list, df: pd.DataFrame,
+    g_fc_cortex: np.ndarray, g_mpc_at_sn: np.ndarray,
+    sn_mask_cortex: np.ndarray, other_mask_cortex: np.ndarray,
+    cortex_mask_full: np.ndarray, gd_cortex: np.ndarray,
+    target_network_labels: np.ndarray,
     spin_model: SpinPermutations, n_rand: int,
-    group_threshold_mask: np.ndarray | None = None,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, float, float, int]:
-    """Connectivity-weighted gradient projection, stored in df, correlated with FC gradient.
+    *, mask_G: np.ndarray | None = None,
+    sc_subjects: list[np.ndarray] | None = None,
+    dist_files: list | None = None,
+) -> dict:
+    """One-stop: per-subject projection + partial correlation + Moran + spin nulls.
 
-    Calls compute_gradient_projection_subjects to obtain the projection per target vertex.
-    Modifies df in-place (stores z-scored projection in rho_col, SE in rho_col+'_se').
-    Returns (x_norm, y_norm, mask_label, spearman_r, spin_pval, n_subjects).
+    Moran is the primary spatial null (within-SN, preserves SAC of g_MPC).
+    Spin is a secondary cortex-wide conservative check.
     """
-    cortex_mask = df["hemisphere"].notna().values
-    mean_slopes, se_slopes = compute_gradient_projection_subjects(
-        files, gradient_values_cortex, network_mask_cortex, other_idx[cortex_mask], df,
-        split_hemi=cfg["split_hemi"], log_transform=cfg["log_transform"],
-        invert_weights=cfg.get("invert_weights", False),
+    result = compute_projection_subjects(
+        files=files, modality=modality,
+        g_fc_cortex=g_fc_cortex, g_mpc_cortex_at_sn=g_mpc_at_sn,
+        sn_mask_cortex=sn_mask_cortex, other_mask_cortex=other_mask_cortex,
+        df_yeo_surf_5k=df,
+        mask_G=mask_G, sc_subjects=sc_subjects, dist_files=dist_files,
+        target_network_labels=target_network_labels,
+    )
+    partial = compute_partial_correlation_subjects(result, g_mpc_at_sn)
+
+    gd_among_sn = gd_cortex[np.ix_(sn_mask_cortex, sn_mask_cortex)]
+    moran = compute_moran_null_projection(
+        g_mpc_at_sn, sn_mask_cortex, gd_among_sn, result, n_rand,
     )
 
-    df.loc[other_idx, rho_col] = zscore(mean_slopes, nan_policy="omit")
-    df.loc[other_idx, f"{rho_col}_se"] = se_slopes
-
-    x = df[rho_col].values
-    y = df["fc_g1"].values
-    mask_label = ~np.isnan(x) & ~np.isnan(y)
-    x_norm, y_norm = zscore(x[mask_label]), zscore(y[mask_label])
-    corr, _ = spearmanr(x_norm, y_norm)
-    r_spin = compute_pvals_spin(x, y, df, spin_model, n_rand)
-    pv_spin = np.mean(np.abs(r_spin) >= np.abs(corr))
-
-    n_subjects = len(files)
-    return x_norm, y_norm, mask_label, corr, pv_spin, n_subjects
+    spin = compute_spin_null_projection(
+        g_mpc_at_sn, sn_mask_cortex, cortex_mask_full, result, spin_model, n_rand,
+    )
+    return {**result, **partial, **moran, **spin}
 
 
-def struct_conn_metric_analysis(df_yeo_surf_5k: pd.DataFrame,
-                                surf5k_lh_infl, surf5k_rh_infl,
-                                df_pni: pd.DataFrame, project_root: Path,
-                                spin_model: SpinPermutations, network: str = "SalVentAttn",
-                                n_rand: int = 100, hemisphere: str = "both") -> None:
-    """
-    Figure 2A: correlate MPC-gradient-driven connectivity fingerprints with the FC gradient.
+def _embed_in_full_cortex(
+    values_at_sn: np.ndarray, sn_mask_cortex: np.ndarray, cortex_mask_full: np.ndarray,
+) -> np.ndarray:
+    """Map per-SN values back to the full 9684-vertex surface (NaN elsewhere)."""
+    out = np.full(N_TOTAL_5K, np.nan)
+    cortex_indices = np.flatnonzero(cortex_mask_full)
+    out[cortex_indices[sn_mask_cortex]] = values_at_sn
+    return out
 
-    Loads SC, GD, and MPC at fsLR-5k. Partitions T1-MPC gradient vertices within `network`
-    computes the connectivity-weighted MPC gradient projection per other-network vertex,
-    then correlates the z-scored projection map with the whole-brain FC gradient
-    (Spearman, spin-test corrected).
 
-    Parameters
-    ----------
-    df_yeo_surf_5k : pd.DataFrame
-        5k surface DataFrame with 'mics', 'network', 'hemisphere' columns.
-    surf5k_lh_infl, surf5k_rh_infl :
-        Inflated fsLR-5k surfaces for brain-map screenshots.
-    df_pni : pd.DataFrame
-        Subject manifest with columns path_sc_5k, path_dist_5k, path_mpc_5k,
-        path_t1_profile_5k.
-    project_root : Path
-        Repository root used to resolve output paths.
-    spin_model : SpinPermutations
-        Pre-fitted spin-permutation model (fitted on fsLR-5k spheres).
-    network : str, optional
-        Yeo network to use as the gradient anchor (default: 'SalVentAttn').
-    n_rand : int, optional
-        Number of spin permutations (default: 100).
-    hemisphere : str, optional
-        Hemisphere filter: 'both', 'LH', or 'RH' (default: 'both').
-    """
-    # Group-consensus SC threshold mask (Betzel 2018); used to exclude sparse edges in per-subject slopes.
-    # A_sc_group is already cortex-indexed (n_cortex × n_cortex); > 0 gives the group-consensus mask.
-    A_sc_group = load_connectome_5k_dist_threshold(
-        df_pni["path_sc_5k"].tolist(), df_pni["path_sc_dist_5k"].tolist(),
-        df_yeo_surf_5k, nbins=10, log_transform=True)
-    sc_threshold = A_sc_group > 0   # (n_cortex, n_cortex)
+def _plot_subject_bars(ax, r_subjects: np.ndarray, ci_low: float, ci_high: float,
+                       r_group: float, network_color="black", label: str = "") -> None:
+    """Stripplot of per-subject r_s with mean + 95% CI overlay."""
+    finite = r_subjects[np.isfinite(r_subjects)]
+    x = np.zeros_like(finite)
+    ax.scatter(x + np.random.uniform(-0.05, 0.05, size=finite.size), finite,
+               s=30, alpha=0.7, color=network_color, edgecolor="white", linewidth=0.5)
+    ax.errorbar(0, r_group, yerr=[[r_group - ci_low], [ci_high - r_group]],
+                fmt="o", color="black", markersize=8, capsize=6, linewidth=2)
+    ax.axhline(0, color="black", linewidth=0.7, linestyle="--")
+    ax.set_xticks([])
+    ax.set_xlim(-0.4, 0.4)
+    ax.set_ylim(-1, 1)
+    ax.set_ylabel(label)
 
-    metric_configs_2a = {
+
+def _scatter_colors_by_target_network(
+    res: dict, df_yeo_surf_5k: pd.DataFrame, fallback_color,
+) -> tuple[np.ndarray, dict]:
+    """Return per-SN-vertex RGB colors based on dominant target network + palette."""
+    dominant, names = compute_dominant_target_network(res)
+    n_sn = res["P_subjects_sn"].shape[1]
+    network_int_map = (df_yeo_surf_5k[["network", "network_int"]]
+                       .drop_duplicates().dropna()
+                       .set_index("network")["network_int"].to_dict())
+    palette = {name: yeo7_rgb[int(network_int_map[name])]
+               for name in names if name in network_int_map}
+    if dominant is None:
+        return np.tile(fallback_color, (n_sn, 1)), {}
+    colors = np.tile(np.array(fallback_color), (n_sn, 1))
+    for idx, name in enumerate(names):
+        if name not in palette:
+            continue
+        colors[dominant == idx] = palette[name]
+    return colors, palette
+
+
+def struct_conn_metric_analysis(
+    df_yeo_surf_5k: pd.DataFrame, surf5k_lh_infl, surf5k_rh_infl,
+    df_pni: pd.DataFrame, project_root: Path, spin_model: SpinPermutations,
+    mask_G: np.ndarray, sc_subjects: list[np.ndarray], gd_cortex: np.ndarray,
+    network: str = "SalVentAttn", n_rand: int = 100, hemisphere: str = "both",
+) -> pd.DataFrame:
+    """Figure 2A: SalVentAttn × {SC, GD, MPC} projection + group inference + Moran/spin nulls."""
+
+    df_yeo_surf_5k = _load_fc_gradient(project_root, df_yeo_surf_5k)
+    cortex_mask_full = df_yeo_surf_5k["hemisphere"].notna().values
+    g_fc_cortex = df_yeo_surf_5k["fc_g1"].values[cortex_mask_full]
+    target_net_labels = df_yeo_surf_5k.loc[cortex_mask_full, "network"].values
+
+    g_mpc_at_sn, sn_mask_cortex, other_mask_cortex = _prepare_network_gradient(
+        df_yeo_surf_5k, network, df_pni, hemisphere,
+    )
+
+    modalities = {
         "SC":  {"files": df_pni["path_sc_5k"].tolist(),
-                "cfg": {"split_hemi": False, "log_transform": True,  "invert_weights": False},
-                "sc_threshold": sc_threshold},
+                "mask_G": mask_G, "sc_subjects": sc_subjects},
         "GD":  {"files": df_pni["path_dist_5k"].tolist(),
-                "cfg": {"split_hemi": True,  "log_transform": False, "invert_weights": True},
-                "sc_threshold": None},
+                "mask_G": None, "sc_subjects": None},
         "MPC": {"files": df_pni["path_mpc_5k"].tolist(),
-                "cfg": {"split_hemi": False, "log_transform": False, "invert_weights": False},
-                "sc_threshold": None},
+                "mask_G": None, "sc_subjects": None},
     }
 
-    df_yeo_surf_5k = _load_fc_gradient(project_root, df_yeo_surf_5k)
-    gradient_values_cortex, network_mask_cortex, other_idx = _prepare_network_gradient(
-        df_yeo_surf_5k, network, df_pni, hemisphere)
-    cortex_mask_2a = df_yeo_surf_5k["hemisphere"].notna().values
-
     fig, axes = plt.subplots(2, 3, figsize=(4 * 4, 10), squeeze=False,
-                             gridspec_kw={"height_ratios": [2, 1]}, sharey="row")
+                             gridspec_kw={"height_ratios": [2, 1]})
+    network_color = yeo7_rgb[int(
+        df_yeo_surf_5k.loc[df_yeo_surf_5k["network"] == network, "network_int"].values[0]
+    )]
+    legend_handles, legend_labels = None, None
 
-    for i, (name, mcfg) in enumerate(metric_configs_2a.items()):
-        rho_col = f"{name}_rho"
-        # For SC: build a (n_other,) mask — True where the other-network vertex has at least one
-        # group-consensus edge. sc_threshold is cortex-indexed; other_cortex selects other-network columns.
-        if mcfg["sc_threshold"] is not None:
-            other_cortex = other_idx[cortex_mask_2a]
-            gt_mask_other = mcfg["sc_threshold"][:, other_cortex].any(axis=0)  # (n_other,)
-        else:
-            gt_mask_other = None
-        x_norm, y_norm, mask_label, corr, pv_spin, n_subjects = _slope_and_correlate(
-            df_yeo_surf_5k, mcfg["files"], mcfg["cfg"], rho_col,
-            gradient_values_cortex, network_mask_cortex, other_idx,
-            spin_model, n_rand, group_threshold_mask=gt_mask_other)
-
-        cortex_count = int(df_yeo_surf_5k["hemisphere"].notna().sum())
-        n_nan_rho = int(df_yeo_surf_5k[rho_col].isna().sum())
-        n_network_gray = cortex_count - int(other_idx.sum())
-        n_sparsity_gray = n_nan_rho - n_network_gray
-        logger.info(
-            f"[{name}] brain map: {n_nan_rho} gray vertices = "
-            f"{n_network_gray} network+medialwall + {n_sparsity_gray} connectivity-sparse"
+    for i, (name, mcfg) in enumerate(modalities.items()):
+        res = _run_projection(
+            modality=name, files=mcfg["files"], df=df_yeo_surf_5k,
+            g_fc_cortex=g_fc_cortex, g_mpc_at_sn=g_mpc_at_sn,
+            sn_mask_cortex=sn_mask_cortex, other_mask_cortex=other_mask_cortex,
+            cortex_mask_full=cortex_mask_full, gd_cortex=gd_cortex,
+            target_network_labels=target_net_labels,
+            spin_model=spin_model, n_rand=n_rand,
+            mask_G=mcfg["mask_G"], sc_subjects=mcfg["sc_subjects"],
+            dist_files=df_pni["path_dist_5k"].tolist(),
         )
 
-        save_brain_map(surf5k_lh_infl, surf5k_rh_infl,
-                       df_yeo_surf_5k[rho_col].values,
-                       array_name="overlay",
-                       filename=project_root / f"results/figures/figure_2a_brain_{name}_rho.svg",
-                       hemisphere=hemisphere)
-
-        # Bar plot: mean gradient projection per network sorted by FC gradient
-        df_plot = (df_yeo_surf_5k.loc[other_idx, ["network", "network_int", rho_col, "fc_g1_network"]]
-                   .dropna(subset=[rho_col])
-                   .sort_values("fc_g1_network"))
-        df_plot = df_plot.copy()
-        df_plot["network_abbrev"] = df_plot["network"].map(yeo7_abbrev)
-        palette = {yeo7_abbrev.get(net, net): yeo7_rgba[int(net_idx)] for net, net_idx in
-                   df_plot[["network", "network_int"]].drop_duplicates().itertuples(index=False)}
-        sns.barplot(x=df_plot["network_abbrev"], y=rho_col, hue="network_abbrev",
-                    data=df_plot, palette=palette, ax=axes[1, i], legend=False,
-                    order=df_plot["network_abbrev"].unique())
-        axes[1, i].axhline(0, color="black", linewidth=1, linestyle="--")
-        axes[1, i].set_ylabel(f"{name} gradient projection (z)")
-        axes[1, i].set_ylim(-1.5, 1.5)
-        axes[1, i].set_aspect(1)
-        axes[1, i].set(xlabel=None)
-        axes[1, i].yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-
         logger.info(
-            f"[Figure 2A] {name}: SalVentAttn gradient projection vs FC-G1 | "
-            f"Spearman r={corr:.3f}, "
-            f"spin-test p={pv_spin:.3e} (n_perm={n_rand}), n={n_subjects} subjects"
+            f"[Figure 2A | {name}] r_group={res['r_group']:+.3f} "
+            f"[{res['ci_low']:+.3f}, {res['ci_high']:+.3f}] "
+            f"t={res['t']:+.2f} p={res['p']:.3e} | "
+            f"p_moran={res['p_moran']:.3e} (primary) p_spin={res['p_spin']:.3e} "
+            f"(n_perm={n_rand}) | "
+            f"r_partial={res['r_group_partial']:+.3f} p_partial={res['p_partial']:.3e} "
+            f"n={res['n']}"
         )
 
-        colors = [yeo7_rgb[int(k)] for k in df_yeo_surf_5k["network_int"].values[mask_label]]
-        axes[0, i].scatter(x_norm, y_norm, s=5, alpha=0.7, c=colors, rasterized=True)
-        sns.regplot(x=x_norm, y=y_norm, scatter=False, color="black",
-                    line_kws={"linewidth": 1}, ax=axes[0, i])
-        axes[0, i].text(0.05, 0.95,
-                        f"r = {corr:.2f}\n"
-                        f"p$_{{spin}}$ = {pv_spin:.3f}  n={n_subjects}",
-                        transform=axes[0, i].transAxes, va="top", fontsize=12)
-        axes[0, i].set_xlim(-3, 3)
-        axes[0, i].set_ylim(-2.5, 2.5)
-        axes[0, i].set_aspect("equal", adjustable="box")
+        P_full = _embed_in_full_cortex(res["P_mean"], sn_mask_cortex, cortex_mask_full)
+        col_P = f"{network}_{name}_P"
+        df_yeo_surf_5k[col_P] = P_full
 
-    axes[0, 0].set_xlabel("SC gradient projection (z)")
-    axes[0, 1].set_xlabel("GD gradient projection (z)")
-    axes[0, 2].set_xlabel("MPC gradient projection (z)")
-    axes[0, 0].set_ylabel("Principal FC gradient")
+        save_brain_map(
+            surf5k_lh_infl, surf5k_rh_infl, P_full,
+            array_name=f"overlay_2a_{name}",
+            filename=project_root / f"results/figures/figure_2a_brain_{name}_rho.svg",
+            hemisphere=hemisphere,
+            color_range=(np.nanpercentile(P_full, 5), np.nanpercentile(P_full, 95))
+                if np.isfinite(P_full).any() else (-1, 1),
+        )
+
+        ax_top = axes[0, i]
+        valid = np.isfinite(g_mpc_at_sn) & np.isfinite(res["P_mean"])
+        colors_per_sn, palette = _scatter_colors_by_target_network(
+            res, df_yeo_surf_5k, fallback_color=network_color,
+        )
+        ax_top.scatter(g_mpc_at_sn[valid], res["P_mean"][valid],
+                       s=15, alpha=0.75, c=colors_per_sn[valid],
+                       edgecolor="none", rasterized=True)
+        sns.regplot(x=g_mpc_at_sn[valid], y=res["P_mean"][valid],
+                    scatter=False, color="black", line_kws={"linewidth": 1}, ax=ax_top)
+        ax_top.text(0.05, 0.95,
+                    f"r = {res['r_group']:+.2f}\n"
+                    f"p$_{{moran}}$ = {res['p_moran']:.3f}\n"
+                    f"p$_{{spin}}$ = {res['p_spin']:.3f}\n"
+                    f"p$_{{partial}}$ = {res['p_partial']:.3f}\n"
+                    f"n = {res['n']}",
+                    transform=ax_top.transAxes, va="top", fontsize=11)
+        ax_top.set_xlabel(f"MPC gradient ({network})")
+        ax_top.set_ylabel(f"{name} projection P (FC-G1 units)")
+
+        if palette and legend_handles is None:
+            from matplotlib.lines import Line2D
+            legend_handles = [
+                Line2D([0], [0], marker="o", color="w", markerfacecolor=c,
+                       markersize=8, label=yeo7_abbrev.get(n, n))
+                for n, c in palette.items()
+            ]
+            legend_labels = list(palette.keys())
+
+        _plot_subject_bars(
+            axes[1, i], res["r_subjects"], res["ci_low"], res["ci_high"],
+            res["r_group"], network_color=network_color, label=f"{name} r per subject",
+        )
+
+    if legend_handles:
+        fig.legend(handles=legend_handles, loc="upper center",
+                   bbox_to_anchor=(0.5, 1.02), ncol=len(legend_handles),
+                   frameon=False, fontsize=11, title="Dominant target network")
+
     sns.despine(fig=fig)
     plt.tight_layout()
-    plt.savefig(project_root / "results/figures/figure_2a_distance_metric.svg")
+    plt.savefig(project_root / "results/figures/figure_2a_distance_metric.svg",
+                bbox_inches="tight")
     plt.close(fig)
+    return df_yeo_surf_5k
 
 
-_MEASURE_CONFIG = {
-    "SC":  {"path_col": "path_sc_5k",   "split_hemi": False, "log_transform": True,  "invert_weights": False},
-    "GD":  {"path_col": "path_dist_5k", "split_hemi": True,  "log_transform": False, "invert_weights": True},
-    "MPC": {"path_col": "path_mpc_5k",  "split_hemi": False, "log_transform": False, "invert_weights": False},
-}
+def struct_conn_network_analysis(
+    df_yeo_surf_5k: pd.DataFrame, surf5k_lh_infl, surf5k_rh_infl,
+    df_pni: pd.DataFrame, project_root: Path, spin_model: SpinPermutations,
+    mask_G: np.ndarray, sc_subjects: list[np.ndarray], gd_cortex: np.ndarray,
+    networks: list[str] = ("SalVentAttn", "Limbic"),
+    n_rand: int = 100, hemisphere: str = "both", measure: str = "SC",
+) -> pd.DataFrame:
+    """Figure 2B: replicate the projection across networks for one modality.
 
-
-def struct_conn_network_analysis(df_yeo_surf_5k: pd.DataFrame,
-                                 surf5k_lh_infl, surf5k_rh_infl,
-                                 df_pni: pd.DataFrame, project_root: Path,
-                                 spin_model: SpinPermutations,
-                                 networks: list[str] = ["SalVentAttn", "Limbic"],
-                                 n_rand: int = 100, hemisphere: str = "both",
-                                 measure: str = "SC") -> pd.DataFrame:
+    Reports Moran (primary, within-region) and spin (secondary) nulls; applies
+    Benjamini-Hochberg FDR correction across networks for both p_moran and
+    p_spin and logs the q-values.
     """
-    Figure 2B: replicate the connectivity-fingerprint/FC-gradient correlation for each Yeo network.
 
-    All analysis at fsLR-5k. For each network, computes the T1-MPC gradient, partitions
-    computes the connectivity-weighted MPC gradient projection per other-network vertex,
-    and correlates the z-scored projection map with the whole-brain FC gradient
-    (Spearman, spin-test corrected).
-
-    Parameters
-    ----------
-    df_yeo_surf_5k : pd.DataFrame
-        5k surface DataFrame.
-    surf5k_lh_infl, surf5k_rh_infl :
-        Inflated fsLR-5k surfaces.
-    df_pni : pd.DataFrame
-        Subject manifest with columns path_sc_5k, path_dist_5k, path_mpc_5k,
-        path_t1_profile_5k.
-    project_root : Path
-        Repository root.
-    spin_model : SpinPermutations
-        Pre-fitted spin-permutation model (fitted on fsLR-5k spheres).
-    networks : list of str, optional
-        Yeo networks to analyse.
-    n_rand : int, optional
-        Number of spin permutations (default: 100).
-    hemisphere : str, optional
-        Hemisphere filter: 'both', 'LH', or 'RH' (default: 'both').
-    measure : str, optional
-        Connectivity measure to use: 'SC', 'GD', or 'MPC' (default: 'SC').
-
-    Returns
-    -------
-    df_yeo_surf_5k : pd.DataFrame
-        5k surface DataFrame with per-network connectivity-difference columns appended.
-    """
-    if measure not in _MEASURE_CONFIG:
-        raise ValueError(f"measure must be one of {list(_MEASURE_CONFIG)}, got '{measure}'")
-    cfg = _MEASURE_CONFIG[measure]
-    files = df_pni[cfg["path_col"]].tolist()
+    if measure not in ("SC", "GD", "MPC"):
+        raise ValueError(f"measure must be one of 'SC', 'GD', 'MPC'; got '{measure}'")
 
     df_yeo_surf_5k = _load_fc_gradient(project_root, df_yeo_surf_5k)
+    cortex_mask_full = df_yeo_surf_5k["hemisphere"].notna().values
+    g_fc_cortex = df_yeo_surf_5k["fc_g1"].values[cortex_mask_full]
+    target_net_labels = df_yeo_surf_5k.loc[cortex_mask_full, "network"].values
+
+    if measure == "SC":
+        files = df_pni["path_sc_5k"].tolist()
+        m_mask_G, m_sc_subjects = mask_G, sc_subjects
+    elif measure == "GD":
+        files = df_pni["path_dist_5k"].tolist()
+        m_mask_G, m_sc_subjects = None, None
+    else:
+        files = df_pni["path_mpc_5k"].tolist()
+        m_mask_G, m_sc_subjects = None, None
 
     n_col = int(np.ceil(len(networks) / 2))
-    fig, axes = plt.subplots(2, n_col, figsize=(4 * n_col, 10), sharex=True, sharey=True, layout="constrained")
+    fig, axes = plt.subplots(2, n_col, figsize=(4 * n_col, 10),
+                             sharex=True, sharey=True, layout="constrained")
     axes = axes.flatten()
 
+    results_per_net = []
     for i, network in enumerate(networks):
-        logger.info(f"Processing network: {network}")
-        gradient_values_cortex, network_mask_cortex, other_idx = _prepare_network_gradient(
-            df_yeo_surf_5k, network, df_pni, hemisphere)
-        rho_col = f"{network}_{measure}_rho"
-        x_norm, y_norm, mask_label, corr, pv_spin, n_subjects = _slope_and_correlate(
-            df_yeo_surf_5k, files, cfg, rho_col,
-            gradient_values_cortex, network_mask_cortex, other_idx,
-            spin_model, n_rand)
-
-        save_brain_map(surf5k_lh_infl, surf5k_rh_infl,
-                       df_yeo_surf_5k[rho_col].values,
-                       array_name="overlay2",
-                       filename=project_root / f"results/figures/figure_2b_brain_{measure}_rho_{network}.svg",
-                       hemisphere=hemisphere)
-
-        logger.info(
-            f"[Figure 2B] {network}: {measure} gradient projection vs FC-G1 | "
-            f"Spearman r={corr:.3f}, "
-            f"spin-test p={pv_spin:.3e} (n_perm={n_rand}), n={n_subjects} subjects"
+        logger.info(f"[Figure 2B | {measure}] processing network: {network}")
+        g_mpc_at_sn, sn_mask_cortex, other_mask_cortex = _prepare_network_gradient(
+            df_yeo_surf_5k, network, df_pni, hemisphere,
         )
 
-        colors = [yeo7_rgb[int(k)] for k in df_yeo_surf_5k["network_int"].values[mask_label]]
-        axes[i].scatter(x_norm, y_norm, s=5, alpha=0.7, c=colors, rasterized=True)
-        sns.regplot(x=x_norm, y=y_norm, scatter=False, color="black",
-                    line_kws={"linewidth": 1}, ax=axes[i])
-        axes[i].text(0.05, 0.95,
-                     f"r = {corr:.2f}\n"
-                     f"p$_{{spin}}$ = {pv_spin:.3f}  n={n_subjects}",
-                     transform=axes[i].transAxes, va="top", fontsize=12)
-        net_color = yeo7_rgb[int(df_yeo_surf_5k.loc[
-            df_yeo_surf_5k["network"] == network, "network_int"].values[0])]
-        net_abbrev = yeo7_abbrev.get(network, network)
-        axes[i].set_title(net_abbrev, fontdict={"color": net_color})
-        axes[i].set_xlabel(f"{measure} gradient projection (z)")
-        if i % n_col == 0:
-            axes[i].set_ylabel("Principal FC gradient")
-        axes[i].set_xlim(-3, 3)
-        axes[i].set_ylim(-3, 3)
-        axes[i].set_aspect("equal", adjustable="box")
+        res = _run_projection(
+            modality=measure, files=files, df=df_yeo_surf_5k,
+            g_fc_cortex=g_fc_cortex, g_mpc_at_sn=g_mpc_at_sn,
+            sn_mask_cortex=sn_mask_cortex, other_mask_cortex=other_mask_cortex,
+            cortex_mask_full=cortex_mask_full, gd_cortex=gd_cortex,
+            target_network_labels=target_net_labels,
+            spin_model=spin_model, n_rand=n_rand,
+            mask_G=m_mask_G, sc_subjects=m_sc_subjects,
+            dist_files=df_pni["path_dist_5k"].tolist(),
+        )
 
-    axes[-1].set_axis_off()
+        logger.info(
+            f"[Figure 2B | {network} | {measure}] r_group={res['r_group']:+.3f} "
+            f"[{res['ci_low']:+.3f}, {res['ci_high']:+.3f}] "
+            f"t={res['t']:+.2f} p={res['p']:.3e} | "
+            f"p_moran={res['p_moran']:.3e} (primary) p_spin={res['p_spin']:.3e} "
+            f"(n_perm={n_rand}) | "
+            f"r_partial={res['r_group_partial']:+.3f} p_partial={res['p_partial']:.3e} "
+            f"n={res['n']}"
+        )
+
+        P_full = _embed_in_full_cortex(res["P_mean"], sn_mask_cortex, cortex_mask_full)
+        df_yeo_surf_5k[f"{network}_{measure}_P"] = P_full
+
+        save_brain_map(
+            surf5k_lh_infl, surf5k_rh_infl, P_full,
+            array_name=f"overlay_2b_{measure}_{network}",
+            filename=project_root / f"results/figures/figure_2b_brain_{measure}_rho_{network}.svg",
+            hemisphere=hemisphere,
+            color_range=(np.nanpercentile(P_full, 5), np.nanpercentile(P_full, 95))
+                if np.isfinite(P_full).any() else (-1, 1),
+        )
+
+        results_per_net.append({
+            "network": network, "res": res, "g_mpc_at_sn": g_mpc_at_sn,
+            "sn_mask_cortex": sn_mask_cortex,
+        })
+
+    q_moran = benjamini_hochberg(np.array([r["res"]["p_moran"] for r in results_per_net]))
+    q_spin  = benjamini_hochberg(np.array([r["res"]["p_spin"]  for r in results_per_net]))
+    for rec, qm, qs in zip(results_per_net, q_moran, q_spin):
+        rec["q_moran"], rec["q_spin"] = qm, qs
+        logger.info(
+            f"[Figure 2B FDR | {measure} | {rec['network']}] "
+            f"q_moran={qm:.3e} q_spin={qs:.3e}"
+        )
+
+    for i, rec in enumerate(results_per_net):
+        network, res = rec["network"], rec["res"]
+        g_mpc_at_sn = rec["g_mpc_at_sn"]
+        net_color = yeo7_rgb[int(
+            df_yeo_surf_5k.loc[df_yeo_surf_5k["network"] == network, "network_int"].values[0]
+        )]
+        net_abbrev = yeo7_abbrev.get(network, network)
+        ax = axes[i]
+        valid = np.isfinite(g_mpc_at_sn) & np.isfinite(res["P_mean"])
+        colors_per_sn, _ = _scatter_colors_by_target_network(
+            res, df_yeo_surf_5k, fallback_color=net_color,
+        )
+        ax.scatter(g_mpc_at_sn[valid], res["P_mean"][valid],
+                   s=10, alpha=0.7, c=colors_per_sn[valid],
+                   edgecolor="none", rasterized=True)
+        sns.regplot(x=g_mpc_at_sn[valid], y=res["P_mean"][valid],
+                    scatter=False, color="black", line_kws={"linewidth": 1}, ax=ax)
+        ax.text(0.05, 0.95,
+                f"r = {res['r_group']:+.2f}\n"
+                f"p$_{{moran}}$ = {res['p_moran']:.3f}\n"
+                f"q$_{{moran}}$ = {rec['q_moran']:.3f}\n"
+                f"n = {res['n']}",
+                transform=ax.transAxes, va="top", fontsize=11)
+        ax.set_title(net_abbrev, fontdict={"color": net_color})
+        ax.set_xlabel("MPC gradient")
+        if i % n_col == 0:
+            ax.set_ylabel(f"{measure} projection P")
+
+    for j in range(len(networks), len(axes)):
+        axes[j].set_axis_off()
+
     sns.despine(fig=fig)
     plt.tight_layout()
     plt.savefig(project_root / f"results/figures/figure_2b_distance_network_{measure}.svg")
+    plt.close(fig)
     return df_yeo_surf_5k
 
 
@@ -797,10 +545,13 @@ def main():
 
     logger = setup_manuscript_logger("figure_2_distance", project_root, args)
     logger.info("Surface space  : fsLR-5k, Yeo 7-network labels")
-    logger.info("SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k")
-    logger.info("GD metric      : geodesic distance at fsLR-5k")
-    logger.info("MPC metric     : microstructural profile covariance at fsLR-5k")
-    logger.info("Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)")
+    logger.info("Statistic      : per-network-vertex connectivity-weighted projection P[i]")
+    logger.info("Group test     : Fisher-z r_s + one-sample t-test (random effects)")
+    logger.info("SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)")
+    logger.info("GD weights     : 1/GD (within-hemisphere)")
+    logger.info("MPC variant    : per-vertex Spearman across targets (rank version)")
+    logger.info("Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)")
+    logger.info("Confound       : partial correlation on mean weighted distance + degree")
     logger.info(f"Script path: {script_path}")
     logger.info(f"Project root: {project_root}")
 
@@ -823,22 +574,45 @@ def main():
             f"fsLR-5k gradient dataframe not found at {path_df_1a_5k} or {path_df_1a_5k_both}. "
             f"Run figure_1a_t1map.py first."
         )
-    found = path_df_1a_5k if path_df_1a_5k.exists() else path_df_1a_5k_both
-    logger.info(f"fsLR-5k gradient dataframe found at {found}")
+    logger.info(f"fsLR-5k gradient dataframe found at "
+                f"{path_df_1a_5k if path_df_1a_5k.exists() else path_df_1a_5k_both}")
 
-    # Figure 2A: SC / Dist / MPC metrics for SalVentAttn
-    struct_conn_metric_analysis(df_yeo_surf_5k,
-                                surf5k_lh_infl, surf5k_rh_infl,
-                                df_pni, project_root, spin_model_5k,
-                                network="SalVentAttn", n_rand=n_rand, hemisphere=args.hemi)
+    logger.info("Building Betzel distance-stratified consensus mask + loading SC subjects...")
+    mask_G, sc_subjects = build_consensus_mask(
+        df_pni["path_sc_5k"].tolist(), df_pni["path_sc_dist_5k"].tolist(),
+        df_yeo_surf_5k, nbins=10,
+    )
 
-    # Figure 2B: replicate SC analysis per Yeo network
+    cortex_mask_full = df_yeo_surf_5k["hemisphere"].notna().values
+    logger.info("Loading group-mean geodesic distance (for Moran spatial-weight matrix)...")
+    gd_stack = [load_subject_matrix(f, cortex_mask_full)
+                for f in df_pni["path_dist_5k"].tolist()]
+    gd_cortex = np.mean(np.stack(gd_stack, axis=0), axis=0)
+    del gd_stack
+
+    df_yeo_surf_5k = struct_conn_metric_analysis(
+        df_yeo_surf_5k, surf5k_lh_infl, surf5k_rh_infl,
+        df_pni, project_root, spin_model_5k,
+        mask_G=mask_G, sc_subjects=sc_subjects, gd_cortex=gd_cortex,
+        network="SalVentAttn", n_rand=n_rand, hemisphere=args.hemi,
+    )
+
+    # SC is the primary modality (axonal, independent of the MPC gradient); MPC is
+    # produced as a supplement (it shares the microstructural backbone with the gradient
+    # and FC-G1, so it is interpreted with that circularity caveat).
     networks = ["Limbic", "Default", "Cont", "SalVentAttn", "DorsAttn", "Vis", "SomMot"]
     df_yeo_surf_5k = struct_conn_network_analysis(
-        df_yeo_surf_5k,
-        surf5k_lh_infl, surf5k_rh_infl,
+        df_yeo_surf_5k, surf5k_lh_infl, surf5k_rh_infl,
         df_pni, project_root, spin_model_5k,
-        networks=networks, n_rand=n_rand, hemisphere=args.hemi, measure="MPC")
+        mask_G=mask_G, sc_subjects=sc_subjects, gd_cortex=gd_cortex,
+        networks=networks, n_rand=n_rand, hemisphere=args.hemi, measure="SC",
+    )
+    df_yeo_surf_5k = struct_conn_network_analysis(
+        df_yeo_surf_5k, surf5k_lh_infl, surf5k_rh_infl,
+        df_pni, project_root, spin_model_5k,
+        mask_G=mask_G, sc_subjects=sc_subjects, gd_cortex=gd_cortex,
+        networks=networks, n_rand=n_rand, hemisphere=args.hemi, measure="MPC",
+    )
 
     df_yeo_surf_5k.to_csv(project_root / f"data/dataframes/df_2b_label_{args.hemi}.csv", index=False)
 

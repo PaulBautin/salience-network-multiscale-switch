@@ -1,20 +1,55 @@
-# Figure 2 — Gradient-driven connectivity fingerprints
+# Figure 2 — Gradient-weighted connectivity projection
 
 **Script:** `scripts/figure_2_distance.py`
+**Module:** `src/connectome_processing.py`
 
-Figure 2 tests whether the microstructural gradient within the salience network
-predicts how vertices connect to the rest of the brain. All analyses run at
-**fsLR-5k** resolution (9,684 vertices: 4,842 LH + 4,842 RH) to keep
-whole-brain connectivity matrices in memory.
+Figure 2 tests whether the microstructural (MPC) gradient within the salience
+network predicts how its vertices connect to the rest of the brain, and whether
+that organisation mirrors the whole-brain **sensory→transmodal** axis captured by
+the principal functional-connectivity (FC) gradient. All analyses run at
+**fsLR-5k** resolution (9,684 vertices: 4,842 LH + 4,842 RH) so the whole-brain
+connectivity matrices fit in memory.
 
-- **Figure 2A** — SC, GD, and MPC connectivity fingerprints for SalVentAttn,
-  correlated with the whole-brain FC gradient.
-- **Figure 2B** — MPC fingerprint replicated across all 7 Yeo networks.
+- **Figure 2A** — SC, GD, and MPC projections for SalVentAttn.
+- **Figure 2B** — projection replicated across all 7 Yeo networks.
+  **SC is the primary modality** (axonal connectivity, independent of the MPC
+  gradient). **MPC is a supplement**: an MPC-weighted analysis of the MPC
+  gradient correlated with FC-G1 partly reflects the shared microstructural
+  backbone of cortical hierarchy (microstructure–function coupling) rather than
+  network-specific connectivity.
 
-The MPC gradient used to anchor the analysis is computed with the shared pipeline
-in [Shared Methods — MPC gradient computation](shared.md#mpc-gradient-computation),
-applied to fsLR-5k T1 profiles. Statistical testing uses spin permutations
-described in [Shared Methods — Spin-test permutations](shared.md#spin-test-permutations-whole-brain).
+The MPC gradient that anchors the analysis is computed with the shared pipeline in
+[Shared Methods — MPC gradient computation](shared.md#mpc-gradient-computation)
+applied to fsLR-5k T1 profiles (procrustes-aligned across subjects in
+`compute_t1_gradient`). Spatial null testing uses spin permutations described in
+[Shared Methods — Spin-test permutations](shared.md#spin-test-permutations-whole-brain).
+
+---
+
+## Statistic — per-network-vertex connectivity-weighted projection
+
+For each source-network vertex $i$ and subject $s$, the projection score is the
+**connectivity-weighted mean of the FC gradient across that vertex's targets**:
+
+$$P^{(s)}_i \;=\; \frac{\sum_{j \in \mathcal{T}_{i,s}} w_{ij}\, g^{\mathrm{FC}}_j}{\sum_{j \in \mathcal{T}_{i,s}} w_{ij}}, \qquad
+\mathcal{T}_{i,s} = \{\, j : w_{ij} > 0,\; j \notin \mathcal{V}_\mathcal{N},\; j \neq i \,\}.$$
+
+$P^{(s)}_i$ is the expected FC-gradient position of vertex $i$'s structural targets
+— **high $P$** means $i$ couples preferentially with the **task-positive** end of
+the FC gradient, **low $P$** with the **default-mode** end.
+
+Per subject, alignment with the within-network MPC gradient is measured by
+Spearman correlation across network vertices:
+
+$$r_s \;=\; \operatorname{Spearman}_{i \in \mathcal{V}_\mathcal{N}}\big(g^{\mathrm{MPC}}_i,\; P^{(s)}_i\big).$$
+
+A **positive $r_s$** supports the directional hypothesis: vertices with more
+differentiated myelin profiles (high $g^{\mathrm{MPC}}$) preferentially couple to
+task-positive systems; less differentiated vertices couple to DMN.
+
+This is the standard "preferred connectivity profile" formulation (Park 2021,
+*eLife*; Vázquez-Rodríguez 2019, *PNAS*; Suárez 2020, *Trends Cogn Sci*) adapted
+to a within-network source.
 
 ---
 
@@ -22,213 +57,207 @@ described in [Shared Methods — Spin-test permutations](shared.md#spin-test-per
 
 | Symbol | Meaning |
 |--------|---------|
-| $\mathcal{V}_\mathcal{N}$ | Network vertices at fsLR-5k (e.g. SalVentAttn), $n_\mathcal{N}$ total |
-| $\mathcal{V}_{\text{other}}$ | Non-target-network cortical vertices, $n_{\text{other}}$ total |
-| $\tilde{g}_v$ | Mean-centred MPC gradient at network vertex $v$ ($\tilde{g}_v = g_v - \bar{g}$) |
-| $w^{(s)}_{v,j}$ | Connectivity weight from network vertex $v$ to target vertex $j$ for subject $s$ |
-| $P^{(s)}_j$ | Per-subject gradient projection at target vertex $j$ |
-| $N_S$ | Number of subjects |
+| $\mathcal{V}_\mathcal{N}$ | Network vertices at fsLR-5k (e.g. SalVentAttn) |
+| $\mathcal{V}_{\text{other}}$ | Non-network cortical vertices (target set) |
+| $g^{\mathrm{MPC}}_i$ | MPC gradient at network vertex $i$, oriented so high = transmodal |
+| $g^{\mathrm{FC}}_j$ | Whole-brain principal FC gradient at target $j$, sign-fixed so transmodal = high |
+| $w_{ij}$ | Modality-dependent connectivity weight ($i \to j$) |
+| $P^{(s)}_i$ | Projection score (expected FC-gradient position of $i$'s targets) |
+| $r_s$ | Per-subject Spearman across $\mathcal{V}_\mathcal{N}$ |
+| $N_S = 18$ | Number of subjects |
 
 ---
 
-## Connectivity metrics
+## Modality routing and weight preprocessing (`src/connectome_processing.prepare_weights`)
 
-Three metrics are computed at fsLR-5k vertex resolution. micapipe stores
-connectivity matrices as upper-triangle GIFTI files (9,684 × 9,684); all are
-symmetrised on load.
+Three connectivity types are supported. micapipe stores fsLR-5k matrices as upper
+triangular GIFTI files (9,684 × 9,684); they are symmetrised on load
+(`load_subject_matrix`).
 
-| Metric | Transform | Inter-hemispheric |
-|--------|-----------|-------------------|
-| **SC** — SIFT2-weighted streamline count | log1p | retained |
-| **GD** — Surface geodesic path length | none | zeroed |
-| **MPC** — Vertex partial-correlation (Fisher z) | none | retained |
+| Modality | $w_{ij}$ | Inter-hemispheric | Notes |
+|----------|---------|-------------------|-------|
+| **SC** (SIFT2 streamline weights) | $\log_{10}\!\big((A_s \odot G)_{ij} \,/\, \varepsilon_s\big)$ on positives; NaN elsewhere | retained | $G$ is the Betzel distance-stratified consensus mask (below); $\varepsilon_s$ = smallest non-zero entry of $A_s \odot G$ |
+| **GD** (surface geodesic distance) | $1 / \mathrm{GD}_{ij}$ (proximity) | dropped | spatial-proximity reading; complements the SC test |
+| **MPC** (vertex partial-correlation, Fisher-z) | raw $\mathrm{MPC}_{ij}$ — **rank variant** (below) | retained | weighted-mean is ill-defined for negative MPC; use rank-Spearman |
 
-Zero entries are set to NaN before analysis (zero = absent edge, not zero
-connectivity).
+In all cases the diagonal, within-network edges ($i, j \in \mathcal{V}_\mathcal{N}$),
+and medial-wall vertices are excluded from $\mathcal{T}_{i,s}$.
 
----
+### Preprocessing of micapipe SIFT2 outputs
 
-## Group-representative SC (Betzel et al. 2018)
+The structural connectivity matrices come from micapipe's
+[`functions/03_SC.sh`](https://github.com/MICA-MNI/micapipe/blob/master/functions/03_SC.sh),
+with these verbatim commands:
 
-For SC, a group-representative binary mask $G$ is built using distance-dependent
-consensus thresholding. Tractography systematically over-represents short-range
-connections because short streamlines are geometrically easier to reconstruct;
-a naive consistency threshold would therefore bias the group network toward
-short-range edges. Distance-dependent thresholding corrects this by selecting
-the most reproducible connections **within each distance stratum**, so the group
-network preserves the empirical connection-length distribution rather than
-collapsing toward short-range edges. This matters here because the analysis
-directly tests whether MPC-gradient extremes differ in their long-range
-structural connectivity.
-
-Let $A^{(s)} \in \mathbb{R}^{n \times n}$ be the SC matrix for subject $s$ and
-$D \in \mathbb{R}^{n \times n}$ the mean tract distance matrix (mean streamline
-length from tractography, `path_sc_dist_5k`).
-
-Edge consistency and mean weight across subjects:
-
-$$C_{ij} = \sum_{s=1}^{N_S} \mathbf{1}[A^{(s)}_{ij} > 0], \qquad \bar{W}_{ij} = \frac{\sum_s A^{(s)}_{ij}}{C_{ij}}$$
-
-Within-hemisphere (WH) and between-hemisphere (BH) edges are handled separately.
-For each compartment, edges are partitioned into $B = 10$ equal-width distance
-bins. The target number of group edges in bin $b$ is proportional to the
-empirical edge-length distribution:
-
-$$k_b = \text{round}\!\left(\frac{D_{\text{total}}}{N_S} \cdot \frac{D_b}{D_{\text{total}}}\right)$$
-
-where $D_b$ is the count of present edges in bin $b$ across all subjects and
-$D_{\text{total}} = \sum_b D_b$. Within each bin the $k_b$ edges with the highest
-$C_{ij}$ are retained.
-
-The binary mask $G > 0$ identifies group-consensus structural edges; vertices
-with no consensus connections are connectivity-sparse by the group criterion.
-
-<details>
-<summary>Implementation — <code>fcn_group_bins</code></summary>
-
-```python
-def fcn_group_bins(adj, dist, hemiid, nbins):
-    if hemiid.ndim == 1:
-        hemiid = hemiid[:, np.newaxis]
-    n, nsub = adj.shape[0], adj.shape[-1]
-    nonzero_dist = dist[np.nonzero(dist)]
-    distbins = np.linspace(nonzero_dist.min(), nonzero_dist.max(), nbins + 1)
-    distbins[-1] += 1
-
-    C = np.sum(adj > 0, axis=2)
-    W = np.sum(adj, axis=2) / np.where(C > 0, C, np.nan)
-    W = np.nan_to_num(W, nan=0.0)
-
-    inter_hemi_mask = np.dot(hemiid, ~hemiid.T)
-    inter_hemi_mask = np.logical_or(inter_hemi_mask, inter_hemi_mask.T)
-
-    Grp = np.zeros((n, n, 2))
-    for j in range(2):                             # j=0: between-hemi, j=1: within-hemi
-        inter_hemi = ~inter_hemi_mask if j else inter_hemi_mask
-        m = dist * inter_hemi
-        D = (adj > 0) * (dist * np.triu(inter_hemi))[..., np.newaxis]
-        D = D[np.nonzero(D)]
-        if len(D) == 0:
-            continue
-        tgt = len(D) / nsub                        # average edges per subject
-
-        G = np.zeros((n, n))
-        for i_bin in range(nbins):
-            mask = np.where(np.triu(
-                (m >= distbins[i_bin]) & (m < distbins[i_bin + 1]), 1))
-            if len(mask[0]) == 0:
-                continue
-            n_D_bin = np.sum((D >= distbins[i_bin]) & (D < distbins[i_bin + 1]))
-            frac = int(np.round(tgt * n_D_bin / len(D)))
-            c = C[mask]
-            idx = np.argsort(c)[::-1]
-            G[mask[0][idx[:frac]], mask[1][idx[:frac]]] = 1
-        Grp[:, :, j] = G
-
-    G = np.sum(Grp, 2)
-    G = G + G.T
-    return G
+```bash
+tcksift2 -nthreads "$threads" "$tck" "$fod_wmN" "$weights"
+tck2connectome -nthreads "$threads" "$tck" "$nodes" "${sc_file}-connectome.txt" \
+               -tck_weights_in "$weights" -quiet -force
+tck2connectome -nthreads "$threads" "$tck" "$nodes" "${sc_file}-edgeLengths.txt" \
+               -tck_weights_in "$weights" -scale_length -stat_edge mean -quiet -force
 ```
 
-</details>
+These commands fix several preprocessing choices that downstream code inherits:
+
+| Choice | What micapipe does | What we do | SOTA rationale |
+|---|---|---|---|
+| Matrix entries | Raw sum of SIFT2 weights per edge (no `-symmetric`, no `-zero_diagonal`, no `-scale_invnodevol`) | symmetrise via `np.triu(A,1) + A.T`, which fills the lower triangle from the upper and drops the diagonal | matches micapipe's upper-triangular storage; the diagonal is self-loops, not connectivity |
+| Inter-subject scaling | `-out_mu` is **not** passed, so the SIFT2 proportionality coefficient $\mu_s$ is not saved | none possible | Smith (MRtrix author) recommends $\mu$ for inter-subject comparison, but micapipe does not write it. Every group statistic we report is a **Spearman rank correlation**, which is invariant to per-subject monotone rescalings, so this gap does not affect our inference |
+| Node-volume scaling | `-scale_invnodevol` not applied | not applied | Smith: "Personally I'm not a fan" — scaling by parcel volume changes the hypothesis from "is connectivity different?" to "is connectivity different beyond volume differences?" |
+| Tract-length scaling | `-scale_length` is applied **only** to the separate `*edgeLengths.txt` file (mean SIFT2-weighted tract length per edge); SC entries themselves are unscaled | length matrix is used only for the Betzel distance stratification, **not** to divide SC weights | SIFT2's cross-sectional multipliers already correct fiber-density bias; further dividing by length penalises long-range edges without clear theoretical support |
+| Distribution skew | none | `log10`/`log1p` of positives | SIFT2 weights are heavy-tailed and right-skewed; log-transform stabilises variance |
+| Negative values | not produced by SIFT2 | not handled (SIFT2 weights are non-negative; absent edges are exactly 0, treated as missing in `prepare_weights`) | absent edge ≠ connectivity of zero |
+
+The de-facto field convention with micapipe (Royer et al., 2022) is "no $\mu$, no
+`-scale_invnodevol`, no length scaling on SC entries" — our preprocessing matches
+this convention exactly, and the rank-based inference removes the $\mu$ concern
+that would otherwise apply. The edge-length matrix is consumed solely by the
+Betzel consensus to stratify edges by tract length, which is the use case
+`-scale_length -stat_edge mean` was designed for.
+
+References — Smith et al., NeuroImage 2015 (SIFT2);
+Royer et al., NeuroImage 2022 (micapipe);
+Betzel et al., Network Neuroscience 2018 (distance-stratified consensus, already
+cited below).
+
+### SC — Betzel distance-stratified mask + per-subject SIFT2 weights
+
+To handle the spatial bias of SIFT2 (short streamlines over-represented) and the
+sparsity of fsLR-5k SC, a **Betzel et al. 2018** distance-dependent consensus
+binary mask $G$ is built **once** across all $N_S$ subjects:
+
+1. Per-subject SC stacked $\to$ cross-subject mean tract length $D$.
+2. Edges binned by distance ($B = 10$ bins, within- vs. between-hemisphere
+   handled separately). Within each bin the target edge count matches the
+   empirical edge-length distribution and the most cross-subject-consistent
+   $C_{ij}$ edges are retained.
+3. $G$ is the binary mask of surviving edges.
+
+$G$ acts only as a **filter**: per-subject SIFT2 weights $A_s$ are used as
+$A_s \odot G$, then log-transformed. **Inference is per-subject random-effects**
+(subject = unit of inference), in line with the analysis spec; no group-averaged
+weight is used.
+
+### MPC — rank variant
+
+MPC partial-correlations are not non-negative, so the weighted-mean projection
+is ill-defined. Instead, per network vertex $i$:
+
+$$r^{(s)}_i \;=\; \operatorname{Spearman}_{j \in \mathcal{V}_{\text{other}}}\big(\mathrm{MPC}^{(s)}_{ij},\; g^{\mathrm{FC}}_j\big),$$
+
+then $r_s = \operatorname{Spearman}_i\big(g^{\mathrm{MPC}}_i, r^{(s)}_i\big)$.
+This preserves the directional interpretation without weight-sign hacks.
 
 ---
 
-## Connectivity-weighted gradient projection
+## Gradient orientation anchoring
 
-### Connectivity weights per metric
-
-| Metric | Weight $w^{(s)}_{v,j}$ | Rationale |
-|--------|------------------------|-----------|
-| **SC** | log1p(SIFT2 streamlines) | structural connection strength |
-| **GD** | $1 / \text{geodesic distance}_{v,j}$ | spatial proximity (within-hemisphere only) |
-| **MPC** | Fisher-z partial correlation | microstructural similarity |
-
-Zero entries are set to NaN before weighting (absent edge, not zero weight).
-
-### Projection formula
-
-For each subject $s$ and target vertex $j \in \mathcal{V}_{\text{other}}$:
-
-$$P^{(s)}_j = \frac{\displaystyle\sum_{v \in \mathcal{V}_\mathcal{N}} w^{(s)}_{v,j}\,\tilde{g}_v}
-                   {\displaystyle\sum_{v \in \mathcal{V}_\mathcal{N}} w^{(s)}_{v,j}}$$
-
-$P^{(s)}_j$ is the connectivity-weighted centroid of the mean-centred MPC gradient: it quantifies
-which part of the gradient axis vertex $j$ preferentially connects to within the network.
-
-- Positive $P^{(s)}_j$: $j$ connects preferentially to the transmodal (high-gradient) end.
-- Negative $P^{(s)}_j$: $j$ connects preferentially to the sensory (low-gradient) end.
-- $P^{(s)}_j \approx 0$: $j$'s connections are evenly spread across the gradient.
-
-No binning, no hyperparameter $K$. The full continuous gradient is used as a weight.
-
-### Subject averaging and z-scoring
-
-The group mean and SE are computed across subjects with valid projections:
-
-$$\bar{P}_j = \frac{1}{N_S}\sum_s P^{(s)}_j, \qquad
-\widehat{\text{SE}}(\bar{P}_j) = \frac{\text{std}(P^{(s)}_j)}{\sqrt{N_S}}$$
-
-**Coverage threshold:** vertices where fewer than $0.5 \cdot N_S$ subjects yield a finite
-$P^{(s)}_j$ are set to NaN.
-
-For brain-map visualization, $\bar{P}$ is z-scored across surviving $j \in \mathcal{V}_{\text{other}}$:
-
-$$z_j = \frac{\bar{P}_j - \overline{\bar{P}}}{\text{std}(\bar{P})}$$
-
-<details>
-<summary>Implementation — <code>compute_gradient_projection_subjects</code></summary>
-
-```python
-def compute_gradient_projection_subjects(files, gradient_values_cortex,
-                                         network_mask_cortex, other_idx_cortex,
-                                         df_yeo_surf_5k, split_hemi=False,
-                                         log_transform=False, invert_weights=False):
-    cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values  # (9684,) → (n_cortex,)
-    g_v = gradient_values_cortex[network_mask_cortex].astype(np.float32)
-    g_v -= np.nanmean(g_v)                                # mean-centre
-
-    subject_projs = []
-    for f in files:
-        data = nib.load(f).darrays[0].data.astype(np.float32)
-        data = data[np.ix_(cortex_mask, cortex_mask)]
-        data = np.triu(data, 1) + data.T
-        data[data == 0] = np.nan
-        # ... split_hemi / log_transform ...
-        C_sub = data[np.ix_(network_mask_cortex, other_idx_cortex)]
-        del data                                          # release full matrix
-
-        if invert_weights:
-            C_sub = np.where(C_sub > 0, 1.0 / C_sub, np.nan).astype(np.float32)
-
-        num = np.nansum(g_v[:, None] * C_sub, axis=0)    # (n_other,)
-        den = np.nansum(C_sub, axis=0)
-        subject_projs.append(np.where(den > 0, num / den, np.nan))
-
-    arr = np.stack(subject_projs, axis=0)
-    mean_proj = np.nanmean(arr, axis=0)
-    # ... coverage threshold, SE ...
-    return mean_proj, se_proj
-```
-
-</details>
+Diffusion-map eigenvectors have no canonical sign, so the raw MPC gradient pole
+is arbitrary. To support a *directional* sensory→transmodal claim, the
+within-network gradient is oriented deterministically against an external
+microstructural reference, **independent of the FC test**: it is flipped so it
+correlates positively with mean qT1 intensity (`acq-T1map`, averaged over
+subjects and the 14 intracortical depths). qT1 rises from myelinated
+sensory/granular cortex toward agranular transmodal cortex, so this fixes
+**high $g^{\mathrm{MPC}}$ = transmodal**, **low = sensory/granular**. The FC
+gradient is likewise sign-fixed so the transmodal/DMN pole is high. The signed
+correlation is interpretable; significance is still assessed two-tailed.
 
 ---
 
-## Correlation with FC gradient and statistical tests
+## Group inference
 
-The z-scored projection map $\mathbf{z}$ is correlated with the whole-brain principal
-FC gradient $\mathbf{g}^{\text{FC}}$ (fsLR-5k) restricted to $\mathcal{V}_{\text{other}}$:
+Two-stage random-effects test:
 
-$$r = \text{Spearman}(\mathbf{z},\; \mathbf{g}^{\text{FC}})$$
+1. **Fisher z-transform** each subject's correlation:
+   $z_s = \operatorname{arctanh} r_s$.
+2. **One-sample t-test** of $\{z_s\}$ against zero across the $N_S$ subjects
+   (`scipy.stats.ttest_1samp`). Report group correlation
+   $\bar r = \tanh(\bar z)$, 95 % CI back-transformed from
+   $\bar z \pm t_{0.975, N_S - 1} \, \mathrm{SE}(z)$, $t$ statistic, and
+   parametric $p$.
 
-### Significance — spin permutations (two-tailed)
+### Spatial null — spin permutations (Alexander-Bloch 2018)
 
-Significance is assessed with 1000 spin permutations (see
-[Shared Methods](shared.md#spin-test-permutations-whole-brain)):
+Vertex-wise gradients carry strong spatial autocorrelation, so the parametric
+$p$ over-states significance. The spin null:
 
-$$p_{\text{spin}} = \frac{1}{1000}\left|\{p : |r_p| \geq |r|\}\right|$$
+- Embeds $g^{\mathrm{MPC}}$ in the full 9,684-vertex fsLR-5k space (NaN outside
+  the source network), then rotates with the fitted `SpinPermutations` model
+  ($n_{\mathrm{rep}} = 1000$).
+- Per permutation $k$, per subject $s$:
+  $r^{(s)}_{k,\mathrm{null}} = \operatorname{Spearman}\!\big(g^{\mathrm{MPC}}_{\mathrm{rot},k},\, P^{(s)}\big)$
+  over the spatial overlap of the rotated and original network footprints.
+- Per permutation aggregate via Fisher-z mean across subjects $\to$
+  $\bar r_{k,\mathrm{null}}$.
+- Two-tailed empirical $p_{\mathrm{spin}} = \mathrm{mean}\big(|\bar r_{\mathrm{null}}| \geq |\bar r_{\mathrm{obs}}|\big)$.
 
-A two-tailed test is used because the sign of the gradient is arbitrary (diffusion
-maps do not have a canonical orientation); the test is conservative relative to a
-one-tailed alternative.
+### Confound control — partial correlation
+
+Because SIFT2 is not length-corrected, $P^{(s)}_i$ can be biased toward nearby
+targets that share FC-gradient values (spatial autocorrelation). Per subject,
+$P^{(s)}_i$ is regressed on per-vertex covariates
+$[\mathrm{meanGD}_i,\,\mathrm{degree}_i,\,1]$ where
+
+$$\mathrm{meanGD}^{(s)}_i = \frac{\sum_j w_{ij} \mathrm{GD}_{ij}}{\sum_j w_{ij}},\qquad
+\mathrm{degree}^{(s)}_i = \sum_j w_{ij},$$
+
+and the residual is correlated with $g^{\mathrm{MPC}}$ (Spearman). The
+partial-correlation $r_s^{\mathrm{partial}}$ is then aggregated with the same
+Fisher-z + t-test as the primary stat. Reported as $r_{\mathrm{partial}}$ /
+$p_{\mathrm{partial}}$ in the log. Skipped for MPC (rank statistic is
+degree-invariant).
+
+---
+
+## Implementation (`src/connectome_processing.py`)
+
+| Function | Role |
+|----------|------|
+| `load_subject_matrix(path, cortex_mask)` | Generic GIFTI loader; symmetrises, restricts to cortex |
+| `fcn_group_bins(adj, dist, hemiid, nbins)` | Betzel distance-stratified consensus (binary mask) |
+| `build_consensus_mask(sc_files, dist_files, df, nbins=10)` | Returns the consensus mask **plus** the per-subject SC matrices |
+| `prepare_weights(W_raw, modality, hemi, sn_mask, mask_G=None)` | Modality-aware preprocessing → weight matrix with NaN exclusions |
+| `compute_projection_score(W, g_fc, sn, other)` | Vectorised weighted-mean $P_i$ (SC, GD) |
+| `compute_projection_score_rank(W, g_fc, sn, other)` | Per-row Spearman across targets (MPC variant) |
+| `compute_projection_subjects(...)` | Per-subject loop + Fisher-z aggregation; returns `r_subjects`, `r_group`, `t`, `p`, CI, plus the per-subject `mean_GD` and `degree` arrays |
+| `compute_partial_correlation_subjects(result, g_mpc)` | Regress out `meanGD + degree`; same aggregation |
+| `compute_spin_null_projection(g_mpc, sn, cortex_mask, result, spin_model, n_rand)` | Spin null + two-tailed empirical $p_{\mathrm{spin}}$ |
+| `compute_tertile_contrast(P_mean, g_mpc)` | Supplementary tertile summary for visualisation |
+
+---
+
+## Output
+
+| File | Content |
+|------|---------|
+| `results/figures/figure_2a_distance_metric.svg` | Fig 2A — SalVentAttn × {SC, GD, MPC}; top row: $g^{\mathrm{MPC}} \times P$ scatter; bottom row: per-subject $r_s$ + mean ± 95 % CI |
+| `results/figures/figure_2a_brain_{SC,GD,MPC}_rho.svg` | Per-modality group-mean $P$ map over SalVentAttn (NaN elsewhere) |
+| `results/figures/figure_2b_distance_network_{SC,MPC}.svg` | Fig 2B — replication across 7 Yeo networks |
+| `results/figures/figure_2b_brain_{measure}_rho_{network}.svg` | Per-network group-mean $P$ map |
+| `data/dataframes/df_2b_label_{hemi}.csv` | Vertex-level cache: `mics, hemisphere, network, label, fc_g1, fc_g1_network, network_int, t1_gradient1_{N}, {N}_{M}_P` |
+
+Group-level summary numbers ($r_{\mathrm{group}}$, $t$, $p$, $p_{\mathrm{spin}}$,
+$r_{\mathrm{partial}}$, $p_{\mathrm{partial}}$, $n$) are written to the run log
+in `logs/figure_2_distance.log`, not duplicated in the CSV.
+
+---
+
+## Method history
+
+Earlier revisions of this figure used a **per-target Spearman** (rank
+correlation across in-network vertices, one value per non-network target,
+z-scored map correlated with FC-G1 by spin test). That statistic was binning-free
+and stable but inverted the natural reading direction. The current per-SN-vertex
+projection is the standard preferred-connectivity-profile statistic used in the
+gradient/structure-function-coupling literature; it gives an interpretable
+per-vertex score in g_FC units and a clean random-effects test (subject is the
+unit of inference, in line with the project analysis spec).
+
+A prior "centroid" variant computed the gradient-weighted mean of
+$g^{\mathrm{MPC}}$ at each target (the opposite direction) and was rejected
+because the weighted mean collapsed to $\approx 0$ whenever weights did not
+covary with $g^{\mathrm{MPC}}$ across SN vertices. The current statistic is in
+the opposite direction (averages $g^{\mathrm{FC}}$ across targets per SN vertex
+weighted by SC), uses an independent weighting variable, and does not share the
+collapse failure mode.

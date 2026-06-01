@@ -40,7 +40,7 @@ python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scri
 #
 # example:
 python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py \
-  -hemi LH
+  -hemi both
 
 # Figure 3a - MNI open iEEG atlas
 #

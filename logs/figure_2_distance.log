@@ -3495,3 +3495,633 @@ Processing network: SalVentAttn
 Loading profiles for 18 subjects...
 Final array shape: (18, 14, 1141)
 Computing T1 gradients...
+Gradient lambdas: [0.07083672 0.05402718 0.04502757 0.04051431 0.02898885 0.02585687
+ 0.02213608 0.01963478 0.0157806  0.01372836]
+[Figure 2B] SalVentAttn: MPC gradient projection vs FC-G1 | Spearman r=-0.108, spin-test p=7.100e-02 (n_perm=1000), n=18 subjects
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07203488 0.05407962 0.0458204  0.03998374 0.02982765 0.02646937
+ 0.02245425 0.01918599 0.01622769 0.01436615]
+[Figure 2B] DorsAttn: MPC gradient projection vs FC-G1 | Spearman r=0.221, spin-test p=2.800e-02 (n_perm=1000), n=18 subjects
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07243872 0.05385338 0.0478129  0.04446409 0.030909   0.0282146
+ 0.02236513 0.01949306 0.01690327 0.0154498 ]
+[Figure 2B] Vis: MPC gradient projection vs FC-G1 | Spearman r=-0.386, spin-test p=1.000e-03 (n_perm=1000), n=18 subjects
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07340451 0.05529499 0.04811664 0.04359724 0.03000525 0.02736685
+ 0.02261183 0.01944717 0.01631016 0.01522273]
+[Figure 2B] SomMot: MPC gradient projection vs FC-G1 | Spearman r=-0.227, spin-test p=1.340e-01 (n_perm=1000), n=18 subjects
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-27 09:50:33
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07083885 0.05400324 0.04501693 0.0405266  0.02898653 0.02585574
+ 0.02213914 0.01962106 0.01578516 0.01372915]
+[SC] brain map: 2151 gray vertices = 1141 network+medialwall + 1010 connectivity-sparse
+[Figure 2A] SC: SalVentAttn gradient projection vs FC-G1 | Spearman r=0.334, spin-test p=1.180e-01 (n_perm=1000), n=18 subjects
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn gradient projection vs FC-G1 | Spearman r=0.167, spin-test p=3.710e-01 (n_perm=1000), n=18 subjects
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn gradient projection vs FC-G1 | Spearman r=-0.006, spin-test p=7.640e-01 (n_perm=1000), n=18 subjects
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06509329 0.0565302  0.04581262 0.04078308 0.02930549 0.02492493
+ 0.0213632  0.01784222 0.01564687 0.01361596]
+[Figure 2B] Limbic: MPC gradient projection vs FC-G1 | Spearman r=-0.009, spin-test p=7.370e-01 (n_perm=1000), n=18 subjects
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07203346 0.05651285 0.04663703 0.04254922 0.02973907 0.02755601
+ 0.02246796 0.01929696 0.01592252 0.01449646]
+[Figure 2B] Default: MPC gradient projection vs FC-G1 | Spearman r=0.008, spin-test p=7.350e-01 (n_perm=1000), n=18 subjects
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07175837 0.05762965 0.0479372  0.04147251 0.03156998 0.0279155
+ 0.02205378 0.01885596 0.01661611 0.01486139]
+[Figure 2B] Cont: MPC gradient projection vs FC-G1 | Spearman r=0.004, spin-test p=8.820e-01 (n_perm=1000), n=18 subjects
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07082159 0.05396432 0.04496447 0.04050284 0.02896936 0.02584471
+ 0.02212531 0.0196193  0.01575801 0.01372074]
+[Figure 2B] SalVentAttn: MPC gradient projection vs FC-G1 | Spearman r=-0.006, spin-test p=7.640e-01 (n_perm=1000), n=18 subjects
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07206796 0.05410812 0.04586532 0.03999869 0.02982471 0.02644773
+ 0.02246171 0.01919441 0.01623547 0.01437002]
+[Figure 2B] DorsAttn: MPC gradient projection vs FC-G1 | Spearman r=0.001, spin-test p=9.440e-01 (n_perm=1000), n=18 subjects
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07240473 0.05389865 0.04775198 0.04442403 0.03088496 0.02819475
+ 0.02236041 0.01949502 0.01689542 0.01544272]
+[Figure 2B] Vis: MPC gradient projection vs FC-G1 | Spearman r=-0.034, spin-test p=8.000e-02 (n_perm=1000), n=18 subjects
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07338914 0.05521847 0.04808714 0.04353214 0.02998585 0.02737665
+ 0.02260371 0.01943416 0.01629192 0.01522285]
+[Figure 2B] SomMot: MPC gradient projection vs FC-G1 | Spearman r=-0.035, spin-test p=3.350e-01 (n_perm=1000), n=18 subjects
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-29 11:47:27
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 530)
+Computing T1 gradients...
+Gradient lambdas: [0.07048293 0.05315317 0.04364717 0.03820453 0.02862593 0.02536107
+ 0.02190629 0.01905678 0.01577655 0.01395181]
+[SC_rho] raw association map: std=0.0520, finite targets=3810/3878
+[SC] brain map: 5874 gray vertices = 4943 network+medialwall + 931 connectivity-sparse
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-29 17:20:23
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 530)
+Computing T1 gradients...
+Gradient lambdas: [0.07049612 0.05315697 0.04359718 0.03822358 0.028624   0.02536151
+ 0.02187279 0.01902227 0.01577899 0.01395007]
+SC consensus matrix built: density=0.103, nbins=10
+[SC_rho] raw association map: std=0.0960, finite targets=3726/3878
+[SC] brain map: 5958 gray vertices = 4943 network+medialwall + 1015 connectivity-sparse
+save_brain_map: rendering failed for figure_2a_brain_SC_rho.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2A] SC: SalVentAttn gradient association vs FC-G1 | Spearman r=0.308, spin-test p=5.800e-02 (n_perm=1000), n=18 subjects
+[GD_rho] raw association map: std=0.1902, finite targets=3878/3878
+[GD] brain map: 5806 gray vertices = 4943 network+medialwall + 863 connectivity-sparse
+save_brain_map: rendering failed for figure_2a_brain_GD_rho.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2A] GD: SalVentAttn gradient association vs FC-G1 | Spearman r=0.126, spin-test p=6.480e-01 (n_perm=1000), n=18 subjects
+[MPC_rho] raw association map: std=0.2137, finite targets=3876/3878
+[MPC] brain map: 5808 gray vertices = 4943 network+medialwall + 865 connectivity-sparse
+save_brain_map: rendering failed for figure_2a_brain_MPC_rho.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2A] MPC: SalVentAttn gradient association vs FC-G1 | Spearman r=0.307, spin-test p=3.100e-02 (n_perm=1000), n=18 subjects
+SC consensus matrix built: density=0.103, nbins=10
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 296)
+Computing T1 gradients...
+Gradient lambdas: [0.06509628 0.05523786 0.0459303  0.04014156 0.03007075 0.02595857
+ 0.02209035 0.01894025 0.01633834 0.01435701]
+[Limbic_SC_rho] raw association map: std=0.1019, finite targets=2667/4112
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Limbic.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] Limbic: SC gradient association vs FC-G1 | Spearman r=-0.218, spin-test p=3.650e-01 (n_perm=1000), n=18 subjects
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1154)
+Computing T1 gradients...
+Gradient lambdas: [0.07190456 0.05590314 0.04480315 0.0412662  0.02972672 0.0270933
+ 0.02152126 0.01884206 0.01596789 0.01409119]
+[Default_SC_rho] raw association map: std=0.1207, finite targets=3208/3254
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Default.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] Default: SC gradient association vs FC-G1 | Spearman r=0.043, spin-test p=8.630e-01 (n_perm=1000), n=18 subjects
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 445)
+Computing T1 gradients...
+Gradient lambdas: [0.07171082 0.05756591 0.04718829 0.03914594 0.03125547 0.02770892
+ 0.02121238 0.01877559 0.01634075 0.01435009]
+[Cont_SC_rho] raw association map: std=0.1732, finite targets=3791/3963
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Cont.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] Cont: SC gradient association vs FC-G1 | Spearman r=0.389, spin-test p=2.800e-02 (n_perm=1000), n=18 subjects
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 530)
+Computing T1 gradients...
+Gradient lambdas: [0.07040692 0.05313747 0.04359819 0.03820841 0.02862869 0.0253512
+ 0.0218961  0.01905734 0.01577225 0.01394798]
+[SalVentAttn_SC_rho] raw association map: std=0.0960, finite targets=3726/3878
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_SalVentAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] SalVentAttn: SC gradient association vs FC-G1 | Spearman r=0.308, spin-test p=5.800e-02 (n_perm=1000), n=18 subjects
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 488)
+Computing T1 gradients...
+Gradient lambdas: [0.07230641 0.05650772 0.04700555 0.03938278 0.03156455 0.02775831
+ 0.02229759 0.0189414  0.01667272 0.01463193]
+[DorsAttn_SC_rho] raw association map: std=0.1960, finite targets=3496/3920
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_DorsAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] DorsAttn: SC gradient association vs FC-G1 | Spearman r=0.359, spin-test p=8.800e-02 (n_perm=1000), n=18 subjects
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 672)
+Computing T1 gradients...
+Gradient lambdas: [0.07248596 0.05442492 0.04738601 0.04350794 0.03150382 0.02795165
+ 0.02207494 0.01917325 0.01710554 0.01539689]
+[Vis_SC_rho] raw association map: std=0.1180, finite targets=2115/3736
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Vis.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] Vis: SC gradient association vs FC-G1 | Spearman r=-0.124, spin-test p=6.030e-01 (n_perm=1000), n=18 subjects
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 823)
+Computing T1 gradients...
+Gradient lambdas: [0.07243233 0.05612386 0.04690997 0.04226962 0.03081204 0.02689094
+ 0.02166261 0.01890317 0.0164561  0.01499117]
+[SomMot_SC_rho] raw association map: std=0.1302, finite targets=2760/3585
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_SomMot.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] SomMot: SC gradient association vs FC-G1 | Spearman r=0.027, spin-test p=9.140e-01 (n_perm=1000), n=18 subjects
+Processing network: Limbic
+[Limbic_MPC_rho] raw association map: std=0.1346, finite targets=4112/4112
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_Limbic.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] Limbic: MPC gradient association vs FC-G1 | Spearman r=0.347, spin-test p=1.500e-02 (n_perm=1000), n=18 subjects
+Processing network: Default
+[Default_MPC_rho] raw association map: std=0.1918, finite targets=3252/3254
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_Default.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] Default: MPC gradient association vs FC-G1 | Spearman r=0.362, spin-test p=1.500e-02 (n_perm=1000), n=18 subjects
+Processing network: Cont
+[Cont_MPC_rho] raw association map: std=0.1862, finite targets=3961/3963
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_Cont.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] Cont: MPC gradient association vs FC-G1 | Spearman r=0.310, spin-test p=2.500e-02 (n_perm=1000), n=18 subjects
+Processing network: SalVentAttn
+[SalVentAttn_MPC_rho] raw association map: std=0.2137, finite targets=3876/3878
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_SalVentAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] SalVentAttn: MPC gradient association vs FC-G1 | Spearman r=0.307, spin-test p=3.100e-02 (n_perm=1000), n=18 subjects
+Processing network: DorsAttn
+[DorsAttn_MPC_rho] raw association map: std=0.1945, finite targets=3918/3920
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_DorsAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] DorsAttn: MPC gradient association vs FC-G1 | Spearman r=0.248, spin-test p=6.400e-02 (n_perm=1000), n=18 subjects
+Processing network: Vis
+[Vis_MPC_rho] raw association map: std=0.2045, finite targets=3734/3736
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_Vis.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] Vis: MPC gradient association vs FC-G1 | Spearman r=-0.293, spin-test p=3.200e-02 (n_perm=1000), n=18 subjects
+Processing network: SomMot
+[SomMot_MPC_rho] raw association map: std=0.2284, finite targets=3583/3585
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_SomMot.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot; values remain available in the dataframe.
+[Figure 2B] SomMot: MPC gradient association vs FC-G1 | Spearman r=0.152, spin-test p=2.230e-01 (n_perm=1000), n=18 subjects
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-29 18:09:16
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+SC metric      : iFOD2 40M streamlines, SIFT2-weighted, log-transformed, fsLR-5k
+GD metric      : geodesic distance at fsLR-5k
+MPC metric     : microstructural profile covariance at fsLR-5k
+Null model     : spin permutation (SpinPermutations, n_rep=1000, random_state=42)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07083486 0.05400235 0.04498516 0.040532   0.02900111 0.02585184
+ 0.0221352  0.0196276  0.01578676 0.01372657]
+SC consensus matrix built: density=0.103, nbins=10
+[SC_rho] raw association map: std=0.1010, finite targets=7332/7680
+[SC] brain map: 2352 gray vertices = 1141 network+medialwall + 1211 connectivity-sparse
+[Figure 2A] SC: SalVentAttn gradient association vs FC-G1 | Spearman r=-0.515, spin-test p=2.000e-03 (n_perm=1000), n=18 subjects
+[GD_rho] raw association map: std=0.2039, finite targets=7680/7680
+[GD] brain map: 2004 gray vertices = 1141 network+medialwall + 863 connectivity-sparse
+[Figure 2A] GD: SalVentAttn gradient association vs FC-G1 | Spearman r=-0.175, spin-test p=4.840e-01 (n_perm=1000), n=18 subjects
+[MPC_rho] raw association map: std=0.2050, finite targets=7678/7680
+[MPC] brain map: 2006 gray vertices = 1141 network+medialwall + 865 connectivity-sparse
+[Figure 2A] MPC: SalVentAttn gradient association vs FC-G1 | Spearman r=-0.406, spin-test p=5.000e-03 (n_perm=1000), n=18 subjects
+SC consensus matrix built: density=0.103, nbins=10
+Processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06509256 0.05653239 0.04582862 0.04083351 0.02931021 0.02494178
+ 0.02135675 0.01784422 0.01564489 0.01362032]
+[Limbic_SC_rho] raw association map: std=0.0717, finite targets=5718/8234
+[Figure 2B] Limbic: SC gradient association vs FC-G1 | Spearman r=0.054, spin-test p=6.790e-01 (n_perm=1000), n=18 subjects
+Processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07204193 0.05661685 0.04677651 0.04256294 0.02975027 0.02756271
+ 0.02247871 0.01930533 0.01592887 0.01450136]
+[Default_SC_rho] raw association map: std=0.0794, finite targets=6725/6823
+[Figure 2B] Default: SC gradient association vs FC-G1 | Spearman r=0.143, spin-test p=4.570e-01 (n_perm=1000), n=18 subjects
+Processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07176445 0.05763447 0.04781523 0.04144582 0.03155447 0.02789941
+ 0.02204761 0.01884056 0.01661163 0.01485337]
+[Cont_SC_rho] raw association map: std=0.1480, finite targets=7501/7740
+[Figure 2B] Cont: SC gradient association vs FC-G1 | Spearman r=-0.379, spin-test p=5.000e-02 (n_perm=1000), n=18 subjects
+Processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07080572 0.05402718 0.04498608 0.04053346 0.0289874  0.02584477
+ 0.02213101 0.01962443 0.01578294 0.01372684]
+[SalVentAttn_SC_rho] raw association map: std=0.1011, finite targets=7332/7680
+[Figure 2B] SalVentAttn: SC gradient association vs FC-G1 | Spearman r=-0.515, spin-test p=2.000e-03 (n_perm=1000), n=18 subjects
+Processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.072053   0.05411641 0.04587136 0.03997079 0.02984634 0.02649501
+ 0.02245881 0.01920062 0.01623747 0.01437217]
+[DorsAttn_SC_rho] raw association map: std=0.1408, finite targets=7183/7867
+[Figure 2B] DorsAttn: SC gradient association vs FC-G1 | Spearman r=-0.329, spin-test p=1.170e-01 (n_perm=1000), n=18 subjects
+Processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07237166 0.05385639 0.04777335 0.04444308 0.03090001 0.02820972
+ 0.02236223 0.01948977 0.01690006 0.01544115]
+[Vis_SC_rho] raw association map: std=0.0816, finite targets=4930/7477
+[Figure 2B] Vis: SC gradient association vs FC-G1 | Spearman r=-0.193, spin-test p=2.870e-01 (n_perm=1000), n=18 subjects
+Processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07340693 0.0552305  0.04815058 0.04354576 0.02999268 0.02737414
+ 0.02260572 0.01944102 0.01631391 0.01522384]
+[SomMot_SC_rho] raw association map: std=0.0915, finite targets=5670/7105
+[Figure 2B] SomMot: SC gradient association vs FC-G1 | Spearman r=-0.034, spin-test p=8.740e-01 (n_perm=1000), n=18 subjects
+Processing network: Limbic
+[Limbic_MPC_rho] raw association map: std=0.1305, finite targets=8234/8234
+[Figure 2B] Limbic: MPC gradient association vs FC-G1 | Spearman r=-0.401, spin-test p=1.200e-02 (n_perm=1000), n=18 subjects
+Processing network: Default
+[Default_MPC_rho] raw association map: std=0.1825, finite targets=6821/6823
+[Figure 2B] Default: MPC gradient association vs FC-G1 | Spearman r=0.402, spin-test p=6.000e-03 (n_perm=1000), n=18 subjects
+Processing network: Cont
+[Cont_MPC_rho] raw association map: std=0.1864, finite targets=7738/7740
+[Figure 2B] Cont: MPC gradient association vs FC-G1 | Spearman r=-0.375, spin-test p=1.100e-02 (n_perm=1000), n=18 subjects
+Processing network: SalVentAttn
+[SalVentAttn_MPC_rho] raw association map: std=0.2050, finite targets=7678/7680
+[Figure 2B] SalVentAttn: MPC gradient association vs FC-G1 | Spearman r=-0.406, spin-test p=5.000e-03 (n_perm=1000), n=18 subjects
+Processing network: DorsAttn
+[DorsAttn_MPC_rho] raw association map: std=0.1964, finite targets=7865/7867
+[Figure 2B] DorsAttn: MPC gradient association vs FC-G1 | Spearman r=-0.327, spin-test p=1.900e-02 (n_perm=1000), n=18 subjects
+Processing network: Vis
+[Vis_MPC_rho] raw association map: std=0.2007, finite targets=7475/7477
+[Figure 2B] Vis: MPC gradient association vs FC-G1 | Spearman r=-0.371, spin-test p=1.100e-02 (n_perm=1000), n=18 subjects
+Processing network: SomMot
+[SomMot_MPC_rho] raw association map: std=0.2256, finite targets=7103/7105
+[Figure 2B] SomMot: MPC gradient association vs FC-G1 | Spearman r=-0.219, spin-test p=1.320e-01 (n_perm=1000), n=18 subjects
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-30 19:17:44
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC variant    : per-vertex Spearman across targets (rank version)
+Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)
+Confound       : partial correlation on mean weighted distance + degree
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-30 19:21:08
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC variant    : per-vertex Spearman across targets (rank version)
+Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)
+Confound       : partial correlation on mean weighted distance + degree
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 530)
+Computing T1 gradients...
+Gradient lambdas: [0.07040034 0.05312906 0.04358815 0.03818542 0.02859053 0.0253484
+ 0.02189118 0.01904365 0.01576979 0.01394685]
+[Figure 2A | SC] r_group=+0.242 [+0.228, +0.256] t=+35.15 p=2.577e-17 p_spin=5.091e-01 (n_perm=1000) r_partial=+0.248 p_partial=3.163e-16 n=18
+save_brain_map: rendering failed for figure_2a_brain_SC_rho.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07085608 0.0540804  0.0450354  0.04055159 0.02902195 0.0258705
+ 0.02214269 0.01963178 0.01579027 0.01373015]
+[Figure 2A | SC] r_group=-0.324 [-0.333, -0.316] t=-76.82 p=4.746e-23 p_spin=3.068e-01 (n_perm=1000) r_partial=-0.323 p_partial=5.261e-22 n=18
+[Figure 2A | GD] r_group=+0.247 [+0.241, +0.252] t=+92.36 p=2.086e-24 p_spin=5.264e-01 (n_perm=1000) r_partial=+0.267 p_partial=4.760e-20 n=18
+save_brain_map: rendering failed for figure_2a_brain_GD_rho.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2A | MPC] r_group=+0.374 [+0.327, +0.419] t=+15.41 p=2.019e-11 p_spin=4.952e-02 (n_perm=1000) r_partial=+nan p_partial=nan n=18
+save_brain_map: rendering failed for figure_2a_brain_MPC_rho.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 296)
+Computing T1 gradients...
+Gradient lambdas: [0.06508361 0.05517194 0.04585082 0.04012088 0.03005138 0.02595637
+ 0.02208811 0.01893715 0.01634414 0.01435306]
+[Figure 2B | Limbic | SC] r_group=-0.047 [-0.064, -0.030] t=-5.81 p=2.101e-05 p_spin=7.940e-01 (n_perm=1000) r_partial=-0.060 p_partial=1.117e-06 n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Limbic.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1154)
+Computing T1 gradients...
+Gradient lambdas: [0.07193502 0.0559479  0.04484361 0.0412433  0.02975184 0.02711537
+ 0.02153385 0.01886037 0.01597439 0.01409756]
+[Figure 2B | Default | SC] r_group=+0.074 [+0.049, +0.099] t=+6.32 p=7.642e-06 p_spin=7.590e-01 (n_perm=1000) r_partial=+0.037 p_partial=1.327e-02 n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Default.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 445)
+Computing T1 gradients...
+Gradient lambdas: [0.07182387 0.05764669 0.0472221  0.0392049  0.03127757 0.02770945
+ 0.02121346 0.0187802  0.01634883 0.01435792]
+[Figure 2B | Cont | SC] r_group=+0.451 [+0.437, +0.464] t=+58.69 p=4.536e-21 p_spin=2.924e-01 (n_perm=1000) r_partial=+0.470 p_partial=1.041e-18 n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Cont.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | SC] r_group=+0.242 [+0.228, +0.256] t=+35.15 p=2.577e-17 p_spin=5.091e-01 (n_perm=1000) r_partial=+0.248 p_partial=3.163e-16 n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_SalVentAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 488)
+Computing T1 gradients...
+Gradient lambdas: [0.07230697 0.05649072 0.04696756 0.03938011 0.03154181 0.0277763
+ 0.02229581 0.01894275 0.01667401 0.0146326 ]
+[Figure 2B | DorsAttn | SC] r_group=+0.220 [+0.194, +0.246] t=+17.21 p=3.430e-12 p_spin=4.881e-01 (n_perm=1000) r_partial=+0.217 p_partial=1.737e-12 n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_DorsAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 672)
+Computing T1 gradients...
+Gradient lambdas: [0.07242326 0.05445998 0.04748798 0.04352521 0.0315305  0.02794988
+ 0.02207982 0.01918022 0.01711471 0.01539716]
+[Figure 2B | Vis | SC] r_group=+0.125 [+0.089, +0.160] t=+7.34 p=1.157e-06 p_spin=6.489e-01 (n_perm=1000) r_partial=+0.098 p_partial=9.586e-06 n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Vis.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 823)
+Computing T1 gradients...
+Gradient lambdas: [0.0723479  0.05603109 0.04681149 0.04219623 0.03079164 0.02682095
+ 0.02164388 0.01889148 0.01644748 0.01498259]
+[Figure 2B | SomMot | SC] r_group=+0.019 [+0.001, +0.037] t=+2.29 p=3.537e-02 p_spin=9.430e-01 (n_perm=1000) r_partial=+0.023 p_partial=3.763e-02 n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_SomMot.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | MPC] processing network: Limbic
+[Figure 2B | Limbic | MPC] r_group=+0.158 [+0.104, +0.211] t=+6.13 p=1.112e-05 p_spin=6.509e-02 (n_perm=1000) r_partial=+nan p_partial=nan n=18
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_Limbic.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | MPC] processing network: Default
+[Figure 2B | Default | MPC] r_group=+0.186 [+0.151, +0.221] t=+11.00 p=3.782e-09 p_spin=6.200e-02 (n_perm=1000) r_partial=+nan p_partial=nan n=18
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_Default.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | MPC] processing network: Cont
+[Figure 2B | Cont | MPC] r_group=+0.116 [+0.060, +0.171] t=+4.34 p=4.475e-04 p_spin=3.833e-01 (n_perm=1000) r_partial=+nan p_partial=nan n=18
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_Cont.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | MPC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | MPC] r_group=+0.374 [+0.327, +0.419] t=+15.41 p=2.019e-11 p_spin=4.952e-02 (n_perm=1000) r_partial=+nan p_partial=nan n=18
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_SalVentAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | MPC] processing network: DorsAttn
+[Figure 2B | DorsAttn | MPC] r_group=+0.183 [+0.127, +0.237] t=+6.87 p=2.736e-06 p_spin=2.138e-01 (n_perm=1000) r_partial=+nan p_partial=nan n=18
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_DorsAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | MPC] processing network: Vis
+[Figure 2B | Vis | MPC] r_group=-0.180 [-0.236, -0.124] t=-6.62 p=4.348e-06 p_spin=7.522e-02 (n_perm=1000) r_partial=+nan p_partial=nan n=18
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_Vis.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | MPC] processing network: SomMot
+[Figure 2B | SomMot | MPC] r_group=+0.410 [+0.365, +0.453] t=+17.52 p=2.582e-12 p_spin=1.306e-02 (n_perm=1000) r_partial=+nan p_partial=nan n=18
+save_brain_map: rendering failed for figure_2b_brain_MPC_rho_SomMot.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-05-31 18:17:28
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC variant    : per-vertex Spearman across targets (rank version)
+Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)
+Confound       : partial correlation on mean weighted distance + degree
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 530)
+Computing T1 gradients...
+Gradient lambdas: [0.07051201 0.05319621 0.04367361 0.03823979 0.02864463 0.02537888
+ 0.02191504 0.01905867 0.01578814 0.01394646]
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-01 10:00:17
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC variant    : per-vertex Spearman across targets (rank version)
+Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)
+Confound       : partial correlation on mean weighted distance + degree
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07090244 0.05405805 0.04507083 0.04055434 0.02898875 0.02586745
+ 0.02213544 0.01962847 0.01578579 0.01373103]
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-01 11:27:00
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC variant    : per-vertex Spearman across targets (rank version)
+Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)
+Confound       : partial correlation on mean weighted distance + degree
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07083794 0.054041   0.04507534 0.04053172 0.02897695 0.02586838
+ 0.02213614 0.01964717 0.01578602 0.01373056]
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-01 13:08:44
+  --hemi: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC variant    : per-vertex Spearman across targets (rank version)
+Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)
+Confound       : partial correlation on mean weighted distance + degree
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07080675 0.05401965 0.04499489 0.04051688 0.02898749 0.0258617
+ 0.02213083 0.01962048 0.0157743  0.01372691]
+[Figure 2A | SC] r_group=-0.324 [-0.333, -0.316] t=-76.77 p=4.796e-23 | p_moran=1.000e-03 (primary) p_spin=3.068e-01 (n_perm=1000) | r_partial=-0.323 p_partial=5.378e-22 n=18
+[Figure 2A | GD] r_group=-0.299 [-0.303, -0.295] t=-143.81 p=1.132e-27 | p_moran=3.000e-03 (primary) p_spin=3.496e-01 (n_perm=1000) | r_partial=-0.306 p_partial=3.841e-21 n=18
+[Figure 2A | MPC] r_group=-0.420 [-0.458, -0.381] t=-20.06 p=2.842e-13 | p_moran=0.000e+00 (primary) p_spin=7.136e-03 (n_perm=1000) | r_partial=+nan p_partial=nan n=18
+[Figure 2B | SC] processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06510699 0.05652963 0.04579297 0.04078791 0.02929378 0.02492634
+ 0.02135507 0.01783016 0.01563691 0.01361356]
+[Figure 2B | Limbic | SC] r_group=-0.033 [-0.045, -0.021] t=-5.63 p=2.992e-05 | p_moran=8.380e-01 (primary) p_spin=8.237e-01 (n_perm=1000) | r_partial=-0.011 p_partial=1.442e-01 n=18
+[Figure 2B | SC] processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07196159 0.05651267 0.04658115 0.04252841 0.02971921 0.02754883
+ 0.02245641 0.01928975 0.01591887 0.01449464]
+[Figure 2B | Default | SC] r_group=+0.156 [+0.145, +0.167] t=+28.88 p=6.874e-16 | p_moran=2.220e-01 (primary) p_spin=4.460e-01 (n_perm=1000) | r_partial=+0.119 p_partial=4.701e-12 n=18
+[Figure 2B | SC] processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07181113 0.05764923 0.04792799 0.04146323 0.03160214 0.02792116
+ 0.02205024 0.0188556  0.01661447 0.01485724]
+[Figure 2B | Cont | SC] r_group=-0.515 [-0.524, -0.505] t=-92.67 p=1.968e-24 | p_moran=4.000e-03 (primary) p_spin=1.660e-01 (n_perm=1000) | r_partial=-0.506 p_partial=4.795e-22 n=18
+[Figure 2B | SC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | SC] r_group=-0.324 [-0.333, -0.316] t=-76.77 p=4.796e-23 | p_moran=1.000e-03 (primary) p_spin=3.068e-01 (n_perm=1000) | r_partial=-0.323 p_partial=5.378e-22 n=18
+[Figure 2B | SC] processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07194166 0.05403834 0.04575058 0.03993167 0.02980513 0.02645167
+ 0.02244961 0.01918492 0.01621872 0.01436288]
+[Figure 2B | DorsAttn | SC] r_group=-0.170 [-0.189, -0.150] t=-17.74 p=2.104e-12 | p_moran=1.970e-01 (primary) p_spin=5.605e-01 (n_perm=1000) | r_partial=-0.190 p_partial=4.026e-14 n=18
+[Figure 2B | SC] processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07237421 0.05384265 0.04775457 0.04439196 0.03088236 0.02819698
+ 0.02235521 0.0194889  0.01688662 0.01544071]
+[Figure 2B | Vis | SC] r_group=+0.037 [+0.009, +0.065] t=+2.74 p=1.389e-02 | p_moran=7.470e-01 (primary) p_spin=9.009e-01 (n_perm=1000) | r_partial=+0.002 p_partial=8.604e-01 n=18
+[Figure 2B | SC] processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07340507 0.05527629 0.0480732  0.04355676 0.02999789 0.02737214
+ 0.02260261 0.01944112 0.01632016 0.01521989]
+[Figure 2B | SomMot | SC] r_group=+0.036 [+0.019, +0.052] t=+4.51 p=3.089e-04 | p_moran=7.090e-01 (primary) p_spin=8.583e-01 (n_perm=1000) | r_partial=+0.029 p_partial=1.294e-03 n=18
+[Figure 2B FDR | SC | Limbic] q_moran=8.380e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | Default] q_moran=3.885e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | Cont] q_moran=1.400e-02 q_spin=9.009e-01
+[Figure 2B FDR | SC | SalVentAttn] q_moran=7.000e-03 q_spin=9.009e-01
+[Figure 2B FDR | SC | DorsAttn] q_moran=3.885e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | Vis] q_moran=8.380e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | SomMot] q_moran=8.380e-01 q_spin=9.009e-01
+[Figure 2B | MPC] processing network: Limbic
+[Figure 2B | Limbic | MPC] r_group=-0.233 [-0.267, -0.198] t=-13.72 p=1.262e-10 | p_moran=0.000e+00 (primary) p_spin=8.219e-03 (n_perm=1000) | r_partial=+nan p_partial=nan n=18
+[Figure 2B | MPC] processing network: Default
+[Figure 2B | Default | MPC] r_group=+0.302 [+0.280, +0.323] t=+27.66 p=1.416e-15 | p_moran=0.000e+00 (primary) p_spin=0.000e+00 (n_perm=1000) | r_partial=+nan p_partial=nan n=18
+[Figure 2B | MPC] processing network: Cont
+[Figure 2B | Cont | MPC] r_group=-0.299 [-0.332, -0.266] t=-17.95 p=1.736e-12 | p_moran=0.000e+00 (primary) p_spin=2.613e-02 (n_perm=1000) | r_partial=+nan p_partial=nan n=18
+[Figure 2B | MPC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | MPC] r_group=-0.420 [-0.458, -0.381] t=-20.06 p=2.842e-13 | p_moran=0.000e+00 (primary) p_spin=7.136e-03 (n_perm=1000) | r_partial=+nan p_partial=nan n=18
+[Figure 2B | MPC] processing network: DorsAttn
