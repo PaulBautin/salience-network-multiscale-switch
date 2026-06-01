@@ -2,69 +2,78 @@
 
 **Scripts:** `scripts/figure_1a_t1map.py` · `scripts/figure_1b_contextualisation.py` · `scripts/figure_1c_cortical_types.py`
 
-The three panels of Figure 1 characterise the microstructural landscape of the
-salience network (SN) using in-vivo qT1 MRI (panel a), post-mortem histology
-(panel b), and cytoarchitectural typing (panel c). All in-vivo analyses use the
-MICA-PNI 7 T dataset at fsLR-32k resolution (32,492 vertices per hemisphere).
+Figure 1 characterises the microstructural landscape of the salience network (SN)
+along three complementary axes: in vivo quantitative T1 (qT1) microstructure
+(panel a), post-mortem histology (panel b), and cytoarchitectural type (panel c).
+All in vivo analyses used the MICA-PNI 7 T dataset (see
+[Data Acquisition](datasets.md#mica-pni-dataset)) and were performed on the
+fsLR-32k surface (32,492 vertices per hemisphere). The SN was defined as the
+ventral attention network of the Yeo seven-network solution mapped onto the
+Schaefer-400 parcellation.
 
----
+## Figure 1a — qT1 microstructural gradient and intracortical profiles
 
-## Figure 1a — T1 microstructural gradient and intracortical profiles
-
-The MPC gradient is computed using the shared pipeline described in
+Intracortical qT1 intensity was sampled along 14 equivolumetric surfaces
+generated between the pial and white-matter boundaries, yielding a depth profile
+at every cortical vertex. Within the SN, the principal axis of microstructural
+variation was estimated as the first microstructural profile covariance (MPC)
+gradient, computed with the shared diffusion-map embedding pipeline described in
 [Shared Methods — MPC gradient computation](shared.md#mpc-gradient-computation).
-Inputs are qT1 intensity profiles at fsLR-32k.
+The first gradient component was averaged across subjects after Procrustes
+alignment and z-scored.
 
-### Gradient extreme identification
+To visualise how intracortical laminar organisation varies along this axis, SN
+vertices were partitioned at the quartiles of the gradient distribution, pooled
+across both hemispheres:
 
-To visualize differences in intracortical laminar organization across the
-gradient, network vertices are split into two poles. Quantile thresholds are
-computed across all SalVentAttn vertices (both hemispheres pooled):
+$$q_{0.25} = \operatorname{quantile}(g_v,\, 0.25), \qquad q_{0.75} = \operatorname{quantile}(g_v,\, 0.75).$$
 
-$$q_{0.25} = \text{quantile}(g_v,\, 0.25), \qquad q_{0.75} = \text{quantile}(g_v,\, 0.75)$$
-
-Vertices with $g_v \leq q_{0.25}$ form the **low pole** (bottom 25%); vertices
-with $g_v \geq q_{0.75}$ form the **high pole** (top 25%); the middle 50% are
-excluded from pole comparisons.
-
-Mean intracortical intensity profiles are then plotted across the 14 equivolumetric
-depths for the low-pole vertices, the high-pole vertices, and all individual
-network vertices (colour-coded by gradient value).
-
----
+Vertices with $g_v \leq q_{0.25}$ defined the inferior pole (lowest quartile) and
+vertices with $g_v \geq q_{0.75}$ the superior pole (highest quartile); the
+intervening 50 % of vertices were excluded from the pole contrast. Mean qT1
+intensity profiles across the 14 equivolumetric depths were then computed for the
+inferior pole, the superior pole, and for all individual SN vertices coloured by
+their gradient value.
 
 ## Figure 1b — Histological contextualisation
 
-The in-vivo T1 gradient is compared with four modalities mapped to the
-fsLR-32k surface:
+The in vivo qT1 gradient was contextualised against four microstructural maps
+sampled on the fsLR-32k surface, spanning in vivo and post-mortem contrasts and
+both myelin- and cell-sensitive stains:
 
 | Modality | Source | Measure |
 |----------|--------|---------|
-| T1map | MICA-PNI 7 T dataset, fsLR-32k | Mean qT1 intensity across subjects and depths |
-| BigBrain | BigBrain open-access (100 µm) | Inverted cell-body staining intensity |
-| Bielschowsky | AHEAD dataset (200 µm) | Nerve-fibre staining intensity |
-| Parvalbumin | AHEAD dataset (200 µm) | Interneuron staining intensity |
+| qT1 | MICA-PNI 7 T dataset, fsLR-32k | mean qT1 intensity across subjects and depths |
+| BigBrain | BigBrain open-access reconstruction (100 µm) | inverted cell-body staining intensity |
+| Bielschowsky | AHEAD dataset (200 µm) | nerve-fibre staining intensity |
+| Parvalbumin | AHEAD dataset (200 µm) | interneuron staining intensity |
 
-Vertex-wise Spearman correlations between the T1 gradient and each histological
-map are computed within the SalVentAttn network mask. Statistical significance is
-assessed with Moran spectral randomisation restricted to network vertices (see
-[Shared Methods — Spatial statistics](shared.md#moran-spectral-randomisation-within-network)).
-
----
+Acquisition and provenance of the histological volumes are described in
+[Data Acquisition](datasets.md#bigbrain-dataset). Each map was correlated with the
+qT1 gradient vertex-wise within the SN mask using the Spearman rank coefficient.
+Because cortical maps carry strong spatial autocorrelation, statistical
+significance was assessed against a within-network Moran spectral randomisation
+null
+([Shared Methods — Moran spectral randomisation](shared.md#moran-spectral-randomisation-within-network))
+rather than the parametric distribution.
 
 ## Figure 1c — Cortical type composition
 
-Cortical types were assigned to Von Economo areas based on a recent reanalysis of
-Von Economo micrographs. This classification scheme was used because its criteria
-are (1) clearly defined, (2) applied consistently across the entire cortex,
-(3) align with Von Economo's original descriptions and (4) are supported by
-several histological samples. Criteria included development of layer IV,
-prominence of deep (V–VI) or superficial (II–III) layers, definition of
-sublayers, sharpness of layer boundaries, and presence of large pyramids in
-superficial layers.
+Cortical types were assigned to Von Economo areas following a recent reanalysis of
+the original Von Economo micrographs. This scheme was adopted because its criteria
+are explicitly defined, applied consistently across the entire cortex, consistent
+with Von Economo's original descriptions, and supported by multiple histological
+samples. Type assignment considered the development of layer IV, the prominence of
+the deep (V–VI) and superficial (II–III) laminae, the definition of sublayers, the
+sharpness of laminar boundaries, and the presence of large pyramidal neurons in
+the superficial layers.
 
-Cortical types synopsise degree of granularity from high laminar elaboration in
-koniocortical (granular) areas, through six identifiable layers in Eu-III to
-Eu-I, to poorly differentiated layers in dysgranular and absent layers in
-agranular cortex. The proportion of each type within SalVentAttn is compared
-with its distribution across the rest of the cortex.
+The resulting ordinal scale synopsises the degree of laminar differentiation, from
+the high elaboration of koniocortical (granular) areas, through the six clearly
+identifiable layers of the eulaminate types (Eu-III to Eu-I), to the poorly
+differentiated dysgranular cortex and the agranular cortex in which layers are
+effectively absent. The proportion of each cortical type within the SN was
+compared with its proportion across the remainder of the cortex, and enrichment
+was evaluated against a spin-permutation null
+([Shared Methods — Spin-test permutations](shared.md#spin-test-permutations-whole-brain))
+to control for spatial autocorrelation.

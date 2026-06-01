@@ -64,6 +64,8 @@ Scripts cache intermediate DataFrames to `data/dataframes/` (TSV/CSV) and skip r
 
 - **`gradient_computation.py`** — Computes microstructure profile covariance (MPC) gradients. `compute_t1_gradient()` takes subject T1 intensity profiles, computes per-subject partial-correlation matrices (controlling for the mean profile), fits `GradientMaps` (diffusion map, normalized angle kernel, procrustes alignment), and returns the z-scored first gradient.
 
+- **`connectome_processing.py`** — Connectome I/O and the gradient-weighted connectivity projection used in figure 2 (fsLR-5k). Loads/symmetrises micapipe connectomes (`load_subject_matrix`), builds the Betzel distance-stratified consensus mask (`build_consensus_mask`), preprocesses per-modality weights (`prepare_weights`), computes the per-network-vertex projection score (`compute_projection_score`, `compute_projection_score_rank`) with per-subject group inference (`compute_projection_subjects`), and runs spin/Moran nulls and partial-correlation confound control.
+
 - **`ieeg_processing.py`** — iEEG signal processing pipeline. Loads MATLAB `.mat` files from BIDS-formatted iEEG datasets, preprocesses signals (bandpass → downsample → demean), computes Welch PSD (`preprocess_and_compute_psd_ieeg`), extracts band power (`extract_band_power`), and maps channels to fsLR-32k surface vertices via GIFTI sensitivity maps. `compute_psd_vectorized` computes PSD on already-preprocessed data (e.g. MNI atlas). `plot_surface_sphere` renders electrode contacts as VTK spheres on a brain surface screenshot.
 
 - **`logging_utils.py`** — `setup_manuscript_logger()` configures dual console + file logging, appending timestamped run headers to `logs/<script_name>.log` without overwriting.
@@ -81,3 +83,55 @@ Most analyses use **fsLR-32k** space (64,984 vertices total: 32,492 LH + 32,492 
 - PNI/MICs micapipe derivatives (T1 profiles, structural connectomes, tractography) at `/data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0`
 - BIDS iEEG dataset at `/host/verges/tank/data/BIDS_iEEG/`
 - Baillarger/Intrusion MYATLAS parcellations (hardcoded paths in `atlas_load.py`)
+
+## Documentation conventions
+
+Docs live in `docs/` and are built with MkDocs (`mkdocs.yml` defines the nav).
+The site keeps four sections: **Home**, **Usage**, **API Reference**, **Methods**.
+When changing docs, keep content in the section it belongs to (API reference for
+modules, Methods for the science) and follow the patterns already in the repo:
+
+**Source of truth.** The numpy-style docstrings in `src/` drive the API pages.
+When you add or change a public function, update its docstring **and** its API
+page in the same change — the API pages are hand-written mirrors and drift
+otherwise. A new `src/` module gets a new `docs/api/<module>.md`, a nav entry in
+`mkdocs.yml`, and a row in `docs/api/overview.md`.
+
+**API page** (`docs/api/<module>.md`) — mirrors the source module:
+- `# \`src/<module>\`` title, optional one-line module intro.
+- One `### \`function_name\`` block per public function, in source order.
+- Each block: a fenced ```python``` signature (verbatim from source) → one-or-two
+  sentence description → **Parameters** table (`Name | Type | Description`) →
+  **Returns** line → **Raises**/**Example** only when relevant.
+- `---` separator between functions. No prose justification or changelogs here.
+
+**Methods pages** (`docs/methods/*.md`) — together these form the manuscript's
+**Materials and Methods**. Write them the way the "Datasets and Methods" section
+of a *Nature* or *Science* paper reads: rigorous, self-contained, reproducible
+prose. `datasets.md` is the model for acquisition text; the figure pages document
+each analysis.
+- **Voice** — formal scientific past tense, third person ("Intracortical profiles
+  were sampled at 14 equivolumetric depths…"). Continuous prose, not bullet or
+  step lists, except where an ordered algorithm is genuinely clearer.
+- **Completeness** — report every detail a reader needs to reproduce the result:
+  sequence parameters, sample sizes, thresholds, software and versions, random
+  seeds, and the exact statistical test with its assumptions. State the number
+  rather than gesturing at it.
+- **Citations** — inline as Author et al., Year (e.g. Betzel et al., 2018).
+- **Tables and equations** — tables are appropriate for acquisition parameters,
+  frequency bands, or modality summaries; give key quantities a displayed
+  equation (MathJax, `$...$` / `$$...$$`).
+- **Page shape** — figure pages open with `**Scripts:**` / `**Module:**` links,
+  then a framing paragraph and one subsection per analysis step.
+- **Delegate, don't repeat** — procedures reused across figures live in
+  `methods/shared.md` and are referenced, not duplicated; code-level function
+  detail lives in the API pages, not here.
+- **Exclude non-manuscript matter** — no module/function reference tables, no
+  output-file lists (those belong in `usage.md`), no changelogs or
+  "approach-rejected" rationale (git history records method evolution).
+
+**Math** uses `$...$` / `$$...$$` (MathJax via the arithmatex extension).
+Inline code identifiers use backticks; cross-page and cross-file references use
+relative markdown links (e.g. `[\`src/...\`](../api/<module>.md)`). Validate with
+`mkdocs build --strict` before finishing (it flags broken links and orphaned
+pages).
