@@ -4137,3 +4137,510 @@ Gradient lambdas: [0.07340507 0.05527629 0.0480732  0.04355676 0.02999789 0.0273
 [Figure 2B FDR | MPC | DorsAttn] q_moran=0.000e+00 q_spin=1.582e-02
 [Figure 2B FDR | MPC | Vis] q_moran=0.000e+00 q_spin=0.000e+00
 [Figure 2B FDR | MPC | SomMot] q_moran=0.000e+00 q_spin=0.000e+00
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-01 15:14:18
+  --hemi: both
+  --panel: 2b
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC variant    : per-vertex Spearman across targets (rank version)
+Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+[Figure 2B | SC] processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06511014 0.05648991 0.04579325 0.0407803  0.0293038  0.02492201
+ 0.02135139 0.01783931 0.01564564 0.01361375]
+[Figure 2B | Limbic | SC] r_group=-0.029 [-0.041, -0.017] t=-5.19 p=7.315e-05 | p_moran=8.640e-01 (primary) p_spin=8.375e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Limbic.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07200794 0.05658688 0.04667581 0.04258846 0.02975432 0.02757895
+ 0.02249446 0.0193025  0.01592819 0.01449912]
+[Figure 2B | Default | SC] r_group=+0.156 [+0.145, +0.168] t=+28.99 p=6.463e-16 | p_moran=2.210e-01 (primary) p_spin=4.430e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Default.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07180624 0.05765639 0.04791536 0.04146382 0.03157462 0.02794382
+ 0.02204647 0.0188576  0.01662083 0.01486513]
+[Figure 2B | Cont | SC] r_group=+0.515 [+0.505, +0.524] t=+92.66 p=1.974e-24 | p_moran=4.000e-03 (primary) p_spin=1.660e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Cont.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07080466 0.05401025 0.04497937 0.0405049  0.02897594 0.02586614
+ 0.0221322  0.01963159 0.01578222 0.01372662]
+[Figure 2B | SalVentAttn | SC] r_group=+0.324 [+0.316, +0.333] t=+76.82 p=4.746e-23 | p_moran=1.000e-03 (primary) p_spin=3.068e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_SalVentAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07191483 0.05407233 0.04580533 0.03992873 0.02982107 0.0264569
+ 0.02246472 0.01919291 0.01622648 0.01436388]
+[Figure 2B | DorsAttn | SC] r_group=+0.170 [+0.150, +0.189] t=+17.74 p=2.102e-12 | p_moran=1.970e-01 (primary) p_spin=5.582e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_DorsAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07235401 0.05387242 0.04776739 0.0444455  0.03090405 0.02820891
+ 0.02235748 0.01948689 0.01690123 0.01545669]
+[Figure 2B | Vis | SC] r_group=+0.036 [+0.008, +0.064] t=+2.71 p=1.500e-02 | p_moran=7.520e-01 (primary) p_spin=8.966e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Vis.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07336234 0.05521933 0.04806792 0.04349557 0.02998823 0.02733193
+ 0.02256858 0.01942407 0.01630348 0.01521417]
+[Figure 2B | SomMot | SC] r_group=-0.036 [-0.052, -0.019] t=-4.51 p=3.088e-04 | p_moran=7.090e-01 (primary) p_spin=8.583e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_SomMot.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B FDR | SC | Limbic] q_moran=8.640e-01 q_spin=8.966e-01
+[Figure 2B FDR | SC | Default] q_moran=3.867e-01 q_spin=8.966e-01
+[Figure 2B FDR | SC | Cont] q_moran=1.400e-02 q_spin=8.966e-01
+[Figure 2B FDR | SC | SalVentAttn] q_moran=7.000e-03 q_spin=8.966e-01
+[Figure 2B FDR | SC | DorsAttn] q_moran=3.867e-01 q_spin=8.966e-01
+[Figure 2B FDR | SC | Vis] q_moran=8.640e-01 q_spin=8.966e-01
+[Figure 2B FDR | SC | SomMot] q_moran=8.640e-01 q_spin=8.966e-01
+[Figure 2B] forest summary written to figure_2b_network_summary_SC.svg
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-01 15:52:00
+  --hemi: both
+  --panel: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC variant    : per-vertex Spearman across targets (rank version)
+Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.0708293  0.05402555 0.0449952  0.04054772 0.02897929 0.02585812
+ 0.02213789 0.01962405 0.0157799  0.01372953]
+[Figure 2A | SC] r_group=+0.324 [+0.316, +0.333] t=+76.81 p=4.751e-23 | p_moran=1.000e-03 (primary) p_spin=3.078e-01 (n_perm=1000) | n=18
+[Figure 2A | GD] r_group=+0.299 [+0.295, +0.303] t=+143.83 p=1.129e-27 | p_moran=3.000e-03 (primary) p_spin=3.476e-01 (n_perm=1000) | n=18
+[Figure 2A | MPC] r_group=+0.420 [+0.381, +0.458] t=+20.09 p=2.771e-13 | p_moran=0.000e+00 (primary) p_spin=7.136e-03 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06509622 0.05651415 0.04582018 0.04079638 0.0293088  0.02492358
+ 0.02134881 0.0178374  0.01563943 0.01361524]
+[Figure 2B | Limbic | SC] r_group=-0.029 [-0.041, -0.018] t=-5.23 p=6.732e-05 | p_moran=8.640e-01 (primary) p_spin=8.402e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07205569 0.0565796  0.04667733 0.04258086 0.02975846 0.0275613
+ 0.0224744  0.01930527 0.01592413 0.01450098]
+[Figure 2B | Default | SC] r_group=+0.156 [+0.145, +0.167] t=+28.93 p=6.684e-16 | p_moran=2.210e-01 (primary) p_spin=4.460e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07184103 0.05769866 0.04798331 0.04156476 0.0315899  0.02792206
+ 0.02205536 0.01885894 0.01662149 0.01486407]
+[Figure 2B | Cont | SC] r_group=+0.515 [+0.505, +0.524] t=+92.68 p=1.964e-24 | p_moran=4.000e-03 (primary) p_spin=1.670e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | SC] r_group=+0.324 [+0.316, +0.333] t=+76.81 p=4.751e-23 | p_moran=1.000e-03 (primary) p_spin=3.078e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.0719858  0.054105   0.04587133 0.03998426 0.02982669 0.02647907
+ 0.0224672  0.01921096 0.01622701 0.01436973]
+[Figure 2B | DorsAttn | SC] r_group=+0.170 [+0.150, +0.190] t=+17.76 p=2.060e-12 | p_moran=1.970e-01 (primary) p_spin=5.593e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07241724 0.05384625 0.04781045 0.04445731 0.03090785 0.02821659
+ 0.02236107 0.01949218 0.01690725 0.01543038]
+[Figure 2B | Vis | SC] r_group=+0.037 [+0.008, +0.065] t=+2.73 p=1.419e-02 | p_moran=7.480e-01 (primary) p_spin=9.009e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07335364 0.05519784 0.04808574 0.04352332 0.02996932 0.02735286
+ 0.02259297 0.01942807 0.01630932 0.01521995]
+[Figure 2B | SomMot | SC] r_group=-0.036 [-0.052, -0.019] t=-4.51 p=3.116e-04 | p_moran=7.080e-01 (primary) p_spin=8.583e-01 (n_perm=1000) | n=18
+[Figure 2B FDR | SC | Limbic] q_moran=8.640e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | Default] q_moran=3.867e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | Cont] q_moran=1.400e-02 q_spin=9.009e-01
+[Figure 2B FDR | SC | SalVentAttn] q_moran=7.000e-03 q_spin=9.009e-01
+[Figure 2B FDR | SC | DorsAttn] q_moran=3.867e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | Vis] q_moran=8.640e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | SomMot] q_moran=8.640e-01 q_spin=9.009e-01
+[Figure 2B] forest summary written to figure_2b_network_summary_SC.svg
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-01 16:59:36
+  --hemi: both
+  --panel: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC variant    : per-vertex Spearman across targets (rank version)
+Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07075188 0.05399568 0.04491455 0.04052027 0.02896801 0.02583849
+ 0.02212242 0.01961692 0.01577809 0.01371636]
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-01 17:05:53
+  --hemi: both
+  --panel: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC variant    : per-vertex Spearman across targets (rank version)
+Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+[Figure 2A | SC] r_group=+0.324 [+0.316, +0.333] t=+76.82 p=4.739e-23 | p_moran=1.000e-03 (primary) p_spin=3.058e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2a_brain_SC_rho.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2A | GD] r_group=+0.299 [+0.295, +0.303] t=+143.75 p=1.139e-27 | p_moran=3.000e-03 (primary) p_spin=3.486e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2a_brain_GD_rho.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2A | MPC] r_group=+0.420 [+0.381, +0.458] t=+20.08 p=2.798e-13 | p_moran=0.000e+00 (primary) p_spin=7.136e-03 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2a_brain_MPC_rho.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06510552 0.05653791 0.04581358 0.04077301 0.02929017 0.0249284
+ 0.02134306 0.01782669 0.01564087 0.01360902]
+[Figure 2B | Limbic | SC] r_group=-0.029 [-0.041, -0.017] t=-5.21 p=7.031e-05 | p_moran=8.600e-01 (primary) p_spin=8.402e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Limbic.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07194711 0.0565374  0.04661538 0.04254634 0.02972218 0.02754273
+ 0.02246295 0.0192895  0.01592237 0.01449346]
+[Figure 2B | Default | SC] r_group=+0.156 [+0.145, +0.167] t=+28.91 p=6.770e-16 | p_moran=2.210e-01 (primary) p_spin=4.460e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Default.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07179098 0.05761583 0.04784436 0.04146046 0.03157616 0.02788595
+ 0.02204438 0.01885247 0.0166139  0.01484841]
+[Figure 2B | Cont | SC] r_group=+0.514 [+0.505, +0.524] t=+92.64 p=1.979e-24 | p_moran=4.000e-03 (primary) p_spin=1.670e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Cont.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | SC] r_group=+0.324 [+0.316, +0.333] t=+76.82 p=4.739e-23 | p_moran=1.000e-03 (primary) p_spin=3.058e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_SalVentAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07198193 0.0540538  0.0458204  0.03989111 0.02980094 0.02645353
+ 0.02245395 0.01918666 0.01622022 0.01436581]
+[Figure 2B | DorsAttn | SC] r_group=+0.170 [+0.150, +0.189] t=+17.74 p=2.102e-12 | p_moran=1.970e-01 (primary) p_spin=5.559e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_DorsAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07245647 0.05388551 0.04782105 0.04447849 0.03089313 0.02821552
+ 0.02237179 0.01949339 0.01690262 0.01545241]
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-01 17:19:46
+  --hemi: both
+  --panel: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC variant    : per-vertex Spearman across targets (rank version)
+Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+[Figure 2B | Vis | SC] r_group=+0.038 [+0.009, +0.066] t=+2.79 p=1.267e-02 | p_moran=7.470e-01 (primary) p_spin=9.009e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Vis.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07339049 0.0552167  0.04809807 0.04355639 0.02998679 0.02735969
+ 0.02260587 0.01943816 0.01631003 0.01522114]
+[Figure 2B | SomMot | SC] r_group=-0.036 [-0.052, -0.019] t=-4.50 p=3.130e-04 | p_moran=7.090e-01 (primary) p_spin=8.583e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_SomMot.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B FDR | SC | Limbic] q_moran=8.600e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | Default] q_moran=3.867e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | Cont] q_moran=1.400e-02 q_spin=9.009e-01
+[Figure 2B FDR | SC | SalVentAttn] q_moran=7.000e-03 q_spin=9.009e-01
+[Figure 2B FDR | SC | DorsAttn] q_moran=3.867e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | Vis] q_moran=8.600e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | SomMot] q_moran=8.600e-01 q_spin=9.009e-01
+[Figure 2B] forest summary written to figure_2b_network_summary_SC.svg
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07079557 0.05405756 0.04499874 0.04052822 0.0289819  0.02585837
+ 0.0221329  0.01962043 0.01578388 0.01373356]
+[Figure 2A | SC] r_group=+0.324 [+0.316, +0.332] t=+76.81 p=4.749e-23 | p_moran=1.000e-03 (primary) p_spin=3.068e-01 (n_perm=1000) | n=18
+[Figure 2A | GD] r_group=+0.299 [+0.295, +0.303] t=+143.59 p=1.162e-27 | p_moran=3.000e-03 (primary) p_spin=3.507e-01 (n_perm=1000) | n=18
+[Figure 2A | MPC] r_group=+0.421 [+0.381, +0.458] t=+20.09 p=2.786e-13 | p_moran=0.000e+00 (primary) p_spin=7.136e-03 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.0651037  0.05651524 0.0458696  0.04083432 0.02931124 0.02494315
+ 0.02135998 0.01784658 0.01565025 0.01361604]
+[Figure 2B | Limbic | SC] r_group=-0.030 [-0.041, -0.018] t=-5.26 p=6.392e-05 | p_moran=8.600e-01 (primary) p_spin=8.292e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07211468 0.05661416 0.04670864 0.04257791 0.02977885 0.02757924
+ 0.0224795  0.01931744 0.01593613 0.01450306]
+[Figure 2B | Default | SC] r_group=+0.156 [+0.145, +0.167] t=+28.94 p=6.670e-16 | p_moran=2.220e-01 (primary) p_spin=4.450e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07174498 0.05760458 0.04788403 0.04143637 0.03155973 0.0279123
+ 0.02204079 0.01884797 0.01661392 0.01485981]
+[Figure 2B | Cont | SC] r_group=+0.514 [+0.505, +0.524] t=+92.72 p=1.953e-24 | p_moran=4.000e-03 (primary) p_spin=1.670e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | SC] r_group=+0.324 [+0.316, +0.332] t=+76.81 p=4.749e-23 | p_moran=1.000e-03 (primary) p_spin=3.068e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07200174 0.05410225 0.04583404 0.03995955 0.02982002 0.02647569
+ 0.02245661 0.01919497 0.01623117 0.01436669]
+[Figure 2B | DorsAttn | SC] r_group=+0.170 [+0.150, +0.190] t=+17.80 p=1.999e-12 | p_moran=1.960e-01 (primary) p_spin=5.548e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07239428 0.0538512  0.04776243 0.04439642 0.03089296 0.02820408
+ 0.02235345 0.01949001 0.01689521 0.01544438]
+[Figure 2B | Vis | SC] r_group=+0.037 [+0.008, +0.065] t=+2.74 p=1.395e-02 | p_moran=7.470e-01 (primary) p_spin=8.987e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07346752 0.05528084 0.04811626 0.04356798 0.02998919 0.027375
+ 0.0226079  0.01944603 0.01631819 0.01522772]
+[Figure 2B | SomMot | SC] r_group=-0.036 [-0.052, -0.019] t=-4.51 p=3.106e-04 | p_moran=7.090e-01 (primary) p_spin=8.605e-01 (n_perm=1000) | n=18
+[Figure 2B FDR | SC | Limbic] q_moran=8.600e-01 q_spin=8.987e-01
+[Figure 2B FDR | SC | Default] q_moran=3.885e-01 q_spin=8.987e-01
+[Figure 2B FDR | SC | Cont] q_moran=1.400e-02 q_spin=8.987e-01
+[Figure 2B FDR | SC | SalVentAttn] q_moran=7.000e-03 q_spin=8.987e-01
+[Figure 2B FDR | SC | DorsAttn] q_moran=3.885e-01 q_spin=8.987e-01
+[Figure 2B FDR | SC | Vis] q_moran=8.600e-01 q_spin=8.987e-01
+[Figure 2B FDR | SC | SomMot] q_moran=8.600e-01 q_spin=8.987e-01
+[Figure 2B] forest summary written to figure_2b_network_summary_SC.svg
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-02 09:16:03
+  --hemi: both
+  --panel: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC variant    : per-vertex Spearman across targets (rank version)
+Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07080302 0.05407834 0.04499166 0.04053561 0.02898315 0.02586794
+ 0.02213672 0.01962924 0.01577838 0.01372912]
+[Figure 2A | SC] r_group=+0.325 [+0.316, +0.333] t=+76.73 p=4.837e-23 | p_moran=1.000e-03 (primary) p_spin=3.078e-01 (n_perm=1000) | n=18
+[Figure 2A | GD] r_group=+0.299 [+0.295, +0.303] t=+143.55 p=1.167e-27 | p_moran=3.000e-03 (primary) p_spin=3.507e-01 (n_perm=1000) | n=18
+[Figure 2A | MPC] r_group=+0.421 [+0.381, +0.459] t=+20.11 p=2.742e-13 | p_moran=0.000e+00 (primary) p_spin=7.136e-03 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06507451 0.05648813 0.04581322 0.04079862 0.02930486 0.02492658
+ 0.02134826 0.01783618 0.01564418 0.0136145 ]
+[Figure 2B | Limbic | SC] r_group=-0.030 [-0.041, -0.018] t=-5.29 p=5.950e-05 | p_moran=8.600e-01 (primary) p_spin=8.320e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07206083 0.05657216 0.04677152 0.0425896  0.02974787 0.02756057
+ 0.02246865 0.01929286 0.01591973 0.01450218]
+[Figure 2B | Default | SC] r_group=+0.156 [+0.145, +0.167] t=+28.99 p=6.469e-16 | p_moran=2.210e-01 (primary) p_spin=4.440e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07184755 0.0577571  0.04799809 0.04150145 0.0315961  0.02793437
+ 0.0220591  0.018859   0.01662572 0.01486774]
+[Figure 2B | Cont | SC] r_group=+0.515 [+0.505, +0.524] t=+92.71 p=1.956e-24 | p_moran=4.000e-03 (primary) p_spin=1.660e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | SC] r_group=+0.325 [+0.316, +0.333] t=+76.73 p=4.837e-23 | p_moran=1.000e-03 (primary) p_spin=3.078e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07203648 0.05411334 0.04587634 0.0399867  0.0298314  0.02646899
+ 0.02246086 0.01919387 0.01623303 0.01438226]
+[Figure 2B | DorsAttn | SC] r_group=+0.170 [+0.150, +0.190] t=+17.78 p=2.027e-12 | p_moran=1.970e-01 (primary) p_spin=5.559e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07243997 0.0538691  0.04773558 0.04443628 0.03090766 0.02821022
+ 0.02236088 0.01948592 0.01689808 0.01544605]
+[Figure 2B | Vis | SC] r_group=+0.037 [+0.009, +0.065] t=+2.76 p=1.342e-02 | p_moran=7.470e-01 (primary) p_spin=9.009e-01 (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07340269 0.0552101  0.04809261 0.04349703 0.02999196 0.02736966
+ 0.02259457 0.01944036 0.01630845 0.01522265]
+[Figure 2B | SomMot | SC] r_group=-0.036 [-0.052, -0.019] t=-4.51 p=3.100e-04 | p_moran=7.080e-01 (primary) p_spin=8.583e-01 (n_perm=1000) | n=18
+[Figure 2B FDR | SC | Limbic] q_moran=8.600e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | Default] q_moran=3.867e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | Cont] q_moran=1.400e-02 q_spin=9.009e-01
+[Figure 2B FDR | SC | SalVentAttn] q_moran=7.000e-03 q_spin=9.009e-01
+[Figure 2B FDR | SC | DorsAttn] q_moran=3.867e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | Vis] q_moran=8.600e-01 q_spin=9.009e-01
+[Figure 2B FDR | SC | SomMot] q_moran=8.600e-01 q_spin=9.009e-01
+[Figure 2B] forest summary written to figure_2b_network_summary_SC.svg
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-02 10:36:06
+  --hemi: both
+  --panel: 2b
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC variant    : per-vertex Spearman across targets (rank version)
+Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+[Figure 2B | SC] processing network: Limbic
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06511702 0.05654599 0.04585862 0.04083634 0.02930726 0.02493678
+ 0.02136559 0.0178471  0.01564781 0.01362033]
+[Figure 2B | Limbic | SC] r_group=-0.029 [-0.041, -0.017] t=-5.19 p=7.341e-05 | p_moran=8.670e-01 (primary) p_spin=8.375e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Limbic.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Default
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.0720103  0.05659619 0.04668299 0.04258193 0.02975534 0.02757276
+ 0.02248276 0.01931143 0.0159385  0.01450105]
+[Figure 2B | Default | SC] r_group=+0.156 [+0.145, +0.167] t=+28.97 p=6.537e-16 | p_moran=2.210e-01 (primary) p_spin=4.440e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Default.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Cont
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07184087 0.05766822 0.04795078 0.04146127 0.03157824 0.02790773
+ 0.02205875 0.0188596  0.0166237  0.01486369]
+[Figure 2B | Cont | SC] r_group=+0.514 [+0.505, +0.524] t=+92.74 p=1.945e-24 | p_moran=4.000e-03 (primary) p_spin=1.660e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Cont.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: SalVentAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07077863 0.05398727 0.04498123 0.04052196 0.02898053 0.02585712
+ 0.02214227 0.01961886 0.01578676 0.0137247 ]
+[Figure 2B | SalVentAttn | SC] r_group=+0.324 [+0.316, +0.333] t=+76.67 p=4.903e-23 | p_moran=1.000e-03 (primary) p_spin=3.078e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_SalVentAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: DorsAttn
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07199229 0.05407037 0.04578483 0.03992352 0.02980929 0.02647232
+ 0.02244424 0.01919055 0.01621589 0.01436083]
+[Figure 2B | DorsAttn | SC] r_group=+0.170 [+0.150, +0.190] t=+17.77 p=2.043e-12 | p_moran=1.970e-01 (primary) p_spin=5.605e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_DorsAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: Vis
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07244076 0.05387175 0.04776838 0.0444186  0.03090278 0.02820612
+ 0.02235999 0.01949193 0.01690008 0.01543958]
+[Figure 2B | Vis | SC] r_group=+0.037 [+0.009, +0.066] t=+2.77 p=1.315e-02 | p_moran=7.470e-01 (primary) p_spin=8.987e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_Vis.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B | SC] processing network: SomMot
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.0734715  0.05531699 0.04807638 0.04356144 0.03000156 0.02737484
+ 0.0226025  0.01942968 0.01630237 0.01522861]
+[Figure 2B | SomMot | SC] r_group=-0.036 [-0.053, -0.019] t=-4.55 p=2.864e-04 | p_moran=7.070e-01 (primary) p_spin=8.549e-01 (n_perm=1000) | n=18
+save_brain_map: rendering failed for figure_2b_brain_SC_rho_SomMot.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). Skipping screenshot.
+[Figure 2B FDR | SC | Limbic] q_moran=8.670e-01 q_spin=8.987e-01
+[Figure 2B FDR | SC | Default] q_moran=3.867e-01 q_spin=8.987e-01
+[Figure 2B FDR | SC | Cont] q_moran=1.400e-02 q_spin=8.987e-01
+[Figure 2B FDR | SC | SalVentAttn] q_moran=7.000e-03 q_spin=8.987e-01
+[Figure 2B FDR | SC | DorsAttn] q_moran=3.867e-01 q_spin=8.987e-01
+[Figure 2B FDR | SC | Vis] q_moran=8.670e-01 q_spin=8.987e-01
+[Figure 2B FDR | SC | SomMot] q_moran=8.670e-01 q_spin=8.987e-01
+[Figure 2B] forest summary written to figure_2b_network_summary_SC.svg

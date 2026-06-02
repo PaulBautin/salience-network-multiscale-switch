@@ -32,14 +32,23 @@
 # All matrices loaded at fsLR-5k (9684 vertices). Subject is the unit of inference.
 #
 # Figure 2A: SalVentAttn × {SC, GD, MPC} - projection map + group r/p per modality.
-# Figure 2B: All 7 Yeo networks × {SC} - replicates the test per network.
+# Figure 2B: All 7 Yeo networks × {SC} - replicates the test per network. The headline
+#            panel is a forest + per-subject beeswarm summary (group r ± 95% CI, FDR
+#            stars) that makes the cross-network effect legible at a glance; the
+#            per-network scatter grid is retained as a supplement.
 #
 # Outputs:
 #   results/figures/figure_2a_distance_metric.svg
 #   results/figures/figure_2a_brain_{SC,GD,MPC}_rho.svg
-#   results/figures/figure_2b_distance_network_SC.svg
+#   results/figures/figure_2b_distance_network_SC.svg          (per-network scatter grid)
+#   results/figures/figure_2b_network_summary_SC.svg           (forest + beeswarm summary)
 #   results/figures/figure_2b_brain_SC_rho_{network}.svg
-#   data/dataframes/df_2b_label_{hemisphere}.csv  (vertex-level cache; new schema)
+#   data/dataframes/df_2b_label_{hemisphere}.csv               (vertex-level cache; new schema)
+#   data/dataframes/df_2b_network_stats_{measure}_{hemi}.csv   (per-network group stats)
+#   data/dataframes/df_2b_network_subject_r_{measure}_{hemi}.csv (per-subject r, for the beeswarm)
+#
+# The -panel {both,2a,2b} flag selects which panel to compute; '2b' regenerates the
+# cross-network summary without rerunning the 2A modality sweep.
 #
 # Requires figure_1a_t1map.py to have been run first (produces
 #   data/dataframes/figure_1a_pni_to_mics_5k.csv).
@@ -108,6 +117,11 @@ def get_parser() -> argparse.ArgumentParser:
     optional.add_argument(
         "-hemi", type=str, default="both", choices=["both", "LH", "RH"],
         help="Hemisphere for analysis: 'both', 'LH', or 'RH' (default: both)"
+    )
+    optional.add_argument(
+        "-panel", type=str, default="both", choices=["both", "2a", "2b"],
+        help="Which panel to compute: 'both', '2a', or '2b' (default: both). "
+             "Use '2b' to regenerate the cross-network summary without rerunning 2A."
     )
     return parser
 
@@ -244,20 +258,85 @@ def _embed_in_full_cortex(
     return out
 
 
-def _plot_subject_bars(ax, r_subjects: np.ndarray, ci_low: float, ci_high: float,
-                       r_group: float, network_color="black", label: str = "") -> None:
-    """Stripplot of per-subject r_s with mean + 95% CI overlay."""
-    finite = r_subjects[np.isfinite(r_subjects)]
-    x = np.zeros_like(finite)
-    ax.scatter(x + np.random.uniform(-0.05, 0.05, size=finite.size), finite,
-               s=30, alpha=0.7, color=network_color, edgecolor="white", linewidth=0.5)
-    ax.errorbar(0, r_group, yerr=[[r_group - ci_low], [ci_high - r_group]],
-                fmt="o", color="black", markersize=8, capsize=6, linewidth=2)
-    ax.axhline(0, color="black", linewidth=0.7, linestyle="--")
-    ax.set_xticks([])
-    ax.set_xlim(-0.4, 0.4)
-    ax.set_ylim(-1, 1)
-    ax.set_ylabel(label)
+def _sig_stars(q: float) -> str:
+    """FDR q-value to significance annotation (n.s. / * / ** / ***)."""
+    if not np.isfinite(q):
+        return ""
+    if q < 1e-3:
+        return "***"
+    if q < 1e-2:
+        return "**"
+    if q < 5e-2:
+        return "*"
+    return "n.s."
+
+
+def plot_network_forest(
+    results_per_net: list, df_yeo_surf_5k: pd.DataFrame, measure: str,
+    project_root: Path, hemisphere: str,
+) -> None:
+    """Figure 2B summary: forest plot of the group effect across networks.
+
+    A single horizontal row that makes the cross-network replication legible at a
+    glance and stacks directly beneath the one-row per-network scatter grid. Each
+    network occupies one column: the per-subject Spearman coefficients r_s (MPC
+    gradient vs connectivity projection P) are drawn as a network-coloured beeswarm
+    (x-jittered), the group estimate is a filled marker, the 95% CI a vertical bar,
+    and FDR-corrected (Moran) significance is annotated with stars. Networks are
+    taken in the order of `results_per_net` (the caller sorts by the signed group
+    effect, shared with the scatter grid so columns align). Coefficients are shown
+    exactly as the projection results produce them (no sign manipulation).
+    """
+    rng = np.random.default_rng(0)
+    net_int_map = (df_yeo_surf_5k[["network", "network_int"]]
+                   .drop_duplicates().dropna()
+                   .set_index("network")["network_int"].to_dict())
+
+    recs = list(results_per_net)
+    n = len(recs)
+
+    fig, ax = plt.subplots(figsize=(3.0 * n, 3.4))
+
+    bounds = []
+    for r in recs:
+        rs = r["res"]["r_subjects"]
+        bounds += [r["res"]["ci_low"], r["res"]["ci_high"]]
+        bounds += list(rs[np.isfinite(rs)])
+    ymax = float(np.nanmax(np.abs(bounds))) * 1.15 + 0.04
+    ax.set_ylim(-ymax, ymax)
+    ax.set_xlim(-0.6, n - 0.4)
+    ax.axhline(0, color="0.35", ls="--", lw=0.9, zorder=1)
+
+    for x, rec in enumerate(recs):
+        res = rec["res"]
+        color = yeo7_rgb[int(net_int_map[rec["network"]])]
+        rs = res["r_subjects"][np.isfinite(res["r_subjects"])]
+        jitter = rng.uniform(-0.16, 0.16, size=rs.size)
+        ax.scatter(np.full(rs.size, x) + jitter, rs, s=16, color=color,
+                   alpha=0.35, edgecolor="none", zorder=2, rasterized=True)
+        ax.plot([x, x], [res["ci_low"], res["ci_high"]], color="black",
+                lw=2.0, solid_capstyle="round", zorder=3)
+        ax.scatter(x, res["r_group"], s=95, color=color,
+                   edgecolor="black", linewidth=1.1, zorder=4)
+        stars = _sig_stars(rec.get("q_moran", np.nan))
+        ax.annotate(stars, xy=(x, ymax * 0.98), ha="center", va="top",
+                    fontsize=11 if stars != "n.s." else 9,
+                    color="black" if stars not in ("", "n.s.") else "0.6")
+
+    ax.set_xticks(range(n))
+    ax.set_xticklabels([yeo7_abbrev.get(r["network"], r["network"]) for r in recs])
+    for tick, rec in zip(ax.get_xticklabels(), recs):
+        tick.set_color(yeo7_rgb[int(net_int_map[rec["network"]])])
+        tick.set_fontweight("bold")
+    ax.set_ylabel(f"Group effect $r$")
+    ax.tick_params(axis="x", length=0)
+
+    sns.despine(ax=ax, bottom=True)
+    plt.tight_layout()
+    out = project_root / f"results/figures/figure_2b_network_summary_{measure}.svg"
+    plt.savefig(out, bbox_inches="tight")
+    plt.close(fig)
+    logger.info(f"[Figure 2B] forest summary written to {out.name}")
 
 
 def _scatter_colors_by_target_network(
@@ -307,8 +386,7 @@ def struct_conn_metric_analysis(
                 "mask_G": None, "sc_subjects": None},
     }
 
-    fig, axes = plt.subplots(2, 3, figsize=(4 * 4, 10), squeeze=False,
-                             gridspec_kw={"height_ratios": [2, 1]})
+    fig, axes = plt.subplots(1, 3, figsize=(4 * 4, 5), squeeze=False)
     network_color = yeo7_rgb[int(
         df_yeo_surf_5k.loc[df_yeo_surf_5k["network"] == network, "network_int"].values[0]
     )]
@@ -351,19 +429,18 @@ def struct_conn_metric_analysis(
         colors_per_sn, palette = _scatter_colors_by_target_network(
             res, df_yeo_surf_5k, fallback_color=network_color,
         )
-        ax_top.scatter(g_mpc_at_sn[valid], res["P_mean"][valid],
+        ax_top.scatter(res["P_mean"][valid], g_mpc_at_sn[valid],
                        s=15, alpha=0.75, c=colors_per_sn[valid],
                        edgecolor="none", rasterized=True)
-        sns.regplot(x=g_mpc_at_sn[valid], y=res["P_mean"][valid],
+        sns.regplot(x=res["P_mean"][valid], y=g_mpc_at_sn[valid],
                     scatter=False, color="black", line_kws={"linewidth": 1}, ax=ax_top)
         ax_top.text(0.05, 0.95,
                     f"r = {res['r_group']:+.2f}\n"
                     f"p$_{{moran}}$ = {res['p_moran']:.3f}\n"
-                    f"p$_{{spin}}$ = {res['p_spin']:.3f}\n"
                     f"n = {res['n']}",
                     transform=ax_top.transAxes, va="top", fontsize=11)
-        ax_top.set_xlabel(f"MPC gradient ({network})")
-        ax_top.set_ylabel(f"{name} projection P (FC-G1 units)")
+        ax_top.set_xlabel(f"{name} projection P (FC-G1 units)")
+        ax_top.set_ylabel(f"MPC gradient ({network})")
 
         if palette and legend_handles is None:
             from matplotlib.lines import Line2D
@@ -374,15 +451,10 @@ def struct_conn_metric_analysis(
             ]
             legend_labels = list(palette.keys())
 
-        _plot_subject_bars(
-            axes[1, i], res["r_subjects"], res["ci_low"], res["ci_high"],
-            res["r_group"], network_color=network_color, label=f"{name} r per subject",
-        )
-
     if legend_handles:
-        fig.legend(handles=legend_handles, loc="upper center",
-                   bbox_to_anchor=(0.5, 1.02), ncol=len(legend_handles),
-                   frameon=False, fontsize=11, title="Dominant target network")
+        fig.legend(handles=legend_handles, loc="lower center",
+                   bbox_to_anchor=(0.5, -0.06), ncol=len(legend_handles),
+                   frameon=False, fontsize=11)
 
     sns.despine(fig=fig)
     plt.tight_layout()
@@ -423,11 +495,6 @@ def struct_conn_network_analysis(
     else:
         files = df_pni["path_mpc_5k"].tolist()
         m_mask_G, m_sc_subjects = None, None
-
-    n_col = int(np.ceil(len(networks) / 2))
-    fig, axes = plt.subplots(2, n_col, figsize=(4 * n_col, 10),
-                             sharex=True, sharey=True, layout="constrained")
-    axes = axes.flatten()
 
     results_per_net = []
     for i, network in enumerate(networks):
@@ -480,39 +547,56 @@ def struct_conn_network_analysis(
             f"q_moran={qm:.3e} q_spin={qs:.3e}"
         )
 
-    for i, rec in enumerate(results_per_net):
+    # Order networks once by the signed group effect; both the scatter row and the
+    # forest summary iterate this list so their columns line up when stacked.
+    results_per_net.sort(key=lambda r: r["res"]["r_group"], reverse=True)
+
+    # Cache per-network group stats and the per-subject coefficients so the
+    # summary forest plot can be regenerated without recomputing the nulls.
+    stats_rows = [{
+        "network": rec["network"], "measure": measure, "n": rec["res"]["n"],
+        "r_group": rec["res"]["r_group"],
+        "ci_low": rec["res"]["ci_low"], "ci_high": rec["res"]["ci_high"],
+        "t": rec["res"]["t"], "p": rec["res"]["p"],
+        "p_moran": rec["res"]["p_moran"], "q_moran": rec["q_moran"],
+        "p_spin": rec["res"]["p_spin"], "q_spin": rec["q_spin"],
+    } for rec in results_per_net]
+    pd.DataFrame(stats_rows).to_csv(
+        project_root / f"data/dataframes/df_2b_network_stats_{measure}_{hemisphere}.csv",
+        index=False)
+    pd.DataFrame({rec["network"]: rec["res"]["r_subjects"] for rec in results_per_net}).to_csv(
+        project_root / f"data/dataframes/df_2b_network_subject_r_{measure}_{hemisphere}.csv",
+        index_label="subject")
+
+    plot_network_forest(results_per_net, df_yeo_surf_5k, measure, project_root, hemisphere)
+
+    # Per-network scatter grid: one row, effect-ordered to stack above the forest
+    # summary. Numeric stats live in the forest row below, so the panels carry only
+    # a colour-coded network title and the shared axes (Tufte minimalism).
+    n_net = len(results_per_net)
+    fig, axes = plt.subplots(1, n_net, figsize=(3.0 * n_net, 3.4),
+                             sharex=True, sharey=True, layout="constrained")
+    axes = np.atleast_1d(axes)
+    for ax, rec in zip(axes, results_per_net):
         network, res = rec["network"], rec["res"]
         g_mpc_at_sn = rec["g_mpc_at_sn"]
         net_color = yeo7_rgb[int(
             df_yeo_surf_5k.loc[df_yeo_surf_5k["network"] == network, "network_int"].values[0]
         )]
-        net_abbrev = yeo7_abbrev.get(network, network)
-        ax = axes[i]
         valid = np.isfinite(g_mpc_at_sn) & np.isfinite(res["P_mean"])
         colors_per_sn, _ = _scatter_colors_by_target_network(
             res, df_yeo_surf_5k, fallback_color=net_color,
         )
-        ax.scatter(g_mpc_at_sn[valid], res["P_mean"][valid],
+        ax.scatter(res["P_mean"][valid], g_mpc_at_sn[valid],
                    s=10, alpha=0.7, c=colors_per_sn[valid],
                    edgecolor="none", rasterized=True)
-        sns.regplot(x=g_mpc_at_sn[valid], y=res["P_mean"][valid],
+        sns.regplot(x=res["P_mean"][valid], y=g_mpc_at_sn[valid],
                     scatter=False, color="black", line_kws={"linewidth": 1}, ax=ax)
-        ax.text(0.05, 0.95,
-                f"r = {res['r_group']:+.2f}\n"
-                f"p$_{{moran}}$ = {res['p_moran']:.3f}\n"
-                f"q$_{{moran}}$ = {rec['q_moran']:.3f}\n"
-                f"n = {res['n']}",
-                transform=ax.transAxes, va="top", fontsize=11)
-        ax.set_title(net_abbrev, fontdict={"color": net_color})
-        ax.set_xlabel("MPC gradient")
-        if i % n_col == 0:
-            ax.set_ylabel(f"{measure} projection P")
-
-    for j in range(len(networks), len(axes)):
-        axes[j].set_axis_off()
+        ax.set_title(yeo7_abbrev.get(network, network), fontdict={"color": net_color})
+    axes[0].set_ylabel("MPC gradient")
+    fig.supxlabel(f"{measure} projection P")
 
     sns.despine(fig=fig)
-    plt.tight_layout()
     plt.savefig(project_root / f"results/figures/figure_2b_distance_network_{measure}.svg")
     plt.close(fig)
     return df_yeo_surf_5k
@@ -571,21 +655,23 @@ def main():
     gd_cortex = np.mean(np.stack(gd_stack, axis=0), axis=0)
     del gd_stack
 
-    df_yeo_surf_5k = struct_conn_metric_analysis(
-        df_yeo_surf_5k, surf5k_lh_infl, surf5k_rh_infl,
-        df_pni, project_root, spin_model_5k,
-        mask_G=mask_G, sc_subjects=sc_subjects, gd_cortex=gd_cortex,
-        network="SalVentAttn", n_rand=n_rand, hemisphere=args.hemi,
-    )
+    if args.panel in ("both", "2a"):
+        df_yeo_surf_5k = struct_conn_metric_analysis(
+            df_yeo_surf_5k, surf5k_lh_infl, surf5k_rh_infl,
+            df_pni, project_root, spin_model_5k,
+            mask_G=mask_G, sc_subjects=sc_subjects, gd_cortex=gd_cortex,
+            network="SalVentAttn", n_rand=n_rand, hemisphere=args.hemi,
+        )
 
-    # SC is the primary modality (axonal, independent of the MPC gradient).
-    networks = ["Limbic", "Default", "Cont", "SalVentAttn", "DorsAttn", "Vis", "SomMot"]
-    df_yeo_surf_5k = struct_conn_network_analysis(
-        df_yeo_surf_5k, surf5k_lh_infl, surf5k_rh_infl,
-        df_pni, project_root, spin_model_5k,
-        mask_G=mask_G, sc_subjects=sc_subjects, gd_cortex=gd_cortex,
-        networks=networks, n_rand=n_rand, hemisphere=args.hemi, measure="SC",
-    )
+    if args.panel in ("both", "2b"):
+        # SC is the primary modality (axonal, independent of the MPC gradient).
+        networks = ["Limbic", "Default", "Cont", "SalVentAttn", "DorsAttn", "Vis", "SomMot"]
+        df_yeo_surf_5k = struct_conn_network_analysis(
+            df_yeo_surf_5k, surf5k_lh_infl, surf5k_rh_infl,
+            df_pni, project_root, spin_model_5k,
+            mask_G=mask_G, sc_subjects=sc_subjects, gd_cortex=gd_cortex,
+            networks=networks, n_rand=n_rand, hemisphere=args.hemi, measure="SC",
+        )
 
     df_yeo_surf_5k.to_csv(project_root / f"data/dataframes/df_2b_label_{args.hemi}.csv", index=False)
 

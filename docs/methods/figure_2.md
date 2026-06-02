@@ -107,5 +107,32 @@ preserves the empirical spatial autocorrelation of the gradient and restricts th
 null entirely to the source network, is also available as a tighter,
 footprint-matched alternative.
 
-Group-level summaries ($\bar r$, t, p, $p_{\mathrm{spin}}$, and
-$p_{\mathrm{moran}}$) were written to `logs/figure_2_distance.log`.
+## Across-network replication (panel 2B)
+
+The structural-connectivity test was repeated independently for each of the seven
+Yeo networks, computing a within-network MPC gradient and the per-subject
+projection statistic $r_s$ for every network in turn. The two spatial-null p
+values ($p_{\mathrm{moran}}$ and $p_{\mathrm{spin}}$) were corrected for the seven
+networks with the Benjamini–Hochberg false-discovery-rate procedure, and the
+resulting $q$ values are reported alongside the group estimates.
+
+The replication is summarised as a forest plot (`figure_2b_network_summary_SC.svg`):
+a single horizontal row with one column per network, ordered by the group effect,
+showing the group correlation $\bar r$ (filled marker), its 95 % confidence interval
+(vertical bar), the distribution of per-subject coefficients $r_s$ (x-jittered
+beeswarm), and FDR significance of the Moran null (stars). The within-network MPC
+gradient is the first diffusion-map eigenvector, whose polarity is mathematically
+arbitrary and is not anchored across networks; coefficients are therefore plotted
+exactly as the projection produces them, and only the magnitude and significance —
+not the sign — are compared between networks. The per-network scatter grid
+(`figure_2b_distance_network_SC.svg`) is laid out as a matching single row in the
+same network order, carrying only the colour-coded network title and shared axes
+(per-vertex MPC gradient against the SC projection $P$); the two figures stack so
+that each network's scatter sits directly above its summary column.
+
+Group-level summaries ($\bar r$, t, p, $p_{\mathrm{spin}}$, $p_{\mathrm{moran}}$,
+and the FDR $q$ values) were written to `logs/figure_2_distance.log`, and the
+per-network group statistics and per-subject coefficients were cached to
+`data/dataframes/df_2b_network_stats_SC_both.csv` and
+`data/dataframes/df_2b_network_subject_r_SC_both.csv` so the forest summary can be
+regenerated without recomputing the nulls.

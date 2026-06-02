@@ -88,25 +88,31 @@ python scripts/figure_1c_cortical_types.py -pni_deriv /path/to/BIDS_PNI/derivati
 
 ## Figure 2
 
-**`scripts/figure_2_distance.py`** — Computes the connectivity-weighted MPC gradient projection per other-network vertex (SC, GD, and MPC weights) and correlates the z-scored projection maps with the whole-brain FC gradient (Spearman, spin-test corrected). Panel 2A reports SC, GD, and MPC for the salience network; Figure 2B replicates the SC projection across all 7 Yeo networks. All analysis runs at fsLR-5k resolution (9,684 vertices).
+**`scripts/figure_2_distance.py`** — Computes the connectivity-weighted MPC gradient projection per other-network vertex (SC, GD, and MPC weights) and correlates the z-scored projection maps with the whole-brain FC gradient (Spearman, spin-test corrected). Panel 2A reports SC, GD, and MPC for the salience network; Figure 2B replicates the SC projection across all 7 Yeo networks and summarises the replication as a forest plot (group _r_ ± 95% CI, per-subject beeswarm, FDR-corrected significance). All analysis runs at fsLR-5k resolution (9,684 vertices).
 
 Requires `figure_1a_t1map.py` to have been run first (produces `data/dataframes/figure_1a_pni_to_mics.csv`).
 
 ```bash
 python scripts/figure_2_distance.py -hemi LH
+# regenerate only the cross-network summary (skips the 2A modality sweep):
+python scripts/figure_2_distance.py -hemi LH -panel 2b
 ```
 
 | Flag | Required | Default | Description |
 |------|----------|---------|-------------|
 | `-hemi` | no | `both` | Hemisphere: `both`, `LH`, or `RH` |
+| `-panel` | no | `both` | Panel to compute: `both`, `2a`, or `2b` |
 
 **Outputs**
 
 - `results/figures/figure_2a_distance_metric.svg`
 - `results/figures/figure_2a_brain_{SC,GD,MPC}_rho.svg`
-- `results/figures/figure_2b_distance_network_SC.svg`
+- `results/figures/figure_2b_distance_network_SC.svg` (per-network scatter grid)
+- `results/figures/figure_2b_network_summary_SC.svg` (forest + beeswarm summary)
 - `results/figures/figure_2b_brain_SC_rho_<network>.svg`
 - `data/dataframes/df_2b_label_<hemi>.csv` (cache)
+- `data/dataframes/df_2b_network_stats_<measure>_<hemi>.csv` (per-network group stats)
+- `data/dataframes/df_2b_network_subject_r_<measure>_<hemi>.csv` (per-subject _r_, for the beeswarm)
 
 ---
 
