@@ -81,6 +81,7 @@ from brainspace.mesh.mesh_io import read_surface
 from brainspace.null_models import SpinPermutations
 
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
 from src.atlas_load import (
     load_yeo_surf_5k, load_t1_salience_profiles,
@@ -593,6 +594,7 @@ def struct_conn_network_analysis(
         sns.regplot(x=res["P_mean"][valid], y=g_mpc_at_sn[valid],
                     scatter=False, color="black", line_kws={"linewidth": 1}, ax=ax)
         ax.set_title(yeo7_abbrev.get(network, network), fontdict={"color": net_color})
+        ax.yaxis.set_major_formatter(ticker.StrMethodFormatter('{x:.1f}'))
     axes[0].set_ylabel("MPC gradient")
     fig.supxlabel(f"{measure} projection P")
 
