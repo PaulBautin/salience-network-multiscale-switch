@@ -10,7 +10,7 @@ load_subject_matrix(path, cortex_mask: np.ndarray) -> np.ndarray
 
 Load an fsLR-5k vertex × vertex `.shape.gii` connectome restricted to cortex.
 
-The upper-triangular storage is symmetrised via `triu(d, 1) + d.T`, recovering the diagonal from the transpose. Negative entries (numerical noise in SC) are clipped to zero.
+The upper-triangular storage is symmetrised via `triu(d, 1) + d.T`, recovering the diagonal from the transpose. Negative entries are clipped to zero; every modality uses only positive connections downstream, so this both removes SC numerical noise and discards the anticorrelated (FC) and negative-partial-correlation (MPC) edges.
 
 **Parameters**
 
@@ -84,21 +84,21 @@ prepare_weights(
 
 Modality-aware preprocessing of a per-subject cortex × cortex matrix.
 
-Always sets to `NaN`: the diagonal and within-network edges. SC weights are masked by `mask_G`, made positive, and log-transformed; GD weights become inverse distance and are restricted to within-hemisphere; MPC zeros become `NaN`. Cross-hemisphere entries are dropped for GD only.
+Always sets to `NaN`: the diagonal and within-network edges. Every modality keeps only positive connections: SC weights are masked by `mask_G` and log-transformed; GD weights become inverse distance and are restricted to within-hemisphere; MPC and FC retain positive correlations while non-positive (negative/zero) entries are dropped to `NaN`. Cross-hemisphere entries are dropped for GD only.
 
 **Parameters**
 
 | Name | Type | Description |
 |------|------|-------------|
-| `W_raw` | `np.ndarray`, shape `(n_cortex, n_cortex)` | Raw subject matrix (cortex-restricted, symmetric). |
-| `modality` | `str` | One of `'SC'`, `'GD'`, `'MPC'`. |
+| `W_raw` | `np.ndarray`, shape `(n_cortex, n_cortex)` | Raw subject matrix (cortex-restricted, symmetric, non-negative after the load-time clip). |
+| `modality` | `str` | One of `'SC'`, `'GD'`, `'MPC'`, `'FC'`. |
 | `hemi_cortex` | `np.ndarray`, shape `(n_cortex,)` | Per-vertex `'LH'`/`'RH'` labels. |
 | `sn_mask_cortex` | `np.ndarray` of `bool`, shape `(n_cortex,)` | `True` for source-network vertices. |
 | `mask_G` | `np.ndarray` of `bool` | Betzel consensus mask (SC only). Optional. |
 
 **Returns** `np.ndarray`, shape `(n_cortex, n_cortex)` — preprocessed weights with `NaN` marking excluded entries.
 
-**Raises** `ValueError` if `modality` is not one of `'SC'`, `'GD'`, `'MPC'`.
+**Raises** `ValueError` if `modality` is not one of `'SC'`, `'GD'`, `'MPC'`, `'FC'`.
 
 ---
 
@@ -112,7 +112,7 @@ compute_projection_score(
 ) -> np.ndarray
 ```
 
-Weighted-mean projection score $P_i = \sum_j w_{ij}\, g^{\mathrm{FC}}_j / \sum_j w_{ij}$ for SC and GD modalities.
+Weighted-mean projection score $P_i = \sum_j w_{ij}\, g^{\mathrm{FC}}_j / \sum_j w_{ij}$ for every modality (SC, GD, MPC, FC).
 
 Only positive, finite weights contribute (to both numerator and denominator). Rows with fewer than `min_valid` finite targets, or a non-positive denominator, return `NaN`.
 
@@ -127,24 +127,6 @@ Only positive, finite weights contribute (to both numerator and denominator). Ro
 | `min_valid` | `int` | Minimum finite targets per vertex. Default `10`. |
 
 **Returns** `np.ndarray`, shape `(n_sn,)` — projection score per source-network vertex.
-
----
-
-### `compute_projection_score_rank`
-
-```python
-compute_projection_score_rank(
-    W: np.ndarray, g_fc_cortex: np.ndarray,
-    sn_idx_cortex: np.ndarray, other_idx_cortex: np.ndarray,
-    *, min_valid: int = 10,
-) -> np.ndarray
-```
-
-Per-source-network-vertex Spearman correlation across targets — the MPC variant, which is robust to signed weights where the weighted mean is ill-defined.
-
-Computes $r_i = \operatorname{Spearman}_j(W_{ij},\, g^{\mathrm{FC}}_j)$ over the target set. Signature and exclusion rules match `compute_projection_score`.
-
-**Returns** `np.ndarray`, shape `(n_sn,)` — per-vertex rank correlation.
 
 ---
 
@@ -172,7 +154,7 @@ Loops over subjects, computes each subject's projection score and its Spearman a
 | Name | Type | Description |
 |------|------|-------------|
 | `files` | `list` | Per-subject connectivity files (used when `sc_subjects` is `None` or modality ≠ SC). |
-| `modality` | `str` | One of `'SC'`, `'GD'`, `'MPC'`. |
+| `modality` | `str` | One of `'SC'`, `'GD'`, `'MPC'`, `'FC'`. |
 | `g_fc_cortex` | `np.ndarray`, shape `(n_cortex,)` | Whole-brain FC gradient. |
 | `g_mpc_cortex_at_sn` | `np.ndarray`, shape `(n_sn,)` | Procrustes-aligned MPC gradient at source-network vertices. |
 | `sn_mask_cortex` / `other_mask_cortex` | `np.ndarray` of `bool` | Source-network and target masks. |

@@ -12,16 +12,18 @@ with per-subject inference (Fisher-z then one-sample t-test across subjects), a
 spin-test null (Alexander-Bloch 2018), and a Moran spectral-randomization null
 (within-network, spatial-autocorrelation-preserving).
 
-Three modalities are supported, with modality-specific weight preprocessing:
+Four modalities are supported, with modality-specific weight preprocessing. Every
+modality uses only positive connections and the same weighted-mean projection:
     - SC (structural connectivity): Betzel distance-stratified consensus mask is
       applied to per-subject SIFT2 weights; weights are log10(SC*G/eps) on
       positives, NaN elsewhere. Two-stage random-effects inference (subject is
       unit of inference).
     - GD (geodesic distance): weights are 1/GD (proximity), within-hemisphere
       only. Used as a spatial-autocorrelation control reading.
-    - MPC (microstructure profile covariance): rank variant - per network vertex
-      i, r_i = Spearman_j(MPC_ij, g_FC[j]); then r_s = Spearman_i(g_MPC[i], r_i).
-      Avoids the undefined weighted-mean-with-negative-weights problem.
+    - MPC (microstructure profile covariance): positive partial correlations are
+      kept as weights; non-positive (negative/zero) entries are dropped.
+    - FC (functional connectivity): positive correlations are kept as weights;
+      non-positive (anticorrelated/zero) entries are dropped.
 """
 
 import logging
@@ -30,7 +32,7 @@ import nibabel as nib
 import numpy as np
 import pandas as pd
 from brainspace.null_models import MoranRandomization
-from scipy.stats import spearmanr, rankdata, ttest_1samp, t as t_dist
+from scipy.stats import spearmanr, ttest_1samp, t as t_dist
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +49,9 @@ def load_subject_matrix(path, cortex_mask: np.ndarray) -> np.ndarray:
 
     micapipe stores fsLR-5k connectomes as upper triangular; the symmetrisation
     `triu(d, 1) + d.T` mirrors the upper triangle and recovers the diagonal from
-    d.T. Negatives are clipped to 0 (they occur as numerical noise in SC).
+    d.T. Negatives are clipped to 0; every modality uses only positive connections
+    downstream, so this both removes SC numerical noise and discards the
+    anticorrelated / negative-partial-correlation edges of FC and MPC.
 
     Parameters
     ----------
@@ -210,13 +214,17 @@ def prepare_weights(
 
     Always sets to NaN: diagonal, within-network edges. Cross-hemisphere is set
     NaN for GD (the spec requires within-hemisphere GD only, mirroring micapipe
-    geodesic distance which is undefined across hemispheres).
+    geodesic distance which is undefined across hemispheres). Every modality keeps
+    only positive connections: SC log-transforms positives, GD inverts positive
+    distances, and MPC/FC retain positive correlations while non-positive entries
+    are dropped to NaN.
 
     Parameters
     ----------
     W_raw : (n_cortex, n_cortex) float
-        Raw subject matrix (cortex-restricted, symmetric, non-negative for SC/GD).
-    modality : {'SC', 'GD', 'MPC'}
+        Raw subject matrix (cortex-restricted, symmetric, non-negative after the
+        load-time clip of negatives to zero).
+    modality : {'SC', 'GD', 'MPC', 'FC'}
     hemi_cortex : (n_cortex,) array of {'LH','RH'}
     sn_mask_cortex : (n_cortex,) bool, True for source-network vertices.
     mask_G : (n_cortex, n_cortex) bool, optional
@@ -248,11 +256,14 @@ def prepare_weights(
             W = np.where(W > 0, 1.0 / W, np.nan)
         W[~same_hemi] = np.nan
 
-    elif modality == "MPC":
-        W = np.where(W == 0, np.nan, W)
+    elif modality in ("MPC", "FC"):
+        # Positive connections only: keep positive partial correlations (MPC) /
+        # positive correlations (FC); drop non-positive (negative/zero) edges.
+        # Whole-brain, no hemisphere restriction.
+        W = np.where(W > 0, W, np.nan)
 
     else:
-        raise ValueError(f"modality must be one of 'SC', 'GD', 'MPC'; got {modality}")
+        raise ValueError(f"modality must be one of 'SC', 'GD', 'MPC', 'FC'; got {modality}")
 
     diag_idx = np.arange(n)
     W[diag_idx, diag_idx] = np.nan
@@ -304,44 +315,6 @@ def compute_projection_score(
     return P
 
 
-def compute_projection_score_rank(
-    W: np.ndarray, g_fc_cortex: np.ndarray,
-    sn_idx_cortex: np.ndarray, other_idx_cortex: np.ndarray,
-    *, min_valid: int = 10,
-) -> np.ndarray:
-    """Per-network-vertex Spearman across targets (MPC variant).
-
-        r_i = Spearman_j( W[i, j], g_FC[j] )    over j in target set.
-
-    Computed row-wise: fast path (rank+Pearson) for rows with no NaN; per-row
-    spearmanr fallback otherwise.
-    """
-    W_sub = W[np.ix_(sn_idx_cortex, other_idx_cortex)]
-    g_targets = g_fc_cortex[other_idx_cortex]
-    n_sn = W_sub.shape[0]
-
-    g_valid = ~np.isnan(g_targets)
-    nan_rows = np.any(np.isnan(W_sub), axis=1) | (~g_valid).any()
-    r = np.full(n_sn, np.nan)
-
-    if not nan_rows.any():
-        g_rank = rankdata(g_targets)
-        gx = g_rank - g_rank.mean()
-        g_norm = np.linalg.norm(gx)
-        ranks = rankdata(W_sub, axis=1)
-        yc = ranks - ranks.mean(axis=1, keepdims=True)
-        denom = g_norm * np.linalg.norm(yc, axis=1)
-        r = np.where(denom > 0, (yc @ gx) / denom, np.nan)
-        return r
-
-    for i in range(n_sn):
-        row = W_sub[i]
-        valid = ~np.isnan(row) & g_valid
-        if valid.sum() >= min_valid:
-            r[i] = spearmanr(row[valid], g_targets[valid])[0]
-    return r
-
-
 # ---------------------------------------------------------------------------
 # Per-subject orchestration
 # ---------------------------------------------------------------------------
@@ -386,7 +359,7 @@ def compute_projection_subjects(
     ----------
     files : list of paths
         Per-subject connectivity files (used if `sc_subjects` is None or modality != SC).
-    modality : {'SC', 'GD', 'MPC'}
+    modality : {'SC', 'GD', 'MPC', 'FC'}
     g_fc_cortex : (n_cortex,)
         Whole-brain FC gradient (NaN at medial wall, but cortex_mask already excludes).
     g_mpc_cortex_at_sn : (n_sn,)
@@ -449,14 +422,9 @@ def compute_projection_subjects(
 
         W = prepare_weights(W_raw, modality, hemi_cortex, sn_mask_cortex, mask_G=mask_G)
 
-        if modality == "MPC":
-            P_s = compute_projection_score_rank(
-                W, g_fc_cortex, sn_mask_cortex, other_mask_cortex, min_valid=min_valid,
-            )
-        else:
-            P_s = compute_projection_score(
-                W, g_fc_cortex, sn_mask_cortex, other_mask_cortex, min_valid=min_valid,
-            )
+        P_s = compute_projection_score(
+            W, g_fc_cortex, sn_mask_cortex, other_mask_cortex, min_valid=min_valid,
+        )
 
         P_subjects_sn[s] = P_s
         P_subjects_full[s, sn_idx_full] = P_s

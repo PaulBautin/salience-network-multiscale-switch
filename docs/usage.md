@@ -88,7 +88,7 @@ python scripts/figure_1c_cortical_types.py -pni_deriv /path/to/BIDS_PNI/derivati
 
 ## Figure 2
 
-**`scripts/figure_2_distance.py`** — Computes the connectivity-weighted MPC gradient projection per other-network vertex (SC, GD, and MPC weights) and correlates the z-scored projection maps with the whole-brain FC gradient (Spearman, spin-test corrected). Panel 2A reports SC, GD, and MPC for the salience network; Figure 2B replicates the SC projection across all 7 Yeo networks and summarises the replication as a forest plot (group _r_ ± 95% CI, per-subject beeswarm, FDR-corrected significance). All analysis runs at fsLR-5k resolution (9,684 vertices).
+**`scripts/figure_2_distance.py`** — Computes the connectivity-weighted projection of the whole-brain FC gradient across each source-network vertex's extranetwork targets, then correlates it per subject with the within-network MPC gradient (Spearman). Every modality uses only positive connections via the same weighted-mean projection. Panel 2A reports SC, GD, MPC, and FC for the salience network (Moran null primary, spin null secondary); Figure 2B replicates the SC projection across all 7 Yeo networks (Moran null only) and summarises it as a forest plot (group _r_ ± 95% CI, per-subject beeswarm, FDR-corrected significance). All analysis runs at fsLR-5k resolution (9,684 vertices).
 
 Requires `figure_1a_t1map.py` to have been run first (produces `data/dataframes/figure_1a_pni_to_mics.csv`).
 
@@ -106,7 +106,7 @@ python scripts/figure_2_distance.py -hemi LH -panel 2b
 **Outputs**
 
 - `results/figures/figure_2a_distance_metric.svg`
-- `results/figures/figure_2a_brain_{SC,GD,MPC}_rho.svg`
+- `results/figures/figure_2a_brain_{SC,GD,MPC,FC}_rho.svg`
 - `results/figures/figure_2b_distance_network_SC.svg` (per-network scatter grid)
 - `results/figures/figure_2b_network_summary_SC.svg` (forest + beeswarm summary)
 - `results/figures/figure_2b_brain_SC_rho_<network>.svg`

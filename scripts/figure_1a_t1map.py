@@ -201,17 +201,24 @@ def main():
         df_pni_5k['path_sc_5k'] = df_pni_5k.apply(lambda row: list(mics_deriv.glob(f'sub-{row["ID_MICs"]}/ses-01/dwi/connectomes/sub-{row["ID_MICs"]}_ses-01_surf-fsLR-5k_desc-iFOD2-40M-SIFT2_full-connectome.shape.gii')), axis=1)
         df_pni_5k['path_sc_dist_5k'] = df_pni_5k.apply(lambda row: list(mics_deriv.glob(f'sub-{row["ID_MICs"]}/ses-01/dwi/connectomes/sub-{row["ID_MICs"]}_ses-01_surf-fsLR-5k_desc-iFOD2-40M-SIFT2_full-edgeLengths.shape.gii')), axis=1)
         df_pni_5k['path_dist_5k'] = df_pni_5k.apply(lambda row: list(pni_deriv.glob(f'sub-{row["ID_PNI"]}/ses-{row["session"]}/dist/sub-{row["ID_PNI"]}_ses-{row["session"]}_surf-fsLR-5k_GD.shape.gii')), axis=1)
+        df_pni_5k['path_fc_5k'] = df_pni_5k.apply(lambda row: list(pni_deriv.glob(f'sub-{row["ID_PNI"]}/ses-{row["session"]}/func/desc-me_task-rest_bold/surf/sub-{row["ID_PNI"]}_ses-{row["session"]}_surf-fsLR-5k_desc-FC.shape.gii')), axis=1)
+        # FC is optional (a session-matched rest run may be absent): it is
+        # exploded like the others (empty glob -> NaN) but kept out of the dropna
+        # so a missing FC leaves NaN rather than dropping the subject from the
+        # other modalities.
         df_pni_5k = (df_pni_5k
                      .explode('path_t1_profile_5k')
                      .explode('path_mpc_5k')
                      .explode('path_sc_5k')
                      .explode('path_sc_dist_5k')
                      .explode('path_dist_5k')
+                     .explode('path_fc_5k')
                      .dropna(subset=['path_t1_profile_5k', 'path_mpc_5k', 'path_sc_5k', 'path_sc_dist_5k', 'path_dist_5k']))
         logger.info(f"Participants   : N={len(df_pni_5k)} (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)")
         logger.info(f"T1 profiles    : acq-T1map, fsLR-5k surface, 14 intracortical depths")
         logger.info(f"MPC            : fsLR-5k vertex-level MPC matrix")
         logger.info(f"Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, fsLR-5k")
+        logger.info(f"FC             : resting-state (desc-me_task-rest_bold), fsLR-5k")
         logger.info(f"Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment")
 
         df_pni_5k.to_csv(project_root / "data/dataframes/figure_1a_pni_to_mics_5k.csv", index=False)

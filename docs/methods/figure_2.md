@@ -7,15 +7,21 @@ Figure 2 tests whether the microstructural (MPC) gradient within the salience
 network (SN) predicts how its vertices connect to the rest of the cortex, and
 whether that connectivity tracks the whole-brain sensory–transmodal axis given by
 the principal functional connectivity (FC) gradient. Panel 2A reports the result
-for the SN across three connectivity modalities — structural connectivity (SC),
-geodesic distance (GD), and microstructural profile covariance (MPC) — and panel
-2B replicates the structural-connectivity result across all seven Yeo networks. SC,
+for the SN across four connectivity modalities — structural connectivity (SC),
+geodesic distance (GD), microstructural profile covariance (MPC), and functional
+connectivity (FC) — and panel 2B replicates the structural-connectivity result
+across all seven Yeo networks. SC,
 which indexes axonal connectivity and is independent of the MPC gradient, is the
 primary modality and the one carried through to the across-network replication; the
 MPC-weighted variant is reported only for the SN in panel 2A as a supplement,
 because correlating an MPC-derived gradient with the FC gradient through MPC weights
 partly reflects the shared microstructural backbone of cortical hierarchy
-(microstructure–function coupling) rather than network-specific connectivity. All
+(microstructure–function coupling) rather than network-specific connectivity. The
+FC-weighted variant is likewise a convergence reading rather than an independent
+test: because the projection target $g^{\mathrm{FC}}$ is itself the principal FC
+gradient, projecting functional coupling onto it measures how strongly resting-state
+connectivity recapitulates the gradient ordering, and is reported for the SN in
+panel 2A alongside the modality-independent SC. All
 analyses were performed
 at fsLR-5k resolution (9,684 vertices: 4,842 per hemisphere), which keeps the
 whole-brain connectivity matrices in memory. The within-network MPC
@@ -49,7 +55,7 @@ al., 2019; Suárez et al., 2020) adapted to a within-network source.
 
 ## Connectivity weights
 
-Three connectivity modalities were used as weights. micapipe stores the fsLR-5k
+Four connectivity modalities were used as weights. micapipe stores the fsLR-5k
 matrices in upper-triangular form; each was symmetrised on loading, and the
 diagonal, within-network edges, and medial-wall vertices were excluded from the
 target set in every modality.
@@ -64,7 +70,13 @@ were log-transformed to stabilise the heavy-tailed SIFT2 weight distribution.
 Geodesic-distance weights were defined as inverse surface distance,
 $w_{ij} = 1/\mathrm{GD}_{ij}$, and restricted to within-hemisphere edges, giving a
 spatial-proximity reading that complements SC. MPC weights were the vertexwise
-Fisher-z partial correlations.
+Fisher-z partial correlations. Functional-connectivity weights were the
+resting-state vertex × vertex correlation matrices from the same micapipe 7T PNI
+session (multi-echo `desc-me_task-rest_bold`). For consistency across modalities,
+every weight matrix was restricted to positive connections: negative entries were
+clipped on loading, so that MPC retained only positive partial correlations and FC
+only positive (co-activating) correlations, with non-positive edges excluded from
+both the numerator and denominator of the projection.
 
 To counter the over-representation of short streamlines in tractography and the
 sparsity of fsLR-5k SC, the SC weights were filtered with a distance-stratified
@@ -77,14 +89,10 @@ filter to each subject's weights, so inference remained a per-subject
 random-effects analysis with the subject as the unit of inference; no
 group-averaged weight entered the statistic.
 
-Because MPC partial correlations can take negative values, the weighted mean is
-ill-defined for that modality, and a rank formulation was used instead. For each
-SN vertex the Spearman correlation between its MPC profile and the FC gradient was
-computed across extranetwork targets,
-$r^{(s)}_i = \operatorname{Spearman}_{j}\big(\mathrm{MPC}^{(s)}_{ij},\, g^{\mathrm{FC}}_j\big)$,
-and this per-vertex value was then correlated with $g^{\mathrm{MPC}}$ as above,
-preserving the directional interpretation without relying on the sign of the
-weights.
+All four modalities therefore shared the same weighted-mean projection $P^{(s)}_i$
+defined above, computed over positive weights only; no modality-specific rank or
+absolute-value formulation was required, since restricting to positive connections
+keeps the weighted mean well-defined for MPC and FC alike.
 
 ## Group inference and spatial null
 
@@ -111,10 +119,12 @@ footprint-matched alternative.
 
 The structural-connectivity test was repeated independently for each of the seven
 Yeo networks, computing a within-network MPC gradient and the per-subject
-projection statistic $r_s$ for every network in turn. The two spatial-null p
-values ($p_{\mathrm{moran}}$ and $p_{\mathrm{spin}}$) were corrected for the seven
-networks with the Benjamini–Hochberg false-discovery-rate procedure, and the
-resulting $q$ values are reported alongside the group estimates.
+projection statistic $r_s$ for every network in turn. Significance was assessed
+with the within-network Moran spectral-randomisation null alone, whose
+footprint-matched construction is the appropriate per-network test; the
+$p_{\mathrm{moran}}$ values were corrected across the seven networks with the
+Benjamini–Hochberg false-discovery-rate procedure, and the resulting $q$ values
+are reported alongside the group estimates.
 
 The replication is summarised as a forest plot (`figure_2b_network_summary_SC.svg`):
 a single horizontal row with one column per network, ordered by the group effect,
@@ -130,8 +140,8 @@ same network order, carrying only the colour-coded network title and shared axes
 (per-vertex MPC gradient against the SC projection $P$); the two figures stack so
 that each network's scatter sits directly above its summary column.
 
-Group-level summaries ($\bar r$, t, p, $p_{\mathrm{spin}}$, $p_{\mathrm{moran}}$,
-and the FDR $q$ values) were written to `logs/figure_2_distance.log`, and the
+Group-level summaries ($\bar r$, t, p, $p_{\mathrm{moran}}$, and the FDR
+$q_{\mathrm{moran}}$) were written to `logs/figure_2_distance.log`, and the
 per-network group statistics and per-subject coefficients were cached to
 `data/dataframes/df_2b_network_stats_SC_both.csv` and
 `data/dataframes/df_2b_network_subject_r_SC_both.csv` so the forest summary can be

@@ -20,18 +20,22 @@
 # (Alexander-Bloch 2018) and a Moran spectral-randomization null (within-network,
 # SAC-preserving).
 #
-# Modality routing:
+# Modality routing (every modality uses only positive connections and the same
+# weighted-mean projection):
 #   - SC : per-subject SIFT2 weights masked by the Betzel distance-stratified consensus
 #          mask (built once across all subjects, removes non-reproducible / sparsity-
 #          driven edges while preserving long-range edges); log10(SC*G/eps) on positives.
 #   - GD : 1/GD (proximity), within-hemisphere only.
-#   - MPC: rank variant (per-network-vertex Spearman across targets, then
-#          Spearman across network vertices). Weighted-mean is ill-defined for MPC's
-#          negative partial-correlation values.
+#   - MPC: positive partial correlations only (negative/zero entries dropped).
+#   - FC : positive correlations only (resting-state, micapipe 7T PNI;
+#          anticorrelated/zero entries dropped). Because the target axis g_FC is
+#          itself the principal FC gradient, this column is a convergence reading
+#          (how strongly functional coupling recapitulates the gradient) rather
+#          than a modality-independent test like SC.
 #
 # All matrices loaded at fsLR-5k (9684 vertices). Subject is the unit of inference.
 #
-# Figure 2A: SalVentAttn × {SC, GD, MPC} - projection map + group r/p per modality.
+# Figure 2A: SalVentAttn × {SC, GD, MPC, FC} - projection map + group r/p per modality.
 # Figure 2B: All 7 Yeo networks × {SC} - replicates the test per network. The headline
 #            panel is a forest + per-subject beeswarm summary (group r ± 95% CI, FDR
 #            stars) that makes the cross-network effect legible at a glance; the
@@ -156,6 +160,40 @@ def save_brain_map(surf_lh, surf_rh, values: np.ndarray, array_name: str,
         _bsp_sp._gen_grid = _orig_gen_grid
 
 
+def _ensure_fc_paths(df_pni: pd.DataFrame) -> pd.DataFrame:
+    """Add a `path_fc_5k` column to `df_pni` if the cached CSV predates FC support.
+
+    The resting-state FC connectome lives in the same micapipe PNI derivatives
+    tree as the (PNI) MPC/GD inputs. The derivatives root is recovered from an
+    existing PNI path column (`path_dist_5k`: .../sub-X/ses-Y/dist/file, so
+    parents[3] is the micapipe_v0.2.0 root). Subjects without a session-matched
+    FC connectome get `NaN` here and are simply excluded from the FC modality
+    (callers pass `df_pni["path_fc_5k"].dropna()`); the other modalities keep
+    their full subject set, since each modality is an independent per-subject
+    group test.
+    """
+    if "path_fc_5k" in df_pni.columns:
+        return df_pni
+
+    df_pni = df_pni.copy()
+    fc_paths = []
+    for _, row in df_pni.iterrows():
+        pni_root = Path(row["path_dist_5k"]).parents[3]
+        fc = (pni_root / f"sub-{row['ID_PNI']}/ses-{row['session']}/func/"
+              f"desc-me_task-rest_bold/surf/"
+              f"sub-{row['ID_PNI']}_ses-{row['session']}_surf-fsLR-5k_desc-FC.shape.gii")
+        fc_paths.append(str(fc) if fc.exists() else np.nan)
+    df_pni["path_fc_5k"] = fc_paths
+
+    missing = df_pni.loc[df_pni["path_fc_5k"].isna(), "ID_PNI"].tolist()
+    if missing:
+        logger.warning(f"[FC] no session-matched fsLR-5k FC connectome for {missing}; "
+                       f"excluded from the FC modality only.")
+    logger.info(f"[FC] resting-state FC connectomes resolved for "
+                f"N={df_pni['path_fc_5k'].notna().sum()} / {len(df_pni)} subjects.")
+    return df_pni
+
+
 def _load_fc_gradient(project_root: Path, df: pd.DataFrame) -> pd.DataFrame:
     """Load fsLR-5k FC gradient GIFTIs and attach fc_g1, fc_g1_network, network_int."""
     fc_lh = nib.load(project_root / "data/parcellations/fc_gradient_fslr-5k_lh.shape.gii").darrays[0].data
@@ -223,11 +261,13 @@ def _run_projection(
     spin_model: SpinPermutations, n_rand: int,
     *, mask_G: np.ndarray | None = None,
     sc_subjects: list[np.ndarray] | None = None,
+    run_spin: bool = True,
 ) -> dict:
-    """One-stop: per-subject projection + Moran + spin nulls.
+    """One-stop: per-subject projection + Moran null (+ optional spin null).
 
-    Moran is the primary spatial null (within-SN, preserves SAC of g_MPC).
-    Spin is a secondary cortex-wide conservative check.
+    Moran is the primary spatial null (within-SN, preserves SAC of g_MPC). The
+    spin null is an optional secondary cortex-wide check; set `run_spin=False`
+    to report Moran only (e.g. Figure 2B).
     """
     result = compute_projection_subjects(
         files=files, modality=modality,
@@ -243,9 +283,11 @@ def _run_projection(
         g_mpc_at_sn, sn_mask_cortex, gd_among_sn, result, n_rand,
     )
 
-    spin = compute_spin_null_projection(
-        g_mpc_at_sn, sn_mask_cortex, cortex_mask_full, result, spin_model, n_rand,
-    )
+    spin = {}
+    if run_spin:
+        spin = compute_spin_null_projection(
+            g_mpc_at_sn, sn_mask_cortex, cortex_mask_full, result, spin_model, n_rand,
+        )
     return {**result, **moran, **spin}
 
 
@@ -385,9 +427,12 @@ def struct_conn_metric_analysis(
                 "mask_G": None, "sc_subjects": None},
         "MPC": {"files": df_pni["path_mpc_5k"].tolist(),
                 "mask_G": None, "sc_subjects": None},
+        "FC":  {"files": df_pni["path_fc_5k"].dropna().tolist(),
+                "mask_G": None, "sc_subjects": None},
     }
 
-    fig, axes = plt.subplots(1, 3, figsize=(4 * 4, 5), squeeze=False)
+    fig, axes = plt.subplots(1, len(modalities), figsize=(4 * len(modalities), 5),
+                             squeeze=False)
     network_color = yeo7_rgb[int(
         df_yeo_surf_5k.loc[df_yeo_surf_5k["network"] == network, "network_int"].values[0]
     )]
@@ -474,9 +519,8 @@ def struct_conn_network_analysis(
 ) -> pd.DataFrame:
     """Figure 2B: replicate the projection across networks for one modality.
 
-    Reports Moran (primary, within-region) and spin (secondary) nulls; applies
-    Benjamini-Hochberg FDR correction across networks for both p_moran and
-    p_spin and logs the q-values.
+    Reports the Moran null only (primary, within-region) and applies
+    Benjamini-Hochberg FDR correction across networks for p_moran.
     """
 
     if measure not in ("SC", "GD", "MPC"):
@@ -512,13 +556,14 @@ def struct_conn_network_analysis(
             target_network_labels=target_net_labels,
             spin_model=spin_model, n_rand=n_rand,
             mask_G=m_mask_G, sc_subjects=m_sc_subjects,
+            run_spin=False,
         )
 
         logger.info(
             f"[Figure 2B | {network} | {measure}] r_group={res['r_group']:+.3f} "
             f"[{res['ci_low']:+.3f}, {res['ci_high']:+.3f}] "
             f"t={res['t']:+.2f} p={res['p']:.3e} | "
-            f"p_moran={res['p_moran']:.3e} (primary) p_spin={res['p_spin']:.3e} "
+            f"p_moran={res['p_moran']:.3e} (primary) "
             f"(n_perm={n_rand}) | n={res['n']}"
         )
 
@@ -540,12 +585,10 @@ def struct_conn_network_analysis(
         })
 
     q_moran = benjamini_hochberg(np.array([r["res"]["p_moran"] for r in results_per_net]))
-    q_spin  = benjamini_hochberg(np.array([r["res"]["p_spin"]  for r in results_per_net]))
-    for rec, qm, qs in zip(results_per_net, q_moran, q_spin):
-        rec["q_moran"], rec["q_spin"] = qm, qs
+    for rec, qm in zip(results_per_net, q_moran):
+        rec["q_moran"] = qm
         logger.info(
-            f"[Figure 2B FDR | {measure} | {rec['network']}] "
-            f"q_moran={qm:.3e} q_spin={qs:.3e}"
+            f"[Figure 2B FDR | {measure} | {rec['network']}] q_moran={qm:.3e}"
         )
 
     # Order networks once by the signed group effect; both the scatter row and the
@@ -560,7 +603,6 @@ def struct_conn_network_analysis(
         "ci_low": rec["res"]["ci_low"], "ci_high": rec["res"]["ci_high"],
         "t": rec["res"]["t"], "p": rec["res"]["p"],
         "p_moran": rec["res"]["p_moran"], "q_moran": rec["q_moran"],
-        "p_spin": rec["res"]["p_spin"], "q_spin": rec["q_spin"],
     } for rec in results_per_net]
     pd.DataFrame(stats_rows).to_csv(
         project_root / f"data/dataframes/df_2b_network_stats_{measure}_{hemisphere}.csv",
@@ -617,8 +659,8 @@ def main():
     logger.info("Group test     : Fisher-z r_s + one-sample t-test (random effects)")
     logger.info("SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)")
     logger.info("GD weights     : 1/GD (within-hemisphere)")
-    logger.info("MPC variant    : per-vertex Spearman across targets (rank version)")
-    logger.info("Null model     : spin permutation (Alexander-Bloch 2018, n_rep=1000)")
+    logger.info("MPC/FC weights : positive connections only (weighted-mean projection)")
+    logger.info("Null model     : Moran spectral randomisation (primary); spin (2A only)")
     logger.info(f"Script path: {script_path}")
     logger.info(f"Project root: {project_root}")
 
@@ -626,6 +668,7 @@ def main():
     surf5k_rh_infl = read_surface(project_root / "data/surfaces/fsLR-5k.R.inflated.surf.gii", itype="gii")
 
     df_pni = pd.read_csv(project_root / "data/dataframes/figure_1a_pni_to_mics_5k.csv")
+    df_pni = _ensure_fc_paths(df_pni)
     n_rand = 1000
     spin_model_5k = SpinPermutations(n_rep=n_rand, random_state=42)
     sphere_5k_lh = read_surface(project_root / "data/surfaces/fsLR-5k.L.sphere.surf.gii", itype="gii")
