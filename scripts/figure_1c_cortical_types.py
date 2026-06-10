@@ -197,7 +197,7 @@ def main():
     if not path_df_1a.exists():
         raise FileNotFoundError(f"Gradient dataframe not found at {path_df_1a}. Run figure_1a_t1map.py with -hemi {args.hemi} first.")
     logger.info(f"Loading gradient dataframe from {path_df_1a}")
-    df_yeo_surf = pd.read_csv(path_df_1a)
+    df_yeo_surf = pd.read_csv(path_df_1a, sep="\t")
 
     df_yeo_surf = load_econo_atlas(project_root, df_yeo_surf)
     screenshot_path = project_root / "results/figures/figure_1c_brain_economo.svg"

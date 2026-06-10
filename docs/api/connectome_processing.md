@@ -1,6 +1,6 @@
 # `src/connectome_processing`
 
-Connectome I/O and the gradient-weighted connectivity projection used in [Figure 2](../methods/figure_2.md). All matrices are handled at fsLR-5k resolution (9,684 vertices); micapipe stores fsLR-5k connectomes as upper-triangular GIFTIs, which are symmetrised on load. See [Figure 2 Methods](../methods/figure_2.md) for the statistical derivation of the projection score and the spin/Moran nulls.
+Connectome I/O and the gradient-weighted connectivity projection used in [Figure 2](../methods/figure_2.md). All matrices are handled at fsLR-5k resolution (9,684 vertices); micapipe stores fsLR-5k connectomes as upper-triangular GIFTIs, which are symmetrised on load. See [Figure 2 Methods](../methods/figure_2.md) for the statistical derivation of the projection score and the within-network Moran null.
 
 ### `load_subject_matrix`
 
@@ -168,35 +168,6 @@ Loops over subjects, computes each subject's projection score and its Spearman a
 
 ---
 
-### `compute_spin_null_projection`
-
-```python
-compute_spin_null_projection(
-    g_mpc_cortex_at_sn: np.ndarray, sn_mask_cortex: np.ndarray,
-    cortex_mask_full: np.ndarray, result: dict,
-    spin_model, n_rand: int,
-) -> dict
-```
-
-Spin-test null for the per-subject MPC gradient ↔ projection alignment (Alexander-Bloch 2018, adapted to a within-network statistic).
-
-The MPC gradient is embedded in the full 9,684-vertex space (`NaN` outside the source network) and rotated with the fitted `SpinPermutations` model. Each permutation is aggregated across subjects with the Fisher-z mean, yielding a two-tailed empirical $p_{\mathrm{spin}}$.
-
-**Parameters**
-
-| Name | Type | Description |
-|------|------|-------------|
-| `g_mpc_cortex_at_sn` | `np.ndarray`, shape `(n_sn,)` | MPC gradient at source-network vertices. |
-| `sn_mask_cortex` | `np.ndarray` of `bool` | Source-network mask on cortex. |
-| `cortex_mask_full` | `np.ndarray` of `bool` | Cortex mask over the full 9,684-vertex space. |
-| `result` | `dict` | Output of `compute_projection_subjects`. |
-| `spin_model` | brainspace `SpinPermutations` | Fitted spin model. |
-| `n_rand` | `int` | Number of rotations. |
-
-**Returns** `dict` — null distribution and two-tailed empirical `p_spin`.
-
----
-
 ### `compute_moran_null_projection`
 
 ```python
@@ -207,9 +178,9 @@ compute_moran_null_projection(
 ) -> dict
 ```
 
-Moran spectral-randomisation null for the MPC gradient ↔ projection alignment.
+Moran spectral-randomisation null for the MPC gradient ↔ projection alignment, restricted entirely to the source network to match the test footprint.
 
-Generates MPC-gradient surrogates that preserve the within-network spatial autocorrelation (Wagner & Dray 2015). Compared to the cortex-wide spin test, the null is restricted entirely to the source network — a tighter, more powerful distribution that matches the test footprint.
+Generates MPC-gradient surrogates that preserve the within-network spatial autocorrelation (Wagner & Dray 2015). Surrogates are generated **per connected component** of the inverse-geodesic-distance graph — i.e. per hemisphere for a bilateral network, since cross-hemisphere geodesic distance is `0` — via `_moran_surrogates_blockwise`, preserving within-hemisphere autocorrelation while keeping both hemispheres in the statistic. The two-tailed empirical p-value uses the add-one estimator $p = (1+k)/(1+n)$, bounded away from zero.
 
 **Parameters**
 
@@ -217,12 +188,12 @@ Generates MPC-gradient surrogates that preserve the within-network spatial autoc
 |------|------|-------------|
 | `g_mpc_cortex_at_sn` | `np.ndarray`, shape `(n_sn,)` | MPC gradient at source-network vertices. |
 | `sn_mask_cortex` | `np.ndarray` of `bool` | Source-network mask on cortex. |
-| `gd_among_sn` | `np.ndarray`, shape `(n_sn, n_sn)` | Geodesic distance among source-network vertices (cross-hemisphere entries `0`). |
+| `gd_among_sn` | `np.ndarray`, shape `(n_sn, n_sn)` | Geodesic distance among source-network vertices; cross-hemisphere entries are `0`, which splits the spatial graph into per-hemisphere components. |
 | `result` | `dict` | Output of `compute_projection_subjects`. |
 | `n_rand` | `int` | Number of surrogates. |
-| `random_state` | `int` | Seed. Default `42`. |
+| `random_state` | `int` | Base seed (offset per component so blocks are decorrelated). Default `42`. |
 
-**Returns** `dict` — null distribution and two-tailed empirical p-value.
+**Returns** `dict` — `null_group_moran`, `p_moran` (two-tailed, add-one), `null_std_moran`.
 
 ---
 
@@ -241,6 +212,25 @@ For each source-network vertex, return the index and name of the target network 
 | `result` | `dict` | Output of `compute_projection_subjects` (with target-network weights). |
 
 **Returns** `(dominant_idx, target_network_names)` — `np.ndarray` of `int`, shape `(n_sn,)` (`-1` where all `NaN`), and the ordered list of network names.
+
+---
+
+### `empirical_p_twosided`
+
+```python
+empirical_p_twosided(null: np.ndarray, observed: float) -> float
+```
+
+Two-tailed empirical permutation p-value via the add-one estimator $p = (1+k)/(1+n)$, where $k$ counts the finite null values whose magnitude is $\geq |\,\text{observed}\,|$ and $n$ is the number of finite null values. The add-one keeps the estimate bounded away from zero. Shared by `compute_moran_null_projection` and the figure 1B within-network Moran null.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `null` | `np.ndarray` | Null distribution of the statistic; non-finite entries are ignored. |
+| `observed` | `float` | Observed statistic. |
+
+**Returns** `float` — empirical p-value, or `NaN` if `observed` is non-finite or there are no finite null values.
 
 ---
 

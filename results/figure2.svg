@@ -29,11 +29,11 @@
      showgrid="false"
      showguides="false"
      height="296mm"
-     inkscape:zoom="0.90509668"
-     inkscape:cx="453.54271"
-     inkscape:cy="139.76407"
+     inkscape:zoom="0.45254834"
+     inkscape:cx="-162.41359"
+     inkscape:cy="198.87378"
      inkscape:window-width="1920"
-     inkscape:window-height="990"
+     inkscape:window-height="992"
      inkscape:window-x="0"
      inkscape:window-y="28"
      inkscape:window-maximized="1"
@@ -2223,18 +2223,6 @@
        transform="scale(0.26458333)"
        id="text94205"
        style="font-size:24px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;white-space:pre;shape-inside:url(#rect94207)" />
-    <image
-       preserveAspectRatio="none"
-       inkscape:svg-dpi="96"
-       width="205.23993"
-       height="33.188602"
-       xlink:href="figures/figure_2b_distance_network_SC.svg"
-       id="image8184"
-       x="1.2659225"
-       y="175.61055"
-       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:3.88056px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
@@ -2339,15 +2327,15 @@
          y="252.77844">Default (DMN)</tspan></text>
     <text
        id="text67413-3-1"
-       x="64.222481"
-       y="9.2071209"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.57029px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.188766;stroke-linecap:butt;stroke-linejoin:round"
+       x="49.558815"
+       y="9.1455173"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325;stroke-linecap:butt;stroke-linejoin:round"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.57029px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.188766"
-         x="42.613377"
-         y="9.044899"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325"
+         x="28.343664"
+         y="8.9862528"
          id="tspan67409-7-4">Structural connectivity (SC)</tspan></text>
     <text
        id="text67413-3-1-3"
@@ -2364,81 +2352,43 @@
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;stroke-width:0.186519"
            x="1.4106578"
            y="120.89661"
-           id="tspan67409-7-4-2">Group effect (MPC gradient vs. SC projection)</tspan></tspan></text>
-    <text
-       id="text67413-3-1-3-7"
-       x="-16.780174"
-       y="125.49867"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;fill:#4d4d4d;stroke-width:0.186519;stroke-linecap:butt;stroke-linejoin:round"
-       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192"><tspan
-         sodipodi:role="line"
-         id="tspan93334-4"
-         x="1.2971419"
-         y="125.33839"
-         style="font-size:3.175px;fill:#4d4d4d"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;fill:#4d4d4d;stroke-width:0.186519"
-           x="1.2971419"
-           y="125.33839"
-           id="tspan67409-7-4-2-1">Effect size (r) with 95% CI</tspan></tspan></text>
-    <text
-       id="text67413-3-1-3-8"
-       x="-16.814796"
-       y="167.74802"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;stroke-width:0.186519;stroke-linecap:butt;stroke-linejoin:round"
-       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192"><tspan
-         sodipodi:role="line"
-         id="tspan93334-5"
-         x="1.2625185"
-         y="167.58772"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;stroke-width:0.186519"
-           x="1.2625185"
-           y="167.58772"
-           id="tspan67409-7-4-2-16">Mean projection across subjects compared to MPC gradient</tspan></tspan></text>
-    <text
-       id="text67413-3-1-3-7-6"
-       x="-16.75692"
-       y="172.18974"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;fill:#4d4d4d;stroke-width:0.186519;stroke-linecap:butt;stroke-linejoin:round"
-       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192"><tspan
-         sodipodi:role="line"
-         id="tspan93334-4-2"
-         x="1.3203963"
-         y="172.02945"
-         style="font-size:3.175px"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;fill:#4d4d4d;stroke-width:0.186519"
-           x="1.3203963"
-           y="172.02945"
-           id="tspan67409-7-4-2-1-1">points = salience vertices colored by dominant target network</tspan></tspan></text>
+           id="tspan67409-7-4-2">Group effect (MPC gradient vs. gFC1 connectivity projections)</tspan></tspan></text>
     <text
        id="text67413-3-1-7"
-       x="122.81888"
-       y="9.2071209"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.57029px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.188766;stroke-linecap:butt;stroke-linejoin:round"
+       x="93.579437"
+       y="9.1455173"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325;stroke-linecap:butt;stroke-linejoin:round"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.57029px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.188766"
-         x="109.49992"
-         y="9.044899"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325"
+         x="80.503296"
+         y="8.9862528"
          id="tspan67409-7-4-0">Geodesic distance (GD)</tspan></text>
     <text
        id="text67413-3-1-7-9"
-       x="190.78036"
-       y="9.207118"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.57029px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.188766;stroke-linecap:butt;stroke-linejoin:round"
+       x="144.7168"
+       y="9.1455145"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325;stroke-linecap:butt;stroke-linejoin:round"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.57029px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.188766"
-         x="176.60635"
-         y="9.044899"
-         id="tspan67409-7-4-0-1">Microstructure profile cov. (MPC)</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325"
+         x="130.80119"
+         y="8.9862528"
+         id="tspan67409-7-4-0-1">Microstructure cov. (MPC)</tspan></text>
+    <text
+       id="text67413-3-1-7-9-0"
+       x="196.07556"
+       y="9.1796036"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325;stroke-linecap:butt;stroke-linejoin:round"
+       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
+       inkscape:export-xdpi="192"
+       inkscape:export-ydpi="192"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325"
+         x="182.15996"
+         y="9.0203419"
+         id="tspan67409-7-4-0-1-1">Functional connectivity (FC)</tspan></text>
     <circle
        style="fill:#b9b36c;fill-opacity:1;stroke:#b9b36c;stroke-width:0.25;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
        id="path127016"
@@ -2484,60 +2434,60 @@
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="61.580914"
-       height="25.671543"
+       width="53.47797"
+       height="22.293631"
        xlink:href="figures/figure_2a_brain_MPC_rho.svg"
        id="image42142"
-       x="145.82231"
-       y="20.866436"
+       x="104.25141"
+       y="20.580339"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="61.48349"
-       height="25.63093"
+       width="53.393368"
+       height="22.25836"
        xlink:href="figures/figure_2a_brain_SC_rho.svg"
        id="image6343"
-       x="11.820543"
-       y="20.83856"
+       x="1.2293426"
+       y="20.556131"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="61.580914"
-       height="25.671543"
+       width="53.47797"
+       height="22.293631"
        xlink:href="figures/figure_2a_brain_GD_rho.svg"
        id="image6707"
-       x="78.656326"
-       y="20.761148"
+       x="53.035809"
+       y="20.488905"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="209.13744"
-       height="69.027275"
+       width="205.17737"
+       height="61.226668"
        xlink:href="figures/figure_2a_distance_metric.svg"
        id="image4195"
        x="0.80552107"
-       y="43.266293"
+       y="42.583759"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="208.60883"
-       height="31.333382"
-       xlink:href="figures/figure_2b_network_summary_SC.svg"
+       width="186.53113"
+       height="77.450974"
+       xlink:href="figures/figure_2b_network_summary_both.svg"
        id="image8199"
-       x="1.2659225"
-       y="127.35553"
+       x="22.854246"
+       y="123.18192"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192" />
@@ -2889,7 +2839,7 @@
     </g>
     <g
        inkscape:label=""
-       transform="matrix(0.570512,0,0,0.570512,42.772959,-30.309124)"
+       transform="matrix(0.56011107,0,0,0.56011107,14.99283,-29.650312)"
        id="g74730"
        style="fill:#4d4d4d"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
@@ -3083,7 +3033,7 @@
     </g>
     <g
        inkscape:label=""
-       transform="matrix(0.570512,0,0,0.570512,-25.636519,-30.309125)"
+       transform="matrix(0.56011107,0,0,0.56011107,-37.103414,-29.650313)"
        id="g79323"
        style="fill:#4d4d4d"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
@@ -3285,7 +3235,7 @@
     </g>
     <g
        inkscape:label=""
-       transform="matrix(0.570512,0,0,0.570512,108.5922,-29.976693)"
+       transform="matrix(0.56011107,0,0,0.56011107,63.506998,-29.323942)"
        id="g83899"
        style="fill:#4d4d4d"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
@@ -3509,6 +3459,232 @@
         </g>
       </g>
     </g>
+    <g
+       inkscape:label=""
+       transform="matrix(0.56011107,0,0,0.56011107,114.76921,-30.062349)"
+       id="g83899-0"
+       style="fill:#4d4d4d;stroke-linecap:butt;stroke-linejoin:round"
+       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
+       inkscape:export-xdpi="192"
+       inkscape:export-ydpi="192">
+      <g
+         id="g157-1"
+         style="fill:#4d4d4d">
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g7556-3">
+          <use
+             xlink:href="#symbol1279"
+             x="93.121002"
+             y="73.18"
+             id="use5844-7"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g6085-7">
+          <use
+             xlink:href="#symbol3518"
+             x="101.492"
+             y="80.652"
+             id="use83864-2"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g6926-6">
+          <use
+             xlink:href="#symbol6204"
+             x="106.575"
+             y="78.411003"
+             id="use5733-4"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g5857-5">
+          <use
+             xlink:href="#symbol4731"
+             x="114.91846"
+             y="78.411003"
+             id="use6276-2"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g7563-0">
+          <use
+             xlink:href="#symbol4570"
+             x="121.06446"
+             y="78.411003"
+             id="use7282-2"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g5134-9">
+          <use
+             xlink:href="#symbol5371"
+             x="126.779"
+             y="79.406998"
+             id="use4128-0"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+          <use
+             xlink:href="#symbol3518"
+             x="129.43703"
+             y="79.406998"
+             id="use7014-9"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g5412-9">
+          <use
+             xlink:href="#symbol5895"
+             x="133.159"
+             y="78.411003"
+             id="use6680-4"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g3421-5">
+          <use
+             xlink:href="#symbol5315"
+             x="137.29601"
+             y="75.403999"
+             id="use5558-1"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g3192-0">
+          <use
+             xlink:href="#symbol6485"
+             x="142.47855"
+             y="75.403999"
+             id="use75-3"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g7608-7">
+          <use
+             xlink:href="#symbol3518"
+             x="137.045"
+             y="80.403"
+             id="use2926-8"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <path
+           style="fill:#4d4d4d;stroke:#000000;stroke-width:0.398;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
+           d="M 9.375e-5,2.5e-4 H 55.16025"
+           transform="matrix(1,0,0,-1,93.121,82.219)"
+           id="path9161-8" />
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g5686-6">
+          <use
+             xlink:href="#symbol1279"
+             x="100.681"
+             y="82.914001"
+             id="use6968-0"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g8501-4">
+          <use
+             xlink:href="#symbol3518"
+             x="109.053"
+             y="90.386002"
+             id="use9977-6"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g9960-7">
+          <use
+             xlink:href="#symbol6204"
+             x="114.135"
+             y="88.144997"
+             id="use8002-6"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g9888-0">
+          <use
+             xlink:href="#symbol4731"
+             x="122.47845"
+             y="88.144997"
+             id="use4930-9"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g8431-7">
+          <use
+             xlink:href="#symbol4570"
+             x="128.62447"
+             y="88.144997"
+             id="use6819-5"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+        <g
+           style="fill:#4d4d4d;fill-opacity:1"
+           id="g5978-9">
+          <use
+             xlink:href="#symbol5371"
+             x="134.339"
+             y="89.140999"
+             id="use3818-7"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+          <use
+             xlink:href="#symbol3518"
+             x="136.99702"
+             y="89.140999"
+             id="use1659-8"
+             style="fill:#4d4d4d"
+             width="100%"
+             height="100%" />
+        </g>
+      </g>
+    </g>
     <text
        xml:space="preserve"
        style="font-size:6.35px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;stroke-width:0.264583"
@@ -3519,6 +3695,83 @@
          id="tspan119934"
          style="stroke-width:0.264583"
          x="3.2503431"
-         y="141.06569"></tspan></text>
+         y="141.06569" /></text>
+    <image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="53.999805"
+       height="22.499928"
+       xlink:href="figures/figure_2a_brain_FC_rho.svg"
+       id="image21861"
+       x="155.65134"
+       y="20.374041" />
+    <image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="21.184141"
+       height="8.8267279"
+       xlink:href="figures/figure_2b_brain_SC_rho_SomMot.svg"
+       id="image30382"
+       x="3.0897479"
+       y="188.42622" />
+    <image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="21.099781"
+       height="8.7915802"
+       xlink:href="figures/figure_2b_brain_SC_rho_Limbic.svg"
+       id="image30494"
+       x="3.0897479"
+       y="178.98099" />
+    <image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="21.089249"
+       height="8.7915802"
+       xlink:href="figures/figure_2b_brain_SC_rho_Vis.svg"
+       id="image30494-3"
+       x="3.0897479"
+       y="169.50061"
+       style="stroke-linecap:butt;stroke-linejoin:round" />
+    <image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="21.089249"
+       height="8.7915802"
+       xlink:href="figures/figure_2b_brain_SC_rho_Default.svg"
+       id="image30494-3-8"
+       x="3.0897479"
+       y="160.02025"
+       style="stroke-linecap:butt;stroke-linejoin:round" />
+    <image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="21.089249"
+       height="8.7915802"
+       xlink:href="figures/figure_2b_brain_SC_rho_DorsAttn.svg"
+       id="image30494-3-8-3"
+       x="3.0897479"
+       y="150.53986"
+       style="stroke-linecap:butt;stroke-linejoin:round" />
+    <image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="21.089249"
+       height="8.7915802"
+       xlink:href="figures/figure_2b_brain_SC_rho_SalVentAttn.svg"
+       id="image30494-3-8-3-7"
+       x="3.0897479"
+       y="141.05948"
+       style="stroke-linecap:butt;stroke-linejoin:round" />
+    <image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="21.089249"
+       height="8.7915802"
+       xlink:href="figures/figure_2b_brain_SC_rho_Cont.svg"
+       id="image30494-3-8-3-7-9"
+       x="3.0897479"
+       y="131.5791"
+       style="stroke-linecap:butt;stroke-linejoin:round" />
   </g>
 </svg>

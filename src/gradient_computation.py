@@ -44,6 +44,7 @@ def compute_t1_gradient(
     t1_salience_profiles: list | np.ndarray,
     n_components: int = 10,
     sparsity: float = 0.9,
+    random_state: int = 0,
 ) -> np.ndarray:
     """
     Compute T1 MPC gradients and return the z-scored first component.
@@ -56,6 +57,10 @@ def compute_t1_gradient(
         Number of gradient components to extract.
     sparsity : float, default=0.9
         Sparsity threshold for GradientMaps.
+    random_state : int, default=0
+        Seed for the diffusion-map embedding, pinned for run-to-run
+        reproducibility. Note the eigenvector *sign* is mathematically arbitrary
+        and is not fixed by the seed; downstream code treats signs as produced.
 
     Returns
     -------
@@ -75,7 +80,7 @@ def compute_t1_gradient(
     # Fit GradientMaps
     gm_t1 = GradientMaps(
         n_components=n_components,
-        random_state=None,
+        random_state=random_state,
         approach='dm',
         kernel='normalized_angle',
         alignment='procrustes'

@@ -38,13 +38,14 @@ python scripts/figure_1a_t1map.py \
 
 - `results/figures/figure_1a_profiles.svg`
 - `results/figures/figure_1a_brain.svg`
-- `data/dataframes/df_1a_<hemi>.tsv` (cache)
+- `data/dataframes/figure_1a_pni_to_mics{,_5k}.csv` (subject → file-path tables)
+- `data/dataframes/df_1a_<hemi>.tsv`, `df_1a_<hemi>_fslr5k.tsv` (surface table + gradient cache)
 
 ---
 
 ## Figure 1b
 
-**`scripts/figure_1b_contextualisation.py`** — Correlates the T1 gradient with BigBrain, AHEAD Bielschowsky, and AHEAD Parvalbumin histological profiles using spin permutation tests.
+**`scripts/figure_1b_contextualisation.py`** — Correlates the T1 gradient with BigBrain, AHEAD Bielschowsky, and AHEAD Parvalbumin histological profiles, with significance assessed against a within-network Moran spectral-randomisation null (the correlation is restricted to salience-network vertices).
 
 ```bash
 python scripts/figure_1b_contextualisation.py -hemi LH
@@ -88,9 +89,9 @@ python scripts/figure_1c_cortical_types.py -pni_deriv /path/to/BIDS_PNI/derivati
 
 ## Figure 2
 
-**`scripts/figure_2_distance.py`** — Computes the connectivity-weighted projection of the whole-brain FC gradient across each source-network vertex's extranetwork targets, then correlates it per subject with the within-network MPC gradient (Spearman). Every modality uses only positive connections via the same weighted-mean projection. Panel 2A reports SC, GD, MPC, and FC for the salience network (Moran null primary, spin null secondary); Figure 2B replicates the SC projection across all 7 Yeo networks (Moran null only) and summarises it as a forest plot (group _r_ ± 95% CI, per-subject beeswarm, FDR-corrected significance). All analysis runs at fsLR-5k resolution (9,684 vertices).
+**`scripts/figure_2_distance.py`** — Computes the connectivity-weighted projection of the whole-brain FC gradient across each source-network vertex's extranetwork targets, then correlates it per subject with the within-network MPC gradient (Spearman). Every modality uses only positive connections via the same weighted-mean projection. Panel 2A reports SC, GD, MPC, and FC for the salience network (within-network Moran null, generated per hemisphere block); Figure 2B replicates the projection for all four measures across all 7 Yeo networks (same Moran null, with Benjamini–Hochberg FDR across networks per measure) and summarises it as a bubble matrix (rows = networks, columns = measures; disc colour = group _r_, area = |_r_|, black ring + stars = FDR-corrected significance). All analysis runs at fsLR-5k resolution (9,684 vertices).
 
-Requires `figure_1a_t1map.py` to have been run first (produces `data/dataframes/figure_1a_pni_to_mics.csv`).
+Requires `figure_1a_t1map.py` to have been run first: it reads the subject → file table `data/dataframes/figure_1a_pni_to_mics_5k.csv` (required) and reuses the cached fsLR-5k MPC gradient from `data/dataframes/df_1a_<hemi>_fslr5k.tsv` when present, recomputing it in-figure otherwise. The `df_1a_*.tsv` caches are tab-separated.
 
 ```bash
 python scripts/figure_2_distance.py -hemi LH
@@ -107,12 +108,12 @@ python scripts/figure_2_distance.py -hemi LH -panel 2b
 
 - `results/figures/figure_2a_distance_metric.svg`
 - `results/figures/figure_2a_brain_{SC,GD,MPC,FC}_rho.svg`
-- `results/figures/figure_2b_distance_network_SC.svg` (per-network scatter grid)
-- `results/figures/figure_2b_network_summary_SC.svg` (forest + beeswarm summary)
-- `results/figures/figure_2b_brain_SC_rho_<network>.svg`
+- `results/figures/figure_2b_distance_network_{SC,GD,MPC,FC}.svg` (per-measure scatter grid)
+- `results/figures/figure_2b_network_summary_<hemi>.svg` (bubble matrix, all measures × networks)
+- `results/figures/figure_2b_brain_{SC,GD,MPC,FC}_rho_<network>.svg`
 - `data/dataframes/df_2b_label_<hemi>.csv` (cache)
 - `data/dataframes/df_2b_network_stats_<measure>_<hemi>.csv` (per-network group stats)
-- `data/dataframes/df_2b_network_subject_r_<measure>_<hemi>.csv` (per-subject _r_, for the beeswarm)
+- `data/dataframes/df_2b_network_subject_r_<measure>_<hemi>.csv` (per-subject _r_; row index is the subject ID, one column per network)
 
 ---
 

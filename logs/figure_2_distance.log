@@ -4997,3 +4997,393 @@ Gradient lambdas: [0.07343302 0.05527189 0.04808355 0.04356052 0.02998314 0.0273
 [Figure 2B FDR | SC | Vis] q_moran=8.620e-01 q_spin=8.987e-01
 [Figure 2B FDR | SC | SomMot] q_moran=8.620e-01 q_spin=8.987e-01
 [Figure 2B] forest summary written to figure_2b_network_summary_SC.svg
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-09 10:24:28
+  --hemi: both
+  --panel: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC/FC weights : positive connections only (weighted-mean projection)
+Null model     : Moran spectral randomisation (primary); spin (2A only)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+[FC] no session-matched fsLR-5k FC connectome for ['PNC024']; excluded from the FC modality only.
+[FC] resting-state FC connectomes resolved for N=17 / 18 subjects.
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07081148 0.05406947 0.04499717 0.04053183 0.02897517 0.02585257
+ 0.02213681 0.0196204  0.01578124 0.01372569]
+[Figure 2A | SC] r_group=+0.325 [+0.316, +0.333] t=+76.80 p=4.768e-23 | p_moran=1.000e-03 (primary) p_spin=3.068e-01 (n_perm=1000) | n=18
+[Figure 2A | GD] r_group=+0.299 [+0.295, +0.304] t=+143.99 p=1.108e-27 | p_moran=3.000e-03 (primary) p_spin=3.486e-01 (n_perm=1000) | n=18
+[Figure 2A | MPC] r_group=+0.445 [+0.418, +0.471] t=+30.61 p=2.614e-16 | p_moran=0.000e+00 (primary) p_spin=5.097e-03 (n_perm=1000) | n=18
+[Figure 2A | FC] r_group=+0.128 [+0.099, +0.156] t=+9.30 p=7.502e-08 | p_moran=3.500e-02 (primary) p_spin=5.199e-01 (n_perm=1000) | n=17
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.0651302  0.05649517 0.045804   0.04079017 0.02930139 0.0249216
+ 0.02135414 0.01783833 0.01564203 0.01361343]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07206265 0.0565827  0.04671876 0.04258442 0.02976262 0.02756386
+ 0.02247971 0.01930214 0.01592659 0.01450152]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07180845 0.05762748 0.0478976  0.04145806 0.03155957 0.02791625
+ 0.0220477  0.01885117 0.01661675 0.01485999]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07209068 0.05414658 0.04589288 0.0399803  0.02982717 0.02648212
+ 0.02246622 0.01919869 0.01623297 0.014373  ]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07240647 0.05388736 0.04778433 0.04441662 0.0309063  0.02821838
+ 0.0223587  0.019491   0.01689976 0.01544417]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07335162 0.05525045 0.04810584 0.04354485 0.02999241 0.02734919
+ 0.02259104 0.01942993 0.01631119 0.01521107]
+[Figure 2B | SC] processing network: Limbic
+[Figure 2B | Limbic | SC] r_group=-0.030 [-0.042, -0.018] t=-5.34 p=5.375e-05 | p_moran=8.560e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Default
+[Figure 2B | Default | SC] r_group=+0.156 [+0.145, +0.168] t=+28.91 p=6.769e-16 | p_moran=2.210e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Cont
+[Figure 2B | Cont | SC] r_group=+0.515 [+0.505, +0.524] t=+92.72 p=1.949e-24 | p_moran=4.000e-03 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | SC] r_group=+0.325 [+0.316, +0.333] t=+76.80 p=4.768e-23 | p_moran=1.000e-03 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: DorsAttn
+[Figure 2B | DorsAttn | SC] r_group=+0.170 [+0.150, +0.190] t=+17.76 p=2.067e-12 | p_moran=1.970e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Vis
+[Figure 2B | Vis | SC] r_group=+0.037 [+0.009, +0.065] t=+2.74 p=1.387e-02 | p_moran=7.470e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: SomMot
+[Figure 2B | SomMot | SC] r_group=-0.036 [-0.052, -0.019] t=-4.51 p=3.078e-04 | p_moran=7.090e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B FDR | SC | Limbic] q_moran=8.560e-01
+[Figure 2B FDR | SC | Default] q_moran=3.867e-01
+[Figure 2B FDR | SC | Cont] q_moran=1.400e-02
+[Figure 2B FDR | SC | SalVentAttn] q_moran=7.000e-03
+[Figure 2B FDR | SC | DorsAttn] q_moran=3.867e-01
+[Figure 2B FDR | SC | Vis] q_moran=8.560e-01
+[Figure 2B FDR | SC | SomMot] q_moran=8.560e-01
+[Figure 2B | GD] processing network: Limbic
+[Figure 2B | Limbic | GD] r_group=-0.001 [-0.004, +0.003] t=-0.34 p=7.360e-01 | p_moran=9.920e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | GD] processing network: Default
+[Figure 2B | Default | GD] r_group=+0.207 [+0.203, +0.211] t=+111.84 p=8.100e-26 | p_moran=1.300e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | GD] processing network: Cont
+[Figure 2B | Cont | GD] r_group=+0.407 [+0.403, +0.411] t=+177.48 p=3.175e-29 | p_moran=9.600e-02 (primary) (n_perm=1000) | n=18
+[Figure 2B | GD] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | GD] r_group=+0.299 [+0.295, +0.304] t=+143.99 p=1.108e-27 | p_moran=3.000e-03 (primary) (n_perm=1000) | n=18
+[Figure 2B | GD] processing network: DorsAttn
+[Figure 2B | DorsAttn | GD] r_group=+0.371 [+0.362, +0.379] t=+79.35 p=2.737e-23 | p_moran=7.000e-03 (primary) (n_perm=1000) | n=18
+[Figure 2B | GD] processing network: Vis
+[Figure 2B | Vis | GD] r_group=-0.153 [-0.164, -0.142] t=-28.00 p=1.158e-15 | p_moran=7.800e-02 (primary) (n_perm=1000) | n=18
+[Figure 2B | GD] processing network: SomMot
+[Figure 2B | SomMot | GD] r_group=-0.096 [-0.104, -0.088] t=-24.30 p=1.214e-14 | p_moran=3.920e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B FDR | GD | Limbic] q_moran=9.920e-01
+[Figure 2B FDR | GD | Default] q_moran=1.820e-01
+[Figure 2B FDR | GD | Cont] q_moran=1.680e-01
+[Figure 2B FDR | GD | SalVentAttn] q_moran=2.100e-02
+[Figure 2B FDR | GD | DorsAttn] q_moran=2.450e-02
+[Figure 2B FDR | GD | Vis] q_moran=1.680e-01
+[Figure 2B FDR | GD | SomMot] q_moran=4.573e-01
+[Figure 2B | MPC] processing network: Limbic
+[Figure 2B | Limbic | MPC] r_group=-0.292 [-0.329, -0.255] t=-15.65 p=1.580e-11 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B | MPC] processing network: Default
+[Figure 2B | Default | MPC] r_group=+0.363 [+0.344, +0.382] t=+36.00 p=1.722e-17 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B | MPC] processing network: Cont
+[Figure 2B | Cont | MPC] r_group=+0.370 [+0.338, +0.401] t=+22.45 p=4.480e-14 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B | MPC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | MPC] r_group=+0.445 [+0.418, +0.471] t=+30.61 p=2.614e-16 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B | MPC] processing network: DorsAttn
+[Figure 2B | DorsAttn | MPC] r_group=+0.326 [+0.296, +0.356] t=+21.17 p=1.184e-13 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B | MPC] processing network: Vis
+[Figure 2B | Vis | MPC] r_group=-0.418 [-0.443, -0.391] t=-29.88 p=3.911e-16 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B | MPC] processing network: SomMot
+[Figure 2B | SomMot | MPC] r_group=+0.513 [+0.478, +0.545] t=+26.30 p=3.264e-15 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B FDR | MPC | Limbic] q_moran=0.000e+00
+[Figure 2B FDR | MPC | Default] q_moran=0.000e+00
+[Figure 2B FDR | MPC | Cont] q_moran=0.000e+00
+[Figure 2B FDR | MPC | SalVentAttn] q_moran=0.000e+00
+[Figure 2B FDR | MPC | DorsAttn] q_moran=0.000e+00
+[Figure 2B FDR | MPC | Vis] q_moran=0.000e+00
+[Figure 2B FDR | MPC | SomMot] q_moran=0.000e+00
+[Figure 2B | FC] processing network: Limbic
+[Figure 2B | Limbic | FC] r_group=-0.026 [-0.048, -0.003] t=-2.42 p=2.758e-02 | p_moran=5.240e-01 (primary) (n_perm=1000) | n=17
+[Figure 2B | FC] processing network: Default
+[Figure 2B | Default | FC] r_group=-0.093 [-0.120, -0.065] t=-7.06 p=2.677e-06 | p_moran=6.700e-02 (primary) (n_perm=1000) | n=17
+[Figure 2B | FC] processing network: Cont
+[Figure 2B | Cont | FC] r_group=-0.001 [-0.056, +0.053] t=-0.06 p=9.565e-01 | p_moran=9.730e-01 (primary) (n_perm=1000) | n=17
+[Figure 2B | FC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | FC] r_group=+0.128 [+0.099, +0.156] t=+9.30 p=7.502e-08 | p_moran=3.500e-02 (primary) (n_perm=1000) | n=17
+[Figure 2B | FC] processing network: DorsAttn
+[Figure 2B | DorsAttn | FC] r_group=+0.157 [+0.124, +0.189] t=+10.07 p=2.505e-08 | p_moran=3.700e-02 (primary) (n_perm=1000) | n=17
+[Figure 2B | FC] processing network: Vis
+[Figure 2B | Vis | FC] r_group=-0.092 [-0.157, -0.025] t=-2.93 p=9.852e-03 | p_moran=4.900e-02 (primary) (n_perm=1000) | n=17
+[Figure 2B | FC] processing network: SomMot
+[Figure 2B | SomMot | FC] r_group=-0.091 [-0.160, -0.022] t=-2.79 p=1.317e-02 | p_moran=4.700e-02 (primary) (n_perm=1000) | n=17
+[Figure 2B FDR | FC | Limbic] q_moran=6.113e-01
+[Figure 2B FDR | FC | Default] q_moran=9.380e-02
+[Figure 2B FDR | FC | Cont] q_moran=9.730e-01
+[Figure 2B FDR | FC | SalVentAttn] q_moran=8.575e-02
+[Figure 2B FDR | FC | DorsAttn] q_moran=8.575e-02
+[Figure 2B FDR | FC | Vis] q_moran=8.575e-02
+[Figure 2B FDR | FC | SomMot] q_moran=8.575e-02
+[Figure 2B] forest summary written to figure_2b_network_summary_both.svg
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-09 12:55:39
+  --hemi: both
+  --panel: 2a
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC/FC weights : positive connections only (weighted-mean projection)
+Null model     : Moran spectral randomisation (primary); spin (2A only)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+[FC] no session-matched fsLR-5k FC connectome for ['PNC024']; excluded from the FC modality only.
+[FC] resting-state FC connectomes resolved for N=17 / 18 subjects.
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07081307 0.05402715 0.04499895 0.04054899 0.02897317 0.02585245
+ 0.0221351  0.01963962 0.0157714  0.01372562]
+[Figure 2A | SC] r_group=+0.324 [+0.316, +0.333] t=+76.78 p=4.788e-23 | p_moran=1.000e-03 (primary) p_spin=3.048e-01 (n_perm=1000) | n=18
+[Figure 2A | GD] r_group=+0.299 [+0.295, +0.303] t=+143.86 p=1.125e-27 | p_moran=3.000e-03 (primary) p_spin=3.486e-01 (n_perm=1000) | n=18
+[Figure 2A | MPC] r_group=+0.445 [+0.418, +0.471] t=+30.52 p=2.735e-16 | p_moran=0.000e+00 (primary) p_spin=5.097e-03 (n_perm=1000) | n=18
+[Figure 2A | FC] r_group=+0.128 [+0.099, +0.156] t=+9.30 p=7.518e-08 | p_moran=3.500e-02 (primary) p_spin=5.219e-01 (n_perm=1000) | n=17
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-09 17:17:34
+  --hemi: both
+  --panel: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC/FC weights : positive connections only (weighted-mean projection)
+Null model     : Moran spectral randomisation (primary); spin (2A only)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+[FC] no session-matched fsLR-5k FC connectome for ['PNC024']; excluded from the FC modality only.
+[FC] resting-state FC connectomes resolved for N=17 / 18 subjects.
+fsLR-5k gradient dataframe found at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.07079383 0.05403459 0.04495698 0.04055355 0.02898066 0.02585699
+ 0.02211259 0.01962606 0.01577803 0.01372588]
+[Figure 2A | SC] r_group=+0.324 [+0.316, +0.333] t=+76.79 p=4.773e-23 | p_moran=1.000e-03 (primary) p_spin=3.068e-01 (n_perm=1000) | n=18
+[Figure 2A | GD] r_group=+0.299 [+0.295, +0.303] t=+143.93 p=1.117e-27 | p_moran=3.000e-03 (primary) p_spin=3.476e-01 (n_perm=1000) | n=18
+[Figure 2A | MPC] r_group=+0.445 [+0.418, +0.471] t=+30.53 p=2.733e-16 | p_moran=0.000e+00 (primary) p_spin=5.097e-03 (n_perm=1000) | n=18
+[Figure 2A | FC] r_group=+0.128 [+0.099, +0.156] t=+9.30 p=7.424e-08 | p_moran=3.500e-02 (primary) p_spin=5.209e-01 (n_perm=1000) | n=17
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06514293 0.05654959 0.04583023 0.04081762 0.02931302 0.02493536
+ 0.02135903 0.01784089 0.0156458  0.0136169 ]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07206546 0.05662571 0.04670412 0.04258291 0.02976451 0.02756505
+ 0.02248088 0.01930731 0.0159282  0.01450317]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07185075 0.05765022 0.0479189  0.04144691 0.03154239 0.02791057
+ 0.02204724 0.01885591 0.01661013 0.01485698]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07205684 0.05412576 0.04584514 0.03998401 0.02981966 0.02647506
+ 0.02245532 0.01918785 0.01622307 0.01436323]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07235831 0.05381838 0.04772159 0.04440154 0.03085482 0.02819741
+ 0.02234698 0.01948363 0.01688949 0.01543727]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.07339338 0.05525457 0.04809906 0.04355465 0.02999918 0.02736862
+ 0.02260628 0.01943979 0.01631565 0.01522673]
+[Figure 2B | SC] processing network: Limbic
+[Figure 2B | Limbic | SC] r_group=-0.030 [-0.041, -0.018] t=-5.28 p=6.064e-05 | p_moran=8.610e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Default
+[Figure 2B | Default | SC] r_group=+0.156 [+0.145, +0.167] t=+28.91 p=6.780e-16 | p_moran=2.220e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Cont
+[Figure 2B | Cont | SC] r_group=+0.515 [+0.505, +0.524] t=+92.63 p=1.983e-24 | p_moran=4.000e-03 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | SC] r_group=+0.324 [+0.316, +0.333] t=+76.79 p=4.773e-23 | p_moran=1.000e-03 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: DorsAttn
+[Figure 2B | DorsAttn | SC] r_group=+0.170 [+0.150, +0.189] t=+17.76 p=2.067e-12 | p_moran=1.970e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Vis
+[Figure 2B | Vis | SC] r_group=+0.037 [+0.009, +0.065] t=+2.76 p=1.342e-02 | p_moran=7.470e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: SomMot
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-09 18:22:59
+  --hemi: both
+  --panel: both
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC/FC weights : positive connections only (weighted-mean projection)
+Null model     : Moran spectral randomisation (primary); spin (2A only)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+[FC] no session-matched fsLR-5k FC connectome for ['PNC024']; excluded from the FC modality only.
+[FC] resting-state FC connectomes resolved for N=17 / 18 subjects.
+Loaded cached fsLR-5k MPC gradient (t1_gradient1_SalVentAttn) from df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1027, n_edges=3995511, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+[FC gradient] flipped sign so the default-mode network sits at the low (default-mode) end.
+[Figure 2A | SC] r_group=+0.324 [+0.316, +0.333] t=+76.78 p=4.783e-23 | p_moran=1.000e-03 (primary) p_spin=3.068e-01 (n_perm=1000) | n=18
+[Figure 2A | GD] r_group=+0.299 [+0.295, +0.303] t=+143.43 p=1.184e-27 | p_moran=3.000e-03 (primary) p_spin=3.507e-01 (n_perm=1000) | n=18
+[Figure 2A | MPC] r_group=+0.446 [+0.419, +0.472] t=+30.67 p=2.524e-16 | p_moran=0.000e+00 (primary) p_spin=5.097e-03 (n_perm=1000) | n=18
+[Figure 2A | FC] r_group=+0.128 [+0.099, +0.157] t=+9.30 p=7.481e-08 | p_moran=3.500e-02 (primary) p_spin=5.240e-01 (n_perm=1000) | n=17
+[FC gradient] flipped sign so the default-mode network sits at the low (default-mode) end.
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06514443 0.056568   0.045871   0.04080021 0.02932299 0.02494771
+ 0.02135809 0.01784412 0.01564757 0.01361917]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07212953 0.05665128 0.04674917 0.04261457 0.02977483 0.02757444
+ 0.02249008 0.01931726 0.01593843 0.0145028 ]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07180051 0.05762064 0.04790116 0.04144512 0.03155966 0.02792199
+ 0.02205309 0.01884953 0.01661122 0.01485882]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07202015 0.05412327 0.04586716 0.03996534 0.02982708 0.02648197
+ 0.02245816 0.0191889  0.01622912 0.01436959]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07238211 0.05384609 0.04777605 0.04444413 0.03090291 0.02820754
+ 0.02235971 0.01948287 0.01689675 0.0154445 ]
+Loading profiles for 18 subjects...
+Final array shape: (18, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.0733892  0.05526093 0.04806347 0.04350846 0.02999274 0.02737744
+ 0.02260072 0.01943767 0.01631064 0.0152216 ]
+[Figure 2B | SC] processing network: Limbic
+[Figure 2B | Limbic | SC] r_group=-0.031 [-0.043, -0.019] t=-5.41 p=4.709e-05 | p_moran=8.580e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Default
+[Figure 2B | Default | SC] r_group=+0.156 [+0.145, +0.167] t=+28.95 p=6.610e-16 | p_moran=2.210e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Cont
+[Figure 2B | Cont | SC] r_group=+0.514 [+0.505, +0.524] t=+92.71 p=1.954e-24 | p_moran=4.000e-03 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | SC] r_group=+0.324 [+0.316, +0.333] t=+76.78 p=4.783e-23 | p_moran=1.000e-03 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: DorsAttn
+[Figure 2B | DorsAttn | SC] r_group=+0.170 [+0.150, +0.189] t=+17.74 p=2.099e-12 | p_moran=1.980e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: Vis
+[Figure 2B | Vis | SC] r_group=+0.037 [+0.009, +0.065] t=+2.75 p=1.365e-02 | p_moran=7.470e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | SC] processing network: SomMot
+[Figure 2B | SomMot | SC] r_group=-0.036 [-0.052, -0.019] t=-4.51 p=3.099e-04 | p_moran=7.080e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B FDR | SC | Limbic] q_moran=8.580e-01
+[Figure 2B FDR | SC | Default] q_moran=3.867e-01
+[Figure 2B FDR | SC | Cont] q_moran=1.400e-02
+[Figure 2B FDR | SC | SalVentAttn] q_moran=7.000e-03
+[Figure 2B FDR | SC | DorsAttn] q_moran=3.867e-01
+[Figure 2B FDR | SC | Vis] q_moran=8.580e-01
+[Figure 2B FDR | SC | SomMot] q_moran=8.580e-01
+[Figure 2B | GD] processing network: Limbic
+[Figure 2B | Limbic | GD] r_group=-0.002 [-0.005, +0.001] t=-1.21 p=2.446e-01 | p_moran=9.760e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | GD] processing network: Default
+[Figure 2B | Default | GD] r_group=+0.207 [+0.203, +0.211] t=+111.69 p=8.284e-26 | p_moran=1.300e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B | GD] processing network: Cont
+[Figure 2B | Cont | GD] r_group=+0.407 [+0.403, +0.411] t=+177.39 p=3.203e-29 | p_moran=9.500e-02 (primary) (n_perm=1000) | n=18
+[Figure 2B | GD] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | GD] r_group=+0.299 [+0.295, +0.303] t=+143.43 p=1.184e-27 | p_moran=3.000e-03 (primary) (n_perm=1000) | n=18
+[Figure 2B | GD] processing network: DorsAttn
+[Figure 2B | DorsAttn | GD] r_group=+0.371 [+0.362, +0.380] t=+79.27 p=2.788e-23 | p_moran=7.000e-03 (primary) (n_perm=1000) | n=18
+[Figure 2B | GD] processing network: Vis
+[Figure 2B | Vis | GD] r_group=-0.153 [-0.164, -0.142] t=-27.95 p=1.187e-15 | p_moran=7.900e-02 (primary) (n_perm=1000) | n=18
+[Figure 2B | GD] processing network: SomMot
+[Figure 2B | SomMot | GD] r_group=-0.096 [-0.104, -0.088] t=-24.28 p=1.229e-14 | p_moran=3.910e-01 (primary) (n_perm=1000) | n=18
+[Figure 2B FDR | GD | Limbic] q_moran=9.760e-01
+[Figure 2B FDR | GD | Default] q_moran=1.820e-01
+[Figure 2B FDR | GD | Cont] q_moran=1.663e-01
+[Figure 2B FDR | GD | SalVentAttn] q_moran=2.100e-02
+[Figure 2B FDR | GD | DorsAttn] q_moran=2.450e-02
+[Figure 2B FDR | GD | Vis] q_moran=1.663e-01
+[Figure 2B FDR | GD | SomMot] q_moran=4.562e-01
+[Figure 2B | MPC] processing network: Limbic
+[Figure 2B | Limbic | MPC] r_group=-0.290 [-0.327, -0.253] t=-15.53 p=1.788e-11 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B | MPC] processing network: Default
+[Figure 2B | Default | MPC] r_group=+0.364 [+0.344, +0.383] t=+36.12 p=1.630e-17 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B | MPC] processing network: Cont
+[Figure 2B | Cont | MPC] r_group=+0.370 [+0.338, +0.401] t=+22.43 p=4.555e-14 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B | MPC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | MPC] r_group=+0.446 [+0.419, +0.472] t=+30.67 p=2.524e-16 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B | MPC] processing network: DorsAttn
+[Figure 2B | DorsAttn | MPC] r_group=+0.326 [+0.295, +0.356] t=+21.12 p=1.225e-13 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B | MPC] processing network: Vis
+[Figure 2B | Vis | MPC] r_group=-0.418 [-0.443, -0.391] t=-29.88 p=3.908e-16 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B | MPC] processing network: SomMot
+[Figure 2B | SomMot | MPC] r_group=+0.513 [+0.479, +0.546] t=+26.35 p=3.167e-15 | p_moran=0.000e+00 (primary) (n_perm=1000) | n=18
+[Figure 2B FDR | MPC | Limbic] q_moran=0.000e+00
+[Figure 2B FDR | MPC | Default] q_moran=0.000e+00
+[Figure 2B FDR | MPC | Cont] q_moran=0.000e+00
+[Figure 2B FDR | MPC | SalVentAttn] q_moran=0.000e+00
+[Figure 2B FDR | MPC | DorsAttn] q_moran=0.000e+00
+[Figure 2B FDR | MPC | Vis] q_moran=0.000e+00
+[Figure 2B FDR | MPC | SomMot] q_moran=0.000e+00
+[Figure 2B | FC] processing network: Limbic
+[Figure 2B | Limbic | FC] r_group=-0.025 [-0.048, -0.003] t=-2.38 p=2.997e-02 | p_moran=5.390e-01 (primary) (n_perm=1000) | n=17
+[Figure 2B | FC] processing network: Default
+[Figure 2B | Default | FC] r_group=-0.093 [-0.120, -0.065] t=-7.07 p=2.648e-06 | p_moran=6.700e-02 (primary) (n_perm=1000) | n=17
+[Figure 2B | FC] processing network: Cont
+[Figure 2B | Cont | FC] r_group=-0.002 [-0.056, +0.053] t=-0.06 p=9.528e-01 | p_moran=9.710e-01 (primary) (n_perm=1000) | n=17
+[Figure 2B | FC] processing network: SalVentAttn
+[Figure 2B | SalVentAttn | FC] r_group=+0.128 [+0.099, +0.157] t=+9.30 p=7.481e-08 | p_moran=3.500e-02 (primary) (n_perm=1000) | n=17
+[Figure 2B | FC] processing network: DorsAttn
+[Figure 2B | DorsAttn | FC] r_group=+0.156 [+0.124, +0.189] t=+10.06 p=2.538e-08 | p_moran=3.700e-02 (primary) (n_perm=1000) | n=17
+[Figure 2B | FC] processing network: Vis
+[Figure 2B | Vis | FC] r_group=-0.092 [-0.157, -0.025] t=-2.93 p=9.910e-03 | p_moran=4.900e-02 (primary) (n_perm=1000) | n=17
+[Figure 2B | FC] processing network: SomMot
+[Figure 2B | SomMot | FC] r_group=-0.091 [-0.160, -0.022] t=-2.79 p=1.309e-02 | p_moran=4.700e-02 (primary) (n_perm=1000) | n=17
+[Figure 2B FDR | FC | Limbic] q_moran=6.288e-01
+[Figure 2B FDR | FC | Default] q_moran=9.380e-02
+[Figure 2B FDR | FC | Cont] q_moran=9.710e-01
+[Figure 2B FDR | FC | SalVentAttn] q_moran=8.575e-02
+[Figure 2B FDR | FC | DorsAttn] q_moran=8.575e-02
+[Figure 2B FDR | FC | Vis] q_moran=8.575e-02
+[Figure 2B FDR | FC | SomMot] q_moran=8.575e-02
+[Figure 2B] bubble-matrix summary written to figure_2b_network_summary_both.svg

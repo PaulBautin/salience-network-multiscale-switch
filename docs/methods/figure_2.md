@@ -9,19 +9,18 @@ whether that connectivity tracks the whole-brain sensory–transmodal axis given
 the principal functional connectivity (FC) gradient. Panel 2A reports the result
 for the SN across four connectivity modalities — structural connectivity (SC),
 geodesic distance (GD), microstructural profile covariance (MPC), and functional
-connectivity (FC) — and panel 2B replicates the structural-connectivity result
-across all seven Yeo networks. SC,
+connectivity (FC) — and panel 2B replicates the test across all seven Yeo networks
+for each of the same four connectivity measures. SC,
 which indexes axonal connectivity and is independent of the MPC gradient, is the
-primary modality and the one carried through to the across-network replication; the
-MPC-weighted variant is reported only for the SN in panel 2A as a supplement,
-because correlating an MPC-derived gradient with the FC gradient through MPC weights
-partly reflects the shared microstructural backbone of cortical hierarchy
-(microstructure–function coupling) rather than network-specific connectivity. The
-FC-weighted variant is likewise a convergence reading rather than an independent
-test: because the projection target $g^{\mathrm{FC}}$ is itself the principal FC
-gradient, projecting functional coupling onto it measures how strongly resting-state
-connectivity recapitulates the gradient ordering, and is reported for the SN in
-panel 2A alongside the modality-independent SC. All
+primary modality and the one that fixes the network ordering shared across measures.
+The MPC-weighted variant partly reflects the shared microstructural backbone of
+cortical hierarchy (microstructure–function coupling) rather than network-specific
+connectivity, because it correlates an MPC-derived gradient with the FC gradient
+through MPC weights. The FC-weighted variant is likewise a convergence reading
+rather than an independent test: because the projection target $g^{\mathrm{FC}}$ is
+itself the principal FC gradient, projecting functional coupling onto it measures how
+strongly resting-state connectivity recapitulates the gradient ordering. Both are
+reported alongside the modality-independent SC and GD measures. All
 analyses were performed
 at fsLR-5k resolution (9,684 vertices: 4,842 per hemisphere), which keeps the
 whole-brain connectivity matrices in memory. The within-network MPC
@@ -42,7 +41,11 @@ where $\mathcal{V}_\mathcal{N}$ is the source network and $w_{ij}$ is the
 modality-dependent connectivity weight from vertex $i$ to vertex $j$. The score
 $P^{(s)}_i$ is the expected FC-gradient position of vertex $i$'s targets: a high
 value indicates preferential coupling to the task-positive pole of the FC
-gradient, a low value coupling to the default-mode pole. Alignment between
+gradient, a low value coupling to the default-mode pole. Because the polarity of
+the diffusion-map FC gradient is mathematically arbitrary, $g^{\mathrm{FC}}$ was
+oriented from the data so that the default-mode network occupied its low pole, and
+the task-positive systems its high pole, before any projection was computed (the
+chosen sign is recorded in the run log). Alignment between
 connectivity and microstructure was quantified per subject as the Spearman rank
 correlation between the within-network MPC gradient and the projection score
 across SN vertices,
@@ -99,50 +102,66 @@ keeps the weighted mean well-defined for MPC and FC alike.
 Per-subject correlations were transformed to Fisher z and tested against zero with
 a one-sample t-test across the $N_S = 18$ subjects. The group correlation
 $\bar r = \tanh(\bar z)$ is reported with a 95 % confidence interval
-back-transformed from the z-scale, together with the t statistic and parametric p
-value.
+back-transformed from the z-scale, together with the t statistic and the parametric
+p value. This t-test quantifies the *subject-level reliability* of the mean
+alignment — whether $\bar r$ is consistently non-zero across the random sample of
+subjects — and treats the subject as the unit of inference. It does **not** account
+for the spatial autocorrelation of the two vertexwise maps, so it is reported as a
+reliability summary rather than the significance test.
 
-Because vertexwise gradients are strongly spatially autocorrelated, the parametric
-p value overstates significance and was confirmed against a spin-permutation null
-([Shared Methods — Spin-test permutations](shared.md#spin-test-permutations-whole-brain);
-Alexander-Bloch et al., 2018). The MPC gradient was embedded in the full
-9,684-vertex fsLR-5k space (NaN outside the source network) and rotated 1,000
-times; for each rotation the per-subject statistic was recomputed over the spatial
-overlap of the rotated and original network footprints and aggregated across
-subjects by the Fisher-z mean, giving a two-tailed empirical $p_{\mathrm{spin}}$.
-A within-network Moran spectral randomisation null (Wagner & Dray, 2015), which
-preserves the empirical spatial autocorrelation of the gradient and restricts the
-null entirely to the source network, is also available as a tighter,
-footprint-matched alternative.
+Because vertexwise gradients are strongly spatially autocorrelated, two smooth maps
+tend to correlate even by chance; spatial significance was assessed against a
+within-network Moran spectral-randomisation null (Wagner & Dray, 2015;
+[Shared Methods — Moran spectral randomisation](shared.md#moran-spectral-randomisation-within-network)).
+Surrogates of the MPC gradient that preserve its empirical within-network spatial
+autocorrelation were generated and, for each surrogate, the per-subject statistic
+was recomputed and aggregated across subjects by the Fisher-z mean, giving a
+two-tailed empirical $p_{\mathrm{moran}}$ via the add-one estimator
+$p = (1 + k)/(1 + n_{\mathrm{perm}})$, with $k$ the number of surrogates whose
+$|\,\bar r\,|$ equalled or exceeded the observed value. Because micapipe geodesic
+distance is undefined across hemispheres, the inverse-distance spatial-weight graph
+of a bilateral source network is disconnected into one component per hemisphere;
+surrogates were therefore generated independently within each connected component
+and reassembled, preserving within-hemisphere autocorrelation while keeping both
+hemispheres in the statistic. A single-hemisphere analysis forms one component.
 
 ## Across-network replication (panel 2B)
 
-The structural-connectivity test was repeated independently for each of the seven
-Yeo networks, computing a within-network MPC gradient and the per-subject
-projection statistic $r_s$ for every network in turn. Significance was assessed
-with the within-network Moran spectral-randomisation null alone, whose
-footprint-matched construction is the appropriate per-network test; the
-$p_{\mathrm{moran}}$ values were corrected across the seven networks with the
-Benjamini–Hochberg false-discovery-rate procedure, and the resulting $q$ values
-are reported alongside the group estimates.
+The test was repeated independently for each of the seven Yeo networks and for each
+of the four connectivity measures, computing a within-network MPC gradient (once per
+network, shared across measures) and the per-subject projection statistic $r_s$ for
+every network–measure combination. Significance was assessed with the same
+within-network Moran spectral-randomisation null as panel 2A (per-hemisphere-block
+surrogates, add-one empirical $p_{\mathrm{moran}}$), whose footprint-matched
+construction is the appropriate per-network test. Each connectivity measure was
+treated as its own inferential family: within each measure the seven networks'
+$p_{\mathrm{moran}}$ values were corrected with the Benjamini–Hochberg
+false-discovery-rate procedure, and the resulting $q$ values are reported alongside
+the group estimates.
 
-The replication is summarised as a forest plot (`figure_2b_network_summary_SC.svg`):
-a single horizontal row with one column per network, ordered by the group effect,
-showing the group correlation $\bar r$ (filled marker), its 95 % confidence interval
-(vertical bar), the distribution of per-subject coefficients $r_s$ (x-jittered
-beeswarm), and FDR significance of the Moran null (stars). The within-network MPC
+The replication is summarised as a bubble matrix
+(`figure_2b_network_summary_{hemi}.svg`) with one row per network and one column per
+connectivity measure (SC, GD, MPC, FC); the four measure columns share the width of
+the Figure 2A modality panels so the two figures align when stacked. The networks are
+ordered once by the primary measure's (SC) signed group effect and that order is
+shared across every measure column. Each cell is a disc whose colour encodes the
+group correlation $\bar r$ on a diverging scale and whose area encodes $|\bar r|$,
+with FDR significance of the Moran null rendered as the disc's black edge ring and
+overprinted stars and the signed value printed beneath. The within-network MPC
 gradient is the first diffusion-map eigenvector, whose polarity is mathematically
-arbitrary and is not anchored across networks; coefficients are therefore plotted
-exactly as the projection produces them, and only the magnitude and significance —
-not the sign — are compared between networks. The per-network scatter grid
-(`figure_2b_distance_network_SC.svg`) is laid out as a matching single row in the
-same network order, carrying only the colour-coded network title and shared axes
-(per-vertex MPC gradient against the SC projection $P$); the two figures stack so
-that each network's scatter sits directly above its summary column.
+arbitrary and is not anchored across networks; coefficients are therefore shown
+exactly as the projection produces them, so the sign is interpretable *within* a row
+(the measures share one $g_{\mathrm{MPC}}$) but not *between* rows, where only the
+magnitude — carried by disc area — and significance are compared. A per-measure scatter grid
+(`figure_2b_distance_network_{measure}.svg`) is laid out as a matching single row in
+the same network order, carrying only the colour-coded network title and shared axes
+(per-vertex MPC gradient against that measure's projection $P$).
 
 Group-level summaries ($\bar r$, t, p, $p_{\mathrm{moran}}$, and the FDR
 $q_{\mathrm{moran}}$) were written to `logs/figure_2_distance.log`, and the
-per-network group statistics and per-subject coefficients were cached to
-`data/dataframes/df_2b_network_stats_SC_both.csv` and
-`data/dataframes/df_2b_network_subject_r_SC_both.csv` so the forest summary can be
-regenerated without recomputing the nulls.
+per-network group statistics and per-subject coefficients were cached per measure to
+`data/dataframes/df_2b_network_stats_{measure}_{hemi}.csv` and
+`data/dataframes/df_2b_network_subject_r_{measure}_{hemi}.csv` so the summary
+can be regenerated without recomputing the nulls. The per-subject coefficients are
+keyed by subject identifier (rather than position), so the reduced FC subject set
+remains traceable across measures.

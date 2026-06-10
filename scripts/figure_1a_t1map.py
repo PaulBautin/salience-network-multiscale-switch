@@ -4,9 +4,17 @@
 #
 # Figure 1a - Local microstructural heterogeneity of the salience network 
 #
-# This script processes MICA-PNI derivatives to extract T1 microstructural profiles, 
-# computes gradients within the Salience/Ventral Attention network, and visualizes 
-# the relationship between T1 profiles and gradient values.
+# This script processes MICA-PNI derivatives to extract T1 microstructural
+# profiles and computes the diffusion-map MPC gradient within the
+# Salience/Ventral Attention network, at two surface resolutions:
+#   Part 1 (fsLR-32k) drives the profile and brain figures below.
+#   Part 2 (fsLR-5k)  builds the per-subject file table + gradient that
+#                     figure_2_distance.py consumes.
+#
+# Outputs:
+#   results/figures/figure_1a_profiles.svg, figure_1a_brain.svg
+#   data/dataframes/figure_1a_pni_to_mics{,_5k}.csv   (subject -> file paths)
+#   data/dataframes/df_1a_{hemi}{,_fslr5k}.tsv         (surface table + gradient)
 #
 # example:
 # python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py \
@@ -43,6 +51,49 @@ logger = logging.getLogger(__name__)
 # Matplotlib globals
 plt.rcParams['font.size'] = 16
 plt.rcParams['svg.fonttype'] = 'none'
+
+
+# ---------------------------------------------------------------------------
+# Per-subject input files
+# ---------------------------------------------------------------------------
+# Each entry is (column, derivatives_root, glob_template). `root` selects the
+# derivatives tree: 'pni' = MICA-PNI (microstructure, geodesic distance, FC),
+# 'mics' = MICA-MICs (diffusion connectomes). The template is formatted per
+# subject row with ID_PNI / session / ID_MICs, then globbed (one file/subject).
+
+# fsLR-32k (Part 1): only the T1 intensity profile is consumed here.
+PATHS_32K = [
+    ("path_t1_profile", "pni",
+     "sub-{ID_PNI}/ses-{session}/mpc/acq-T1map/"
+     "sub-{ID_PNI}_ses-{session}_surf-fsLR-32k_desc-intensity_profiles.shape.gii"),
+]
+REQUIRED_32K = ["path_t1_profile"]
+
+# fsLR-5k (Part 2): consumed downstream by figure_2_distance.py. FC is optional
+# (a session-matched rest run may be absent), so it is not in REQUIRED_5K and a
+# missing FC leaves NaN rather than dropping the subject from the other modalities.
+PATHS_5K = [
+    ("path_t1_profile_5k", "pni",
+     "sub-{ID_PNI}/ses-{session}/mpc/acq-T1map/"
+     "sub-{ID_PNI}_ses-{session}_surf-fsLR-5k_desc-intensity_profiles.shape.gii"),
+    ("path_mpc_5k", "pni",
+     "sub-{ID_PNI}/ses-{session}/mpc/acq-T1map/"
+     "sub-{ID_PNI}_ses-{session}_surf-fsLR-5k_desc-MPC.shape.gii"),
+    ("path_sc_5k", "mics",
+     "sub-{ID_MICs}/ses-01/dwi/connectomes/"
+     "sub-{ID_MICs}_ses-01_surf-fsLR-5k_desc-iFOD2-40M-SIFT2_full-connectome.shape.gii"),
+    ("path_sc_dist_5k", "mics",
+     "sub-{ID_MICs}/ses-01/dwi/connectomes/"
+     "sub-{ID_MICs}_ses-01_surf-fsLR-5k_desc-iFOD2-40M-SIFT2_full-edgeLengths.shape.gii"),
+    ("path_dist_5k", "pni",
+     "sub-{ID_PNI}/ses-{session}/dist/"
+     "sub-{ID_PNI}_ses-{session}_surf-fsLR-5k_GD.shape.gii"),
+    ("path_fc_5k", "pni",
+     "sub-{ID_PNI}/ses-{session}/func/desc-me_task-rest_bold/surf/"
+     "sub-{ID_PNI}_ses-{session}_surf-fsLR-5k_desc-FC.shape.gii"),
+]
+REQUIRED_5K = ["path_t1_profile_5k", "path_mpc_5k", "path_sc_5k",
+               "path_sc_dist_5k", "path_dist_5k"]  # FC optional
 
 
 def get_parser():
@@ -82,17 +133,37 @@ def plot_gradient_profiles(
     network: str = 'SalVentAttn',
     hemisphere: str = 'both',
 ) -> None:
-    net_mask = df_yeo_surf["network"] == network
-    if hemisphere in ('LH', 'RH'):
-        net_mask = net_mask & (df_yeo_surf["hemisphere"] == hemisphere)
+    """Plot per-vertex T1 profiles within `network`, coloured by the MPC gradient.
 
-    # find top and bottom quantiles
-    low_q, high_q = np.nanquantile(df_yeo_surf["t1_gradient1_SalVentAttn"], [0.25, 0.75])
-    df_yeo_surf.loc[net_mask & (df_yeo_surf["t1_gradient1_SalVentAttn"] <= low_q), "quantiles"] = -1
-    df_yeo_surf.loc[net_mask & (df_yeo_surf["t1_gradient1_SalVentAttn"] >= high_q), "quantiles"] = 1
+    Each network vertex's intracortical T1 profile is drawn faint and coloured by
+    its first MPC-gradient value (diverging scale, clipped to [-3, 3]); the mean
+    profiles of the bottom- and top-quartile gradient vertices are overlaid. The
+    vertex axis of `t1_salience_profiles` is in the same order as the masked rows
+    of `df_yeo_surf` (both follow vertex index over the network mask), so colours
+    and quartile masks align with the profiles. Does not mutate `df_yeo_surf`.
+
+    Parameters
+    ----------
+    df_yeo_surf : pd.DataFrame
+        Surface table carrying the `t1_gradient1_{network}` column.
+    t1_salience_profiles : np.ndarray, shape (n_subjects, n_depths, n_network_vertices)
+        Per-subject T1 profiles for the network vertices.
+    screenshot_path : Path
+        Output SVG path.
+    network : str
+        Yeo 7-network label whose gradient colours the profiles.
+    hemisphere : {'both', 'LH', 'RH'}
+        Restricts the vertices (and the quartile thresholds) to one hemisphere.
+    """
+    grad_col = f"t1_gradient1_{network}"
+    net_mask = compute_network_mask(df_yeo_surf, network, hemisphere)
+    grad_sn = df_yeo_surf.loc[net_mask, grad_col].to_numpy()
+
+    # Bottom/top gradient quartiles, computed within the plotted vertex set.
+    low_q, high_q = np.nanquantile(grad_sn, [0.25, 0.75])
+    bottom_mask = grad_sn <= low_q
+    top_mask = grad_sn >= high_q
     profiles = np.mean(t1_salience_profiles, axis=0)
-    bottom_mask = df_yeo_surf.loc[net_mask, "quantiles"] == -1
-    top_mask = df_yeo_surf.loc[net_mask, "quantiles"] == 1
     bottom_profiles = np.mean(t1_salience_profiles[:, :, bottom_mask], axis=0)
     top_profiles = np.mean(t1_salience_profiles[:, :, top_mask], axis=0)
 
@@ -100,14 +171,14 @@ def plot_gradient_profiles(
     fig, ax = plt.subplots(figsize=(6, 6))
     custom_cmap = plt.get_cmap("coolwarm")
     norm = mpl.colors.Normalize(vmin=-3, vmax=3)
-    colors = custom_cmap(norm(df_yeo_surf.loc[net_mask, f"t1_gradient1_{network}"]))
-    
+    colors = custom_cmap(norm(grad_sn))
+
     y_axis = np.linspace(0, 1, profiles.shape[0])
-    
+
     # Plot individual profiles (Consider LineCollection here in the future if this loop is slow)
     for i, col in enumerate(colors):
         ax.plot(profiles[:, i] / 1000, y_axis, color=col, alpha=0.1, rasterized=True)
-        
+
     ax.plot(np.mean(bottom_profiles, axis=1) / 1000, y_axis, color='b', alpha=0.8, label='bottom 25%')
     ax.plot(np.mean(top_profiles, axis=1) / 1000, y_axis, color='r', alpha=0.8, label='top 25%')
     
@@ -127,110 +198,152 @@ def plot_gradient_profiles(
     plt.savefig(screenshot_path)
 
 
+def _filtered_pni_subjects(mica_pni_csv: Path) -> pd.DataFrame:
+    """Healthy-control PNI subjects (PNC*, ses-a1) matched to a MICA-MICs scan."""
+    df = pd.read_csv(mica_pni_csv)[["ID_PNI", "session", "ID_MICs"]].drop_duplicates()
+    return df[df["ID_PNI"].str.contains("PNC", na=False)
+              & df["session"].str.contains("a1", na=False)
+              & df["ID_MICs"].str.contains("HC", na=False)]
+
+
+def _glob_subject_paths(
+    df: pd.DataFrame, pni_deriv: Path, mics_deriv: Path, path_specs: list,
+) -> pd.DataFrame:
+    """Add one path column per (column, root, template) spec by globbing derivatives.
+
+    Each cell is the list of files the template resolves to for that subject row
+    (usually one; empty when the file is absent).
+    """
+    roots = {"pni": pni_deriv, "mics": mics_deriv}
+    df = df.copy()
+    for col, root, template in path_specs:
+        base = roots[root]
+        # base/template bound as defaults so each lambda captures this iteration's spec.
+        df[col] = df.apply(
+            lambda row, base=base, template=template: list(base.glob(template.format(
+                ID_PNI=row["ID_PNI"], session=row["session"], ID_MICs=row["ID_MICs"]))),
+            axis=1,
+        )
+    return df
+
+
+def build_or_load_subject_table(
+    csv_path: Path, mica_pni_csv: Path, pni_deriv: Path, mics_deriv: Path,
+    path_specs: list, required: list, log_lines: list,
+) -> pd.DataFrame:
+    """Return the cached subject->file table, or build it by globbing derivatives.
+
+    One row per subject with one file-path column per `path_specs` entry. Rows
+    missing any `required` path are dropped; other columns may be NaN (e.g. the
+    optional FC run), so a missing optional input never drops the subject from
+    the required modalities.
+    """
+    if csv_path.exists():
+        logger.info(f"Found existing subject table at {csv_path}. Loading...")
+        return pd.read_csv(csv_path)
+
+    df = _filtered_pni_subjects(mica_pni_csv)
+    df = _glob_subject_paths(df, pni_deriv, mics_deriv, path_specs)
+    # Each cell is the list of glob matches (expected 0 or 1 file per subject).
+    # Take the first match per column independently (NaN when none) rather than
+    # exploding each list column in turn, which would cross-join any column with
+    # >1 match into a cartesian product and silently duplicate subjects.
+    for col, _root, _template in path_specs:
+        df[col] = df[col].apply(lambda paths: str(paths[0]) if paths else np.nan)
+    df = df.dropna(subset=required)
+
+    logger.info(f"Participants   : N={len(df)} (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)")
+    for line in log_lines:
+        logger.info(line)
+    df.to_csv(csv_path, index=False)
+    return df
+
+
+def gradient_and_profiles(
+    df_yeo: pd.DataFrame, df_pni: pd.DataFrame, t1_col: str,
+    cache_path: Path, hemisphere: str, network: str = "SalVentAttn",
+) -> tuple[pd.DataFrame, np.ndarray]:
+    """Attach the network T1 gradient + mean T1map to `df_yeo`; return masked profiles.
+
+    The network mask and per-subject T1 profiles are loaded either way (the
+    profiles drive the profile figure). When `cache_path` exists the surface
+    table (with the gradient columns) is read back from it; otherwise the
+    diffusion-map MPC gradient is computed and the table is cached. The profile
+    vertex axis is in the same order as the masked rows of `df_yeo`.
+    """
+    net_mask = compute_network_mask(df_yeo, network, hemisphere)
+    profiles = load_t1_salience_profiles(df_pni[t1_col].tolist(), net_mask)
+    if cache_path.exists():
+        logger.info(f"Found existing gradient table at {cache_path}. Loading...")
+        df_yeo = pd.read_csv(cache_path, sep="\t")
+    else:
+        df_yeo.loc[net_mask, f"t1_gradient1_{network}"] = compute_t1_gradient(profiles)
+        df_yeo.loc[net_mask, "T1map"] = compute_t1map(profiles)
+        df_yeo.to_csv(cache_path, sep="\t", index=False)
+    return df_yeo, profiles
+
+
 def main():
     parser = get_parser()
     args = parser.parse_args()
 
-    # Setup Paths dynamically
     script_path = Path(__file__).resolve()
     project_root = script_path.parent.parent
     pni_deriv = Path(args.pni_deriv)
     mics_deriv = Path(args.mics_deriv)
 
     logger = setup_manuscript_logger("figure_1a_t1map", project_root, args)
-    logger.info(f"Surface space  : fsLR-32k (64,984 vertices total: 32,492 LH + 32,492 RH)")
-    logger.info(f"Parcellation   : Schaefer-400 with Yeo 7-network labels")
-    logger.info(f"Network        : SalVentAttn (Salience/Ventral Attention)")
-
+    logger.info("Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)")
+    logger.info("Parcellation   : Schaefer-400 with Yeo 7-network labels")
+    logger.info("Network        : SalVentAttn (Salience/Ventral Attention)")
     logger.info(f"Script path: {script_path}")
     logger.info(f"Project root: {project_root}")
     logger.info(f"MICA-PNI derivatives: {pni_deriv}")
     logger.info(f"MICA-MICs derivatives: {mics_deriv}")
 
-    # load surfaces
+    mica_pni_csv = project_root / "data/dataframes/MICA_PNI.csv"
+
+    # surfaces (fsLR-32k inflated for screenshots; conte69 for atlas borders)
     surf32k_lh_infl = read_surface(project_root / 'data/surfaces/fsLR-32k.L.inflated.surf.gii', itype='gii')
     surf32k_rh_infl = read_surface(project_root / 'data/surfaces/fsLR-32k.R.inflated.surf.gii', itype='gii')
     surf_32k = load_conte69(join=True)
 
-    # load atlases
+    ######### Part 1 -- fsLR-32k T1 gradient (drives the profile + brain figures)
     df_yeo_surf = load_yeo_atlas(micapipe=project_root, surf_32k=surf_32k)
+    df_pni = build_or_load_subject_table(
+        project_root / "data/dataframes/figure_1a_pni_to_mics.csv",
+        mica_pni_csv, pni_deriv, mics_deriv, PATHS_32K, REQUIRED_32K,
+        log_lines=[
+            "T1 profiles    : acq-T1map, fsLR-32k surface, 14 intracortical depths",
+            "Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment",
+        ],
+    )
+    df_yeo_surf, t1_salience_profiles = gradient_and_profiles(
+        df_yeo_surf, df_pni, "path_t1_profile",
+        project_root / f"data/dataframes/df_1a_{args.hemi}.tsv", args.hemi,
+    )
 
-    ######### Part 1 -- T1 map fslr32k
-    path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
-    if path_df_1a.exists():
-        logger.info(f"Found existing dataframe at {path_df_1a}. Loading...")
-        df_pni = pd.read_csv(project_root / "data/dataframes/figure_1a_pni_to_mics.csv")
-        net_mask = compute_network_mask(df_yeo_surf, 'SalVentAttn', args.hemi)
-        t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), net_mask)
-        df_yeo_surf = pd.read_csv(path_df_1a)
-    else:
-        df_pni = pd.read_csv(project_root / 'data/dataframes/MICA_PNI.csv')[['ID_PNI', 'session', 'ID_MICs']].drop_duplicates()
-        df_pni = df_pni[(df_pni['ID_PNI'].str.contains('PNC', na=False)) & (df_pni['session'].str.contains('a1', na=False)) & (df_pni['ID_MICs'].str.contains('HC', na=False))]
-        # add column with path to T1 profiles if exists, otherwise drop rows with missing T1 profiles
-        df_pni['path_t1_profile'] = df_pni.apply(lambda row: list(pni_deriv.glob(f'sub-{row["ID_PNI"]}/ses-{row["session"]}/mpc/acq-T1map/sub-{row["ID_PNI"]}_ses-{row["session"]}_surf-fsLR-32k_desc-intensity_profiles.shape.gii')), axis=1)
-        df_pni['path_sc'] = df_pni.apply(lambda row: list(mics_deriv.glob(f'sub-{row["ID_MICs"]}/ses-01/dwi/connectomes/sub-{row["ID_MICs"]}_ses-01_space-dwi_atlas-schaefer-400_desc-iFOD2-40M-SIFT2_full-connectome.shape.gii')), axis=1)
-        df_pni['path_dist'] = df_pni.apply(lambda row: list(mics_deriv.glob(f'sub-{row["ID_MICs"]}/ses-01/dwi/connectomes/sub-{row["ID_MICs"]}_ses-01_space-dwi_atlas-schaefer-400_desc-iFOD2-40M-SIFT2_full-edgeLengths.shape.gii')), axis=1)
-        df_pni = df_pni.explode('path_t1_profile').explode('path_sc').explode('path_dist').dropna(subset=['path_t1_profile', 'path_sc', 'path_dist'])
-        logger.info(f"Participants   : N={len(df_pni)} (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)")
-        logger.info(f"T1 profiles    : acq-T1map, fsLR-32k surface, 14 intracortical depths")
-        logger.info(f"Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, atlas-schaefer-400")
-        logger.info(f"MPC            : partial correlation controlling for mean profile, Fisher z-transformed")
-        logger.info(f"Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment")
-
-        df_pni.to_csv(project_root / "data/dataframes/figure_1a_pni_to_mics.csv", index=False)
-        net_mask = compute_network_mask(df_yeo_surf, 'SalVentAttn', args.hemi)
-        t1_salience_profiles = load_t1_salience_profiles(df_pni['path_t1_profile'].tolist(), net_mask)
-        df_yeo_surf.loc[net_mask, 't1_gradient1_SalVentAttn'] = compute_t1_gradient(t1_salience_profiles)
-        df_yeo_surf.loc[net_mask, 'T1map'] = compute_t1map(t1_salience_profiles)
-        df_yeo_surf.to_csv(path_df_1a, index=False)
-
-    ######### Part 2 -- T1 map fslr5k
-    path_df_1a_5k = project_root / f'data/dataframes/df_1a_{args.hemi}_fslr5k.tsv'
+    ######### Part 2 -- fsLR-5k T1 gradient (subject table consumed by figure_2_distance.py)
     df_yeo_surf_5k = load_yeo_surf_5k(project_root)
-    if path_df_1a_5k.exists():
-        logger.info(f"Found existing dataframe at {path_df_1a_5k}. Loading...")
-        df_pni_5k = pd.read_csv(project_root / "data/dataframes/figure_1a_pni_to_mics_5k.csv")
-        net_mask_5k = compute_network_mask(df_yeo_surf_5k, 'SalVentAttn', args.hemi)
-        t1_salience_profiles_5k = load_t1_salience_profiles(df_pni_5k['path_t1_profile_5k'].tolist(), net_mask_5k)
-        df_yeo_surf_5k = pd.read_csv(path_df_1a_5k)
-    else:
-        df_pni_5k = pd.read_csv(project_root / 'data/dataframes/MICA_PNI.csv')[['ID_PNI', 'session', 'ID_MICs']].drop_duplicates()
-        df_pni_5k = df_pni_5k[(df_pni_5k['ID_PNI'].str.contains('PNC', na=False)) & (df_pni_5k['session'].str.contains('a1', na=False)) & (df_pni_5k['ID_MICs'].str.contains('HC', na=False))]
-        df_pni_5k['path_t1_profile_5k'] = df_pni_5k.apply(lambda row: list(pni_deriv.glob(f'sub-{row["ID_PNI"]}/ses-{row["session"]}/mpc/acq-T1map/sub-{row["ID_PNI"]}_ses-{row["session"]}_surf-fsLR-5k_desc-intensity_profiles.shape.gii')), axis=1)
-        df_pni_5k['path_mpc_5k'] = df_pni_5k.apply(lambda row: list(pni_deriv.glob(f'sub-{row["ID_PNI"]}/ses-{row["session"]}/mpc/acq-T1map/sub-{row["ID_PNI"]}_ses-{row["session"]}_surf-fsLR-5k_desc-MPC.shape.gii')), axis=1)
-        df_pni_5k['path_sc_5k'] = df_pni_5k.apply(lambda row: list(mics_deriv.glob(f'sub-{row["ID_MICs"]}/ses-01/dwi/connectomes/sub-{row["ID_MICs"]}_ses-01_surf-fsLR-5k_desc-iFOD2-40M-SIFT2_full-connectome.shape.gii')), axis=1)
-        df_pni_5k['path_sc_dist_5k'] = df_pni_5k.apply(lambda row: list(mics_deriv.glob(f'sub-{row["ID_MICs"]}/ses-01/dwi/connectomes/sub-{row["ID_MICs"]}_ses-01_surf-fsLR-5k_desc-iFOD2-40M-SIFT2_full-edgeLengths.shape.gii')), axis=1)
-        df_pni_5k['path_dist_5k'] = df_pni_5k.apply(lambda row: list(pni_deriv.glob(f'sub-{row["ID_PNI"]}/ses-{row["session"]}/dist/sub-{row["ID_PNI"]}_ses-{row["session"]}_surf-fsLR-5k_GD.shape.gii')), axis=1)
-        df_pni_5k['path_fc_5k'] = df_pni_5k.apply(lambda row: list(pni_deriv.glob(f'sub-{row["ID_PNI"]}/ses-{row["session"]}/func/desc-me_task-rest_bold/surf/sub-{row["ID_PNI"]}_ses-{row["session"]}_surf-fsLR-5k_desc-FC.shape.gii')), axis=1)
-        # FC is optional (a session-matched rest run may be absent): it is
-        # exploded like the others (empty glob -> NaN) but kept out of the dropna
-        # so a missing FC leaves NaN rather than dropping the subject from the
-        # other modalities.
-        df_pni_5k = (df_pni_5k
-                     .explode('path_t1_profile_5k')
-                     .explode('path_mpc_5k')
-                     .explode('path_sc_5k')
-                     .explode('path_sc_dist_5k')
-                     .explode('path_dist_5k')
-                     .explode('path_fc_5k')
-                     .dropna(subset=['path_t1_profile_5k', 'path_mpc_5k', 'path_sc_5k', 'path_sc_dist_5k', 'path_dist_5k']))
-        logger.info(f"Participants   : N={len(df_pni_5k)} (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)")
-        logger.info(f"T1 profiles    : acq-T1map, fsLR-5k surface, 14 intracortical depths")
-        logger.info(f"MPC            : fsLR-5k vertex-level MPC matrix")
-        logger.info(f"Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, fsLR-5k")
-        logger.info(f"FC             : resting-state (desc-me_task-rest_bold), fsLR-5k")
-        logger.info(f"Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment")
+    df_pni_5k = build_or_load_subject_table(
+        project_root / "data/dataframes/figure_1a_pni_to_mics_5k.csv",
+        mica_pni_csv, pni_deriv, mics_deriv, PATHS_5K, REQUIRED_5K,
+        log_lines=[
+            "T1 profiles    : acq-T1map, fsLR-5k surface, 14 intracortical depths",
+            "MPC            : fsLR-5k vertex-level MPC matrix",
+            "Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, fsLR-5k",
+            "FC             : resting-state (desc-me_task-rest_bold), fsLR-5k (optional)",
+            "Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment",
+        ],
+    )
+    df_yeo_surf_5k, _ = gradient_and_profiles(
+        df_yeo_surf_5k, df_pni_5k, "path_t1_profile_5k",
+        project_root / f"data/dataframes/df_1a_{args.hemi}_fslr5k.tsv", args.hemi,
+    )
 
-        df_pni_5k.to_csv(project_root / "data/dataframes/figure_1a_pni_to_mics_5k.csv", index=False)
-        net_mask_5k = compute_network_mask(df_yeo_surf_5k, 'SalVentAttn', args.hemi)
-        t1_salience_profiles_5k = load_t1_salience_profiles(df_pni_5k['path_t1_profile_5k'].tolist(), net_mask_5k)
-        df_yeo_surf_5k.loc[net_mask_5k, 't1_gradient1_SalVentAttn'] = compute_t1_gradient(t1_salience_profiles_5k)
-        df_yeo_surf_5k.loc[net_mask_5k, 'T1map'] = compute_t1map(t1_salience_profiles_5k)
-        df_yeo_surf_5k.to_csv(path_df_1a_5k, index=False)
-    
-    # plot figures
+    ######### Figures (fsLR-32k)
     screenshot_path = project_root / "results/figures/figure_1a_profiles.svg"
-    logger.info(f"Generating brain qt1 profiles figure at {screenshot_path}")
+    logger.info(f"Generating qt1 profiles figure at {screenshot_path}")
     plot_gradient_profiles(df_yeo_surf, t1_salience_profiles, screenshot_path, network='SalVentAttn', hemisphere=args.hemi)
 
     screenshot_path = project_root / "results/figures/figure_1a_brain.svg"

@@ -290,7 +290,7 @@ def main():
     if not path_df_1a.exists():
         raise FileNotFoundError(f"Gradient dataframe not found at {path_df_1a}. Run figure_1a_t1map.py with -hemi {args.hemi} first.")
     logger.info(f"Loading gradient dataframe from {path_df_1a}")
-    df_yeo_surf = pd.read_csv(path_df_1a)
+    df_yeo_surf = pd.read_csv(path_df_1a, sep="\t")
 
     ######### Part 2 -- Extract iEEG data
     df_data, sampling_frequency = load_mni_ieeg_data(ieeg_deriv, project_root, df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, network)

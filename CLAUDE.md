@@ -135,3 +135,7 @@ Inline code identifiers use backticks; cross-page and cross-file references use
 relative markdown links (e.g. `[\`src/...\`](../api/<module>.md)`). Validate with
 `mkdocs build --strict` before finishing (it flags broken links and orphaned
 pages).
+
+## Claude Insights
+- Add under ## Documentation or a new ## Scientific Writing section\n\nDocumentation conventions: keep Methods prose subtle and uniform across measures; do NOT put results in methods docs, and never make overconfident scientific claims without explicit supporting evidence.
+- Present scientific results faithfully: do not flip eigenvector/gradient signs or otherwise manipulate data to look consistent; report signs and values as the analysis produces them.

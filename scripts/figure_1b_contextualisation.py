@@ -37,12 +37,13 @@ from brainspace.utils.parcellation import map_to_labels, reduce_by_labels, relab
 from brainspace.datasets import load_gradient, load_marker, load_conte69, load_parcellation
 from brainspace.mesh import mesh_elements
 
-from brainspace.null_models import SpinPermutations, moran
+from brainspace.null_models import moran
 from scipy.stats import spearmanr, zscore
 
 import logging
 
 from src.atlas_load import load_yeo_atlas, load_bigbrain, load_ahead_biel, load_ahead_parva, compute_network_mask
+from src.connectome_processing import empirical_p_twosided
 from src.logging_utils import setup_manuscript_logger
 
 logger = logging.getLogger(__name__)
@@ -91,7 +92,7 @@ def context_analysis(df_yeo_surf: pd.DataFrame, surf_32k, modalities: list[str],
         sns.regplot(x=x, y=y, ax=ax, scatter_kws={"s": 10, "alpha": 0.3, "edgecolors":'none', 'rasterized':True}, line_kws={"color": "black", "lw":2.5})
         r_obs, p = spearmanr(x, y, nan_policy='omit')
         r_rand = np.asarray([spearmanr(x, d, nan_policy='omit')[0] for d in rand])
-        pv_rand = np.mean(np.abs(r_rand) >= np.abs(r_obs))
+        pv_rand = empirical_p_twosided(r_rand, r_obs)
         logger.info(f"[Figure 1B] {label}: MPC-gradient vs {label} | Spearman r={r_obs:.3f}, Moran permutation p={pv_rand:.3e} (n_perm={n_rep})")
         stats_text = f"$r={r_obs:.2f}$\n$p={pv_rand:.3f}$"
         ax.text(0.05, 0.95, stats_text, transform=ax.transAxes, va='top', fontweight='bold', fontsize=12)
@@ -170,7 +171,7 @@ def main():
     if not path_df_1a.exists():
         raise FileNotFoundError(f"Gradient dataframe not found at {path_df_1a}. Run figure_1a_t1map.py with -hemi {args.hemi} first.")
     logger.info(f"Loading gradient dataframe from {path_df_1a}")
-    df_yeo_surf = pd.read_csv(path_df_1a)
+    df_yeo_surf = pd.read_csv(path_df_1a, sep="\t")
 
     ######### Part 2 -- Contextualisation
     # Use 'both' to match original behavior: old loaders had no hemisphere filter

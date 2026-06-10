@@ -8,9 +8,13 @@ network vertex i,
     P[i] = sum_{j in T_i} w_ij * g_FC[j] / sum_{j in T_i} w_ij,
     T_i  = { j : w_ij > 0, j not in network, j != i }
 
-with per-subject inference (Fisher-z then one-sample t-test across subjects), a
-spin-test null (Alexander-Bloch 2018), and a Moran spectral-randomization null
-(within-network, spatial-autocorrelation-preserving).
+with per-subject inference (Fisher-z then one-sample t-test across subjects) and a
+within-network Moran spectral-randomization null (spatial-autocorrelation-
+preserving). Moran surrogates are generated per connected component of the
+within-network spatial graph, i.e. per hemisphere (micapipe geodesic distance is
+undefined across hemispheres, so the bilateral graph splits into two blocks),
+preserving within-hemisphere autocorrelation while keeping both hemispheres in the
+statistic.
 
 Four modalities are supported, with modality-specific weight preprocessing. Every
 modality uses only positive connections and the same weighted-mean projection:
@@ -32,6 +36,8 @@ import nibabel as nib
 import numpy as np
 import pandas as pd
 from brainspace.null_models import MoranRandomization
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import connected_components
 from scipy.stats import spearmanr, ttest_1samp, t as t_dist
 
 logger = logging.getLogger(__name__)
@@ -388,7 +394,13 @@ def compute_projection_subjects(
     cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values
     hemi_cortex = df_yeo_surf_5k.loc[cortex_mask, "hemisphere"].values
     n_sn = int(sn_mask_cortex.sum())
-    n_sub = len(files) if files else len(sc_subjects)
+    n_sub = len(files) if files else (len(sc_subjects) if sc_subjects else 0)
+    if n_sub == 0:
+        raise ValueError(
+            f"[{modality}] no subjects to process: `files` is empty and no "
+            f"pre-loaded `sc_subjects` were supplied. (For FC this means no "
+            f"subject had a session-matched connectome; check `path_fc_5k`.)"
+        )
 
     n_cortex = int(cortex_mask.sum())
     cortex_indices = np.flatnonzero(cortex_mask)
@@ -477,73 +489,73 @@ def compute_projection_subjects(
 
 
 # ---------------------------------------------------------------------------
-# Spin-test null
-# ---------------------------------------------------------------------------
-
-def compute_spin_null_projection(
-    g_mpc_cortex_at_sn: np.ndarray, sn_mask_cortex: np.ndarray,
-    cortex_mask_full: np.ndarray, result: dict,
-    spin_model, n_rand: int,
-) -> dict:
-    """Spin-test null for the per-subject g_MPC ↔ P alignment.
-
-    Strategy (Alexander-Bloch 2018, adapted to a within-network statistic):
-      - Embed g_MPC in the full 9684-vertex fsLR-5k space with NaN outside SN.
-      - Rotate via the fitted SpinPermutations model (LH and RH spheres).
-      - Per permutation k, per subject s: correlate the rotated g_MPC against the
-        subject's P_s (defined on original SN positions, NaN elsewhere).
-        Correlation is over positions where BOTH are finite (= overlap of rotated
-        SN and original SN).
-      - Per perm aggregate over subjects with the Fisher-z mean; this gives the
-        group-level null r distribution. Empirical two-tailed
-        p_spin = mean( |null_group| >= |r_group_observed| ).
-    """
-    g_mpc_full = np.full(N_TOTAL_5K, np.nan)
-    cortex_indices = np.flatnonzero(cortex_mask_full)
-    sn_idx_full = cortex_indices[sn_mask_cortex]
-    g_mpc_full[sn_idx_full] = g_mpc_cortex_at_sn
-
-    g_lh = g_mpc_full[:N_LH_5K]
-    g_rh = g_mpc_full[N_LH_5K:]
-    rotated_lh, rotated_rh = spin_model.randomize(g_lh, g_rh)
-    rotated = np.hstack([rotated_lh, rotated_rh])  # shape (n_rand, 9684)
-
-    P_subjects_full = result["P_subjects_full"]  # (n_sub, 9684)
-    n_sub = P_subjects_full.shape[0]
-
-    null_subjects = np.full((n_rand, n_sub), np.nan)
-    for k in range(n_rand):
-        x = rotated[k]
-        x_finite = np.isfinite(x)
-        for s in range(n_sub):
-            y = P_subjects_full[s]
-            mask = x_finite & np.isfinite(y)
-            if mask.sum() < 10:
-                continue
-            null_subjects[k, s] = spearmanr(x[mask], y[mask])[0]
-
-    with np.errstate(invalid="ignore"):
-        z = np.arctanh(np.clip(null_subjects, -0.999, 0.999))
-    null_group = np.tanh(np.nanmean(z, axis=1))  # (n_rand,)
-
-    r_obs = result["r_group"]
-    if np.isfinite(r_obs) and np.isfinite(null_group).any():
-        p_spin = float(np.mean(np.abs(null_group[np.isfinite(null_group)]) >= np.abs(r_obs)))
-    else:
-        p_spin = np.nan
-
-    null_std = float(np.nanstd(null_group))
-    if null_std < 1e-6:
-        logger.warning(
-            f"spin null group std={null_std:.2e}: rotation may be degenerate."
-        )
-
-    return {"null_group": null_group, "p_spin": p_spin, "null_std": null_std}
-
-
-# ---------------------------------------------------------------------------
 # Moran spectral randomization null (within-SN, SAC-preserving)
 # ---------------------------------------------------------------------------
+
+def _moran_surrogates_blockwise(
+    g: np.ndarray, w_spatial: np.ndarray, n_rand: int,
+    random_state: int, min_block: int = 3,
+) -> np.ndarray:
+    """Generate Moran surrogates per connected component of the spatial graph.
+
+    micapipe geodesic distance is undefined across hemispheres, so for a bilateral
+    source network the inverse-distance weight matrix `w_spatial` splits into two
+    disconnected blocks (one per hemisphere). Each connected component is fitted and
+    randomised separately and the per-component surrogates are reassembled into the
+    full vector, so within-hemisphere autocorrelation is preserved and both
+    hemispheres contribute to the statistic without coupling across hemispheres. A
+    single-hemisphere graph is one component.
+
+    Components with fewer than `min_block` vertices (where spatial autocorrelation is
+    not meaningfully defined) fall back to a per-permutation random shuffle of that
+    block's values, which preserves the marginal distribution.
+
+    Parameters
+    ----------
+    g : (n_sn,) float, the map to randomise.
+    w_spatial : (n_sn, n_sn) float, symmetric non-negative spatial weights.
+    n_rand : int, number of surrogates.
+    random_state : int, base seed (offset per component so blocks are decorrelated).
+    min_block : int, minimum component size for spectral randomisation.
+
+    Returns
+    -------
+    surrogates : (n_rand, n_sn) float
+    """
+    n_sn = g.size
+    n_comp, comp_labels = connected_components(
+        csr_matrix(w_spatial > 0), directed=False
+    )
+    surrogates = np.empty((n_rand, n_sn), dtype=np.float64)
+    sizes = []
+    for c in range(n_comp):
+        comp_idx = np.flatnonzero(comp_labels == c)
+        sizes.append(comp_idx.size)
+        sub_g = g[comp_idx].astype(np.float64)
+        if comp_idx.size >= min_block:
+            # brainspace.compute_mem double-centers the block weights and then
+            # expects a single near-zero eigenvalue (the constant mode the centering
+            # kills). It runs eigh in float32, so the true-zero eigenvalue surfaces
+            # at roughly |max(ev)| * n * eps(float32) ~ 1e-4 to 1e-3 for a dense
+            # inverse-distance block — above brainspace's default tol=1e-10, which
+            # would spuriously reject. Each component is connected, so exactly one
+            # such mode appears; raise the tolerance to recognise the float32 zero.
+            moran = MoranRandomization(
+                n_rep=n_rand, random_state=random_state + c,
+                procedure="singleton", spectrum="nonzero", tol=1e-3,
+            )
+            moran.fit(w_spatial[np.ix_(comp_idx, comp_idx)])
+            surrogates[:, comp_idx] = moran.randomize(sub_g)
+        else:
+            rng = np.random.default_rng(random_state + c)
+            for k in range(n_rand):
+                surrogates[k, comp_idx] = rng.permutation(sub_g)
+    logger.info(
+        f"Moran null: {n_comp} connected component(s) (block sizes={sizes}); "
+        f"surrogates generated per component."
+    )
+    return surrogates
+
 
 def compute_moran_null_projection(
     g_mpc_cortex_at_sn: np.ndarray, sn_mask_cortex: np.ndarray,
@@ -554,24 +566,27 @@ def compute_moran_null_projection(
 
     Surrogates of g_MPC are generated to preserve its within-SN spatial
     autocorrelation (Wagner & Dray 2015; equivalent to BrainSMASH at the
-    eigen-decomposition level). For each surrogate the per-subject Spearman is
+    eigen-decomposition level), restricting the null entirely to the source network
+    so it matches the test footprint. For each surrogate the per-subject Spearman is
     recomputed against P_s; per perm aggregated via Fisher-z mean across subjects.
 
-    Compared to the cortex-wide spin test (which restricts evaluation to the
-    overlap of rotated and original SN footprints — small, noisy, and biased
-    toward the SN boundary), the Moran null:
-      - restricts the null entirely to the source network (matches the test);
-      - preserves the empirical Moran's I (~SAC) of g_MPC on the SN;
-      - gives a tighter, more powerful null distribution.
+    Surrogates are generated per connected component of the inverse-geodesic-distance
+    graph (i.e. per hemisphere for a bilateral SN; see `_moran_surrogates_blockwise`),
+    so within-hemisphere autocorrelation is preserved without coupling the hemispheres.
+
+    The empirical two-tailed p-value uses the add-one estimator
+    `p = (1 + #{|null| >= |obs|}) / (1 + n_valid)`, bounded away from zero (a plain
+    proportion can return 0 when the observed effect exceeds every surrogate, which
+    corrupts downstream FDR/log steps).
 
     Parameters
     ----------
     g_mpc_cortex_at_sn : (n_sn,)
     sn_mask_cortex : (n_cortex,) bool
     gd_among_sn : (n_sn, n_sn) float
-        Geodesic distance among SN vertices. Cross-hemisphere entries should
-        be 0 if SN spans both hemispheres (yields a 0 spatial weight, i.e.
-        no connection in the Moran graph).
+        Geodesic distance among SN vertices. Cross-hemisphere entries are 0 when the
+        SN spans both hemispheres (yielding a 0 spatial weight, i.e. no edge in the
+        Moran graph), which is what splits the graph into per-hemisphere components.
     result : dict from compute_projection_subjects.
     n_rand : int
     random_state : int
@@ -587,19 +602,9 @@ def compute_moran_null_projection(
     np.fill_diagonal(w_spatial, 0.0)
     w_spatial = 0.5 * (w_spatial + w_spatial.T)
 
-    # brainspace.compute_mem double-centers w_spatial and then expects one
-    # near-zero eigenvalue (the constant mode that the centering kills).
-    # It runs eigh in float32, so the true-zero eigenvalue surfaces at roughly
-    # |max(ev)| * n * eps(float32) ~ 1e-4 to 1e-3 for a dense n~500 inverse-distance
-    # matrix — well above brainspace's default tol=1e-10, which makes the check
-    # spuriously reject. Raise the tolerance so the float32 zero is recognised.
-    moran = MoranRandomization(
-        n_rep=n_rand, random_state=random_state,
-        procedure="singleton", spectrum="nonzero",
-        tol=1e-3,
-    )
-    moran.fit(w_spatial)
-    surrogates = moran.randomize(g_mpc_cortex_at_sn.astype(np.float64))  # (n_rand, n_sn)
+    surrogates = _moran_surrogates_blockwise(
+        g_mpc_cortex_at_sn, w_spatial, n_rand, random_state,
+    )  # (n_rand, n_sn)
 
     P_subjects_sn = result["P_subjects_sn"]
     n_sub = P_subjects_sn.shape[0]
@@ -619,12 +624,7 @@ def compute_moran_null_projection(
         z = np.arctanh(np.clip(null_subjects, -0.999, 0.999))
     null_group = np.tanh(np.nanmean(z, axis=1))
 
-    r_obs = result["r_group"]
-    finite_null = null_group[np.isfinite(null_group)]
-    if np.isfinite(r_obs) and finite_null.size > 0:
-        p_moran = float(np.mean(np.abs(finite_null) >= np.abs(r_obs)))
-    else:
-        p_moran = np.nan
+    p_moran = empirical_p_twosided(null_group, result["r_group"])
 
     null_std = float(np.nanstd(null_group))
     if null_std < 1e-6:
@@ -662,6 +662,26 @@ def compute_dominant_target_network(result: dict) -> tuple[np.ndarray, list[str]
     if valid.any():
         dominant[valid] = np.nanargmax(W[:, valid], axis=0)
     return dominant, names
+
+
+# ---------------------------------------------------------------------------
+# Empirical permutation p-value
+# ---------------------------------------------------------------------------
+
+def empirical_p_twosided(null: np.ndarray, observed: float) -> float:
+    """Two-tailed empirical p-value via the add-one estimator `(1 + k)/(1 + n)`.
+
+    `k` counts the finite null values whose magnitude equals or exceeds `|observed|`
+    and `n` is the number of finite null values. The add-one keeps the estimate
+    bounded away from zero (a plain proportion returns 0 when the observed effect
+    exceeds every surrogate, which is improper and corrupts downstream FDR/log steps).
+    Returns NaN if `observed` is non-finite or there are no finite null values.
+    """
+    finite = null[np.isfinite(null)]
+    if not np.isfinite(observed) or finite.size == 0:
+        return np.nan
+    k = int(np.sum(np.abs(finite) >= np.abs(observed)))
+    return float((1 + k) / (1 + finite.size))
 
 
 # ---------------------------------------------------------------------------
