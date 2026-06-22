@@ -83,63 +83,82 @@ def context_analysis(df_yeo_surf: pd.DataFrame, surf_32k, modalities: list[str],
     msr = moran.MoranRandomization(n_rep=n_rep, procedure='singleton', tol=1e-6, random_state=0)
     msr.fit(w)
 
-    # Plot 
-    fig, axes = plt.subplots(len(modalities), 1, figsize=(3, 2.5 * len(modalities)), sharex=True, sharey=True)
-    for ax, label in zip(axes, modalities):
+    # Plot
+    fig, axes = plt.subplots(
+        len(modalities),
+        2,
+        figsize=(6.0, 2.8 * len(modalities)),
+        gridspec_kw={'wspace': 0.1, 'hspace': 0.4, 'width_ratios': [1.0, 1.0]},
+    )
+    axes = np.atleast_2d(axes)
+    title_txt = {
+        'BigBrain': 'BigBrain – Merker staining (neuronal cell-body density)',
+        'T1map': 'MICA-PNI – qT1 MRI (intracortical myelin content)',
+        'Bielschowsky': 'AHEAD – Bielschowsky staining (axonal fiber density)',
+        'Parvalbumin': 'AHEAD – Parvalbumin staining (PV+ interneurons)'
+    }
+    for row, label in enumerate(modalities):
+        ax = axes[row, 0]
+        ax_stem = axes[row, 1]
         y = df_yeo_surf.loc[net_mask, label].values
-        y = np.nan_to_num(y)
-        rand = msr.randomize(y)
-        sns.regplot(x=x, y=y, ax=ax, scatter_kws={"s": 10, "alpha": 0.3, "edgecolors":'none', 'rasterized':True}, line_kws={"color": "black", "lw":2.5})
-        r_obs, p = spearmanr(x, y, nan_policy='omit')
-        r_rand = np.asarray([spearmanr(x, d, nan_policy='omit')[0] for d in rand])
+        # Score the correlation only where both the gradient and the modality are
+        # finite. The Moran model needs a value at every masked vertex, so feed it a
+        # NaN-filled vector, but evaluate observed and surrogate r on the same finite
+        # subset so no artificial zeros bias the statistic.
+        finite = np.isfinite(x) & np.isfinite(y)
+        rand = msr.randomize(np.nan_to_num(y))
+        sns.regplot(x=x[finite], y=y[finite], ax=ax, scatter_kws={"s": 20, "alpha": 0.1, "edgecolors":'none', 'rasterized':True}, line_kws={"color": "black", "lw":2.5})
+        r_obs, _ = spearmanr(x[finite], y[finite])
+        r_rand = np.asarray([spearmanr(x[finite], d[finite])[0] for d in rand])
         pv_rand = empirical_p_twosided(r_rand, r_obs)
         logger.info(f"[Figure 1B] {label}: MPC-gradient vs {label} | Spearman r={r_obs:.3f}, Moran permutation p={pv_rand:.3e} (n_perm={n_rep})")
         stats_text = f"$r={r_obs:.2f}$\n$p={pv_rand:.3f}$"
         ax.text(0.05, 0.95, stats_text, transform=ax.transAxes, va='top', fontweight='bold', fontsize=12)
+        t = ax.set_title(f"{title_txt.get(label, label)}", loc='left', pad=15)
+        t.set_in_layout(False)
         ax.set_ylim([-4,4])
         ax.set_xlim([-3,3])
         ax.set_yticks([-2, 2])
+        ax.set_ylabel(label)
+        ax.set_box_aspect(1)
         ax.spines['right'].set_visible(False)
         ax.spines['top'].set_visible(False)
-    ax.set_xlabel('MPC gradient')
+        if row < len(modalities) - 1:
+            ax.set_xlabel('')
+            ax.tick_params(labelbottom=False)
+
+        # Color the marker and stem based on sign of the observed r
+        color = "tab:blue" if r_obs >= 0 else "tab:red"
+        markerline, stemlines, baseline = ax_stem.stem([0], [abs(r_obs)], orientation='horizontal', basefmt='k-')
+        plt.setp(markerline, markersize=7, markeredgewidth=0, markerfacecolor=color, markeredgecolor=color)
+        plt.setp(stemlines, linewidth=2.5, color=color)
+        plt.setp(baseline, linewidth=1.0, color='0.5')
+        ax_stem.axhline(0, color='0.6', lw=1, zorder=0)
+        ax_stem.axvline(0, color='0.9', lw=1, zorder=0)
+        ax_stem.set_xlim(0, 0.5)
+        ax_stem.set_ylim(-0.6, 0.6)
+        ax_stem.set_yticks([])
+        ax_stem.set_xticks([0, 0.25, 0.5])
+        ax_stem.set_xticklabels(['0', '0.25', '0.5'])
+        # Only keep an x-axis label on the bottom-most row
+        if row < len(modalities) - 1:
+            ax_stem.set_xlabel('')
+            ax_stem.tick_params(labelbottom=False)
+        else:
+            ax_stem.set_xlabel('Spearman |r|')
+        ax_stem.set_title('')
+        ax_stem.set_box_aspect(1)
+        ax_stem.spines['right'].set_visible(False)
+        ax_stem.spines['top'].set_visible(False)
+        ax_stem.spines['left'].set_visible(False)
+        if row < len(modalities) - 1:
+            ax_stem.spines['bottom'].set_visible(False)
+        ax_stem.text(abs(r_obs) + 0.08, 0, f"{abs(r_obs):.2f}", ha='center', va='center', fontsize=11, fontweight='bold')
+
+    axes[-1, 0].set_xlabel('MPC gradient')
     plt.tight_layout()
-    plt.savefig(project_root / "results/figures/figure_1b_correlations.svg")
-
-    r_vals, labels = [], []
-    for label in modalities:
-        if label in df_yeo_surf.columns:
-            y = df_yeo_surf.loc[net_mask, label].values
-            if len(y) > 1 and not np.all(np.isnan(y)):
-                r, _ = spearmanr(x, y, nan_policy='omit')
-                r_vals.append(r)
-                labels.append(label)
-
-    # Convert to numpy
-    r_vals = np.array(r_vals)
-
-    if r_vals.size == 0:
-        raise ValueError("No valid correlations could be computed. Check your modality columns.")
-
-    # Half-circle polar coordinates
-    N = len(r_vals)
-    theta = np.linspace(-np.pi /2 + np.pi/N*0.8, np.pi /2, N, endpoint=False)[::-1]
-    radii = np.abs(r_vals)
-
-    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(6, 8))
-    bars = ax.bar(theta, radii, width=np.pi/N*0.8, align="center", alpha=0.8)
-    ax.set_thetamax(90)
-    ax.set_thetamin(-90)
-    ax.tick_params(axis='y', labelsize=12) 
-    ax.set_rticks([0.0, 0.1, 0.2, 0.3])
-
-    # Color by sign
-    for bar, r in zip(bars, r_vals):
-        bar.set_facecolor("tab:red" if r < 0 else "tab:blue")
-    plt.grid(axis='x')
-    ax.set_xticklabels([])
-    ax.set_ylabel("Spearman's |r|")
-    #ax.set_yticklabels([])
-    plt.savefig(project_root / "results/figures/figure_1b_correlations_circle.svg")
+    plt.savefig(project_root / "results/figures/figure_1b_correlations.svg", transparent=True, bbox_inches="tight")
+    plt.close(fig)
 
 
 def main():
@@ -148,12 +167,13 @@ def main():
     args = parser.parse_args()
     script_path = Path(__file__).resolve()
     project_root = script_path.parent.parent
+    n_rep = 100
 
     logger = setup_manuscript_logger("figure_1b_contextualisation", project_root, args)
     logger.info(f"Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels")
     logger.info(f"Network        : SalVentAttn (Salience/Ventral Attention)")
     logger.info(f"Modalities     : BigBrain (cell staining), T1map (in-vivo MRI), Bielschowsky (myelin), Parvalbumin (AHEAD)")
-    logger.info(f"Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)")
+    logger.info(f"Null model     : Moran randomization (n_rep={n_rep}, procedure=singleton, random_state=0)")
 
     logger.info(f"Script path: {script_path}")
     logger.info(f"Project root: {project_root}")
@@ -192,7 +212,7 @@ def main():
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['Parvalbumin'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
         nan_color=(220, 220, 220, 1), cmap='coolwarm', transparent_bg=True, screenshot=True, filename=screenshot_path, cb__numberOfLabels=0)
 
-    context_analysis(df_yeo_surf, surf_32k, modalities=["BigBrain", "T1map", "Bielschowsky", "Parvalbumin"], n_rep=100, hemisphere=args.hemi, project_root=project_root)
+    context_analysis(df_yeo_surf, surf_32k, modalities=["BigBrain", "T1map", "Bielschowsky", "Parvalbumin"], n_rep=n_rep, hemisphere=args.hemi, project_root=project_root)
 
 
 if __name__ == "__main__":

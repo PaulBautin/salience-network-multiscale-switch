@@ -3,8 +3,8 @@
 
 <svg
    width="210mm"
-   height="211mm"
-   viewBox="0 0 210 211"
+   height="243mm"
+   viewBox="0 0 210 243"
    version="1.1"
    id="svg5"
    inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
@@ -29,9 +29,9 @@
      showgrid="false"
      showguides="false"
      height="296mm"
-     inkscape:zoom="0.45254834"
-     inkscape:cx="-162.41359"
-     inkscape:cy="198.87378"
+     inkscape:zoom="0.90509668"
+     inkscape:cx="397.74756"
+     inkscape:cy="371.23106"
      inkscape:window-width="1920"
      inkscape:window-height="992"
      inkscape:window-x="0"
@@ -2226,8 +2226,8 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:3.88056px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
-       x="1.2525276"
-       y="116.09712"
+       x="1.0302155"
+       y="164.49313"
        id="text41577"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
@@ -2235,1456 +2235,218 @@
          sodipodi:role="line"
          id="tspan41575"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:3.88056px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-         x="1.2525276"
-         y="116.09712">B | Connectivity embedding of each network microstructure gradient</tspan></text>
+         x="1.0302155"
+         y="164.49313">B | Connectivity embedding of each network microstructure gradient</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-       x="180.05432"
-       y="248.75638"
+       x="192.49724"
+       y="305.88132"
        id="text337525"><tspan
          sodipodi:role="line"
          id="tspan337523"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-         x="180.05432"
-         y="248.75638">Limbic (Lim)</tspan></text>
+         x="192.49724"
+         y="305.88132">Limbic (Lim)</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
-       x="177.54602"
-       y="244.44504"
+       x="189.98894"
+       y="301.56998"
        id="text337525-57"><tspan
          sodipodi:role="line"
          id="tspan337523-1"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Bold';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-         x="177.54602"
-         y="244.44504">Networks</tspan></text>
+         x="189.98894"
+         y="301.56998">Networks</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
-       x="180.05432"
-       y="256.8006"
+       x="192.49724"
+       y="313.92554"
        id="text337525-59"><tspan
          sodipodi:role="line"
          id="tspan337523-5"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-         x="180.05432"
-         y="256.8006">Control (FPN)</tspan></text>
+         x="192.49724"
+         y="313.92554">Control (FPN)</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
-       x="180.05432"
-       y="260.82285"
+       x="192.49724"
+       y="317.94778"
        id="text337525-59-8"><tspan
          sodipodi:role="line"
          id="tspan337523-5-3"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-         x="180.05432"
-         y="260.82285">DorsAttn (DAN)</tspan></text>
+         x="192.49724"
+         y="317.94778">DorsAttn (DAN)</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
-       x="180.05432"
-       y="268.84488"
+       x="192.49724"
+       y="325.96982"
        id="text337525-59-8-3"><tspan
          sodipodi:role="line"
          id="tspan337523-5-3-1"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-         x="180.05432"
-         y="268.84488">Visual (Vis)</tspan></text>
+         x="192.49724"
+         y="325.96982">Visual (Vis)</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
-       x="180.05432"
-       y="264.84488"
+       x="192.49724"
+       y="321.96982"
        id="text337525-59-8-3-1"><tspan
          sodipodi:role="line"
          id="tspan337523-5-3-1-7"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-         x="180.05432"
-         y="264.84488">SalVentAttn (Sal)</tspan></text>
+         x="192.49724"
+         y="321.96982">SalVentAttn (Sal)</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
-       x="180.05432"
-       y="272.86682"
+       x="192.49724"
+       y="329.99176"
        id="text337525-59-8-3-9"><tspan
          sodipodi:role="line"
          id="tspan337523-5-3-1-9"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-         x="180.05432"
-         y="272.86682">SomMot (SM)</tspan></text>
+         x="192.49724"
+         y="329.99176">SomMot (SM)</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;stroke-linecap:butt;stroke-linejoin:round"
-       x="180.05432"
-       y="252.77844"
+       x="192.49724"
+       y="309.90338"
        id="text337525-5"><tspan
          sodipodi:role="line"
          id="tspan337523-6"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-         x="180.05432"
-         y="252.77844">Default (DMN)</tspan></text>
-    <text
-       id="text67413-3-1"
-       x="49.558815"
-       y="9.1455173"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325;stroke-linecap:butt;stroke-linejoin:round"
-       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325"
-         x="28.343664"
-         y="8.9862528"
-         id="tspan67409-7-4">Structural connectivity (SC)</tspan></text>
+         x="192.49724"
+         y="309.90338">Default (DMN)</tspan></text>
     <text
        id="text67413-3-1-3"
-       x="-16.666658"
-       y="121.05688"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;stroke-width:0.186519;stroke-linecap:butt;stroke-linejoin:round"
+       x="-16.888971"
+       y="169.45285"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;fill:#4d4d4d;stroke-width:0.186519;stroke-linecap:butt;stroke-linejoin:round"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192"><tspan
          sodipodi:role="line"
          id="tspan93334"
-         x="1.4106578"
-         y="120.89661"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;stroke-width:0.186519"
-           x="1.4106578"
-           y="120.89661"
-           id="tspan67409-7-4-2">Group effect (MPC gradient vs. gFC1 connectivity projections)</tspan></tspan></text>
+         x="1.1883457"
+         y="169.2926"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;fill:#4d4d4d;stroke-width:0.186519"
+           x="1.1883457"
+           y="169.2926"
+           id="tspan67409-7-4-2">MPC gradient connectivity embedding was repeated for each of the seven Yeo networks</tspan></tspan></text>
     <text
-       id="text67413-3-1-7"
-       x="93.579437"
-       y="9.1455173"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325;stroke-linecap:butt;stroke-linejoin:round"
+       id="text67413-3-1-3-8"
+       x="-16.83272"
+       y="8.9212046"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;fill:#4d4d4d;stroke-width:0.186519;stroke-linecap:butt;stroke-linejoin:round"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325"
-         x="80.503296"
-         y="8.9862528"
-         id="tspan67409-7-4-0">Geodesic distance (GD)</tspan></text>
-    <text
-       id="text67413-3-1-7-9"
-       x="144.7168"
-       y="9.1455145"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325;stroke-linecap:butt;stroke-linejoin:round"
-       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325"
-         x="130.80119"
-         y="8.9862528"
-         id="tspan67409-7-4-0-1">Microstructure cov. (MPC)</tspan></text>
-    <text
-       id="text67413-3-1-7-9-0"
-       x="196.07556"
-       y="9.1796036"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325;stroke-linecap:butt;stroke-linejoin:round"
-       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.5052px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;stroke-width:0.185325"
-         x="182.15996"
-         y="9.0203419"
-         id="tspan67409-7-4-0-1-1">Functional connectivity (FC)</tspan></text>
+         sodipodi:role="line"
+         id="tspan93334-9"
+         x="1.2445962"
+         y="8.7609339"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;line-height:normal;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-anchor:start;fill:#4d4d4d;stroke-width:0.186519"
+           x="1.2445962"
+           y="8.7609339"
+           id="tspan67409-7-4-2-6">Distinct connectivity profiles emerge along the first SN microstucture gradient</tspan></tspan></text>
     <circle
        style="fill:#b9b36c;fill-opacity:1;stroke:#b9b36c;stroke-width:0.25;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
        id="path127016"
-       cx="178.37338"
-       cy="247.60162"
+       cx="190.8163"
+       cy="304.72656"
        r="1" />
     <circle
        style="fill:#e7646e;fill-opacity:1;stroke:#e7646e;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
        id="path127016-8"
-       cx="178.37338"
-       cy="251.6441"
+       cx="190.8163"
+       cy="308.76904"
        r="1" />
     <circle
        style="fill:#ffb656;fill-opacity:1;stroke:#ffb656;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
        id="path127016-8-9"
-       cx="178.37338"
-       cy="255.68668"
+       cx="190.8163"
+       cy="312.81161"
        r="1" />
     <circle
        style="fill:#0faf3d;fill-opacity:1;stroke:#0faf3d;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
        id="path127016-8-9-0"
-       cx="178.37338"
-       cy="259.72934"
+       cx="190.8163"
+       cy="316.85428"
        r="1" />
     <circle
        style="fill:#d56fff;fill-opacity:1;stroke:#d56fff;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
        id="path127016-8-9-0-2"
-       cx="178.37338"
-       cy="263.77191"
+       cx="190.8163"
+       cy="320.89685"
        r="1" />
     <circle
        style="fill:#b258cd;fill-opacity:1;stroke:#b258cd;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
        id="path127016-8-9-0-2-4"
-       cx="178.37338"
-       cy="267.81442"
+       cx="190.8163"
+       cy="324.93936"
        r="1" />
     <circle
        style="fill:#70a7de;fill-opacity:1;stroke:#70a7de;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stop-color:#000000"
        id="path127016-8-9-0-2-4-7"
-       cx="178.37338"
-       cy="271.85681"
+       cx="190.8163"
+       cy="328.98175"
        r="1" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="53.47797"
-       height="22.293631"
+       width="142.26532"
+       height="29.43928"
        xlink:href="figures/figure_2a_brain_MPC_rho.svg"
        id="image42142"
-       x="104.25141"
-       y="20.580339"
+       x="81.60463"
+       y="87.250076"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="53.393368"
-       height="22.25836"
+       width="142.26532"
+       height="29.439281"
        xlink:href="figures/figure_2a_brain_SC_rho.svg"
        id="image6343"
-       x="1.2293426"
-       y="20.556131"
+       x="81.60463"
+       y="17.577206"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="53.47797"
-       height="22.293631"
+       width="142.26532"
+       height="29.43928"
        xlink:href="figures/figure_2a_brain_GD_rho.svg"
        id="image6707"
-       x="53.035809"
-       y="20.488905"
+       x="81.60463"
+       y="52.413639"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="205.17737"
-       height="61.226668"
+       width="126.15266"
+       height="147.23013"
        xlink:href="figures/figure_2a_distance_metric.svg"
        id="image4195"
-       x="0.80552107"
-       y="42.583759"
+       x="0.64167297"
+       y="11.30585"
        inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192" />
-    <image
-       preserveAspectRatio="none"
-       inkscape:svg-dpi="96"
-       width="186.53113"
-       height="77.450974"
-       xlink:href="figures/figure_2b_network_summary_both.svg"
-       id="image8199"
-       x="22.854246"
-       y="123.18192"
-       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192" />
-    <g
-       inkscape:label=""
-       transform="translate(100.268,97.4907)"
-       id="g65967">
-      <g
-         id="g9896">
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g9725">
-          <use
-             xlink:href="#symbol4679"
-             x="277.29599"
-             y="82.872002"
-             id="use7793"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g902">
-          <use
-             xlink:href="#symbol3975"
-             x="287.81201"
-             y="93.333"
-             id="use1620"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g887">
-          <use
-             xlink:href="#symbol8756"
-             x="293.67099"
-             y="90.344002"
-             id="use5142"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol2712"
-             x="301.50458"
-             y="90.344002"
-             id="use461"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g725">
-          <use
-             xlink:href="#symbol6406"
-             x="309.75201"
-             y="91.837997"
-             id="use6209"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol3975"
-             x="312.5708"
-             y="91.837997"
-             id="use2613"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g4678">
-          <use
-             xlink:href="#symbol9166"
-             x="316.76901"
-             y="90.344002"
-             id="use9880"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g8710">
-          <use
-             xlink:href="#symbol5697"
-             x="321.87799"
-             y="86.727997"
-             id="use490"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g2233">
-          <use
-             xlink:href="#symbol1854"
-             x="328.00449"
-             y="86.727997"
-             id="use7063"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g8592">
-          <use
-             xlink:href="#symbol3975"
-             x="321.51999"
-             y="92.936996"
-             id="use2575"
-             width="100%"
-             height="100%" />
-        </g>
-        <path
-           style="fill:none;stroke:#000000;stroke-width:0.398;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
-           d="m 8.75e-4,9.6875e-4 h 57.40625"
-           transform="matrix(1,0,0,-1,277.296,96.083)"
-           id="path6861" />
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g3581">
-          <use
-             xlink:href="#symbol4679"
-             x="286.26401"
-             y="97.935997"
-             id="use3241"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g1290">
-          <use
-             xlink:href="#symbol3975"
-             x="296.78"
-             y="108.397"
-             id="use9277"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g3731">
-          <use
-             xlink:href="#symbol8756"
-             x="302.638"
-             y="105.408"
-             id="use29"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol2712"
-             x="310.47159"
-             y="105.408"
-             id="use5431"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g4742">
-          <use
-             xlink:href="#symbol6406"
-             x="318.72"
-             y="106.902"
-             id="use221"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol3975"
-             x="321.53882"
-             y="106.902"
-             id="use6412"
-             width="100%"
-             height="100%" />
-        </g>
-      </g>
-    </g>
-    <g
-       inkscape:label=""
-       transform="translate(100.268,97.4907)"
-       id="g70294">
-      <g
-         id="g3526">
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g4842">
-          <use
-             xlink:href="#symbol2512"
-             x="277.29599"
-             y="82.872002"
-             id="use7400"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g9538">
-          <use
-             xlink:href="#symbol2377"
-             x="287.81201"
-             y="93.333"
-             id="use4865"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g4897">
-          <use
-             xlink:href="#symbol6356"
-             x="293.67099"
-             y="90.344002"
-             id="use7975"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol174"
-             x="301.50458"
-             y="90.344002"
-             id="use9359"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g4278">
-          <use
-             xlink:href="#symbol4648"
-             x="309.75201"
-             y="91.837997"
-             id="use5994"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol2377"
-             x="312.5708"
-             y="91.837997"
-             id="use9701"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g1633">
-          <use
-             xlink:href="#symbol6495"
-             x="316.76901"
-             y="90.344002"
-             id="use9646"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g5580">
-          <use
-             xlink:href="#symbol1864"
-             x="321.87799"
-             y="86.727997"
-             id="use1194"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g6233">
-          <use
-             xlink:href="#symbol6321"
-             x="328.00449"
-             y="86.727997"
-             id="use5179"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g6666">
-          <use
-             xlink:href="#symbol2377"
-             x="321.51999"
-             y="92.936996"
-             id="use1524"
-             width="100%"
-             height="100%" />
-        </g>
-        <path
-           style="fill:none;stroke:#000000;stroke-width:0.398;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
-           d="m 8.75e-4,9.6875e-4 h 57.40625"
-           transform="matrix(1,0,0,-1,277.296,96.083)"
-           id="path2713" />
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g1923">
-          <use
-             xlink:href="#symbol2512"
-             x="286.26401"
-             y="97.935997"
-             id="use7396"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g231">
-          <use
-             xlink:href="#symbol2377"
-             x="296.78"
-             y="108.397"
-             id="use2992"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g4658">
-          <use
-             xlink:href="#symbol6356"
-             x="302.638"
-             y="105.408"
-             id="use9603"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol174"
-             x="310.47159"
-             y="105.408"
-             id="use3822"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#000000;fill-opacity:1"
-           id="g6315">
-          <use
-             xlink:href="#symbol4648"
-             x="318.72"
-             y="106.902"
-             id="use7173"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol2377"
-             x="321.53882"
-             y="106.902"
-             id="use260"
-             width="100%"
-             height="100%" />
-        </g>
-      </g>
-    </g>
-    <g
-       inkscape:label=""
-       transform="matrix(0.56011107,0,0,0.56011107,14.99283,-29.650312)"
-       id="g74730"
-       style="fill:#4d4d4d"
-       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192">
-      <g
-         id="g690"
-         style="fill:#4d4d4d">
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5224">
-          <use
-             xlink:href="#symbol934"
-             x="93.121002"
-             y="73.18"
-             id="use7631"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g6901">
-          <use
-             xlink:href="#symbol2180"
-             x="101.492"
-             y="80.652"
-             id="use5633"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g2529">
-          <use
-             xlink:href="#symbol9084"
-             x="106.575"
-             y="78.411003"
-             id="use1676"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol2270"
-             x="112.7775"
-             y="78.411003"
-             id="use5591"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g8479">
-          <use
-             xlink:href="#symbol3950"
-             x="119.292"
-             y="79.406998"
-             id="use6322"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol2180"
-             x="121.95002"
-             y="79.406998"
-             id="use7104"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5370">
-          <use
-             xlink:href="#symbol2700"
-             x="125.671"
-             y="78.411003"
-             id="use74709"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g654">
-          <use
-             xlink:href="#symbol6405"
-             x="129.808"
-             y="75.403999"
-             id="use5014"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g4496">
-          <use
-             xlink:href="#symbol397"
-             x="134.99553"
-             y="75.403999"
-             id="use9193"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5572">
-          <use
-             xlink:href="#symbol2180"
-             x="129.558"
-             y="80.403"
-             id="use9311"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <path
-           style="fill:#4d4d4d;stroke:#000000;stroke-width:0.398;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
-           d="M 9.375e-5,2.5e-4 H 47.671969"
-           transform="matrix(1,0,0,-1,93.121,82.219)"
-           id="path3652" />
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g6818">
-          <use
-             xlink:href="#symbol934"
-             x="100.681"
-             y="82.914001"
-             id="use9245"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g4692">
-          <use
-             xlink:href="#symbol2180"
-             x="109.053"
-             y="90.386002"
-             id="use9746"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g2514">
-          <use
-             xlink:href="#symbol9084"
-             x="114.135"
-             y="88.144997"
-             id="use1373"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol2270"
-             x="120.3375"
-             y="88.144997"
-             id="use1272"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g4454">
-          <use
-             xlink:href="#symbol3950"
-             x="126.852"
-             y="89.140999"
-             id="use290"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol2180"
-             x="129.51003"
-             y="89.140999"
-             id="use9267"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-      </g>
-    </g>
-    <g
-       inkscape:label=""
-       transform="matrix(0.56011107,0,0,0.56011107,-37.103414,-29.650313)"
-       id="g79323"
-       style="fill:#4d4d4d"
-       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192">
-      <g
-         id="g6110"
-         style="fill:#4d4d4d">
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g1978">
-          <use
-             xlink:href="#symbol2340"
-             x="93.121002"
-             y="73.18"
-             id="use5777"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g1182">
-          <use
-             xlink:href="#symbol3294"
-             x="101.492"
-             y="80.652"
-             id="use6551"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g8402">
-          <use
-             xlink:href="#symbol835"
-             x="106.575"
-             y="78.411003"
-             id="use4706"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g2091">
-          <use
-             xlink:href="#symbol959"
-             x="111.85068"
-             y="78.411003"
-             id="use568"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5308">
-          <use
-             xlink:href="#symbol8173"
-             x="117.562"
-             y="79.406998"
-             id="use1509"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol3294"
-             x="120.22002"
-             y="79.406998"
-             id="use1382"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g6345">
-          <use
-             xlink:href="#symbol3815"
-             x="123.942"
-             y="78.411003"
-             id="use4207"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g551">
-          <use
-             xlink:href="#symbol1157"
-             x="128.07899"
-             y="75.403999"
-             id="use2333"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5442">
-          <use
-             xlink:href="#symbol4173"
-             x="133.26653"
-             y="75.403999"
-             id="use1513"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g2920">
-          <use
-             xlink:href="#symbol3294"
-             x="127.829"
-             y="80.403"
-             id="use1428"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <path
-           style="fill:#4d4d4d;stroke:#000000;stroke-width:0.398;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
-           d="M 9.375e-5,2.5e-4 H 45.9415"
-           transform="matrix(1,0,0,-1,93.121,82.219)"
-           id="path4330" />
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g2865">
-          <use
-             xlink:href="#symbol2340"
-             x="100.681"
-             y="82.914001"
-             id="use9129"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g9407">
-          <use
-             xlink:href="#symbol3294"
-             x="109.053"
-             y="90.386002"
-             id="use8822"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g4649">
-          <use
-             xlink:href="#symbol835"
-             x="114.135"
-             y="88.144997"
-             id="use8678"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g4984">
-          <use
-             xlink:href="#symbol959"
-             x="119.41068"
-             y="88.144997"
-             id="use8359"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g6770">
-          <use
-             xlink:href="#symbol8173"
-             x="125.123"
-             y="89.140999"
-             id="use7720"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol3294"
-             x="127.78102"
-             y="89.140999"
-             id="use7657"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-      </g>
-    </g>
-    <g
-       inkscape:label=""
-       transform="matrix(0.56011107,0,0,0.56011107,63.506998,-29.323942)"
-       id="g83899"
-       style="fill:#4d4d4d"
-       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192">
-      <g
-         id="g157"
-         style="fill:#4d4d4d">
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g7556">
-          <use
-             xlink:href="#symbol1279"
-             x="93.121002"
-             y="73.18"
-             id="use5844"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g6085">
-          <use
-             xlink:href="#symbol3518"
-             x="101.492"
-             y="80.652"
-             id="use83864"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g6926">
-          <use
-             xlink:href="#symbol6204"
-             x="106.575"
-             y="78.411003"
-             id="use5733"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5857">
-          <use
-             xlink:href="#symbol4731"
-             x="114.91846"
-             y="78.411003"
-             id="use6276"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g7563">
-          <use
-             xlink:href="#symbol4570"
-             x="121.06446"
-             y="78.411003"
-             id="use7282"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5134">
-          <use
-             xlink:href="#symbol5371"
-             x="126.779"
-             y="79.406998"
-             id="use4128"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol3518"
-             x="129.43703"
-             y="79.406998"
-             id="use7014"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5412">
-          <use
-             xlink:href="#symbol5895"
-             x="133.159"
-             y="78.411003"
-             id="use6680"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g3421">
-          <use
-             xlink:href="#symbol5315"
-             x="137.29601"
-             y="75.403999"
-             id="use5558"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g3192">
-          <use
-             xlink:href="#symbol6485"
-             x="142.47855"
-             y="75.403999"
-             id="use75"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g7608">
-          <use
-             xlink:href="#symbol3518"
-             x="137.045"
-             y="80.403"
-             id="use2926"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <path
-           style="fill:#4d4d4d;stroke:#000000;stroke-width:0.398;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
-           d="M 9.375e-5,2.5e-4 H 55.16025"
-           transform="matrix(1,0,0,-1,93.121,82.219)"
-           id="path9161" />
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5686">
-          <use
-             xlink:href="#symbol1279"
-             x="100.681"
-             y="82.914001"
-             id="use6968"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g8501">
-          <use
-             xlink:href="#symbol3518"
-             x="109.053"
-             y="90.386002"
-             id="use9977"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g9960">
-          <use
-             xlink:href="#symbol6204"
-             x="114.135"
-             y="88.144997"
-             id="use8002"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g9888">
-          <use
-             xlink:href="#symbol4731"
-             x="122.47845"
-             y="88.144997"
-             id="use4930"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g8431">
-          <use
-             xlink:href="#symbol4570"
-             x="128.62447"
-             y="88.144997"
-             id="use6819"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5978">
-          <use
-             xlink:href="#symbol5371"
-             x="134.339"
-             y="89.140999"
-             id="use3818"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol3518"
-             x="136.99702"
-             y="89.140999"
-             id="use1659"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-      </g>
-    </g>
-    <g
-       inkscape:label=""
-       transform="matrix(0.56011107,0,0,0.56011107,114.76921,-30.062349)"
-       id="g83899-0"
-       style="fill:#4d4d4d;stroke-linecap:butt;stroke-linejoin:round"
-       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192">
-      <g
-         id="g157-1"
-         style="fill:#4d4d4d">
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g7556-3">
-          <use
-             xlink:href="#symbol1279"
-             x="93.121002"
-             y="73.18"
-             id="use5844-7"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g6085-7">
-          <use
-             xlink:href="#symbol3518"
-             x="101.492"
-             y="80.652"
-             id="use83864-2"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g6926-6">
-          <use
-             xlink:href="#symbol6204"
-             x="106.575"
-             y="78.411003"
-             id="use5733-4"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5857-5">
-          <use
-             xlink:href="#symbol4731"
-             x="114.91846"
-             y="78.411003"
-             id="use6276-2"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g7563-0">
-          <use
-             xlink:href="#symbol4570"
-             x="121.06446"
-             y="78.411003"
-             id="use7282-2"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5134-9">
-          <use
-             xlink:href="#symbol5371"
-             x="126.779"
-             y="79.406998"
-             id="use4128-0"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol3518"
-             x="129.43703"
-             y="79.406998"
-             id="use7014-9"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5412-9">
-          <use
-             xlink:href="#symbol5895"
-             x="133.159"
-             y="78.411003"
-             id="use6680-4"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g3421-5">
-          <use
-             xlink:href="#symbol5315"
-             x="137.29601"
-             y="75.403999"
-             id="use5558-1"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g3192-0">
-          <use
-             xlink:href="#symbol6485"
-             x="142.47855"
-             y="75.403999"
-             id="use75-3"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g7608-7">
-          <use
-             xlink:href="#symbol3518"
-             x="137.045"
-             y="80.403"
-             id="use2926-8"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <path
-           style="fill:#4d4d4d;stroke:#000000;stroke-width:0.398;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
-           d="M 9.375e-5,2.5e-4 H 55.16025"
-           transform="matrix(1,0,0,-1,93.121,82.219)"
-           id="path9161-8" />
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5686-6">
-          <use
-             xlink:href="#symbol1279"
-             x="100.681"
-             y="82.914001"
-             id="use6968-0"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g8501-4">
-          <use
-             xlink:href="#symbol3518"
-             x="109.053"
-             y="90.386002"
-             id="use9977-6"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g9960-7">
-          <use
-             xlink:href="#symbol6204"
-             x="114.135"
-             y="88.144997"
-             id="use8002-6"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g9888-0">
-          <use
-             xlink:href="#symbol4731"
-             x="122.47845"
-             y="88.144997"
-             id="use4930-9"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g8431-7">
-          <use
-             xlink:href="#symbol4570"
-             x="128.62447"
-             y="88.144997"
-             id="use6819-5"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-        <g
-           style="fill:#4d4d4d;fill-opacity:1"
-           id="g5978-9">
-          <use
-             xlink:href="#symbol5371"
-             x="134.339"
-             y="89.140999"
-             id="use3818-7"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-          <use
-             xlink:href="#symbol3518"
-             x="136.99702"
-             y="89.140999"
-             id="use1659-8"
-             style="fill:#4d4d4d"
-             width="100%"
-             height="100%" />
-        </g>
-      </g>
-    </g>
     <text
        xml:space="preserve"
        style="font-size:6.35px;line-height:1.25;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:none;stroke-width:0.264583"
@@ -3699,79 +2461,128 @@
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="53.999805"
-       height="22.499928"
+       width="142.26532"
+       height="29.43928"
        xlink:href="figures/figure_2a_brain_FC_rho.svg"
        id="image21861"
-       x="155.65134"
-       y="20.374041" />
+       x="81.60463"
+       y="122.08651" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="21.184141"
+       width="42.655163"
        height="8.8267279"
        xlink:href="figures/figure_2b_brain_SC_rho_SomMot.svg"
        id="image30382"
-       x="3.0897479"
-       y="188.42622" />
+       x="1.8091023"
+       y="229.94296" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="21.099781"
+       width="42.48531"
        height="8.7915802"
        xlink:href="figures/figure_2b_brain_SC_rho_Limbic.svg"
        id="image30494"
-       x="3.0897479"
-       y="178.98099" />
+       x="1.8091023"
+       y="221.55612" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="21.089249"
+       width="42.48531"
        height="8.7915802"
        xlink:href="figures/figure_2b_brain_SC_rho_Vis.svg"
        id="image30494-3"
-       x="3.0897479"
-       y="169.50061"
+       x="1.8091023"
+       y="212.60493"
        style="stroke-linecap:butt;stroke-linejoin:round" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="21.089249"
+       width="42.48531"
        height="8.7915802"
        xlink:href="figures/figure_2b_brain_SC_rho_Default.svg"
        id="image30494-3-8"
-       x="3.0897479"
-       y="160.02025"
+       x="1.8091023"
+       y="204.18289"
        style="stroke-linecap:butt;stroke-linejoin:round" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="21.089249"
+       width="42.48531"
        height="8.7915802"
        xlink:href="figures/figure_2b_brain_SC_rho_DorsAttn.svg"
        id="image30494-3-8-3"
-       x="3.0897479"
-       y="150.53986"
+       x="1.8091023"
+       y="195.23166"
        style="stroke-linecap:butt;stroke-linejoin:round" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="21.089249"
+       width="42.48531"
        height="8.7915802"
        xlink:href="figures/figure_2b_brain_SC_rho_SalVentAttn.svg"
        id="image30494-3-8-3-7"
-       x="3.0897479"
-       y="141.05948"
+       x="1.8091023"
+       y="186.8096"
        style="stroke-linecap:butt;stroke-linejoin:round" />
     <image
        preserveAspectRatio="none"
        inkscape:svg-dpi="96"
-       width="21.089249"
+       width="42.48531"
        height="8.7915802"
        xlink:href="figures/figure_2b_brain_SC_rho_Cont.svg"
        id="image30494-3-8-3-7-9"
-       x="3.0897479"
-       y="131.5791"
+       x="1.8091023"
+       y="177.85838"
        style="stroke-linecap:butt;stroke-linejoin:round" />
+    <text
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71654px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#1c1b19;fill-opacity:1;stroke-width:0.137118;stroke-linecap:butt;stroke-linejoin:round"
+       x="101.25146"
+       y="153.61824"
+       id="text20871-9-7">min</text>
+    <text
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71654px;font-family:'Avenir Next';-inkscape-font-specification:'Avenir Next, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#1c1b19;fill-opacity:1;stroke-width:0.137118;stroke-linecap:butt;stroke-linejoin:round"
+       x="184.87921"
+       y="152.94995"
+       id="text20871-9-6-9">max</text>
+    <image
+       width="84.378464"
+       height="1.8632468"
+       preserveAspectRatio="none"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA7cAAAAVCAIAAAASOo4sAAAAA3NCSVQICAjb4U/gAAAAGHRFWHRT b2Z0d2FyZQBtYXRlLXNjcmVlbnNob3TIlvBKAAAFg0lEQVR4nO2dzYolRRSEI0724C8i6kLwF3wL N25duXfrK7oRNz6OiCCC4wzalSdcVN2e4aJWJHSjo/HRi74Q90zkqeq+kUVPHkpCCCGEEEII4Tnq nzYQQgghhBDCv44bAHmcHEIIIYQQAgCS+zc3AFp4/Hj79cnWbb7b/mcAkMv6+4VrFUn4K1wtvSBf bJsvXPJgCx/Gw0p7F5p7eFhxcd935XpZra3v/u+ei37F80LZRRtuTa49Alix4VZeXNpS0x7gAYcW 7rT9DfeuXLxoK+q1R0K2WEs2tFTbv8pasiFfu9ThJb0e4PbBYice5iovrEzrlZc8m8qV56WCs0L9 5Yu/c2GbcK/IoTLzLTBef+3Rm2/w0aP95Q2Ap0/n199+/813Pzx5up2+n2RVeXmPrOLguZggSbLG 8D6DWWPUsP5chGQVWYaYrNpX59RFVZVTdhePqrLWVsUaZan3vnlXgzyunfOhTaBGGVfuqFzFqvMA xd1GkV4rRqHK22YRo0BaIa4KVSjqNMDwWJ0bDavg3ZUAMGiVJUGKhNczkCqvMoAqDTcTaW+aUVkE ijI/3cm9rCUuaqEyRFqZb1cO7/coiWKbv/ULXUce+Ts9j5tNND1ApUlZ4oJKE56YENWQZ7ibcltB THpPYiix56mHO8NoOasjQDWO1Z0i9i42tBB7g2RVbtuDgGetMOQ90e7qMP2yjf3LoVuuB2hOtddh ST3VXoTq1mzrhhfUrW4znGmbai9OqjFbXmGpe0rT6rC6NdtsRR8ejETb6tnyrrJavVkeBGh2b26H +3Zfnedhdk9ry9Cb+nf1rbW6d7/4/MOvvnzlg/f2lzcAuvXL4+2HH3978nQ6Jfb8BOPZKEn6cbZY Y5i5s0bf2TDExQsnHsgaZefv3uOs50EsywOgcYMqWWJqT/aeYdVo13CJx+7lXDzGSpQcGl40IzGG mw53AzQC4h58h214DDf7kgtlC65hALUS1kfB3L7VXd8MMZ9r8hkqytg3HeJB2ftN7UndKCyivQ2D ABEacPYAALrY7qYFs9A8f6J8eCjHgwSpLpXP7apLs8yHOb1R54YlQaLa8yBIUu+Vz9Xd1dPcC6kb 6nOxDqhp3BGHYXiG0VPTNYy5WYlzz9yS2jC8XxGzMoBuzPOHYkfZbkwjGxxu3TwtSdsGL+2pW5tr WNMyrIthN55KfTvd1XX3nM7qJPXu4azwHjQ1u+d07jVJ89byAKBnz1u3bM9u23DP7s3aC+2GtRmZ Xuru3lrOjdnqW/XvrdtzMYDbn37u7Vnd/O+9EEIIIYQQrklKDiGEEEII4Zqk5BBCCCGEEK5JSg4h hBBCCOGapOQQQgghhBCuSUoOIYQQQgjhmqTkEEIIIYQQrrkB8PLL47NP3/no/Ve3zTgIkAsj5HjM kHCkOCaLeJOqaA9OOPya4osNU+y2Yl+YK0Z55yrf6ddsmFXvHFiTLxbmCvpi8yzhZQ+8zDcxPfgD 57gwa5IXJ/csJkF3XhcXfzhgTRW5vMEaCXFX2pxMAXP+CC6z9/wO0x9wSO8YXQCQe1Dx0Q13YMp+ vrIllqsE9tl75lg28ZhqZQ3IsMuCgjkDBQAk+vO69kkl5qCQhRlncg8qXvRwXA5z5oU51gSXw5hN DsPmGJSjuiVue2n77BiT46xrX+zew0sddmZ5HNqWP3ROkt+3ltyZc5La99AwpgnpqCv3p1mwh7Yc B6Db521D07Xx2icfv/T2W3cveTlqfXFyZ9h5iLm6LyBpwzPSixXSrfBnvICfRi+g5X8B/92u/XdX 9uA8TBj1i5KF50YPc21qdgghhBBCCP8D8nfJIYQQQgghXJOUHEIIIYQQwjVJySGEEEIIIVyTlBxC CCGEEMI1SckhhBBCCCFc8wcjZzqTm8ttlAAAAABJRU5ErkJggg== "
+       id="image61001"
+       x="100.78811"
+       y="149.6675"
+       style="stroke-linecap:butt;stroke-linejoin:round" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.78029px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:sans-serif;font-variant-ligatures:none;stroke-width:0.260652;stroke-linecap:butt;stroke-linejoin:round"
+       x="126.84216"
+       y="155.77603"
+       id="text61995"><tspan
+         sodipodi:role="line"
+         id="tspan61993"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.78029px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.260652"
+         x="126.84216"
+         y="155.77603">Column avg. (z-score)</tspan></text>
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#feffff;stroke-width:0.193999;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       id="rect65652"
+       width="35.336918"
+       height="135.79813"
+       x="203.9518"
+       y="18.733984" />
+    <image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="170.01613"
+       height="70.765678"
+       xlink:href="figures/figure_2b_network_summary_both.svg"
+       id="image8199"
+       x="38.088593"
+       y="171.38411"
+       inkscape:export-filename="/local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figure2.png"
+       inkscape:export-xdpi="192"
+       inkscape:export-ydpi="192" />
   </g>
 </svg>

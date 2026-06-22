@@ -38,7 +38,7 @@ import pandas as pd
 from brainspace.null_models import MoranRandomization
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
-from scipy.stats import spearmanr, ttest_1samp, t as t_dist
+from scipy.stats import spearmanr, ttest_1samp, t as t_dist, rankdata
 
 logger = logging.getLogger(__name__)
 
@@ -283,6 +283,38 @@ def prepare_weights(
 # Projection score
 # ---------------------------------------------------------------------------
 
+def _weighted_mean_projection(
+    W_sub: np.ndarray, g_targets: np.ndarray, *, min_valid: int = 10,
+) -> np.ndarray:
+    """Core weighted-mean projection on an already-sliced SN x target submatrix.
+
+    P[i] = sum_j w_ij g_targets[j] / sum_j w_ij over positive, finite weights only
+    (NaN/non-positive weights are excluded from numerator AND denominator). Rows with
+    fewer than `min_valid` finite-positive targets, or a non-positive denominator,
+    return NaN. Shared by `compute_projection_score` (full-matrix entry point) and the
+    geometry-preserving topological null, which rewires `W_sub` directly.
+
+    Parameters
+    ----------
+    W_sub : (n_sn, n_other) float, preprocessed SN->target weights (NaN = excluded).
+    g_targets : (n_other,) float, FC gradient at the target vertices.
+    min_valid : int
+
+    Returns
+    -------
+    P : (n_sn,) float
+    """
+    valid = np.isfinite(W_sub) & (W_sub > 0) & np.isfinite(g_targets)[None, :]
+    W_eff = np.where(valid, W_sub, 0.0)
+    g_safe = np.where(np.isfinite(g_targets), g_targets, 0.0)
+
+    num = W_eff @ g_safe
+    den = W_eff.sum(axis=1)
+    n_valid = valid.sum(axis=1)
+
+    return np.where(n_valid >= min_valid, num / np.where(den > 0, den, np.nan), np.nan)
+
+
 def compute_projection_score(
     W: np.ndarray, g_fc_cortex: np.ndarray,
     sn_idx_cortex: np.ndarray, other_idx_cortex: np.ndarray,
@@ -290,9 +322,10 @@ def compute_projection_score(
 ) -> np.ndarray:
     """Weighted-mean projection: P[i] = sum_j w_ij g_FC[j] / sum_j w_ij.
 
-    Only positive weights contribute (NaN weights are excluded from numerator
-    AND denominator). Returns NaN for rows with fewer than `min_valid` finite
-    targets, or with zero/negative denominator.
+    Slices the SN x target submatrix from the full preprocessed `W` and delegates the
+    arithmetic to `_weighted_mean_projection`. Only positive weights contribute (NaN
+    weights are excluded from numerator AND denominator). Returns NaN for rows with
+    fewer than `min_valid` finite targets, or with zero/negative denominator.
 
     Parameters
     ----------
@@ -308,17 +341,7 @@ def compute_projection_score(
     """
     W_sub = W[np.ix_(sn_idx_cortex, other_idx_cortex)]
     g_targets = g_fc_cortex[other_idx_cortex]
-
-    valid = np.isfinite(W_sub) & (W_sub > 0) & np.isfinite(g_targets)[None, :]
-    W_eff = np.where(valid, W_sub, 0.0)
-    g_safe = np.where(np.isfinite(g_targets), g_targets, 0.0)
-
-    num = W_eff @ g_safe
-    den = W_eff.sum(axis=1)
-    n_valid = valid.sum(axis=1)
-
-    P = np.where(n_valid >= min_valid, num / np.where(den > 0, den, np.nan), np.nan)
-    return P
+    return _weighted_mean_projection(W_sub, g_targets, min_valid=min_valid)
 
 
 # ---------------------------------------------------------------------------
@@ -387,6 +410,7 @@ def compute_projection_subjects(
         P_subjects_full : (n_sub, n_cortex_full=9684) per-subject P_s expanded to full vertex space, NaN outside SN.
         P_subjects_sn  : (n_sub, n_sn) per-subject projection (SN-only).
         r_subjects : (n_sub,) per-subject Spearman(g_MPC, P_s).
+        n_targets_per_sn : (n_sn,) mean-over-subjects count of finite-positive targets per SN vertex (sparsity diagnostic).
         target_net_weights : (n_networks, n_sn) group-mean weighted connectivity from each SN vertex to each target network (None if target_network_labels not supplied).
         target_network_names : list of str, names matching the first axis of target_net_weights.
         + Fisher-z aggregate keys: r_group, t, p, ci_low, ci_high, n.
@@ -409,6 +433,9 @@ def compute_projection_subjects(
     r_subjects = np.full(n_sub, np.nan)
     P_subjects_full = np.full((n_sub, N_TOTAL_5K), np.nan)
     P_subjects_sn = np.full((n_sub, n_sn), np.nan)
+    # Per-subject count of finite-positive targets per SN vertex (sparsity diagnostic).
+    n_targets_subjects = np.full((n_sub, n_sn), np.nan)
+    g_targets_finite = np.isfinite(g_fc_cortex[other_mask_cortex])
 
     if target_network_labels is not None:
         target_net_names = [n for n in pd.unique(target_network_labels[other_mask_cortex])
@@ -440,6 +467,10 @@ def compute_projection_subjects(
 
         P_subjects_sn[s] = P_s
         P_subjects_full[s, sn_idx_full] = P_s
+
+        W_sub = W[np.ix_(sn_mask_cortex, other_mask_cortex)]
+        n_targets_subjects[s] = (np.isfinite(W_sub) & (W_sub > 0)
+                                 & g_targets_finite[None, :]).sum(axis=1)
 
         finite = valid_g_mpc & np.isfinite(P_s)
         if finite.sum() >= min_valid:
@@ -482,6 +513,7 @@ def compute_projection_subjects(
         "P_subjects_full": P_subjects_full,
         "P_subjects_sn": P_subjects_sn,
         "r_subjects": r_subjects,
+        "n_targets_per_sn": np.nanmean(n_targets_subjects, axis=0),
         "target_net_weights": target_net_weights,
         "target_network_names": target_net_names,
         **agg,
@@ -633,6 +665,202 @@ def compute_moran_null_projection(
         )
 
     return {"null_group_moran": null_group, "p_moran": p_moran, "null_std_moran": null_std}
+
+
+# ---------------------------------------------------------------------------
+# Geometry-preserving topological null (within-network, wiring specificity)
+# ---------------------------------------------------------------------------
+
+def _build_distance_bins(
+    gd_sn_to_other: np.ndarray, nbins: int, valid_target: np.ndarray | None = None,
+) -> tuple[np.ndarray, list]:
+    """Per-(SN vertex, bin) candidate target pools for distance-preserving rewiring.
+
+    Targets are binned by their geodesic distance from each source-network vertex
+    into `nbins` equal-width intra-hemisphere bins; cross-hemisphere / undefined
+    targets (geodesic distance == 0) form one additional bin (index `nbins`) whose
+    reassignment is restricted to the contralateral targets. Reassigning an edge
+    within its bin preserves the edge-length distribution while randomising target
+    identity (Roberts et al. 2016; Betzel et al. 2018).
+
+    Parameters
+    ----------
+    gd_sn_to_other : (n_sn, n_other) float, geodesic distance from each SN vertex to
+        each target; cross-hemisphere entries are 0.
+    nbins : int, number of intra-hemisphere distance bins.
+    valid_target : (n_other,) bool, optional
+        Targets eligible to receive a reassigned edge. Targets with a non-finite
+        projected value (e.g. NaN FC gradient) must be excluded, or the resampled
+        projection numerator becomes NaN. Defaults to all targets.
+
+    Returns
+    -------
+    bin_of : (n_sn, n_other) int, bin index per (row, target); the inter-hemisphere
+        bin is `nbins`.
+    pools : list (len n_sn) of list (len nbins+1) of int arrays
+        `pools[i][b]` holds the eligible target-column indices in bin b for SN vertex i.
+    """
+    n_sn, n_other = gd_sn_to_other.shape
+    if valid_target is None:
+        valid_target = np.ones(n_other, dtype=bool)
+    intra = gd_sn_to_other > 0
+    bin_of = np.full(gd_sn_to_other.shape, nbins, dtype=int)  # default inter-hemi bin
+    if intra.any():
+        vals = gd_sn_to_other[intra]
+        edges = np.linspace(vals.min(), vals.max(), nbins + 1)
+        edges[-1] += 1e-6
+        bin_of[intra] = np.clip(np.digitize(gd_sn_to_other[intra], edges) - 1, 0, nbins - 1)
+    pools = [[np.flatnonzero((bin_of[i] == b) & valid_target) for b in range(nbins + 1)]
+             for i in range(n_sn)]
+    return bin_of, pools
+
+
+def _rank_corr_columns(x: np.ndarray, Y: np.ndarray) -> np.ndarray:
+    """Spearman correlation of vector `x` (M,) with each column of `Y` (M, K).
+
+    Ranks use tie-averaging, so Pearson on the ranks equals Spearman's rho. Vectorised
+    across the K surrogate columns (the finite mask is constant across surrogates, so
+    a single subset is taken upstream). Returns a (K,) array of correlations.
+    """
+    rx = rankdata(x).astype(np.float64)
+    rx -= rx.mean()
+    RY = np.empty(Y.shape, dtype=np.float64)
+    for k in range(Y.shape[1]):
+        RY[:, k] = rankdata(Y[:, k])
+    RY -= RY.mean(axis=0, keepdims=True)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        r = (rx @ RY) / (np.linalg.norm(rx) * np.linalg.norm(RY, axis=0))
+    return r
+
+
+def compute_topological_null_projection(
+    modality: str, files: list, df_yeo_surf_5k: pd.DataFrame,
+    g_fc_cortex: np.ndarray, g_mpc_cortex_at_sn: np.ndarray,
+    sn_mask_cortex: np.ndarray, other_mask_cortex: np.ndarray,
+    gd_sn_to_other: np.ndarray, result: dict, n_rand: int,
+    *, sc_subjects: list[np.ndarray] | None = None, mask_G: np.ndarray | None = None,
+    nbins: int = 10, random_state: int = 42, min_valid: int = 10,
+) -> dict:
+    """Geometry-preserving topological null for the g_MPC <-> projection alignment.
+
+    Tests whether the *specific* SN->target wiring, beyond connectome geometry, drives
+    the alignment. Each subject's connectivity is rewired by reassigning every
+    SN->target edge to a different target **in the same geodesic-distance bin** (with
+    replacement; pools are large relative to per-vertex degree), keeping the edge
+    weight attached. This preserves each source vertex's degree, weight multiset, and
+    edge-length distribution while randomising target identity (and hence the FC
+    gradient value the edge lands on). The projection and per-subject Spearman are
+    recomputed on the rewired connectome and aggregated by Fisher-z mean across
+    subjects per surrogate.
+
+    Because edge length is preserved, the null distribution of the group correlation is
+    centred on the *geometry expectation* rather than zero, so an observed correlation
+    in its tail isolates directional targeting specificity from distance dependence.
+    Intended for SC, MPC and FC; GD weights are a pure function of distance, so a
+    within-bin reassignment barely changes them and the null is uninformative there.
+
+    Parameters
+    ----------
+    modality : {'SC', 'MPC', 'FC'}
+    files : list of paths
+        Per-subject connectivity files (used when `sc_subjects` is None or modality != SC).
+    df_yeo_surf_5k : pd.DataFrame
+        Provides the cortex mask and per-vertex hemisphere labels.
+    g_fc_cortex : (n_cortex,) whole-brain FC gradient on cortex.
+    g_mpc_cortex_at_sn : (n_sn,) MPC gradient at source-network vertices.
+    sn_mask_cortex, other_mask_cortex : (n_cortex,) bool, source-network and target masks.
+    gd_sn_to_other : (n_sn, n_other) geodesic distance from SN vertices to targets
+        (cross-hemisphere entries 0).
+    result : dict from `compute_projection_subjects` (only `r_group` is read).
+    n_rand : int, number of surrogates.
+    sc_subjects : list of (n_cortex, n_cortex), optional pre-loaded SC matrices.
+    mask_G : (n_cortex, n_cortex) bool, optional Betzel consensus mask (SC only).
+    nbins : int, intra-hemisphere distance bins. Default 10.
+    random_state : int, base seed. Default 42.
+    min_valid : int, minimum finite-positive targets per SN vertex. Default 10.
+
+    Returns
+    -------
+    {null_group_topo, p_topo, null_std_topo}
+    """
+    cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values
+    hemi_cortex = df_yeo_surf_5k.loc[cortex_mask, "hemisphere"].values
+    n_sn = int(sn_mask_cortex.sum())
+    g_targets = g_fc_cortex[other_mask_cortex].astype(np.float64)
+    g_targets_finite = np.isfinite(g_targets)
+    g_mpc_sn = g_mpc_cortex_at_sn.astype(np.float64)
+    valid_g_mpc = np.isfinite(g_mpc_sn)
+
+    # Pools exclude targets with a non-finite projected value, otherwise a resampled
+    # target would inject NaN into the projection numerator.
+    bin_of, pools = _build_distance_bins(gd_sn_to_other, nbins, valid_target=g_targets_finite)
+    # Flatten each row's per-bin candidate FC-gradient values into one array with bin
+    # start-offsets and sizes, so a surrogate resamples all of a row's edges in a single
+    # vectorised draw (geometry-only; reused for every subject and surrogate).
+    g_concat, bin_off, bin_sz = [], [], []
+    for i in range(n_sn):
+        gp = [g_targets[pools[i][b]] for b in range(nbins + 1)]
+        sizes = np.array([a.size for a in gp])
+        g_concat.append(np.concatenate(gp) if sizes.sum() else np.empty(0))
+        bin_sz.append(sizes)
+        bin_off.append(np.concatenate([[0], np.cumsum(sizes)[:-1]]))  # start of each bin
+
+    n_sub = len(files) if files else (len(sc_subjects) if sc_subjects else 0)
+    if n_sub == 0:
+        raise ValueError(f"[{modality}] topological null: no subjects to process.")
+
+    rng = np.random.default_rng(random_state)
+    null_subjects = np.full((n_rand, n_sub), np.nan)
+
+    for s in range(n_sub):
+        if modality == "SC" and sc_subjects is not None:
+            W_raw = sc_subjects[s]
+        else:
+            W_raw = load_subject_matrix(files[s], cortex_mask)
+        W = prepare_weights(W_raw, modality, hemi_cortex, sn_mask_cortex, mask_G=mask_G)
+        W_sub = W[np.ix_(sn_mask_cortex, other_mask_cortex)]
+
+        pos = np.isfinite(W_sub) & (W_sub > 0) & g_targets_finite[None, :]
+        row_deg = pos.sum(axis=1)
+        W_total = np.where(pos, W_sub, 0.0).sum(axis=1)
+
+        # Denominator (total weight) is invariant under within-bin reassignment, so only
+        # the numerator (sum of weight x reassigned-target FC value) is resampled.
+        P_surr = np.full((n_sn, n_rand), np.nan)
+        for i in range(n_sn):
+            if row_deg[i] < min_valid:
+                continue
+            cols = np.flatnonzero(pos[i])
+            w_e = W_sub[i, cols].astype(np.float64)
+            b_e = bin_of[i, cols]
+            sz = bin_sz[i][b_e].astype(np.float64)            # pool size of each edge's bin
+            off = bin_off[i][b_e]                              # pool start offset per edge
+            # One draw per edge per surrogate: a uniform index into its same-distance pool.
+            loc = (rng.random((n_rand, cols.size)) * sz).astype(np.intp)
+            g_draw = g_concat[i][off[None, :] + loc]           # (n_rand, n_edges)
+            P_surr[i] = (g_draw @ w_e) / W_total[i]
+
+        mask = valid_g_mpc & (row_deg >= min_valid)
+        if mask.sum() >= min_valid:
+            null_subjects[:, s] = _rank_corr_columns(g_mpc_sn[mask], P_surr[mask])
+
+    with np.errstate(invalid="ignore"):
+        z = np.arctanh(np.clip(null_subjects, -0.999, 0.999))
+    null_group = np.tanh(np.nanmean(z, axis=1))
+
+    p_topo = empirical_p_twosided(null_group, result["r_group"])
+    null_std = float(np.nanstd(null_group))
+    if null_std < 1e-6:
+        logger.warning(
+            f"[{modality}] topological null group std={null_std:.2e}: "
+            f"surrogates may be degenerate."
+        )
+    logger.info(
+        f"[{modality}] topological null: nbins={nbins}, n_rand={n_rand}; "
+        f"null mean={np.nanmean(null_group):+.3f} (geometry expectation), "
+        f"obs r_group={result['r_group']:+.3f}, p_topo={p_topo:.3e}"
+    )
+    return {"null_group_topo": null_group, "p_topo": p_topo, "null_std_topo": null_std}
 
 
 # ---------------------------------------------------------------------------

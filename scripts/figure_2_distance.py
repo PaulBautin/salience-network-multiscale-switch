@@ -44,32 +44,44 @@
 #
 # All matrices loaded at fsLR-5k (9684 vertices). Subject is the unit of inference.
 #
-# Figure 2A: SalVentAttn × {SC, GD, MPC, FC} - projection map + group r/p per modality.
+# Figure 2A: figure-1B-style grid - one row per modality {SC, GD, MPC, FC}, two
+#            columns. Column 1 is the SalVentAttn scatter with the within-network MPC
+#            gradient on a single shared bottom x-axis and that measure's projection P
+#            on y (group r and spatial-null p_moran). Column 2 is a horizontal lollipop
+#            placing all 7 Yeo networks (stem length = |group r| on a shared bottom |r|
+#            axis, network-coloured, FDR-Moran-significant networks filled + starred).
+#            All inputs are views of the per-network computation (nothing recomputed).
 # Figure 2B: All 7 Yeo networks × {SC, GD, MPC, FC} - replicates the test per network
 #            for every connectivity measure. The headline panel is a bubble matrix
-#            (rows = networks, columns = measures aligned with the 2A panels; disc
-#            colour = group r, area = |r|, black ring + stars = FDR-Moran
-#            significance) that makes the cross-network and cross-modality effect
-#            legible at a glance; per-measure scatter grids are retained as supplements.
+#            (rows = networks, columns = measures; disc colour = group r, area = |r|,
+#            black ring + stars = FDR-Moran significance); per-measure scatter grids
+#            and per-network brain maps are retained as supplements.
 #
 # Outputs:
-#   results/figures/figure_2a_distance_metric.svg
-#   results/figures/figure_2a_brain_{SC,GD,MPC,FC}_rho.svg
+#   results/figures/figure_2a_distance_metric.svg               (scatter + lollipop, 1B layout)
+#   results/figures/figure_2a_brain_{SC,GD,MPC,FC}_rho.svg      (SalVentAttn projection maps)
 #   results/figures/figure_2b_distance_network_{measure}.svg   (per-measure scatter grid)
 #   results/figures/figure_2b_network_summary_{hemi}.svg       (bubble matrix, all measures)
 #   results/figures/figure_2b_brain_{measure}_rho_{network}.svg
-#   data/dataframes/df_2b_label_{hemisphere}.csv               (vertex-level cache; new schema)
+#   data/dataframes/df_2b_label_{hemisphere}.csv               (vertex cache: _P + _dominant cols)
 #   data/dataframes/df_2b_network_stats_{measure}_{hemi}.csv   (per-network group stats)
 #   data/dataframes/df_2b_network_subject_r_{measure}_{hemi}.csv (per-subject r; row index = subject ID, one column per network)
 #
-# The -panel {both,2a,2b} flag selects which panel to compute; '2b' regenerates the
-# cross-network summary without rerunning the 2A modality sweep.
+# Two flags. -stage {both,compute,plot} separates the expensive computation from
+# drawing: 'both'/'compute' run the projection + Moran nulls, write every figure-data
+# cache above (the per-network projection always runs over all 7 networks), AND draw
+# the figures (so a fresh compute always refreshes them); 'plot' skips all heavy loads
+# and redraws figures from the caches in seconds (fast aesthetic iteration). -panel
+# {both,2a,2b} then selects which figures are rendered. ('-stage plot' needs a prior
+# compute run.)
 #
 # Requires figure_1a_t1map.py to have been run first (produces
 #   data/dataframes/figure_1a_pni_to_mics_5k.csv).
 #
 # Example:
 #   python /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py -hemi LH
+#   # then iterate on figure aesthetics without recomputing (seconds):
+#   python .../scripts/figure_2_distance.py -hemi LH -stage plot
 #
 # If working on remote server add before command: xvfb-run -s "-screen 0 1920x1080x24"
 # ---------------------------------------------------------------------------------------
@@ -81,17 +93,15 @@
 
 import argparse
 import logging
-from functools import partial
 from pathlib import Path
 
 import nibabel as nib
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from scipy.stats import zscore, spearmanr
 
-from brainspace.plotting import plot_surf
-import brainspace.plotting.surface_plotting as _bsp_sp
-from brainspace.plotting.utils import _gen_grid as _orig_gen_grid
+from brainspace.plotting import plot_hemispheres
 from brainspace.mesh.mesh_io import read_surface
 
 import matplotlib.pyplot as plt
@@ -106,7 +116,8 @@ from src.plot_colors import yeo7_rgb, yeo7_abbrev
 from src.logging_utils import setup_manuscript_logger
 from src.connectome_processing import (
     build_consensus_mask, compute_projection_subjects,
-    compute_moran_null_projection, compute_dominant_target_network,
+    compute_moran_null_projection, compute_topological_null_projection,
+    compute_dominant_target_network,
     benjamini_hochberg, load_subject_matrix,
 )
 
@@ -118,6 +129,11 @@ plt.rcParams["text.usetex"] = False
 
 N_LH_5K = 4842
 N_TOTAL_5K = 9684
+
+# Modalities that receive the geometry-preserving topological null. GD is excluded: its
+# weights are 1/geodesic-distance, so a within-distance-bin target reassignment barely
+# changes them and the null would be uninformative.
+TOPO_MODALITIES = ("SC", "MPC", "FC")
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -134,39 +150,53 @@ def get_parser() -> argparse.ArgumentParser:
     )
     optional.add_argument(
         "-panel", type=str, default="both", choices=["both", "2a", "2b"],
-        help="Which panel to compute: 'both', '2a', or '2b' (default: both). "
-             "Use '2b' to regenerate the cross-network summary without rerunning 2A."
+        help="Which panel to render: 'both', '2a', or '2b' (default: both). "
+             "Use '2b' to regenerate the cross-network summary without redrawing 2A."
+    )
+    optional.add_argument(
+        "-stage", type=str, default="both", choices=["both", "compute", "plot"],
+        help="Pipeline stage (default: both). 'both'/'compute' run the projection + "
+             "nulls, write all figure-data caches, AND draw the figures (so a fresh "
+             "compute always refreshes the figures); 'plot' skips the heavy computation "
+             "and redraws figures from the caches (fast aesthetic iteration). 'plot' "
+             "requires a prior 'compute'/'both' run."
     )
     return parser
 
 
-def save_brain_map(surf_lh, surf_rh, values: np.ndarray, array_name: str,
-                   filename: Path, hemisphere: str = "both",
-                   color_range=(-3, 3)) -> None:
-    """Append per-vertex values to fsLR-5k inflated surfaces and save a screenshot."""
-    surf_lh.append_array(values[:N_LH_5K], name=array_name)
-    surf_rh.append_array(values[N_LH_5K:], name=array_name)
-    surfs = {"rh1": surf_rh, "lh1": surf_lh}
-    if hemisphere == "LH":
-        layout, view = [["lh1", "lh1"]], [["lateral", "medial"]]
-    elif hemisphere == "RH":
-        layout, view = [["rh1", "rh1"]], [["lateral", "medial"]]
-    else:
-        layout, view = [["lh1", "rh1"]], [["lateral", "medial"]]
-    _bsp_sp._gen_grid = partial(_orig_gen_grid, size_bar=0.20)
-    try:
-        plot_surf(
-            surfs, layout=layout, view=view,
-            array_name=array_name, size=(1200, 500), zoom=1.4, color_bar="bottom",
-            share="both", nan_color=(220, 220, 220, 1), cmap="coolwarm",
-            color_range=color_range, transparent_bg=True, screenshot=True, filename=filename,
-            cb__numberOfLabels=3,
-            cb__labelTextProperty={'fontSize': 36, 'bold': False})
-    except (AttributeError, RuntimeError) as e:
-        logger.warning(f"save_brain_map: rendering failed for {filename.name} "
-                       f"({type(e).__name__}: {e}). Skipping screenshot.")
-    finally:
-        _bsp_sp._gen_grid = _orig_gen_grid
+def save_brain_map(surf_lh, surf_rh, values: np.ndarray,
+                   filename: Path, color_range=(-3, 3)) -> None:
+    """Plot per-vertex fsLR-5k `values` on both hemispheres and save a screenshot.
+
+    Renders the canonical four-view both-hemisphere layout (LH lateral/medial,
+    RH lateral/medial) with the colorbar on the right, matching the figure-1 brain
+    plots. A single-hemisphere analysis simply leaves the other hemisphere grey (its
+    values in `values` are NaN).
+    """
+    # Use plot_hemispheres (the same call figure 1 uses) rather than a direct
+    # plot_surf with a custom colorbar layout: the latter trips a brainspace
+    # 0.1.22 colorbar bug ('VTKMethodWrapper' object has no attribute
+    # 'lookupTable') that silently skipped every figure-2 brain screenshot.
+    # plot_hemispheres splits the LH/RH arrays internally, so pass `values` whole.
+    for n_labels in (3, 0):
+        try:
+            plot_hemispheres(
+                surf_lh, surf_rh, array_name=values,
+                size=(1450, 300), zoom=1.3, color_bar="right", share="both",
+                nan_color=(220, 220, 220, 1), cmap="coolwarm",
+                color_range=color_range, transparent_bg=True,
+                screenshot=True, filename=filename,
+                cb__numberOfLabels=n_labels)
+            return
+        except (AttributeError, RuntimeError) as e:
+            if n_labels:  # retry once with figure-1's label-free colorbar
+                logger.warning(
+                    f"save_brain_map: {filename.name} colorbar with "
+                    f"{n_labels} labels failed ({type(e).__name__}: {e}); "
+                    f"retrying with no numeric labels.")
+                continue
+            logger.error(f"save_brain_map: rendering FAILED for {filename.name} "
+                         f"({type(e).__name__}: {e}). No brain screenshot written.")
 
 
 def _ensure_fc_paths(df_pni: pd.DataFrame) -> pd.DataFrame:
@@ -290,11 +320,14 @@ def _run_projection(
     *, mask_G: np.ndarray | None = None,
     sc_subjects: list[np.ndarray] | None = None,
 ) -> dict:
-    """One-stop: per-subject projection + within-network Moran null.
+    """One-stop: per-subject projection + within-network Moran and topological nulls.
 
-    The Moran spectral randomisation preserves the SAC of g_MPC and matches the test
-    footprint; surrogates are generated per hemisphere block inside
-    `compute_moran_null_projection`.
+    The Moran spectral randomisation preserves the SAC of g_MPC and controls for map
+    smoothness; surrogates are generated per hemisphere block inside
+    `compute_moran_null_projection`. The geometry-preserving topological null
+    (SC/MPC/FC only) rewires the connectome within geodesic-distance bins and controls
+    for connectome geometry, isolating wiring specificity. GD gets no topological null
+    (its weights are pure distance), so `p_topo` is NaN there.
     """
     result = compute_projection_subjects(
         files=files, modality=modality,
@@ -309,7 +342,20 @@ def _run_projection(
     moran = compute_moran_null_projection(
         g_mpc_at_sn, sn_mask_cortex, gd_among_sn, result, n_rand,
     )
-    return {**result, **moran}
+
+    if modality in TOPO_MODALITIES:
+        gd_sn_to_other = gd_cortex[np.ix_(sn_mask_cortex, other_mask_cortex)]
+        topo = compute_topological_null_projection(
+            modality=modality, files=files, df_yeo_surf_5k=df,
+            g_fc_cortex=g_fc_cortex, g_mpc_cortex_at_sn=g_mpc_at_sn,
+            sn_mask_cortex=sn_mask_cortex, other_mask_cortex=other_mask_cortex,
+            gd_sn_to_other=gd_sn_to_other, result=result, n_rand=n_rand,
+            sc_subjects=sc_subjects, mask_G=mask_G,
+        )
+    else:
+        topo = {"null_group_topo": None, "p_topo": np.nan, "null_std_topo": np.nan}
+
+    return {**result, **moran, **topo}
 
 
 def _embed_in_full_cortex(
@@ -320,6 +366,20 @@ def _embed_in_full_cortex(
     cortex_indices = np.flatnonzero(cortex_mask_full)
     out[cortex_indices[sn_mask_cortex]] = values_at_sn
     return out
+
+
+def _net_int_map(df: pd.DataFrame) -> dict:
+    """network -> network_int lookup from the surface table (NaN rows dropped)."""
+    return (df[["network", "network_int"]]
+            .drop_duplicates().dropna()
+            .set_index("network")["network_int"].to_dict())
+
+
+def _pct_range(values: np.ndarray) -> tuple[float, float]:
+    """Symmetric-ish 5th/95th-percentile colour range; (-1, 1) if all-NaN."""
+    if np.isfinite(values).any():
+        return (np.nanpercentile(values, 5), np.nanpercentile(values, 95))
+    return (-1, 1)
 
 
 def _sig_stars(q: float) -> str:
@@ -359,9 +419,7 @@ def plot_network_bubble_matrix(
     from matplotlib.colors import Normalize
     from matplotlib.cm import ScalarMappable
 
-    net_int_map = (df_yeo_surf_5k[["network", "network_int"]]
-                   .drop_duplicates().dropna()
-                   .set_index("network")["network_int"].to_dict())
+    net_int_map = _net_int_map(df_yeo_surf_5k)
 
     measures = list(measures)
     n_meas = len(measures)
@@ -457,106 +515,188 @@ def plot_network_bubble_matrix(
     logger.info(f"[Figure 2B] bubble-matrix summary written to {out.name}")
 
 
-def _scatter_colors_by_target_network(
-    res: dict, df_yeo_surf_5k: pd.DataFrame, fallback_color,
-) -> tuple[np.ndarray, dict]:
-    """Return per-SN-vertex RGB colors based on dominant target network + palette."""
+def _dominant_network_int(res: dict, net_int_map: dict) -> np.ndarray:
+    """Per-SN-vertex `network_int` of the dominant target network (NaN where none).
+
+    Computed once (compute stage) from the projection result's group-mean
+    target-network weights, then cached as the `{network}_{measure}_dominant`
+    surface column so the scatter coloring survives into the plot-only stage.
+    """
     dominant, names = compute_dominant_target_network(res)
     n_sn = res["P_subjects_sn"].shape[1]
-    network_int_map = (df_yeo_surf_5k[["network", "network_int"]]
-                       .drop_duplicates().dropna()
-                       .set_index("network")["network_int"].to_dict())
-    palette = {name: yeo7_rgb[int(network_int_map[name])]
-               for name in names if name in network_int_map}
+    out = np.full(n_sn, np.nan)
     if dominant is None:
-        return np.tile(fallback_color, (n_sn, 1)), {}
-    colors = np.tile(np.array(fallback_color), (n_sn, 1))
+        return out
     for idx, name in enumerate(names):
-        if name not in palette:
-            continue
-        colors[dominant == idx] = palette[name]
-    return colors, palette
+        if name in net_int_map:
+            out[dominant == idx] = net_int_map[name]
+    return out
 
 
-def struct_conn_metric_analysis(
-    df_yeo_surf_5k: pd.DataFrame, surf5k_lh_infl, surf5k_rh_infl,
-    df_pni: pd.DataFrame, project_root: Path,
-    mask_G: np.ndarray, sc_subjects: list[np.ndarray], gd_cortex: np.ndarray,
-    network: str = "SalVentAttn", n_rand: int = 100, hemisphere: str = "both",
-) -> pd.DataFrame:
-    """Figure 2A: SalVentAttn × {SC, GD, MPC, FC} projection + group inference + Moran null."""
+def _colors_from_dominant_int(dominant_int: np.ndarray, fallback_color) -> np.ndarray:
+    """Map per-vertex dominant `network_int` values to RGB (fallback where NaN)."""
+    dominant_int = np.asarray(dominant_int, dtype=float)
+    colors = np.tile(np.asarray(fallback_color, dtype=float), (dominant_int.shape[0], 1))
+    finite = np.isfinite(dominant_int)
+    colors[finite] = yeo7_rgb[dominant_int[finite].astype(int)]
+    return colors
 
-    df_yeo_surf_5k = _load_fc_gradient(project_root, df_yeo_surf_5k)
-    cortex_mask_full = df_yeo_surf_5k["hemisphere"].notna().values
-    g_fc_cortex = df_yeo_surf_5k["fc_g1"].values[cortex_mask_full]
-    target_net_labels = df_yeo_surf_5k.loc[cortex_mask_full, "network"].values
 
-    g_mpc_at_sn, sn_mask_cortex, other_mask_cortex = _prepare_network_gradient(
-        df_yeo_surf_5k, network, df_pni, hemisphere,
+def plot_figure_2a_scatter_lollipop(
+    results_by_measure: dict, measures: list, df_yeo_surf_5k: pd.DataFrame,
+    surf5k_lh_infl, surf5k_rh_infl, project_root: Path,
+    focus_network: str = "SalVentAttn",
+) -> None:
+    """Figure 2A: figure-1B-style grid — one modality row, scatter + lollipop columns.
+
+    Transposed to mirror ``figure_1b_contextualisation.context_analysis``: each
+    connectivity measure (SC, GD, MPC, FC) is a row, with two columns and a single
+    clear x-axis at the bottom of each.
+
+    - Column 0 (scatter): the focus network's within-network MPC gradient on the
+      shared x-axis (the same vector for every modality, so it is labelled only on
+      the bottom row) against that measure's connectivity-weighted projection P on y
+      (the per-row y-label names the modality). Points are coloured by dominant
+      target network; black regression line; group $r$ / spatial-null
+      $p_{\\mathrm{moran}}$ text box.
+    - Column 1 (lollipop): a horizontal stem per Yeo network, length $|\\bar r|$ on
+      the shared bottom |r| axis, network-coloured, FDR-Moran significant networks
+      ($q<0.05$) filled + starred (others faded/open), the value printed at the
+      marker. Networks share the single Figure 2B ordering (strongest at top).
+
+    Magnitude (not signed $\\bar r$) is shown because each network's MPC gradient is
+    a diffusion-map eigenvector with arbitrary polarity, so only $|\\bar r|$ is
+    comparable across networks. All inputs are views of ``results_by_measure`` and
+    the cached ``{network}_{measure}_P`` columns — nothing is recomputed. The
+    focus-network projection maps are re-emitted under
+    ``figure_2a_brain_{measure}_rho.svg``.
+    """
+    measures = list(measures)
+    n_meas = len(measures)
+    net_int_map = _net_int_map(df_yeo_surf_5k)
+    focus_color = yeo7_rgb[int(net_int_map[focus_network])]
+
+    # Full descriptive titles per modality (left-aligned over each scatter, fig-1B style).
+    title_txt = {
+        "SC":  "Structural connectivity – SIFT2-weighted tractography",
+        "GD":  "Geodesic distance – cortical surface proximity",
+        "MPC": "Microstructural profile covariance – qT1 profile similarity",
+        "FC":  "Functional connectivity – resting-state BOLD",
+    }
+
+    # Shared network order (strongest at top) and the focus MPC gradient, which is
+    # identical across measures, so it sets one shared scatter x-range.
+    networks = [r["network"] for r in results_by_measure[measures[0]]]
+    n_net = len(networks)
+    ypos = {net: (n_net - 1) - j for j, net in enumerate(networks)}
+    focus_g = next(r for r in results_by_measure[measures[0]]
+                   if r["network"] == focus_network)["g_mpc_at_sn"]
+    gfin = focus_g[np.isfinite(focus_g)]
+    if gfin.size:
+        gpad = 0.05 * (gfin.max() - gfin.min() or 1.0)
+        gxlim = (gfin.min() - gpad, gfin.max() + gpad)
+    else:
+        gxlim = (-3, 3)
+
+    # Shared |r| axis with headroom for the printed value + stars to the marker's right.
+    all_abs_r = [abs(rec["res"]["r_group"])
+                 for m in measures for rec in results_by_measure[m]
+                 if np.isfinite(rec["res"]["r_group"])]
+    rmax = (max(all_abs_r) * 1.45) if all_abs_r else 1.0
+
+    fig, axes = plt.subplots(
+        n_meas, 2, figsize=(6.0, 2.8 * n_meas), squeeze=False,
+        gridspec_kw={"wspace": 0.35, "hspace": 0.4, "width_ratios": [1.0, 1.0]},
     )
 
-    modalities = ("SC", "GD", "MPC", "FC")
-    fig, axes = plt.subplots(1, len(modalities), figsize=(4 * len(modalities), 5),
-                             squeeze=False)
-    network_color = yeo7_rgb[int(
-        df_yeo_surf_5k.loc[df_yeo_surf_5k["network"] == network, "network_int"].values[0]
-    )]
+    for row, measure in enumerate(measures):
+        records = results_by_measure[measure]          # already in shared order
+        focus_rec = next(r for r in records if r["network"] == focus_network)
+        res = focus_rec["res"]
+        g_mpc = focus_rec["g_mpc_at_sn"]
 
-    for i, name in enumerate(modalities):
-        _, files, m_mask_G, m_sc_subjects = _measure_inputs(
-            name, df_pni, mask_G, sc_subjects,
-        )
-        res = _run_projection(
-            modality=name, files=files, df=df_yeo_surf_5k,
-            g_fc_cortex=g_fc_cortex, g_mpc_at_sn=g_mpc_at_sn,
-            sn_mask_cortex=sn_mask_cortex, other_mask_cortex=other_mask_cortex,
-            gd_cortex=gd_cortex, target_network_labels=target_net_labels,
-            n_rand=n_rand, mask_G=m_mask_G, sc_subjects=m_sc_subjects,
-        )
-
-        logger.info(
-            f"[Figure 2A | {name}] r_group={res['r_group']:+.3f} "
-            f"[{res['ci_low']:+.3f}, {res['ci_high']:+.3f}] "
-            f"t={res['t']:+.2f} p={res['p']:.3e} (subject-level) | "
-            f"p_moran={res['p_moran']:.3e} (spatial null, n_perm={n_rand}) | n={res['n']}"
-        )
-
-        P_full = _embed_in_full_cortex(res["P_mean"], sn_mask_cortex, cortex_mask_full)
-        col_P = f"{network}_{name}_P"
-        df_yeo_surf_5k[col_P] = P_full
-
+        # Re-emit the focus-network projection map (from the cached _P column).
+        P_full = df_yeo_surf_5k[f"{focus_network}_{measure}_P"].values
         save_brain_map(
             surf5k_lh_infl, surf5k_rh_infl, P_full,
-            array_name=f"overlay_2a_{name}",
-            filename=project_root / f"results/figures/figure_2a_brain_{name}_rho.svg",
-            hemisphere=hemisphere,
-            color_range=(np.nanpercentile(P_full, 5), np.nanpercentile(P_full, 95))
-                if np.isfinite(P_full).any() else (-1, 1),
+            filename=project_root / f"results/figures/figure_2a_brain_{measure}_rho.svg",
+            color_range=_pct_range(P_full),
         )
 
-        ax_top = axes[0, i]
-        valid = np.isfinite(g_mpc_at_sn) & np.isfinite(res["P_mean"])
-        colors_per_sn, _ = _scatter_colors_by_target_network(
-            res, df_yeo_surf_5k, fallback_color=network_color,
-        )
-        ax_top.scatter(res["P_mean"][valid], g_mpc_at_sn[valid],
-                       s=15, alpha=0.75, c=colors_per_sn[valid],
-                       edgecolor="none", rasterized=True)
-        sns.regplot(x=res["P_mean"][valid], y=g_mpc_at_sn[valid],
-                    scatter=False, color="black", line_kws={"linewidth": 1}, ax=ax_top)
-        ax_top.text(0.05, 0.95,
-                    f"r = {res['r_group']:+.2f}\n"
-                    f"p$_{{moran}}$ = {res['p_moran']:.3f}",
-                    transform=ax_top.transAxes, va="top", fontsize=11)
-        ax_top.set_xlabel(f"{name} projection")
-        ax_top.set_ylabel(f"MPC gradient ({network})" if i == 0 else "")
+        # Column 0 - scatter: x = MPC gradient (shared), y = projection P.
+        ax = axes[row, 0]
+        valid = np.isfinite(g_mpc) & np.isfinite(res["P_mean"])
+        colors_per_sn = _colors_from_dominant_int(focus_rec["dominant_int"], focus_color)
+        ax.scatter(g_mpc[valid], res["P_mean"][valid],
+                   s=15, alpha=0.75, c=colors_per_sn[valid],
+                   edgecolor="none", rasterized=True)
+        sns.regplot(x=g_mpc[valid], y=res["P_mean"][valid],
+                    scatter=False, color="black", line_kws={"linewidth": 2.5}, ax=ax)
+        # Two nulls where both apply (SC/MPC/FC): p_moran (map smoothness) and p_topo
+        # (connectome geometry). GD has only p_moran.
+        stat_txt = (f"$r={res['r_group']:+.2f}$\n"
+                    f"$p_{{moran}}={res['p_moran']:.3f}$")
+        if np.isfinite(res.get("p_topo", np.nan)):
+            stat_txt += f"\n$p_{{topo}}={res['p_topo']:.3f}$"
+        ax.text(0.05, 0.95, stat_txt,
+                transform=ax.transAxes, va="top", fontweight="bold", fontsize=12)
+        t = ax.set_title(title_txt.get(measure, measure), loc="left", pad=15)
+        t.set_in_layout(False)
+        ax.set_ylabel(f"{measure} projection")
+        ax.set_xlim(*gxlim)
+        # Shared y-range across all modality rows (z-scored P, SD units); ticks only
+        # at -4, 0, 4.
+        ax.set_ylim(-5, 5)
+        ax.set_yticks([-4, 0, 4])
+        # Integer-only x ticks (x = z-scored MPC gradient, SD units).
+        ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+        ax.set_box_aspect(1)
+        ax.spines["right"].set_visible(False)
+        ax.spines["top"].set_visible(False)
+        if row < n_meas - 1:
+            ax.tick_params(labelbottom=False)
+
+        # Column 1 - horizontal lollipop: y = networks, x = |r| (shared).
+        axl = axes[row, 1]
+        for rec in records:
+            net = rec["network"]
+            r_abs = abs(rec["res"]["r_group"])
+            q = rec.get("q_moran", np.nan)
+            color = tuple(yeo7_rgb[int(net_int_map[net])])
+            sig = np.isfinite(q) and q < 5e-2
+            y = ypos[net]
+            axl.hlines(y, 0, r_abs, colors=[color], lw=2.5, alpha=1.0 if sig else 0.45)
+            axl.scatter(r_abs, y, s=55, facecolors=(color if sig else "white"),
+                        edgecolors=[color], linewidths=1.8,
+                        alpha=1.0 if sig else 0.85, zorder=3)
+            stars = _sig_stars(q)
+            label = f"{r_abs:.2f}{stars if sig and stars not in ('', 'n.s.') else ''}"
+            axl.annotate(label, xy=(r_abs, y), xytext=(6, 0),
+                         textcoords="offset points", ha="left", va="center",
+                         fontsize=8.5, color="0.25")
+        axl.set_xlim(0, rmax)
+        axl.set_ylim(-0.6, n_net - 0.4)
+        axl.set_yticks([ypos[n] for n in networks])
+        axl.set_yticklabels([yeo7_abbrev.get(n, n) for n in networks])
+        for tick, n in zip(axl.get_yticklabels(), networks):
+            tick.set_color(tuple(yeo7_rgb[int(net_int_map[n])]))
+        axl.tick_params(axis="y", length=0)
+        axl.set_box_aspect(1)
+        axl.spines["right"].set_visible(False)
+        axl.spines["top"].set_visible(False)
+        if row < n_meas - 1:
+            axl.tick_params(labelbottom=False)
+            axl.spines["bottom"].set_visible(False)
+
+    axes[-1, 0].set_xlabel("MPC gradient")
+    axes[-1, 1].set_xlabel(r"Spearman $|r|$")
 
     sns.despine(fig=fig)
-    plt.tight_layout()
     plt.savefig(project_root / "results/figures/figure_2a_distance_metric.svg",
-                bbox_inches="tight")
+                bbox_inches="tight", transparent=True)
     plt.close(fig)
-    return df_yeo_surf_5k
+    logger.info("[Figure 2A] scatter + lollipop figure written to "
+                "figure_2a_distance_metric.svg")
 
 
 # Connectivity measure -> the df_pni column holding its per-subject file paths.
@@ -602,19 +742,16 @@ def _plot_network_scatter_grid(
     colour-coded network title and the shared axes (Tufte minimalism).
     """
     n_net = len(results_per_net)
+    net_int_map = _net_int_map(df_yeo_surf_5k)
     fig, axes = plt.subplots(1, n_net, figsize=(3.0 * n_net, 3.4),
                              sharex=True, sharey=True, layout="constrained")
     axes = np.atleast_1d(axes)
     for ax, rec in zip(axes, results_per_net):
         network, res = rec["network"], rec["res"]
         g_mpc_at_sn = rec["g_mpc_at_sn"]
-        net_color = yeo7_rgb[int(
-            df_yeo_surf_5k.loc[df_yeo_surf_5k["network"] == network, "network_int"].values[0]
-        )]
+        net_color = yeo7_rgb[int(net_int_map[network])]
         valid = np.isfinite(g_mpc_at_sn) & np.isfinite(res["P_mean"])
-        colors_per_sn, _ = _scatter_colors_by_target_network(
-            res, df_yeo_surf_5k, fallback_color=net_color,
-        )
+        colors_per_sn = _colors_from_dominant_int(rec["dominant_int"], net_color)
         ax.scatter(res["P_mean"][valid], g_mpc_at_sn[valid],
                    s=10, alpha=0.7, c=colors_per_sn[valid],
                    edgecolor="none", rasterized=True)
@@ -630,24 +767,38 @@ def _plot_network_scatter_grid(
     plt.close(fig)
 
 
-def struct_conn_network_analysis(
-    df_yeo_surf_5k: pd.DataFrame, surf5k_lh_infl, surf5k_rh_infl,
-    df_pni: pd.DataFrame, project_root: Path,
+def compute_network_results(
+    df_yeo_surf_5k: pd.DataFrame, df_pni: pd.DataFrame, project_root: Path,
     mask_G: np.ndarray, sc_subjects: list[np.ndarray], gd_cortex: np.ndarray,
     networks: list[str] = ("SalVentAttn", "Limbic"),
     measures: tuple[str, ...] = ("SC", "GD", "MPC", "FC"),
     n_rand: int = 100, hemisphere: str = "both",
-) -> pd.DataFrame:
-    """Figure 2B: replicate the projection across networks for every connectivity measure.
+) -> tuple[pd.DataFrame, dict]:
+    """Compute stage: per network x measure projection + Moran null; persist all caches.
 
-    Each network's MPC gradient is computed once and reused across measures; for
-    each measure the projection is run per network. Significance comes from the
-    within-network Moran null (the sole spatial null; surrogates per hemisphere
-    block) with Benjamini-Hochberg FDR correction across the seven networks within
-    each measure. The headline panel is a bubble matrix (rows = networks, columns =
-    measures); per-measure scatter grids and per-measure/network brain maps are
-    retained as supplements. A single network ordering (by the primary measure's
-    signed group effect) is shared across every measure column.
+    The expensive work (per-subject projection + within-network Moran nulls) runs
+    once across every network and measure. Each network's MPC gradient is computed
+    (cache-aware) once and reused across measures; significance is the within-network
+    Moran null (per hemisphere block) with Benjamini-Hochberg FDR across the seven
+    networks within each measure, sharing one network ordering (primary measure's
+    signed group effect).
+
+    No figures are drawn here. Results are returned AND persisted so the plot stage
+    can redraw without recomputing:
+      - ``df_2b_network_stats_{measure}_{hemi}.csv``      (per-network group stats)
+      - ``df_2b_network_subject_r_{measure}_{hemi}.csv``  (per-subject r)
+      - surface columns ``{network}_{measure}_P`` and ``{network}_{measure}_dominant``
+        (the latter = dominant target network's ``network_int`` per SN vertex; NaN
+        elsewhere) — written into the df the caller persists as ``df_2b_label``.
+
+    Returns
+    -------
+    df_yeo_surf_5k : pd.DataFrame
+        The surface table with the per-network/measure ``_P`` and ``_dominant`` columns.
+    results_by_measure : dict[str, list]
+        Per measure, the per-network records (``network``, ``res``, ``g_mpc_at_sn``,
+        ``dominant_int``, ``q_moran``) in the shared network order. The plot stage
+        reconstructs the same record shape via ``load_results_from_cache``.
     """
     for measure in measures:
         if measure not in ("SC", "GD", "MPC", "FC"):
@@ -657,6 +808,7 @@ def struct_conn_network_analysis(
     cortex_mask_full = df_yeo_surf_5k["hemisphere"].notna().values
     g_fc_cortex = df_yeo_surf_5k["fc_g1"].values[cortex_mask_full]
     target_net_labels = df_yeo_surf_5k.loc[cortex_mask_full, "network"].values
+    net_int_map = _net_int_map(df_yeo_surf_5k)
 
     # MPC gradient is measure-independent: compute (cache-aware) once per network.
     net_gradients = {}
@@ -675,7 +827,7 @@ def struct_conn_network_analysis(
 
         results_per_net = []
         for network in networks:
-            logger.info(f"[Figure 2B | {measure}] processing network: {network}")
+            logger.info(f"[compute | {measure}] processing network: {network}")
             g_mpc_at_sn, sn_mask_cortex, other_mask_cortex = net_gradients[network]
 
             res = _run_projection(
@@ -687,38 +839,57 @@ def struct_conn_network_analysis(
             )
 
             logger.info(
-                f"[Figure 2B | {network} | {measure}] r_group={res['r_group']:+.3f} "
+                f"[compute | {network} | {measure}] r_group={res['r_group']:+.3f} "
                 f"[{res['ci_low']:+.3f}, {res['ci_high']:+.3f}] "
                 f"t={res['t']:+.2f} p={res['p']:.3e} (subject-level) | "
-                f"p_moran={res['p_moran']:.3e} (spatial null, n_perm={n_rand}) | n={res['n']}"
+                f"p_moran={res['p_moran']:.3e} (spatial null) | "
+                f"p_topo={res['p_topo']:.3e} (topological null) | "
+                f"n={res['n']} (n_perm={n_rand})"
             )
 
+            # Sparsity diagnostic: how many targets each SN vertex actually connects
+            # to, and how often the min_valid=10 floor binds (an underpowered regime).
+            nt = res["n_targets_per_sn"]
+            nt = nt[np.isfinite(nt)]
+            if nt.size:
+                logger.info(
+                    f"[sparsity | {network} | {measure}] targets/SN-vertex "
+                    f"median={np.median(nt):.0f} "
+                    f"IQR=[{np.percentile(nt, 25):.0f}, {np.percentile(nt, 75):.0f}] | "
+                    f"frac SN vertices with <=10 targets: {np.mean(nt <= 10):.2f}"
+                )
+
+            # Standardize the group-mean projection per network x measure for display
+            # and caching (brain-map embed + scatter y-axis in SD units). This is a
+            # monotone rescale: the rank-based r_subjects / r_group and the Moran null
+            # (computed from res["P_subjects_sn"]) are untouched.
+            res["P_mean"] = zscore(res["P_mean"], nan_policy="omit")
             P_full = _embed_in_full_cortex(res["P_mean"], sn_mask_cortex, cortex_mask_full)
             df_yeo_surf_5k[f"{network}_{measure}_P"] = P_full
 
-            save_brain_map(
-                surf5k_lh_infl, surf5k_rh_infl, P_full,
-                array_name=f"overlay_2b_{measure}_{network}",
-                filename=project_root / f"results/figures/figure_2b_brain_{measure}_rho_{network}.svg",
-                hemisphere=hemisphere,
-                color_range=(np.nanpercentile(P_full, 5), np.nanpercentile(P_full, 95))
-                    if np.isfinite(P_full).any() else (-1, 1),
-            )
+            dominant_int = _dominant_network_int(res, net_int_map)
+            df_yeo_surf_5k[f"{network}_{measure}_dominant"] = _embed_in_full_cortex(
+                dominant_int, sn_mask_cortex, cortex_mask_full)
 
             results_per_net.append({
                 "network": network, "res": res, "g_mpc_at_sn": g_mpc_at_sn,
-                "sn_mask_cortex": sn_mask_cortex,
+                "dominant_int": dominant_int,
             })
 
         q_moran = benjamini_hochberg(np.array([r["res"]["p_moran"] for r in results_per_net]))
-        for rec, qm in zip(results_per_net, q_moran):
+        q_topo = benjamini_hochberg(np.array([r["res"]["p_topo"] for r in results_per_net]))
+        for rec, qm, qt in zip(results_per_net, q_moran, q_topo):
             rec["q_moran"] = qm
-            logger.info(f"[Figure 2B FDR | {measure} | {rec['network']}] q_moran={qm:.3e}")
+            rec["q_topo"] = qt
+            logger.info(
+                f"[compute FDR | {measure} | {rec['network']}] "
+                f"q_moran={qm:.3e} q_topo={qt:.3e}"
+            )
 
         results_by_measure[measure] = results_per_net
 
     # Fix a single network ordering (by the primary measure's signed group effect)
-    # and apply it to every measure so the bubble matrix's columns line up.
+    # and apply it to every measure so the figures' network order lines up.
     primary = measures[0]
     ordered_networks = [rec["network"] for rec in sorted(
         results_by_measure[primary], key=lambda r: r["res"]["r_group"], reverse=True)]
@@ -726,8 +897,8 @@ def struct_conn_network_analysis(
     for measure in measures:
         results_by_measure[measure].sort(key=lambda r: order_index[r["network"]])
 
-    # Cache per-network group stats and per-subject coefficients per measure so the
-    # summary bubble matrix can be regenerated without recomputing the nulls.
+    # Always persist the per-network group stats and per-subject coefficients so the
+    # plot stage can redraw every figure without recomputing the nulls.
     for measure in measures:
         results_per_net = results_by_measure[measure]
         stats_rows = [{
@@ -736,6 +907,7 @@ def struct_conn_network_analysis(
             "ci_low": rec["res"]["ci_low"], "ci_high": rec["res"]["ci_high"],
             "t": rec["res"]["t"], "p": rec["res"]["p"],
             "p_moran": rec["res"]["p_moran"], "q_moran": rec["q_moran"],
+            "p_topo": rec["res"]["p_topo"], "q_topo": rec["q_topo"],
         } for rec in results_per_net]
         pd.DataFrame(stats_rows).to_csv(
             project_root / f"data/dataframes/df_2b_network_stats_{measure}_{hemisphere}.csv",
@@ -745,12 +917,197 @@ def struct_conn_network_analysis(
                      index=subject_ids_by_measure[measure]).to_csv(
             project_root / f"data/dataframes/df_2b_network_subject_r_{measure}_{hemisphere}.csv",
             index_label="subject")
+
+    return df_yeo_surf_5k, results_by_measure
+
+
+def _obs_r_group(synth_g: np.ndarray, P_subjects_sn: np.ndarray, min_valid: int = 10) -> float:
+    """Fisher-z group correlation of a synthetic map against each subject's projection.
+
+    Mirrors the per-subject Spearman + Fisher-z aggregation used for the real statistic,
+    so the observed value is comparable to the topological null's `null_group`.
+    """
+    rs = []
+    valid_g = np.isfinite(synth_g)
+    for s in range(P_subjects_sn.shape[0]):
+        P_s = P_subjects_sn[s]
+        m = valid_g & np.isfinite(P_s)
+        if m.sum() >= min_valid:
+            rs.append(spearmanr(synth_g[m], P_s[m])[0])
+    z = np.arctanh(np.clip(np.asarray(rs)[np.isfinite(rs)], -0.999, 0.999))
+    return float(np.tanh(z.mean())) if z.size else np.nan
+
+
+def validate_topological_null(
+    results_by_measure: dict, df_yeo_surf_5k: pd.DataFrame, df_pni: pd.DataFrame,
+    project_root: Path, sc_subjects: list, mask_G: np.ndarray, gd_cortex: np.ndarray,
+    focus_network: str = "SalVentAttn", n_rand: int = 1000, hemisphere: str = "both",
+) -> None:
+    """Power/specificity control: does the SC topological null discriminate wiring from
+    geometry at the real connection density?
+
+    Two synthetic source-network maps are tested against the SC topological null,
+    holding the real per-subject SC projections fixed:
+
+    - **Positive control** — a wiring-aligned map (the group-mean SC projection itself):
+      its observed alignment is near-perfect by construction, so a null that destroys
+      specific targeting should reject (small `p_topo`), confirming power.
+    - **Negative control** — a geometry-only map (the GD/proximity projection): aligned
+      to distance but not to specific SC wiring, so the geometry-centred topological
+      null should *not* reject (`p_topo` n.s.), confirming specificity.
+
+    Emits `results/figures/figure_2_supp_topo_control.svg` (the two null distributions
+    with the observed values) and logs both `p_topo`.
+    """
+    if "SC" not in results_by_measure or "GD" not in results_by_measure:
+        logger.info("[control] SC and GD measures required; skipping topological-null control.")
+        return
+    try:
+        rec_sc = next(r for r in results_by_measure["SC"] if r["network"] == focus_network)
+        rec_gd = next(r for r in results_by_measure["GD"] if r["network"] == focus_network)
+    except StopIteration:
+        logger.info(f"[control] focus network {focus_network} not found; skipping control.")
+        return
+
+    _, sn_mask_cortex, other_mask_cortex = _prepare_network_gradient(
+        df_yeo_surf_5k, focus_network, df_pni, hemisphere,
+    )
+    cortex_mask_full = df_yeo_surf_5k["hemisphere"].notna().values
+    g_fc_cortex = df_yeo_surf_5k["fc_g1"].values[cortex_mask_full]
+    gd_sn_to_other = gd_cortex[np.ix_(sn_mask_cortex, other_mask_cortex)]
+
+    P_subjects_sn = rec_sc["res"]["P_subjects_sn"]
+    g_pos = rec_sc["res"]["P_mean"]   # wiring-aligned (SC projection)
+    g_neg = rec_gd["res"]["P_mean"]   # geometry-only (GD projection)
+
+    controls = {}
+    for label, synth_g in (("positive", g_pos), ("negative", g_neg)):
+        obs = _obs_r_group(synth_g, P_subjects_sn)
+        topo = compute_topological_null_projection(
+            modality="SC", files=None, df_yeo_surf_5k=df_yeo_surf_5k,
+            g_fc_cortex=g_fc_cortex, g_mpc_cortex_at_sn=synth_g,
+            sn_mask_cortex=sn_mask_cortex, other_mask_cortex=other_mask_cortex,
+            gd_sn_to_other=gd_sn_to_other, result={"r_group": obs}, n_rand=n_rand,
+            sc_subjects=sc_subjects, mask_G=mask_G,
+        )
+        controls[label] = {"obs": obs, **topo}
+        logger.info(
+            f"[control | {label}] obs r_group={obs:+.3f}, p_topo={topo['p_topo']:.3e} "
+            f"(expected {'reject' if label == 'positive' else 'n.s.'})"
+        )
+
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), layout="constrained")
+    titles = {
+        "positive": "Positive control\n(wiring-aligned map)",
+        "negative": "Negative control\n(geometry-only map)",
+    }
+    for ax, label in zip(axes, ("positive", "negative")):
+        null = controls[label]["null_group_topo"]
+        null = null[np.isfinite(null)]
+        ax.hist(null, bins=30, color="0.7", edgecolor="white")
+        ax.axvline(controls[label]["obs"], color="crimson", lw=2.5,
+                   label=f"observed\n$p_{{topo}}={controls[label]['p_topo']:.3f}$")
+        ax.set_title(titles[label])
+        ax.set_xlabel(r"group $r$ under SC topological null")
+        ax.legend(fontsize=9, loc="upper center")
+        ax.spines["right"].set_visible(False)
+        ax.spines["top"].set_visible(False)
+    axes[0].set_ylabel("surrogate count")
+    out = project_root / "results/figures/figure_2_supp_topo_control.svg"
+    plt.savefig(out, bbox_inches="tight")
+    plt.close(fig)
+    logger.info(f"[control] topological-null control figure written to {out.name}")
+
+
+def plot_figure_2b(
+    results_by_measure: dict, df_yeo_surf_5k: pd.DataFrame,
+    surf5k_lh_infl, surf5k_rh_infl, project_root: Path,
+    measures: tuple[str, ...] = ("SC", "GD", "MPC", "FC"), hemisphere: str = "both",
+) -> None:
+    """Figure 2B rendering: per-network brain maps, per-measure scatter grids, bubble matrix.
+
+    Pure plotting — reads ``results_by_measure`` plus the cached
+    ``{network}_{measure}_P`` surface columns (for the brain maps), so it runs
+    identically in the compute+plot and the plot-only stages.
+    """
+    for measure in measures:
+        results_per_net = results_by_measure[measure]
+        for rec in results_per_net:
+            network = rec["network"]
+            P_full = df_yeo_surf_5k[f"{network}_{measure}_P"].values
+            save_brain_map(
+                surf5k_lh_infl, surf5k_rh_infl, P_full,
+                filename=project_root / f"results/figures/figure_2b_brain_{measure}_rho_{network}.svg",
+                color_range=_pct_range(P_full),
+            )
         _plot_network_scatter_grid(results_per_net, df_yeo_surf_5k, measure, project_root)
 
     plot_network_bubble_matrix(
         results_by_measure, list(measures), df_yeo_surf_5k, project_root, hemisphere,
     )
-    return df_yeo_surf_5k
+
+
+def load_results_from_cache(
+    project_root: Path, hemisphere: str, measures: tuple[str, ...],
+    df_yeo_surf_5k: pd.DataFrame,
+) -> dict:
+    """Plot stage: rebuild ``results_by_measure`` from the on-disk caches.
+
+    Reads ``df_2b_network_stats_{measure}_{hemi}.csv`` (group stats: ``r_group``,
+    ``ci_*``, ``t``, ``p``, ``p_moran``, ``q_moran``, ``n``) plus the per-vertex
+    ``df_2b_label`` columns ``{network}_{measure}_P``, ``t1_gradient1_{network}`` and
+    ``{network}_{measure}_dominant``. Per (measure, network) the SN vertices are
+    exactly where ``{network}_{measure}_P`` is finite, taken in surface-row order —
+    the same order the compute stage used — so the reconstructed ``g_mpc_at_sn`` /
+    ``P_mean`` / ``dominant_int`` align with one another and with the stored stats.
+    Networks keep the cached (shared) order from the stats file. Raises
+    ``FileNotFoundError`` if a cache is missing (run ``-stage compute`` first).
+    """
+    results_by_measure: dict[str, list] = {}
+    for measure in measures:
+        stats_path = (project_root /
+                      f"data/dataframes/df_2b_network_stats_{measure}_{hemisphere}.csv")
+        if not stats_path.exists():
+            raise FileNotFoundError(
+                f"Figure-data cache {stats_path} not found; run with "
+                f"'-stage compute' (or 'both') before '-stage plot'."
+            )
+        stats = pd.read_csv(stats_path).set_index("network")
+
+        records = []
+        for network in stats.index:  # cached shared order
+            p_col = f"{network}_{measure}_P"
+            g_col = f"t1_gradient1_{network}"
+            d_col = f"{network}_{measure}_dominant"
+            for c in (p_col, g_col):
+                if c not in df_yeo_surf_5k.columns:
+                    raise FileNotFoundError(
+                        f"Column '{c}' missing from the df_2b_label cache; "
+                        f"run with '-stage compute' (or 'both') first."
+                    )
+            P_full = df_yeo_surf_5k[p_col].to_numpy(dtype=float)
+            sn = np.isfinite(P_full)
+            g_mpc_at_sn = df_yeo_surf_5k[g_col].to_numpy(dtype=float)[sn]
+            dominant_int = (df_yeo_surf_5k[d_col].to_numpy(dtype=float)[sn]
+                            if d_col in df_yeo_surf_5k.columns
+                            else np.full(int(sn.sum()), np.nan))
+            srow = stats.loc[network]
+            res = {
+                "P_mean": P_full[sn],
+                "r_group": float(srow["r_group"]),
+                "ci_low": float(srow["ci_low"]), "ci_high": float(srow["ci_high"]),
+                "t": float(srow["t"]), "p": float(srow["p"]),
+                "p_moran": float(srow["p_moran"]), "n": int(srow["n"]),
+                # p_topo/q_topo absent in caches predating the topological null.
+                "p_topo": float(srow["p_topo"]) if "p_topo" in srow.index else np.nan,
+            }
+            records.append({
+                "network": network, "res": res, "g_mpc_at_sn": g_mpc_at_sn,
+                "dominant_int": dominant_int, "q_moran": float(srow["q_moran"]),
+                "q_topo": float(srow["q_topo"]) if "q_topo" in srow.index else np.nan,
+            })
+        results_by_measure[measure] = records
+    return results_by_measure
 
 
 def main():
@@ -767,86 +1124,119 @@ def main():
     logger.info("SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)")
     logger.info("GD weights     : 1/GD (within-hemisphere)")
     logger.info("MPC/FC weights : positive connections only (weighted-mean projection)")
-    logger.info("Null model     : within-network Moran spectral randomisation (per hemisphere block)")
+    logger.info("Null models    : Moran spectral randomisation (map smoothness, all measures) + "
+                "geometry-preserving topological null (wiring specificity, SC/MPC/FC)")
+    logger.info(f"Stage / panel  : stage={args.stage}, panel={args.panel}, hemi={args.hemi}")
     logger.info(f"Script path: {script_path}")
     logger.info(f"Project root: {project_root}")
 
     surf5k_lh_infl = read_surface(project_root / "data/surfaces/fsLR-5k.L.inflated.surf.gii", itype="gii")
     surf5k_rh_infl = read_surface(project_root / "data/surfaces/fsLR-5k.R.inflated.surf.gii", itype="gii")
 
-    pni_csv = project_root / "data/dataframes/figure_1a_pni_to_mics_5k.csv"
-    if not pni_csv.exists():
-        raise FileNotFoundError(
-            f"fsLR-5k subject table not found at {pni_csv}. Run figure_1a_t1map.py first."
-        )
-    df_pni = pd.read_csv(pni_csv)
-    df_pni = _ensure_fc_paths(df_pni)
+    # SC is the primary modality (axonal, independent of the MPC gradient) and fixes
+    # the shared network ordering reused by every figure.
+    networks = ["Limbic", "Default", "Cont", "SalVentAttn", "DorsAttn", "Vis", "SomMot"]
+    measures = ("SC", "GD", "MPC", "FC")
     n_rand = 1000
+    df_label_path = project_root / f"data/dataframes/df_2b_label_{args.hemi}.csv"
 
-    df_yeo_surf_5k = load_yeo_surf_5k(micapipe=project_root)
+    if args.stage in ("compute", "both"):
+        # --- Compute stage: run the projection + nulls and write the figure caches. ---
+        pni_csv = project_root / "data/dataframes/figure_1a_pni_to_mics_5k.csv"
+        if not pni_csv.exists():
+            raise FileNotFoundError(
+                f"fsLR-5k subject table not found at {pni_csv}. Run figure_1a_t1map.py first."
+            )
+        df_pni = pd.read_csv(pni_csv)
+        df_pni = _ensure_fc_paths(df_pni)
 
-    # Consume the fsLR-5k MPC gradient that figure_1a (Part 2) cached, instead of
-    # recomputing the diffusion-map embedding here: copy its t1_gradient1_*
-    # column(s) into the surface table so _prepare_network_gradient short-circuits
-    # (its `if grad_col not in df.columns` guard). The cache rows are in the same
-    # order as load_yeo_surf_5k, so a positional assignment is aligned. An
-    # exact-hemisphere cache is preferred; a 'both' cache is a safe superset for a
-    # single-hemisphere run (the per-hemisphere mask subsets it), but an LH/RH
-    # cache is NOT used for a 'both' run (it would silently drop the other
-    # hemisphere's vertices). Anything else falls back to an in-figure recompute,
-    # which is deterministic and uses identical inputs.
-    path_df_1a_5k = project_root / f"data/dataframes/df_1a_{args.hemi}_fslr5k.tsv"
-    path_df_1a_5k_both = project_root / "data/dataframes/df_1a_both_fslr5k.tsv"
-    if path_df_1a_5k.exists():
-        grad_cache = path_df_1a_5k
-    elif args.hemi != "both" and path_df_1a_5k_both.exists():
-        grad_cache = path_df_1a_5k_both
-    else:
-        grad_cache = None
-    if grad_cache is not None:
-        cached = pd.read_csv(grad_cache, sep="\t")
-        grad_cols = [c for c in cached.columns if c.startswith("t1_gradient1_")]
-        for c in grad_cols:
-            df_yeo_surf_5k[c] = cached[c].to_numpy()
-        logger.info(f"Loaded cached fsLR-5k MPC gradient ({', '.join(grad_cols) or 'none'}) "
-                    f"from {grad_cache.name}")
-    else:
-        logger.info("No matching fsLR-5k gradient cache; computing the gradient in-figure.")
+        df_yeo_surf_5k = load_yeo_surf_5k(micapipe=project_root)
 
-    logger.info("Building Betzel distance-stratified consensus mask + loading SC subjects...")
-    mask_G, sc_subjects = build_consensus_mask(
-        df_pni["path_sc_5k"].tolist(), df_pni["path_sc_dist_5k"].tolist(),
-        df_yeo_surf_5k, nbins=10,
-    )
+        # Consume the fsLR-5k MPC gradient that figure_1a (Part 2) cached, instead of
+        # recomputing the diffusion-map embedding here: copy its t1_gradient1_*
+        # column(s) into the surface table so _prepare_network_gradient short-circuits
+        # (its `if grad_col not in df.columns` guard). The cache rows are in the same
+        # order as load_yeo_surf_5k, so a positional assignment is aligned. An
+        # exact-hemisphere cache is preferred; a 'both' cache is a safe superset for a
+        # single-hemisphere run (the per-hemisphere mask subsets it), but an LH/RH
+        # cache is NOT used for a 'both' run (it would silently drop the other
+        # hemisphere's vertices). Anything else falls back to an in-figure recompute,
+        # which is deterministic and uses identical inputs.
+        path_df_1a_5k = project_root / f"data/dataframes/df_1a_{args.hemi}_fslr5k.tsv"
+        path_df_1a_5k_both = project_root / "data/dataframes/df_1a_both_fslr5k.tsv"
+        if path_df_1a_5k.exists():
+            grad_cache = path_df_1a_5k
+        elif args.hemi != "both" and path_df_1a_5k_both.exists():
+            grad_cache = path_df_1a_5k_both
+        else:
+            grad_cache = None
+        if grad_cache is not None:
+            cached = pd.read_csv(grad_cache, sep="\t")
+            grad_cols = [c for c in cached.columns if c.startswith("t1_gradient1_")]
+            for c in grad_cols:
+                df_yeo_surf_5k[c] = cached[c].to_numpy()
+            logger.info(f"Loaded cached fsLR-5k MPC gradient ({', '.join(grad_cols) or 'none'}) "
+                        f"from {grad_cache.name}")
+        else:
+            logger.info("No matching fsLR-5k gradient cache; computing the gradient in-figure.")
 
-    cortex_mask_full = df_yeo_surf_5k["hemisphere"].notna().values
-    logger.info("Loading group-mean geodesic distance (for Moran spatial-weight matrix)...")
-    gd_stack = [load_subject_matrix(f, cortex_mask_full)
-                for f in df_pni["path_dist_5k"].tolist()]
-    gd_cortex = np.mean(np.stack(gd_stack, axis=0), axis=0)
-    del gd_stack
-
-    if args.panel in ("both", "2a"):
-        df_yeo_surf_5k = struct_conn_metric_analysis(
-            df_yeo_surf_5k, surf5k_lh_infl, surf5k_rh_infl,
-            df_pni, project_root,
-            mask_G=mask_G, sc_subjects=sc_subjects, gd_cortex=gd_cortex,
-            network="SalVentAttn", n_rand=n_rand, hemisphere=args.hemi,
+        logger.info("Building Betzel distance-stratified consensus mask + loading SC subjects...")
+        mask_G, sc_subjects = build_consensus_mask(
+            df_pni["path_sc_5k"].tolist(), df_pni["path_sc_dist_5k"].tolist(),
+            df_yeo_surf_5k, nbins=10,
         )
 
-    if args.panel in ("both", "2b"):
-        # All four modalities across all networks. SC is the primary modality
-        # (axonal, independent of the MPC gradient) and fixes the network ordering.
-        networks = ["Limbic", "Default", "Cont", "SalVentAttn", "DorsAttn", "Vis", "SomMot"]
-        measures = ("SC", "GD", "MPC", "FC")
-        df_yeo_surf_5k = struct_conn_network_analysis(
-            df_yeo_surf_5k, surf5k_lh_infl, surf5k_rh_infl,
-            df_pni, project_root,
+        cortex_mask_full = df_yeo_surf_5k["hemisphere"].notna().values
+        logger.info("Loading group-mean geodesic distance (for Moran spatial-weight matrix)...")
+        gd_stack = [load_subject_matrix(f, cortex_mask_full)
+                    for f in df_pni["path_dist_5k"].tolist()]
+        gd_cortex = np.mean(np.stack(gd_stack, axis=0), axis=0)
+        del gd_stack
+
+        df_yeo_surf_5k, results_by_measure = compute_network_results(
+            df_yeo_surf_5k, df_pni, project_root,
             mask_G=mask_G, sc_subjects=sc_subjects, gd_cortex=gd_cortex,
             networks=networks, measures=measures, n_rand=n_rand, hemisphere=args.hemi,
-            )
+        )
+        df_yeo_surf_5k.to_csv(df_label_path, index=False)
+        logger.info(f"[compute] figure-data caches written: {df_label_path.name}, "
+                    f"df_2b_network_stats_*_{args.hemi}.csv, df_2b_network_subject_r_*_{args.hemi}.csv")
 
-    df_yeo_surf_5k.to_csv(project_root / f"data/dataframes/df_2b_label_{args.hemi}.csv", index=False)
+        # Synthetic power/specificity control: confirm the SC topological null
+        # discriminates wiring from geometry at the real connection density.
+        validate_topological_null(
+            results_by_measure, df_yeo_surf_5k, df_pni, project_root,
+            sc_subjects=sc_subjects, mask_G=mask_G, gd_cortex=gd_cortex,
+            focus_network="SalVentAttn", n_rand=n_rand, hemisphere=args.hemi,
+        )
+    else:
+        # --- Plot stage: skip the heavy loads; rebuild results from the caches. ---
+        if not df_label_path.exists():
+            raise FileNotFoundError(
+                f"Vertex cache {df_label_path} not found; run with '-stage compute' "
+                f"(or 'both') before '-stage plot'."
+            )
+        logger.info("[plot] loading figure-data caches (skipping projection + nulls)")
+        df_yeo_surf_5k = pd.read_csv(df_label_path)
+        results_by_measure = load_results_from_cache(
+            project_root, args.hemi, measures, df_yeo_surf_5k,
+        )
+
+    # --- Render figures (every stage draws so a fresh compute always refreshes the
+    # figures; only the heavy computation is gated by -stage). Figures are gated by
+    # -panel. ---
+    if args.panel in ("both", "2a"):
+        plot_figure_2a_scatter_lollipop(
+            results_by_measure, list(measures), df_yeo_surf_5k,
+            surf5k_lh_infl, surf5k_rh_infl, project_root,
+            focus_network="SalVentAttn",
+        )
+    if args.panel in ("both", "2b"):
+        plot_figure_2b(
+            results_by_measure, df_yeo_surf_5k,
+            surf5k_lh_infl, surf5k_rh_infl, project_root,
+            measures=measures, hemisphere=args.hemi,
+        )
 
 
 if __name__ == "__main__":

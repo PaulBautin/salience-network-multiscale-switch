@@ -50,7 +50,8 @@ both myelin- and cell-sensitive stains:
 
 Acquisition and provenance of the histological volumes are described in
 [Data Acquisition](datasets.md#bigbrain-dataset). Each map was correlated with the
-qT1 gradient vertex-wise within the SN mask using the Spearman rank coefficient.
+qT1 gradient vertex-wise within the SN mask using the Spearman rank coefficient,
+restricted to vertices where both the gradient and the modality were finite.
 Because cortical maps carry strong spatial autocorrelation, statistical
 significance was assessed against a within-network Moran spectral randomisation
 null

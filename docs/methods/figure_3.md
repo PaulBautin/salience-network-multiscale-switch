@@ -60,7 +60,49 @@ For the MICA cohort, each electrode contact carries a subject-specific sensitivi
 map derived from a leadfield model in the electroMICA pipeline, defined on the
 fsLR-32k surface. Each contact's sensitivity map was rectified (absolute value),
 thresholded at 0.001, and aggregated across hemispheres to give a per-contact
-spatial weighting vector. Band power was projected onto the surface by weighting
-each contact's contribution by its sensitivity map, so that contacts influence
-surface vertices in proportion to their modelled spatial sensitivity rather than
-through a single nearest-vertex assignment.
+spatial weighting vector. Spectral quantities were projected onto the surface by
+weighting each contact's contribution by its sensitivity map, so that contacts
+influence surface vertices in proportion to their modelled spatial sensitivity
+rather than through a single nearest-vertex assignment. The analyses below were
+carried out within one hemisphere at a time.
+
+**Band power along the microstructural gradient.** Sensitivity-weighted relative
+band power was mapped to the surface for each canonical frequency band, and within
+the target network its value at each covered vertex was correlated (Spearman) with
+the within-network MPC gradient. Significance was assessed against a within-network
+Moran spectral-randomisation null (see [Shared Methods](shared.md#moran-spectral-randomisation-within-network)),
+with the two-tailed empirical $p$-value computed from the add-one estimator
+$p = (1 + k)/(1 + n_\text{perm})$.
+
+**Electrophysiological-similarity projection.** The spectral content of the iEEG
+recordings was treated as a connectivity measure, by analogy with functional
+connectivity, and entered into the same gradient-weighted projection used in
+[Figure 2](figure_2.md#the-projection-statistic). For every covered surface vertex
+a power spectral density fingerprint was obtained by sensitivity-weighted averaging
+of channel spectra and $z$-scored across frequencies. The electrophysiological
+similarity between two vertices was defined as the positive part of the Pearson
+correlation between their spectral fingerprints, giving a vertex-by-vertex
+non-negative similarity that plays the role of a connection weight. For each
+source-network vertex $i$ the projection score is the similarity-weighted mean of
+the functional-connectivity (FC) gradient across its targets,
+
+$$P_i = \frac{\sum_{j} \text{ES}^{+}_{ij}\, g^{\mathrm{FC}}_j}{\sum_{j} \text{ES}^{+}_{ij}}, \qquad j \in \{\text{cortical vertices outside the source network}\},$$
+
+where $\text{ES}^{+}_{ij}$ is the non-negative spectral similarity and
+$g^{\mathrm{FC}}_j$ the FC gradient at target $j$. The FC gradient polarity is
+arbitrary, so it was oriented by anatomy — flipped where necessary so the
+default-mode network occupied the low end and task-positive systems the high end —
+and the chosen orientation was logged. Vertices with fewer than ten contributing
+targets were left undefined.
+
+Because the iEEG spectral fingerprints are aggregated across the cohort, inference
+was performed at the group level: the projection was computed once and summarised
+by a single Spearman correlation between the within-network MPC gradient and the
+projection score across source-network vertices. Spatial significance was the
+within-network Moran spectral-randomisation null
+(see [Shared Methods](shared.md#moran-spectral-randomisation-within-network)),
+with surrogates of the MPC gradient generated within the analysed hemisphere and
+the two-tailed empirical $p$-value taken from the add-one estimator
+$p = (1 + k)/(1 + n_\text{perm})$. For display, the projection was additionally
+summarised as its mean restricted to each target network, giving a per-target-network
+readout of the spectral-similarity-weighted FC-gradient position.

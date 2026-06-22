@@ -80,3 +80,33 @@ component** and reassembled into the full network vector, preserving within-hemi
 autocorrelation while keeping both hemispheres in the statistic; a single-hemisphere
 analysis forms one component. The two-tailed empirical p-value uses the add-one
 estimator $p = (1 + k)/(1 + n)$.
+
+### Geometry-preserving topological null (within-network)
+
+The Moran null above randomises the source map and so controls for the spatial
+smoothness of the two vertexwise maps, but it leaves the connectome untouched. For a
+statistic built from connectivity weights, a complementary null is required to ask
+whether the *specific* pattern of connections — rather than the connectome's geometry
+(degree and edge length) — carries the effect. This is assessed with a
+geometry-preserving topological null that rewires each subject's connectome within
+geodesic-distance bins (Roberts et al., 2016; Betzel et al., 2018; Váša & Mišić,
+2022).
+
+Targets are binned by their geodesic distance from each source vertex into ten
+equal-width intra-hemisphere bins; cross-hemisphere targets, for which geodesic
+distance is undefined, form a single additional bin reassigned among contralateral
+targets only. For each surrogate, every source→target edge is reassigned to another
+target **in the same distance bin**, with the edge weight kept attached. The
+reassignment preserves each source vertex's degree, its multiset of weights, and the
+edge-length distribution, while randomising only the identity of the target — and
+hence the value of the projected map at the target. Because edge length is preserved,
+the null distribution of the group statistic is centred on the *geometry expectation*
+rather than on zero, so an observed value in its tail isolates targeting specificity
+from distance dependence. The rewiring is applied per subject (the subject is the unit
+of inference), the per-subject statistic is recomputed on the rewired connectome and
+aggregated across subjects by the Fisher-z mean, and the two-tailed empirical p-value
+again uses the add-one estimator $p = (1 + k)/(1 + n)$. The null is defined for any
+weight matrix and is therefore applied to the structural, microstructural, and
+functional connectivity measures, but not to the geodesic-distance measure, whose
+weights are a deterministic function of distance and are left essentially unchanged by
+a within-bin reassignment.

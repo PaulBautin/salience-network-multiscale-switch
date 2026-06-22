@@ -60,7 +60,6 @@ python scripts/figure_1b_contextualisation.py -hemi LH
 **Outputs**
 
 - `results/figures/figure_1b_correlations.svg`
-- `results/figures/figure_1b_correlations_circle.svg`
 - `results/figures/figure_1b_brain_t1map.svg`
 - `results/figures/figure_1b_brain_bigbrain.svg`
 - `results/figures/figure_1b_brain_biel.svg`
@@ -89,30 +88,37 @@ python scripts/figure_1c_cortical_types.py -pni_deriv /path/to/BIDS_PNI/derivati
 
 ## Figure 2
 
-**`scripts/figure_2_distance.py`** — Computes the connectivity-weighted projection of the whole-brain FC gradient across each source-network vertex's extranetwork targets, then correlates it per subject with the within-network MPC gradient (Spearman). Every modality uses only positive connections via the same weighted-mean projection. Panel 2A reports SC, GD, MPC, and FC for the salience network (within-network Moran null, generated per hemisphere block); Figure 2B replicates the projection for all four measures across all 7 Yeo networks (same Moran null, with Benjamini–Hochberg FDR across networks per measure) and summarises it as a bubble matrix (rows = networks, columns = measures; disc colour = group _r_, area = |_r_|, black ring + stars = FDR-corrected significance). All analysis runs at fsLR-5k resolution (9,684 vertices).
+**`scripts/figure_2_distance.py`** — Computes the connectivity-weighted projection of the whole-brain FC gradient across each source-network vertex's extranetwork targets, then correlates it per subject with the within-network MPC gradient (Spearman). Every modality uses only positive connections via the same weighted-mean projection. Panel 2A is laid out like Figure 1B: one row per modality (SC, GD, MPC, FC) with two columns. The left column is the salience-network scatter with the within-network MPC gradient on a single shared bottom x-axis and that measure's projection P on y (group _r_ and spatial-null _p_); the right column is a horizontal lollipop placing all 7 Yeo networks (stem length = |group _r_| on a shared bottom |_r_| axis, network-coloured, with FDR-Moran-significant networks filled and starred). Significance uses two complementary nulls: a within-network Moran spectral-randomisation null (map smoothness; all measures) and a geometry-preserving topological null that rewires the connectome within geodesic-distance bins (wiring specificity; SC/MPC/FC), each Benjamini–Hochberg-corrected across networks per measure. Figure 2B replicates the projection for all four measures across all 7 Yeo networks and summarises it as a bubble matrix (rows = networks, columns = measures; disc colour = group _r_, area = |_r_|, black ring + stars = FDR-corrected significance). The per-network projection is the single computation behind both panels, so the lollipop reuses the same numbers as the bubble matrix. All analysis runs at fsLR-5k resolution (9,684 vertices).
 
 Requires `figure_1a_t1map.py` to have been run first: it reads the subject → file table `data/dataframes/figure_1a_pni_to_mics_5k.csv` (required) and reuses the cached fsLR-5k MPC gradient from `data/dataframes/df_1a_<hemi>_fslr5k.tsv` when present, recomputing it in-figure otherwise. The `df_1a_*.tsv` caches are tab-separated.
 
 ```bash
+# full run: compute the projection + nulls, then draw every figure
 python scripts/figure_2_distance.py -hemi LH
-# regenerate only the cross-network summary (skips the 2A modality sweep):
-python scripts/figure_2_distance.py -hemi LH -panel 2b
+# iterate on figure aesthetics without recomputing (loads caches, seconds):
+python scripts/figure_2_distance.py -hemi LH -stage plot
+# redraw only Figure 2A from cache:
+python scripts/figure_2_distance.py -hemi LH -stage plot -panel 2a
 ```
+
+The expensive projection + Moran nulls are separated from drawing by `-stage`. `both` (default) and `compute` both run the computation over all 7 networks, write every figure-data cache below, **and draw the figures** (so a fresh compute always refreshes the figures); `plot` skips all heavy loads and redraws figures from those caches in seconds (so you can iterate on layout/colours without rerunning anything). `-stage plot` requires a prior `compute`/`both` run for the same `-hemi`. `-panel` then selects which figures are rendered.
 
 | Flag | Required | Default | Description |
 |------|----------|---------|-------------|
 | `-hemi` | no | `both` | Hemisphere: `both`, `LH`, or `RH` |
-| `-panel` | no | `both` | Panel to compute: `both`, `2a`, or `2b` |
+| `-panel` | no | `both` | Figures to render: `both`, `2a`, or `2b` |
+| `-stage` | no | `both` | Pipeline stage: `both`/`compute` (compute + write caches + draw), or `plot` (redraw from cache only) |
 
 **Outputs**
 
-- `results/figures/figure_2a_distance_metric.svg`
-- `results/figures/figure_2a_brain_{SC,GD,MPC,FC}_rho.svg`
+- `results/figures/figure_2a_distance_metric.svg` (Figure-1B-style: scatter + horizontal |_r_| lollipop, one row per modality; the scatter y-axis is the z-scored projection P)
+- `results/figures/figure_2a_brain_{SC,GD,MPC,FC}_rho.svg` (salience-network projection maps; both hemispheres, colorbar on the right)
 - `results/figures/figure_2b_distance_network_{SC,GD,MPC,FC}.svg` (per-measure scatter grid)
 - `results/figures/figure_2b_network_summary_<hemi>.svg` (bubble matrix, all measures × networks)
 - `results/figures/figure_2b_brain_{SC,GD,MPC,FC}_rho_<network>.svg`
-- `data/dataframes/df_2b_label_<hemi>.csv` (cache)
-- `data/dataframes/df_2b_network_stats_<measure>_<hemi>.csv` (per-network group stats)
+- `results/figures/figure_2_supp_topo_control.svg` (topological-null power/specificity control: SC null distributions for a wiring-aligned and a geometry-only synthetic map, written in the compute stage)
+- `data/dataframes/df_2b_label_<hemi>.csv` (vertex cache; `{network}_{measure}_P` projection columns — z-scored per network×measure for display — + `{network}_{measure}_dominant` dominant-target-network columns that drive the scatter colours on replot)
+- `data/dataframes/df_2b_network_stats_<measure>_<hemi>.csv` (per-network group stats, including `p_moran`/`q_moran` and the geometry-preserving topological-null `p_topo`/`q_topo`; `p_topo`/`q_topo` are NaN for the GD measure)
 - `data/dataframes/df_2b_network_subject_r_<measure>_<hemi>.csv` (per-subject _r_; row index is the subject ID, one column per network)
 
 ---
@@ -139,7 +145,7 @@ python scripts/figure_3_ieeg_mni.py \
 
 ## Figure 3 MICA
 
-**`scripts/figure_3_ieeg_mica.py`** — Same pipeline as Figure 3 MNI, applied to the MICA intracranial EEG dataset with subject-specific leadfield sensitivity maps.
+**`scripts/figure_3_ieeg_mica.py`** — Applies the iEEG spectral pipeline to the MICA intracranial EEG dataset using subject-specific leadfield sensitivity maps. Sensitivity-weighted band power is correlated with the within-network MPC gradient, and the spectral similarity between surface vertices is used as a connectivity measure to project the FC gradient (the Figure 2 gradient-weighted projection, group-level variant) and test it against the MPC gradient. Significance for both analyses is a within-network Moran spectral-randomisation null with the add-one empirical *p*.
 
 ```bash
 python scripts/figure_3_ieeg_mica.py \
@@ -151,8 +157,11 @@ python scripts/figure_3_ieeg_mica.py \
 |------|----------|---------|-------------|
 | `-ieeg_deriv` | yes | — | Path to electroMICA derivatives directory |
 | `-hemi` | no | `RH` | Hemisphere: `both`, `LH`, or `RH` |
+| `-network` | no | `SalVentAttn` | Yeo 7-network analysis target |
 
-**Outputs** — `results/figures/figure_3b_ieeg_mica_*.svg`
+Requires `data/dataframes/df_1a_{hemi}.tsv` (run `figure_1a_t1map.py` with the matching `-hemi` first).
+
+**Outputs** — `results/figures/figure_3b_ieeg_mica_*.svg`: the ES projection scatter (`*_es_scatter_{hemi}.svg`) and projection brain map (`*_es_map_{hemi}.svg`); the channel-level PSD correlation matrix (`*_corr_{hemi}.svg`); and the band-power panels (`*_psd_{hemi}.svg`, `*_band_power_corr_{hemi}.svg`, `*_{band}_map_{hemi}.svg`, `*_sensitivity_map_{hemi}.svg`).
 
 ---
 

@@ -97,7 +97,7 @@ defined above, computed over positive weights only; no modality-specific rank or
 absolute-value formulation was required, since restricting to positive connections
 keeps the weighted mean well-defined for MPC and FC alike.
 
-## Group inference and spatial null
+## Group inference and null models
 
 Per-subject correlations were transformed to Fisher z and tested against zero with
 a one-sample t-test across the $N_S = 18$ subjects. The group correlation
@@ -125,6 +125,48 @@ surrogates were therefore generated independently within each connected componen
 and reassembled, preserving within-hemisphere autocorrelation while keeping both
 hemispheres in the statistic. A single-hemisphere analysis forms one component.
 
+The Moran null controls for the smoothness of the two maps but leaves the connectome
+unchanged, so it cannot establish that the alignment is carried by connectivity rather
+than by connectome geometry: when both maps are smooth and connectivity is
+distance-dependent, the projection is gradient-aligned by geometry alone. Wiring
+specificity was therefore tested with a complementary geometry-preserving topological
+null ([Shared Methods — Geometry-preserving topological
+null](shared.md#geometry-preserving-topological-null-within-network)), which rewires
+each subject's source→target edges within geodesic-distance bins — preserving each
+vertex's degree, weight multiset, and edge-length distribution while randomising target
+identity — and recomputes the projection statistic, aggregating across subjects by the
+Fisher-z mean to give a two-tailed empirical $p_{\mathrm{topo}}$. Because the
+reassignment preserves edge length, the null distribution is centred on the geometry
+expectation, so an effect surviving this null reflects targeting specificity beyond
+distance. The topological null was applied to the structural, microstructural, and
+functional connectivity measures; the geodesic-distance measure, whose weights are a
+deterministic function of distance, was excluded. As a power and specificity check,
+the structural-connectivity null was additionally run on two synthetic source maps at
+the empirical connection density — a wiring-aligned map (expected to be rejected) and a
+geometry-only map (expected to be retained) — verifying that the null discriminates
+specific wiring from geometry rather than from sparsity.
+
+Panel 2A (`figure_2a_distance_metric.svg`) is laid out with one row per connectivity
+measure (SC, GD, MPC, FC) and two columns. The left column plots, for the salience
+network, each vertex's within-network MPC gradient — on a single shared bottom x-axis,
+as the gradient is the same vector for every measure — against that measure's
+connectivity-weighted projection $P$, with points coloured by their dominant target
+network and annotated with the group correlation $\bar r$, the spatial-null
+$p_{\mathrm{moran}}$, and — for the measures that receive it (SC, MPC, FC) — the
+topological-null $p_{\mathrm{topo}}$. For visualisation, the group-mean projection is standardised
+(z-scored) per network and measure; because the per-subject statistic is rank-based
+(Spearman), this monotone rescale leaves $\bar r$ and $p_{\mathrm{moran}}$ unchanged.
+The right column summarises the same statistic across all seven
+Yeo networks as a horizontal network-coloured lollipop chart, encoding the effect
+magnitude $|\bar r|$ as stem length on a shared bottom $|r|$ axis in the shared network
+ordering; networks surviving the FDR-corrected Moran null (described next) are drawn
+with a filled marker and significance stars, the others faded and open. Magnitude
+rather than signed $\bar r$ is shown because the within-network MPC gradient is the
+first diffusion-map eigenvector, whose polarity is mathematically arbitrary and is not
+anchored across networks, so only $|\bar r|$ is comparable between networks. Both
+columns are views of the per-network computation reused for panel 2B, so the lollipop
+lengths equal the magnitudes in the panel 2B bubble matrix.
+
 ## Across-network replication (panel 2B)
 
 The test was repeated independently for each of the seven Yeo networks and for each
@@ -136,8 +178,11 @@ surrogates, add-one empirical $p_{\mathrm{moran}}$), whose footprint-matched
 construction is the appropriate per-network test. Each connectivity measure was
 treated as its own inferential family: within each measure the seven networks'
 $p_{\mathrm{moran}}$ values were corrected with the Benjamini–Hochberg
-false-discovery-rate procedure, and the resulting $q$ values are reported alongside
-the group estimates.
+false-discovery-rate procedure, and the topological-null $p_{\mathrm{topo}}$ values
+(SC, MPC, FC) were corrected the same way within their measure; the resulting $q$
+values are reported alongside the group estimates. The bubble matrix's significance
+ring encodes the Moran FDR; the topological-null result is reported in the per-network
+statistics caches.
 
 The replication is summarised as a bubble matrix
 (`figure_2b_network_summary_{hemi}.svg`) with one row per network and one column per
@@ -157,8 +202,11 @@ magnitude — carried by disc area — and significance are compared. A per-meas
 the same network order, carrying only the colour-coded network title and shared axes
 (per-vertex MPC gradient against that measure's projection $P$).
 
-Group-level summaries ($\bar r$, t, p, $p_{\mathrm{moran}}$, and the FDR
-$q_{\mathrm{moran}}$) were written to `logs/figure_2_distance.log`, and the
+Group-level summaries ($\bar r$, t, p, $p_{\mathrm{moran}}$, $p_{\mathrm{topo}}$, and
+the FDR $q_{\mathrm{moran}}$ / $q_{\mathrm{topo}}$), together with a per-network
+connection-sparsity summary (the median number of targets per source vertex and the
+fraction of vertices at the minimum-target floor), were written to
+`logs/figure_2_distance.log`, and the
 per-network group statistics and per-subject coefficients were cached per measure to
 `data/dataframes/df_2b_network_stats_{measure}_{hemi}.csv` and
 `data/dataframes/df_2b_network_subject_r_{measure}_{hemi}.csv` so the summary

@@ -164,7 +164,7 @@ Loops over subjects, computes each subject's projection score and its Spearman a
 | `target_network_labels` | `np.ndarray` | Enables per-target-network weight summaries. Optional. |
 | `min_valid` | `int` | Minimum finite targets per vertex. Default `10`. |
 
-**Returns** `dict` — keys include `P_mean`, `P_subjects_sn`, `P_subjects_full`, `r_subjects`, `target_net_weights`, `target_network_names`, and the Fisher-z aggregates `r_group`, `t`, `p`, `ci_low`, `ci_high`, `n`.
+**Returns** `dict` — keys include `P_mean`, `P_subjects_sn`, `P_subjects_full`, `r_subjects`, `n_targets_per_sn` (mean-over-subjects finite-positive target count per source vertex, a sparsity diagnostic), `target_net_weights`, `target_network_names`, and the Fisher-z aggregates `r_group`, `t`, `p`, `ci_low`, `ci_high`, `n`.
 
 ---
 
@@ -194,6 +194,46 @@ Generates MPC-gradient surrogates that preserve the within-network spatial autoc
 | `random_state` | `int` | Base seed (offset per component so blocks are decorrelated). Default `42`. |
 
 **Returns** `dict` — `null_group_moran`, `p_moran` (two-tailed, add-one), `null_std_moran`.
+
+---
+
+### `compute_topological_null_projection`
+
+```python
+compute_topological_null_projection(
+    modality: str, files: list, df_yeo_surf_5k: pd.DataFrame,
+    g_fc_cortex: np.ndarray, g_mpc_cortex_at_sn: np.ndarray,
+    sn_mask_cortex: np.ndarray, other_mask_cortex: np.ndarray,
+    gd_sn_to_other: np.ndarray, result: dict, n_rand: int,
+    *, sc_subjects: list[np.ndarray] | None = None, mask_G: np.ndarray | None = None,
+    nbins: int = 10, random_state: int = 42, min_valid: int = 10,
+) -> dict
+```
+
+Geometry-preserving topological null for the MPC gradient ↔ projection alignment, testing whether the *specific* source→target wiring drives the effect beyond connectome geometry.
+
+Each subject's connectome is rewired by reassigning every source→target edge to a different target **in the same geodesic-distance bin** (with replacement; pools are large relative to per-vertex degree), keeping the edge weight attached. This preserves each source vertex's degree, weight multiset, and edge-length distribution while randomising target identity. The projection and per-subject Spearman are recomputed on the rewired connectome and aggregated by the Fisher-z mean across subjects per surrogate; because edge length is preserved, the null distribution is centred on the geometry expectation rather than zero. Intended for `'SC'`, `'MPC'`, `'FC'`; `'GD'` weights are a deterministic function of distance, so a within-bin reassignment leaves them essentially unchanged and the null is uninformative.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `modality` | `str` | One of `'SC'`, `'MPC'`, `'FC'`. |
+| `files` | `list` | Per-subject connectivity files (used when `sc_subjects` is `None` or modality ≠ SC). |
+| `df_yeo_surf_5k` | `pd.DataFrame` | Provides the cortex mask and per-vertex hemisphere labels. |
+| `g_fc_cortex` | `np.ndarray`, shape `(n_cortex,)` | Whole-brain FC gradient on cortex. |
+| `g_mpc_cortex_at_sn` | `np.ndarray`, shape `(n_sn,)` | MPC gradient at source-network vertices. |
+| `sn_mask_cortex` / `other_mask_cortex` | `np.ndarray` of `bool` | Source-network and target masks. |
+| `gd_sn_to_other` | `np.ndarray`, shape `(n_sn, n_other)` | Geodesic distance from source vertices to targets; cross-hemisphere entries `0` form a separate (inter-hemisphere) bin. |
+| `result` | `dict` | Output of `compute_projection_subjects`; only `r_group` is read (the observed value). |
+| `n_rand` | `int` | Number of surrogates. |
+| `sc_subjects` | `list[np.ndarray]` | Pre-loaded SC matrices (SC only). Optional. |
+| `mask_G` | `np.ndarray` of `bool` | Betzel consensus mask (SC only). Optional. |
+| `nbins` | `int` | Intra-hemisphere distance bins. Default `10`. |
+| `random_state` | `int` | Base seed. Default `42`. |
+| `min_valid` | `int` | Minimum finite-positive targets per source vertex. Default `10`. |
+
+**Returns** `dict` — `null_group_topo`, `p_topo` (two-tailed, add-one), `null_std_topo`.
 
 ---
 
