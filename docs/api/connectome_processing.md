@@ -139,7 +139,7 @@ compute_projection_subjects(
     sn_mask_cortex: np.ndarray, other_mask_cortex: np.ndarray,
     df_yeo_surf_5k: pd.DataFrame,
     *, mask_G: np.ndarray | None = None,
-    sc_subjects: list[np.ndarray] | None = None,
+    preloaded_subjects: list[np.ndarray] | None = None,
     target_network_labels: np.ndarray | None = None,
     min_valid: int = 10,
 ) -> dict
@@ -153,14 +153,14 @@ Loops over subjects, computes each subject's projection score and its Spearman a
 
 | Name | Type | Description |
 |------|------|-------------|
-| `files` | `list` | Per-subject connectivity files (used when `sc_subjects` is `None` or modality ≠ SC). |
+| `files` | `list` | Per-subject connectivity files (used only when `preloaded_subjects` is `None`). |
 | `modality` | `str` | One of `'SC'`, `'GD'`, `'MPC'`, `'FC'`. |
 | `g_fc_cortex` | `np.ndarray`, shape `(n_cortex,)` | Whole-brain FC gradient. |
 | `g_mpc_cortex_at_sn` | `np.ndarray`, shape `(n_sn,)` | Procrustes-aligned MPC gradient at source-network vertices. |
 | `sn_mask_cortex` / `other_mask_cortex` | `np.ndarray` of `bool` | Source-network and target masks. |
 | `df_yeo_surf_5k` | `pd.DataFrame` | Provides hemisphere info. |
 | `mask_G` | `np.ndarray` of `bool` | Betzel consensus mask (SC only). Optional. |
-| `sc_subjects` | `list[np.ndarray]` | Pre-loaded SC matrices, avoiding re-reads. Optional. |
+| `preloaded_subjects` | `list[np.ndarray]` | Pre-loaded per-subject raw matrices (used instead of reading `files`; load once, reuse across networks). Optional. |
 | `target_network_labels` | `np.ndarray` | Enables per-target-network weight summaries. Optional. |
 | `min_valid` | `int` | Minimum finite targets per vertex. Default `10`. |
 
@@ -205,21 +205,23 @@ compute_topological_null_projection(
     g_fc_cortex: np.ndarray, g_mpc_cortex_at_sn: np.ndarray,
     sn_mask_cortex: np.ndarray, other_mask_cortex: np.ndarray,
     gd_sn_to_other: np.ndarray, result: dict, n_rand: int,
-    *, sc_subjects: list[np.ndarray] | None = None, mask_G: np.ndarray | None = None,
-    nbins: int = 10, random_state: int = 42, min_valid: int = 10,
+    *, preloaded_subjects: list[np.ndarray] | None = None, mask_G: np.ndarray | None = None,
+    nbins: int = 10, random_state: int = 42, min_valid: int = 10, method: str = "exact",
 ) -> dict
 ```
 
 Geometry-preserving topological null for the MPC gradient ↔ projection alignment, testing whether the *specific* source→target wiring drives the effect beyond connectome geometry.
 
-Each subject's connectome is rewired by reassigning every source→target edge to a different target **in the same geodesic-distance bin** (with replacement; pools are large relative to per-vertex degree), keeping the edge weight attached. This preserves each source vertex's degree, weight multiset, and edge-length distribution while randomising target identity. The projection and per-subject Spearman are recomputed on the rewired connectome and aggregated by the Fisher-z mean across subjects per surrogate; because edge length is preserved, the null distribution is centred on the geometry expectation rather than zero. Intended for `'SC'`, `'MPC'`, `'FC'`; `'GD'` weights are a deterministic function of distance, so a within-bin reassignment leaves them essentially unchanged and the null is uninformative.
+Each subject's connectome is rewired by reassigning every source→target edge to a different target **in the same geodesic-distance bin** (with replacement; pools are large relative to per-vertex degree), keeping the edge weight attached. This preserves each source vertex's degree, weight multiset, and edge-length distribution while randomising target identity. The projection and per-subject Spearman are recomputed on the rewired connectome and aggregated by the Fisher-z mean across subjects per surrogate; because edge length is preserved, the null distribution is centred on the geometry expectation rather than zero. `p_topo` is consequently an **excess-magnitude** add-one estimate (`empirical_p_excess_magnitude`) — testing whether the observed alignment is *stronger in magnitude* ($|r_{\text{obs}}| \geq |r_{\text{null}}|$) than the geometry expectation — not a two-sided test around zero. The magnitude (rather than fixed-side) comparison is required because the group correlation inherits the arbitrary polarity of the source gradient `g_MPC`; the observed effect and the surrogates share that same fixed `g_MPC`, so both lie on the same side of zero and folding by $|\cdot|$ recovers the intended test while staying invariant to the eigenvector's arbitrary sign (a fixed upper-tail test would spuriously report n.s. whenever `g_MPC` came out sign-negative). Intended for `'SC'`, `'MPC'`, `'FC'`; `'GD'` weights are a deterministic function of distance, so a within-bin reassignment leaves them essentially unchanged and the null is uninformative.
+
+Two samplers, selected by `method`: `'exact'` resamples each edge's target explicitly; `'clt'` is an algebraically equivalent analytic-moment shortcut — the per-vertex resampled numerator has closed-form mean `Σ_b W_b·μ_b` and variance `Σ_b (Σ_e w_e²)·σ²_b` (summed over distance-bins `b`; `W_b` = bin edge-weight sum, `μ_b`/`σ²_b` = bin target-map mean/variance) and, for dense connectomes, is drawn from the matching Gaussian (central limit theorem), removing the per-surrogate resampling cost. Used for the dense `'MPC'`/`'FC'` measures; `'SC'` keeps `'exact'`. The two agree within Monte-Carlo error.
 
 **Parameters**
 
 | Name | Type | Description |
 |------|------|-------------|
 | `modality` | `str` | One of `'SC'`, `'MPC'`, `'FC'`. |
-| `files` | `list` | Per-subject connectivity files (used when `sc_subjects` is `None` or modality ≠ SC). |
+| `files` | `list` | Per-subject connectivity files (used only when `preloaded_subjects` is `None`). |
 | `df_yeo_surf_5k` | `pd.DataFrame` | Provides the cortex mask and per-vertex hemisphere labels. |
 | `g_fc_cortex` | `np.ndarray`, shape `(n_cortex,)` | Whole-brain FC gradient on cortex. |
 | `g_mpc_cortex_at_sn` | `np.ndarray`, shape `(n_sn,)` | MPC gradient at source-network vertices. |
@@ -227,13 +229,14 @@ Each subject's connectome is rewired by reassigning every source→target edge t
 | `gd_sn_to_other` | `np.ndarray`, shape `(n_sn, n_other)` | Geodesic distance from source vertices to targets; cross-hemisphere entries `0` form a separate (inter-hemisphere) bin. |
 | `result` | `dict` | Output of `compute_projection_subjects`; only `r_group` is read (the observed value). |
 | `n_rand` | `int` | Number of surrogates. |
-| `sc_subjects` | `list[np.ndarray]` | Pre-loaded SC matrices (SC only). Optional. |
+| `preloaded_subjects` | `list[np.ndarray]` | Pre-loaded per-subject raw matrices (used instead of reading `files`; load once, reuse across networks). Optional. |
 | `mask_G` | `np.ndarray` of `bool` | Betzel consensus mask (SC only). Optional. |
 | `nbins` | `int` | Intra-hemisphere distance bins. Default `10`. |
 | `random_state` | `int` | Base seed. Default `42`. |
 | `min_valid` | `int` | Minimum finite-positive targets per source vertex. Default `10`. |
+| `method` | `str` | Surrogate sampler: `'exact'` (default) or `'clt'`. |
 
-**Returns** `dict` — `null_group_topo`, `p_topo` (two-tailed, add-one), `null_std_topo`.
+**Returns** `dict` — `null_group_topo`, `p_topo` (excess-magnitude, add-one), `null_std_topo`.
 
 ---
 
@@ -262,6 +265,44 @@ empirical_p_twosided(null: np.ndarray, observed: float) -> float
 ```
 
 Two-tailed empirical permutation p-value via the add-one estimator $p = (1+k)/(1+n)$, where $k$ counts the finite null values whose magnitude is $\geq |\,\text{observed}\,|$ and $n$ is the number of finite null values. The add-one keeps the estimate bounded away from zero. Shared by `compute_moran_null_projection` and the figure 1B within-network Moran null.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `null` | `np.ndarray` | Null distribution of the statistic; non-finite entries are ignored. |
+| `observed` | `float` | Observed statistic. |
+
+**Returns** `float` — empirical p-value, or `NaN` if `observed` is non-finite or there are no finite null values.
+
+---
+
+### `empirical_p_upper`
+
+```python
+empirical_p_upper(null: np.ndarray, observed: float) -> float
+```
+
+One-sided **upper-tail** empirical permutation p-value via the add-one estimator $p = (1+k)/(1+n)$, where $k$ counts the finite null values $\geq \text{observed}$ (not in absolute value) and $n$ is the number of finite null values. Use for a null whose centre is **not** zero **and** whose statistic has a fixed, interpretable sign (the observed effect is expected on the upper side). When the statistic's sign is arbitrary (e.g. a correlation against an unanchored diffusion-map eigenvector) use `empirical_p_excess_magnitude` instead — a fixed-side tail test misfires when the effect comes out sign-negative. For a ~0-centred null use `empirical_p_twosided`.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `null` | `np.ndarray` | Null distribution of the statistic; non-finite entries are ignored. |
+| `observed` | `float` | Observed statistic. |
+
+**Returns** `float` — empirical p-value, or `NaN` if `observed` is non-finite or there are no finite null values.
+
+---
+
+### `empirical_p_excess_magnitude`
+
+```python
+empirical_p_excess_magnitude(null: np.ndarray, observed: float) -> float
+```
+
+Sign-invariant **excess-magnitude** empirical permutation p-value via the add-one estimator $p = (1+k)/(1+n)$, where $k$ counts the finite null values with $|\,\text{null}\,| \geq |\,\text{observed}\,|$ and $n$ is the number of finite null values. This is the correct one-sided test for the geometry-preserving topological null: its surrogates are centred on the non-zero geometry expectation, but the group correlation inherits the arbitrary polarity of the source gradient `g_MPC`. Because the observed statistic and the surrogates share that same fixed `g_MPC`, both lie on the same side of zero, so folding by $|\cdot|$ recovers the "alignment exceeds geometry" comparison while remaining invariant to the eigenvector's arbitrary sign (unlike `empirical_p_upper`, which silently reports n.s. when `g_MPC` comes out sign-negative). The add-one keeps the estimate bounded away from zero.
 
 **Parameters**
 

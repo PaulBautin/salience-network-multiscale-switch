@@ -44,7 +44,7 @@ import matplotlib as mp
 import logging
 
 from src.atlas_load import load_yeo_atlas, load_bigbrain_gradients, convert_states_str2int, compute_network_mask
-from src.ieeg_processing import preprocess_and_compute_psd_ieeg, extract_band_power, plot_surface_sphere, compute_gradient_quantiles
+from src.ieeg_processing import preprocess_and_compute_psd_ieeg, plot_surface_sphere, compute_gradient_quantiles
 from src.plot_colors import yeo7_rgba, yeo7_rgb
 from src.logging_utils import setup_manuscript_logger
 

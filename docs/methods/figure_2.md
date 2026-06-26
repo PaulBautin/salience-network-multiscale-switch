@@ -135,12 +135,18 @@ null](shared.md#geometry-preserving-topological-null-within-network)), which rew
 each subject's source→target edges within geodesic-distance bins — preserving each
 vertex's degree, weight multiset, and edge-length distribution while randomising target
 identity — and recomputes the projection statistic, aggregating across subjects by the
-Fisher-z mean to give a two-tailed empirical $p_{\mathrm{topo}}$. Because the
-reassignment preserves edge length, the null distribution is centred on the geometry
-expectation, so an effect surviving this null reflects targeting specificity beyond
-distance. The topological null was applied to the structural, microstructural, and
-functional connectivity measures; the geodesic-distance measure, whose weights are a
-deterministic function of distance, was excluded. As a power and specificity check,
+Fisher-z mean. Because the reassignment preserves edge length, the null distribution is
+centred on the geometry expectation rather than on zero; $p_{\mathrm{topo}}$ is therefore
+an **excess-magnitude** add-one estimate ($|r_{\mathrm{obs}}| \ge |r_{\mathrm{null}}|$),
+testing whether the observed alignment is stronger in magnitude than what geometry alone
+produces, so an effect surviving this null reflects targeting specificity beyond distance.
+The comparison is made on magnitude rather than a fixed tail because the within-network
+microstructural gradient is a diffusion-map eigenvector of arbitrary polarity; the
+observed statistic and the surrogates share that same fixed gradient and so lie on the
+same side of zero, making the magnitude test invariant to the eigenvector's sign. The topological null was applied to the structural,
+microstructural, and functional connectivity measures; the geodesic-distance measure,
+whose weights are a deterministic function of distance, was excluded. As a power and
+specificity check,
 the structural-connectivity null was additionally run on two synthetic source maps at
 the empirical connection density — a wiring-aligned map (expected to be rejected) and a
 geometry-only map (expected to be retained) — verifying that the null discriminates

@@ -116,32 +116,46 @@ Canonical bands: delta (0.5–4 Hz), theta (4–8 Hz), alpha (8–13 Hz), beta (
 
 ---
 
-### `compute_psd_vectorized`
+### `compute_spectral_parameters`
 
 ```python
-compute_psd_vectorized(
-    data: np.ndarray,
-    fs: float,
-    fmin: float = 0.5,
+compute_spectral_parameters(
+    pxx: np.ndarray,
+    freq: np.ndarray,
+    bands: dict[str, tuple[float, float]] | None = None,
+    fmin: float = 1.0,
     fmax: float = 80.0,
-) -> tuple[np.ndarray, np.ndarray]
+    aperiodic_mode: str = "knee",
+    peak_width_limits: tuple[float, float] = (1.0, 12.0),
+    max_n_peaks: int = 6,
+    min_peak_height: float = 0.05,
+) -> dict
 ```
 
-Compute relative PSD for all channels simultaneously, without preprocessing.
-
-Unlike `preprocess_and_compute_psd_ieeg`, this function skips filtering, downsampling, and demeaning — use it when the data are already preprocessed (e.g. MNI iEEG atlas data).
-
-Uses Welch's method with a 2-second Hamming window and 1-second overlap. PSD is normalized by total power.
+Parameterise power spectra with a single `specparam` fit (FOOOF; Donoghue et al.,
+2020) into an aperiodic exponent and per-band oscillatory peak power. Deriving band
+power from the periodic component (peak power above the aperiodic fit) makes it
+orthogonal to the exponent, so the two measures do not re-encode the same 1/f change.
+Fitting in `'knee'` mode suits the broadband iEEG range, and the per-channel unit-sum
+PSD normalisation only shifts the aperiodic offset, leaving both measures unchanged.
 
 **Parameters**
 
 | Name | Type | Description |
 |------|------|-------------|
-| `data` | `np.ndarray` | Shape `(n_channels, n_times)`. |
-| `fs` | `float` | Sampling frequency in Hz. |
-| `fmin` / `fmax` | `float` | Frequency range to retain in Hz. Default `0.5` / `80.0`. |
+| `pxx` | `np.ndarray` | PSD, shape `(n_spectra, n_frequencies)` or `(n_frequencies,)`; linear power. |
+| `freq` | `np.ndarray` | Frequency axis in Hz. |
+| `bands` | `dict[str, tuple[float, float]] \| None` | Band name → `(fmin, fmax)` for the oscillatory readout; `None` returns only the exponent. |
+| `fmin` | `float` | Lower bound of the fitting range in Hz. Default `1.0`. |
+| `fmax` | `float` | Upper bound of the fitting range in Hz. Default `80.0`. |
+| `aperiodic_mode` | `str` | `specparam` aperiodic mode, `'knee'` or `'fixed'`. Default `'knee'`. |
+| `peak_width_limits` | `tuple[float, float]` | (min, max) Gaussian peak bandwidth in Hz. |
+| `max_n_peaks` | `int` | Maximum oscillatory peaks per spectrum. Default `6`. |
+| `min_peak_height` | `float` | Minimum peak height above the aperiodic fit. Default `0.05`. |
 
-**Returns** `(f_band, pxx_rel)` — frequency array shape `(n_frequencies,)` and normalized PSD shape `(n_channels, n_frequencies)`.
+**Returns** `dict` — `'exponent'`: aperiodic exponent χ, shape `pxx.shape[:-1]` (NaN where the fit failed); `'band_power'`: `{name: array}` of oscillatory peak power per band, same shape (NaN where no peak was detected or the fit failed).
+
+**Raises** `ImportError` — if `specparam` is not installed (a hard dependency of the iEEG spectral analysis).
 
 ---
 

@@ -13,6 +13,7 @@ dependencies:
   - pip:
       - brainspace
       - bctpy
+      - specparam
       - mkdocs-material
 
 

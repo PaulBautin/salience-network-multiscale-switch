@@ -262,21 +262,26 @@ def build_or_load_subject_table(
 def gradient_and_profiles(
     df_yeo: pd.DataFrame, df_pni: pd.DataFrame, t1_col: str,
     cache_path: Path, hemisphere: str, network: str = "SalVentAttn",
-) -> tuple[pd.DataFrame, np.ndarray]:
+    need_profiles: bool = True,
+) -> tuple[pd.DataFrame, np.ndarray | None]:
     """Attach the network T1 gradient + mean T1map to `df_yeo`; return masked profiles.
 
-    The network mask and per-subject T1 profiles are loaded either way (the
-    profiles drive the profile figure). When `cache_path` exists the surface
-    table (with the gradient columns) is read back from it; otherwise the
-    diffusion-map MPC gradient is computed and the table is cached. The profile
-    vertex axis is in the same order as the masked rows of `df_yeo`.
+    When `cache_path` exists the surface table (with the gradient columns) is read
+    back from it; otherwise the diffusion-map MPC gradient is computed from the
+    per-subject T1 profiles and the table is cached. The per-subject profiles are
+    only loaded when they are actually consumed: always on a cache-miss (they drive
+    the gradient) and on a cache-hit only when `need_profiles` is set (the caller
+    plots them). When they are not loaded the second return value is ``None``. The
+    profile vertex axis is in the same order as the masked rows of `df_yeo`.
     """
     net_mask = compute_network_mask(df_yeo, network, hemisphere)
-    profiles = load_t1_salience_profiles(df_pni[t1_col].tolist(), net_mask)
     if cache_path.exists():
         logger.info(f"Found existing gradient table at {cache_path}. Loading...")
+        profiles = (load_t1_salience_profiles(df_pni[t1_col].tolist(), net_mask)
+                    if need_profiles else None)
         df_yeo = pd.read_csv(cache_path, sep="\t")
     else:
+        profiles = load_t1_salience_profiles(df_pni[t1_col].tolist(), net_mask)
         df_yeo.loc[net_mask, f"t1_gradient1_{network}"] = compute_t1_gradient(profiles)
         df_yeo.loc[net_mask, "T1map"] = compute_t1map(profiles)
         df_yeo.to_csv(cache_path, sep="\t", index=False)
@@ -341,6 +346,7 @@ def main():
     df_yeo_surf_5k, _ = gradient_and_profiles(
         df_yeo_surf_5k, df_pni_5k, "path_t1_profile_5k",
         project_root / f"data/dataframes/df_1a_{args.hemi}_fslr5k.tsv", args.hemi,
+        need_profiles=False,  # Part 2 only needs the gradient table, not the profiles
     )
 
     ######### Figures (fsLR-32k)

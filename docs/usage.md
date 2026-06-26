@@ -108,6 +108,7 @@ The expensive projection + Moran nulls are separated from drawing by `-stage`. `
 | `-hemi` | no | `both` | Hemisphere: `both`, `LH`, or `RH` |
 | `-panel` | no | `both` | Figures to render: `both`, `2a`, or `2b` |
 | `-stage` | no | `both` | Pipeline stage: `both`/`compute` (compute + write caches + draw), or `plot` (redraw from cache only) |
+| `-n_rand` | no | `1000` | Surrogates for the Moran and topological nulls. Lower (e.g. `300`) for faster iteration; the add-one empirical _p_ floor is 1/(1+`n_rand`), so keep `1000` for the final run. |
 
 **Outputs**
 
@@ -156,12 +157,12 @@ python scripts/figure_3_ieeg_mica.py \
 | Flag | Required | Default | Description |
 |------|----------|---------|-------------|
 | `-ieeg_deriv` | yes | — | Path to electroMICA derivatives directory |
-| `-hemi` | no | `RH` | Hemisphere: `both`, `LH`, or `RH` |
+| `-hemi` | no | `RH` | Hemisphere: `LH` or `RH` (the sensitivity maps are evaluated one hemisphere at a time) |
 | `-network` | no | `SalVentAttn` | Yeo 7-network analysis target |
 
 Requires `data/dataframes/df_1a_{hemi}.tsv` (run `figure_1a_t1map.py` with the matching `-hemi` first).
 
-**Outputs** — `results/figures/figure_3b_ieeg_mica_*.svg`: the ES projection scatter (`*_es_scatter_{hemi}.svg`) and projection brain map (`*_es_map_{hemi}.svg`); the channel-level PSD correlation matrix (`*_corr_{hemi}.svg`); and the band-power panels (`*_psd_{hemi}.svg`, `*_band_power_corr_{hemi}.svg`, `*_{band}_map_{hemi}.svg`, `*_sensitivity_map_{hemi}.svg`).
+**Outputs** — `results/figures/figure_3b_ieeg_mica_*.svg`: the primary aperiodic-exponent (1/f slope) scatter (`*_slope_corr_{hemi}.svg`) and brain map (`*_slope_map_{hemi}.svg`); the FDR-corrected oscillatory band-power panels (`*_psd_{hemi}.svg`, `*_band_power_corr_{hemi}.svg`, `*_{band}_map_{hemi}.svg`, `*_sensitivity_map_{hemi}.svg`); and the spectral-similarity projection scatter (`*_es_scatter_{hemi}.svg`), projection brain map (`*_es_map_{hemi}.svg`), and the channel-level PSD correlation matrix (`*_corr_{hemi}.svg`).
 
 ---
 

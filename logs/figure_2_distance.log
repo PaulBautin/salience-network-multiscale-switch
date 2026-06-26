@@ -6223,3 +6223,1102 @@ Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates gener
 [sparsity | Default | MPC] targets/SN-vertex median=3318 IQR=[3300, 3334] | frac SN vertices with <=10 targets: 0.00
 [compute | MPC] processing network: Cont
 Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[MPC] topological null: nbins=10, n_rand=1000; null mean=+0.192 (geometry expectation), obs r_group=+0.364, p_topo=9.990e-04
+[compute | Cont | MPC] r_group=+0.364 [+0.333, +0.394] t=+22.83 p=9.681e-15 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | Cont | MPC] targets/SN-vertex median=3790 IQR=[3760, 3813] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[MPC] topological null: nbins=10, n_rand=1000; null mean=+0.013 (geometry expectation), obs r_group=+0.086, p_topo=9.990e-04
+[compute | SalVentAttn | MPC] r_group=+0.086 [+0.063, +0.110] t=+7.66 p=4.551e-07 (subject-level) | p_moran=1.598e-02 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SalVentAttn | MPC] targets/SN-vertex median=3726 IQR=[3702, 3750] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[MPC] topological null: nbins=10, n_rand=1000; null mean=+0.244 (geometry expectation), obs r_group=+0.326, p_topo=9.990e-04
+[compute | DorsAttn | MPC] r_group=+0.326 [+0.297, +0.354] t=+22.39 p=1.356e-14 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | DorsAttn | MPC] targets/SN-vertex median=3800 IQR=[3751, 3851] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: Vis
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-22 18:09:18
+  --hemi: both
+  --panel: both
+  --stage: both
+  --n_rand: 1000
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC/FC weights : positive connections only (weighted-mean projection)
+Null models    : Moran spectral randomisation (map smoothness, all measures) + geometry-preserving topological null (wiring specificity, SC/MPC/FC)
+Stage / panel  : stage=both, panel=both, hemi=both
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loaded cached fsLR-5k MPC gradient (t1_gradient1_SalVentAttn) from df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1028, n_edges=3998392, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+[FC gradient] flipped sign so the default-mode network sits at the low (default-mode) end.
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06507687 0.05652771 0.04587616 0.04080785 0.02930041 0.0248962
+ 0.02141152 0.01790186 0.01574277 0.01363902]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07213035 0.05670261 0.04671686 0.04262806 0.02975918 0.02759623
+ 0.02246464 0.01936789 0.01591434 0.01452765]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07174909 0.0576005  0.04797758 0.04141052 0.03150997 0.02790015
+ 0.02209617 0.01891142 0.01665035 0.01488045]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07201533 0.0540723  0.04587488 0.04014614 0.02984984 0.02641465
+ 0.02240931 0.01921446 0.01620986 0.01440252]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07233027 0.05375015 0.04764357 0.04442422 0.03081914 0.02812276
+ 0.02247495 0.01960471 0.01685837 0.01544457]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.0733092  0.05518287 0.04800148 0.04356643 0.02994433 0.02742928
+ 0.02270689 0.01949572 0.01630666 0.01523715]
+[compute | SC] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[SC] topological null: nbins=10, n_rand=1000; null mean=+0.028 (geometry expectation), obs r_group=-0.040, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Limbic | SC] r_group=-0.040 [-0.051, -0.028] t=-7.03 p=1.477e-06 (subject-level) | p_moran=7.752e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Limbic | SC] targets/SN-vertex median=151 IQR=[75, 266] | frac SN vertices with <=10 targets: 0.03
+[compute | SC] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[SC] topological null: nbins=10, n_rand=1000; null mean=+0.251 (geometry expectation), obs r_group=+0.168, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Default | SC] r_group=+0.168 [+0.157, +0.179] t=+31.63 p=3.143e-17 (subject-level) | p_moran=1.638e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Default | SC] targets/SN-vertex median=238 IQR=[152, 350] | frac SN vertices with <=10 targets: 0.02
+[compute | SC] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[SC] topological null: nbins=10, n_rand=1000; null mean=+0.517 (geometry expectation), obs r_group=+0.519, p_topo=1.039e-01 (one-sided upper-tail)
+[compute | Cont | SC] r_group=+0.519 [+0.510, +0.527] t=+99.73 p=3.802e-26 (subject-level) | p_moran=2.997e-03 (spatial null) | p_topo=1.039e-01 (topological null) | n=19 (n_perm=1000)
+[sparsity | Cont | SC] targets/SN-vertex median=366 IQR=[253, 500] | frac SN vertices with <=10 targets: 0.04
+[compute | SC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[SC] topological null: nbins=10, n_rand=1000; null mean=-0.048 (geometry expectation), obs r_group=-0.046, p_topo=2.338e-01 (one-sided upper-tail)
+[compute | SalVentAttn | SC] r_group=-0.046 [-0.054, -0.039] t=-13.05 p=1.286e-10 (subject-level) | p_moran=4.925e-01 (spatial null) | p_topo=2.338e-01 (topological null) | n=19 (n_perm=1000)
+[sparsity | SalVentAttn | SC] targets/SN-vertex median=333 IQR=[198, 511] | frac SN vertices with <=10 targets: 0.00
+[compute | SC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[SC] topological null: nbins=10, n_rand=1000; null mean=+0.252 (geometry expectation), obs r_group=+0.164, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | DorsAttn | SC] r_group=+0.164 [+0.144, +0.184] t=+16.74 p=2.037e-12 (subject-level) | p_moran=2.887e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | DorsAttn | SC] targets/SN-vertex median=313 IQR=[206, 472] | frac SN vertices with <=10 targets: 0.00
+[compute | SC] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[SC] topological null: nbins=10, n_rand=1000; null mean=+0.089 (geometry expectation), obs r_group=+0.049, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Vis | SC] r_group=+0.049 [+0.022, +0.075] t=+3.88 p=1.108e-03 (subject-level) | p_moran=6.583e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Vis | SC] targets/SN-vertex median=80 IQR=[24, 149] | frac SN vertices with <=10 targets: 0.18
+[compute | SC] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[SC] topological null: nbins=10, n_rand=1000; null mean=-0.110 (geometry expectation), obs r_group=-0.021, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SomMot | SC] r_group=-0.021 [-0.036, -0.005] t=-2.72 p=1.403e-02 (subject-level) | p_moran=8.072e-01 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SomMot | SC] targets/SN-vertex median=176 IQR=[111, 292] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | SC | Limbic] q_moran=8.072e-01 q_topo=1.000e+00
+[compute FDR | SC | Default] q_moran=5.734e-01 q_topo=1.000e+00
+[compute FDR | SC | Cont] q_moran=2.098e-02 q_topo=3.636e-01
+[compute FDR | SC | SalVentAttn] q_moran=8.072e-01 q_topo=5.455e-01
+[compute FDR | SC | DorsAttn] q_moran=6.737e-01 q_topo=1.000e+00
+[compute FDR | SC | Vis] q_moran=8.072e-01 q_topo=1.000e+00
+[compute FDR | SC | SomMot] q_moran=8.072e-01 q_topo=6.993e-03
+[GD] preloading 19 connectomes once for reuse across networks...
+[compute | GD] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[compute | Limbic | GD] r_group=-0.001 [-0.005, +0.002] t=-0.76 p=4.585e-01 (subject-level) | p_moran=9.910e-01 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Limbic | GD] targets/SN-vertex median=4012 IQR=[4012, 4022] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[compute | Default | GD] r_group=+0.219 [+0.216, +0.223] t=+124.70 p=6.857e-28 (subject-level) | p_moran=9.990e-02 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Default | GD] targets/SN-vertex median=3175 IQR=[3175, 3485] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[compute | Cont | GD] r_group=+0.408 [+0.404, +0.412] t=+187.01 p=4.680e-31 (subject-level) | p_moran=9.790e-02 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Cont | GD] targets/SN-vertex median=3682 IQR=[3682, 3868] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[compute | SalVentAttn | GD] r_group=-0.068 [-0.071, -0.065] t=-46.16 p=3.782e-20 (subject-level) | p_moran=3.546e-01 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | SalVentAttn | GD] targets/SN-vertex median=3678 IQR=[3678, 3757] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[compute | DorsAttn | GD] r_group=+0.375 [+0.366, +0.384] t=+78.31 p=2.928e-24 (subject-level) | p_moran=8.991e-03 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | DorsAttn | GD] targets/SN-vertex median=3793 IQR=[3793, 3817] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[compute | Vis | GD] r_group=-0.151 [-0.162, -0.141] t=-29.56 p=1.039e-16 (subject-level) | p_moran=8.192e-02 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Vis | GD] targets/SN-vertex median=3624 IQR=[3623, 3624] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[compute | SomMot | GD] r_group=-0.094 [-0.102, -0.086] t=-25.21 p=1.712e-15 (subject-level) | p_moran=3.906e-01 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | SomMot | GD] targets/SN-vertex median=3390 IQR=[3390, 3458] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | GD | Limbic] q_moran=9.910e-01 q_topo=nan
+[compute FDR | GD | Default] q_moran=1.748e-01 q_topo=nan
+[compute FDR | GD | Cont] q_moran=1.748e-01 q_topo=nan
+[compute FDR | GD | SalVentAttn] q_moran=4.557e-01 q_topo=nan
+[compute FDR | GD | DorsAttn] q_moran=6.294e-02 q_topo=nan
+[compute FDR | GD | Vis] q_moran=1.748e-01 q_topo=nan
+[compute FDR | GD | SomMot] q_moran=4.557e-01 q_topo=nan
+[MPC] preloading 19 connectomes once for reuse across networks...
+[compute | MPC] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[MPC] topological null: nbins=10, n_rand=1000; null mean=-0.101 (geometry expectation), obs r_group=-0.290, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Limbic | MPC] r_group=-0.290 [-0.325, -0.255] t=-16.36 p=3.000e-12 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Limbic | MPC] targets/SN-vertex median=4043 IQR=[4016, 4067] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[MPC] topological null: nbins=10, n_rand=1000; null mean=+0.198 (geometry expectation), obs r_group=+0.359, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | Default | MPC] r_group=+0.359 [+0.340, +0.378] t=+35.79 p=3.514e-18 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | Default | MPC] targets/SN-vertex median=3318 IQR=[3300, 3334] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[MPC] topological null: nbins=10, n_rand=1000; null mean=+0.192 (geometry expectation), obs r_group=+0.364, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | Cont | MPC] r_group=+0.364 [+0.333, +0.394] t=+22.83 p=9.681e-15 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | Cont | MPC] targets/SN-vertex median=3790 IQR=[3760, 3813] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[MPC] topological null: nbins=10, n_rand=1000; null mean=+0.013 (geometry expectation), obs r_group=+0.086, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SalVentAttn | MPC] r_group=+0.086 [+0.063, +0.110] t=+7.66 p=4.551e-07 (subject-level) | p_moran=1.598e-02 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SalVentAttn | MPC] targets/SN-vertex median=3726 IQR=[3702, 3750] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[MPC] topological null: nbins=10, n_rand=1000; null mean=+0.244 (geometry expectation), obs r_group=+0.326, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | DorsAttn | MPC] r_group=+0.326 [+0.297, +0.354] t=+22.39 p=1.356e-14 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | DorsAttn | MPC] targets/SN-vertex median=3800 IQR=[3751, 3851] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[MPC] topological null: nbins=10, n_rand=1000; null mean=-0.144 (geometry expectation), obs r_group=-0.415, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Vis | MPC] r_group=-0.415 [-0.439, -0.390] t=-31.44 p=3.494e-17 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Vis | MPC] targets/SN-vertex median=3555 IQR=[3477, 3642] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[MPC] topological null: nbins=10, n_rand=1000; null mean=+0.240 (geometry expectation), obs r_group=+0.512, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SomMot | MPC] r_group=+0.512 [+0.480, +0.543] t=+27.95 p=2.795e-16 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SomMot | MPC] targets/SN-vertex median=3256 IQR=[3096, 3442] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | MPC | Limbic] q_moran=1.166e-03 q_topo=1.000e+00
+[compute FDR | MPC | Default] q_moran=1.166e-03 q_topo=1.399e-03
+[compute FDR | MPC | Cont] q_moran=1.166e-03 q_topo=1.399e-03
+[compute FDR | MPC | SalVentAttn] q_moran=1.598e-02 q_topo=1.399e-03
+[compute FDR | MPC | DorsAttn] q_moran=1.166e-03 q_topo=1.399e-03
+[compute FDR | MPC | Vis] q_moran=1.166e-03 q_topo=1.000e+00
+[compute FDR | MPC | SomMot] q_moran=1.166e-03 q_topo=1.399e-03
+[FC] preloading 18 connectomes once for reuse across networks...
+[compute | FC] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[FC] topological null: nbins=10, n_rand=1000; null mean=-0.022 (geometry expectation), obs r_group=-0.030, p_topo=9.031e-01 (one-sided upper-tail)
+[compute | Limbic | FC] r_group=-0.030 [-0.051, -0.009] t=-2.97 p=8.646e-03 (subject-level) | p_moran=4.136e-01 (spatial null) | p_topo=9.031e-01 (topological null) | n=18 (n_perm=1000)
+[sparsity | Limbic | FC] targets/SN-vertex median=3867 IQR=[3679, 3965] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[FC] topological null: nbins=10, n_rand=1000; null mean=+0.042 (geometry expectation), obs r_group=-0.089, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Default | FC] r_group=-0.089 [-0.114, -0.063] t=-7.23 p=1.409e-06 (subject-level) | p_moran=9.391e-02 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | Default | FC] targets/SN-vertex median=2608 IQR=[2336, 2979] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[FC] topological null: nbins=10, n_rand=1000; null mean=+0.218 (geometry expectation), obs r_group=-0.004, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Cont | FC] r_group=-0.004 [-0.055, +0.048] t=-0.15 p=8.793e-01 (subject-level) | p_moran=9.391e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | Cont | FC] targets/SN-vertex median=3184 IQR=[2897, 3452] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[FC] topological null: nbins=10, n_rand=1000; null mean=-0.015 (geometry expectation), obs r_group=+0.024, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SalVentAttn | FC] r_group=+0.024 [+0.001, +0.048] t=+2.19 p=4.302e-02 (subject-level) | p_moran=5.934e-01 (spatial null) | p_topo=9.990e-04 (topological null) | n=18 (n_perm=1000)
+[sparsity | SalVentAttn | FC] targets/SN-vertex median=3739 IQR=[3624, 3815] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[FC] topological null: nbins=10, n_rand=1000; null mean=+0.219 (geometry expectation), obs r_group=+0.162, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | DorsAttn | FC] r_group=+0.162 [+0.132, +0.192] t=+11.11 p=3.242e-09 (subject-level) | p_moran=1.099e-02 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | DorsAttn | FC] targets/SN-vertex median=3664 IQR=[3523, 3821] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[FC] topological null: nbins=10, n_rand=1000; null mean=+0.022 (geometry expectation), obs r_group=-0.080, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Vis | FC] r_group=-0.080 [-0.144, -0.015] t=-2.60 p=1.887e-02 (subject-level) | p_moran=5.395e-02 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | Vis | FC] targets/SN-vertex median=3380 IQR=[3281, 3511] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[FC] topological null: nbins=10, n_rand=1000; null mean=-0.065 (geometry expectation), obs r_group=-0.093, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | SomMot | FC] r_group=-0.093 [-0.157, -0.028] t=-3.01 p=7.912e-03 (subject-level) | p_moran=4.096e-02 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | SomMot | FC] targets/SN-vertex median=3153 IQR=[3033, 3324] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | FC | Limbic] q_moran=5.790e-01 q_topo=1.000e+00
+[compute FDR | FC | Default] q_moran=1.643e-01 q_topo=1.000e+00
+[compute FDR | FC | Cont] q_moran=9.391e-01 q_topo=1.000e+00
+[compute FDR | FC | SalVentAttn] q_moran=6.923e-01 q_topo=6.993e-03
+[compute FDR | FC | DorsAttn] q_moran=7.692e-02 q_topo=1.000e+00
+[compute FDR | FC | Vis] q_moran=1.259e-01 q_topo=1.000e+00
+[compute FDR | FC | SomMot] q_moran=1.259e-01 q_topo=1.000e+00
+[compute] figure-data caches written: df_2b_label_both.csv, df_2b_network_stats_*_both.csv, df_2b_network_subject_r_*_both.csv
+[SC] topological null: nbins=10, n_rand=1000; null mean=+0.827 (geometry expectation), obs r_group=+0.965, p_topo=9.990e-04 (one-sided upper-tail)
+[control | positive] obs r_group=+0.965, p_topo=9.990e-04 (expected reject)
+[SC] topological null: nbins=10, n_rand=1000; null mean=+0.863 (geometry expectation), obs r_group=+0.829, p_topo=1.000e+00 (one-sided upper-tail)
+[control | negative] obs r_group=+0.829, p_topo=1.000e+00 (expected n.s.)
+[control] topological-null control figure written to figure_2_supp_topo_control.svg
+[Figure 2A] scatter + lollipop figure written to figure_2a_distance_metric.svg
+[Figure 2B] bubble-matrix summary written to figure_2b_network_summary_both.svg
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-23 16:16:20
+  --hemi: both
+  --panel: both
+  --stage: both
+  --n_rand: 1000
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC/FC weights : positive connections only (weighted-mean projection)
+Null models    : Moran spectral randomisation (map smoothness, all measures) + geometry-preserving topological null (wiring specificity, SC/MPC/FC)
+Stage / panel  : stage=both, panel=both, hemi=both
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loaded cached fsLR-5k MPC gradient (t1_gradient1_SalVentAttn) from df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1028, n_edges=3998392, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+[FC gradient] flipped sign so the default-mode network sits at the low (default-mode) end.
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06507687 0.05652771 0.04587616 0.04080785 0.02930041 0.0248962
+ 0.02141152 0.01790186 0.01574277 0.01363902]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07213035 0.05670261 0.04671686 0.04262806 0.02975918 0.02759623
+ 0.02246464 0.01936789 0.01591434 0.01452765]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07174909 0.0576005  0.04797758 0.04141052 0.03150997 0.02790015
+ 0.02209617 0.01891142 0.01665035 0.01488045]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07201533 0.0540723  0.04587488 0.04014614 0.02984984 0.02641465
+ 0.02240931 0.01921446 0.01620986 0.01440252]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07233027 0.05375015 0.04764357 0.04442422 0.03081914 0.02812276
+ 0.02247495 0.01960471 0.01685837 0.01544457]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.0733092  0.05518287 0.04800148 0.04356643 0.02994433 0.02742928
+ 0.02270689 0.01949572 0.01630666 0.01523715]
+[compute | SC] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.028 (geometry expectation), obs r_group=-0.040, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Limbic | SC] r_group=-0.040 [-0.051, -0.028] t=-7.03 p=1.477e-06 (subject-level) | p_moran=7.752e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Limbic | SC] targets/SN-vertex median=151 IQR=[75, 266] | frac SN vertices with <=10 targets: 0.03
+[compute | SC] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.251 (geometry expectation), obs r_group=+0.168, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Default | SC] r_group=+0.168 [+0.157, +0.179] t=+31.63 p=3.143e-17 (subject-level) | p_moran=1.638e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Default | SC] targets/SN-vertex median=238 IQR=[152, 350] | frac SN vertices with <=10 targets: 0.02
+[compute | SC] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.517 (geometry expectation), obs r_group=+0.519, p_topo=1.039e-01 (one-sided upper-tail)
+[compute | Cont | SC] r_group=+0.519 [+0.510, +0.527] t=+99.73 p=3.802e-26 (subject-level) | p_moran=2.997e-03 (spatial null) | p_topo=1.039e-01 (topological null) | n=19 (n_perm=1000)
+[sparsity | Cont | SC] targets/SN-vertex median=366 IQR=[253, 500] | frac SN vertices with <=10 targets: 0.04
+[compute | SC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.250 (geometry expectation), obs r_group=+0.335, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SalVentAttn | SC] r_group=+0.335 [+0.326, +0.344] t=+71.67 p=1.433e-23 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SalVentAttn | SC] targets/SN-vertex median=333 IQR=[198, 511] | frac SN vertices with <=10 targets: 0.00
+[compute | SC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.252 (geometry expectation), obs r_group=+0.164, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | DorsAttn | SC] r_group=+0.164 [+0.144, +0.184] t=+16.74 p=2.037e-12 (subject-level) | p_moran=2.887e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | DorsAttn | SC] targets/SN-vertex median=313 IQR=[206, 472] | frac SN vertices with <=10 targets: 0.00
+[compute | SC] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.089 (geometry expectation), obs r_group=+0.049, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Vis | SC] r_group=+0.049 [+0.022, +0.075] t=+3.88 p=1.108e-03 (subject-level) | p_moran=6.583e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Vis | SC] targets/SN-vertex median=80 IQR=[24, 149] | frac SN vertices with <=10 targets: 0.18
+[compute | SC] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=-0.110 (geometry expectation), obs r_group=-0.021, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SomMot | SC] r_group=-0.021 [-0.036, -0.005] t=-2.72 p=1.403e-02 (subject-level) | p_moran=8.072e-01 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SomMot | SC] targets/SN-vertex median=176 IQR=[111, 292] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | SC | Limbic] q_moran=8.072e-01 q_topo=1.000e+00
+[compute FDR | SC | Default] q_moran=3.823e-01 q_topo=1.000e+00
+[compute FDR | SC | Cont] q_moran=1.049e-02 q_topo=2.424e-01
+[compute FDR | SC | SalVentAttn] q_moran=6.993e-03 q_topo=3.497e-03
+[compute FDR | SC | DorsAttn] q_moran=5.052e-01 q_topo=1.000e+00
+[compute FDR | SC | Vis] q_moran=8.072e-01 q_topo=1.000e+00
+[compute FDR | SC | SomMot] q_moran=8.072e-01 q_topo=3.497e-03
+[GD] preloading 19 connectomes once for reuse across networks...
+[compute | GD] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[compute | Limbic | GD] r_group=-0.001 [-0.005, +0.002] t=-0.76 p=4.585e-01 (subject-level) | p_moran=9.910e-01 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Limbic | GD] targets/SN-vertex median=4012 IQR=[4012, 4022] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[compute | Default | GD] r_group=+0.219 [+0.216, +0.223] t=+124.70 p=6.857e-28 (subject-level) | p_moran=9.990e-02 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Default | GD] targets/SN-vertex median=3175 IQR=[3175, 3485] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[compute | Cont | GD] r_group=+0.408 [+0.404, +0.412] t=+187.01 p=4.680e-31 (subject-level) | p_moran=9.790e-02 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Cont | GD] targets/SN-vertex median=3682 IQR=[3682, 3868] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[compute | SalVentAttn | GD] r_group=+0.308 [+0.304, +0.312] t=+152.30 p=1.880e-29 (subject-level) | p_moran=1.998e-03 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | SalVentAttn | GD] targets/SN-vertex median=3678 IQR=[3678, 3757] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[compute | DorsAttn | GD] r_group=+0.375 [+0.366, +0.384] t=+78.31 p=2.928e-24 (subject-level) | p_moran=8.991e-03 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | DorsAttn | GD] targets/SN-vertex median=3793 IQR=[3793, 3817] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[compute | Vis | GD] r_group=-0.151 [-0.162, -0.141] t=-29.56 p=1.039e-16 (subject-level) | p_moran=8.192e-02 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Vis | GD] targets/SN-vertex median=3624 IQR=[3623, 3624] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[compute | SomMot | GD] r_group=-0.094 [-0.102, -0.086] t=-25.21 p=1.712e-15 (subject-level) | p_moran=3.906e-01 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | SomMot | GD] targets/SN-vertex median=3390 IQR=[3390, 3458] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | GD | Limbic] q_moran=9.910e-01 q_topo=nan
+[compute FDR | GD | Default] q_moran=1.399e-01 q_topo=nan
+[compute FDR | GD | Cont] q_moran=1.399e-01 q_topo=nan
+[compute FDR | GD | SalVentAttn] q_moran=1.399e-02 q_topo=nan
+[compute FDR | GD | DorsAttn] q_moran=3.147e-02 q_topo=nan
+[compute FDR | GD | Vis] q_moran=1.399e-01 q_topo=nan
+[compute FDR | GD | SomMot] q_moran=4.557e-01 q_topo=nan
+[MPC] preloading 19 connectomes once for reuse across networks...
+[compute | MPC] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=-0.101 (geometry expectation), obs r_group=-0.290, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Limbic | MPC] r_group=-0.290 [-0.325, -0.255] t=-16.36 p=3.000e-12 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Limbic | MPC] targets/SN-vertex median=4043 IQR=[4016, 4067] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.199 (geometry expectation), obs r_group=+0.359, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | Default | MPC] r_group=+0.359 [+0.340, +0.378] t=+35.79 p=3.514e-18 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | Default | MPC] targets/SN-vertex median=3318 IQR=[3300, 3334] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.192 (geometry expectation), obs r_group=+0.364, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | Cont | MPC] r_group=+0.364 [+0.333, +0.394] t=+22.83 p=9.681e-15 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | Cont | MPC] targets/SN-vertex median=3790 IQR=[3760, 3813] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.276 (geometry expectation), obs r_group=+0.445, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SalVentAttn | MPC] r_group=+0.445 [+0.420, +0.469] t=+33.14 p=1.374e-17 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SalVentAttn | MPC] targets/SN-vertex median=3726 IQR=[3702, 3750] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.244 (geometry expectation), obs r_group=+0.326, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | DorsAttn | MPC] r_group=+0.326 [+0.297, +0.354] t=+22.39 p=1.356e-14 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | DorsAttn | MPC] targets/SN-vertex median=3800 IQR=[3751, 3851] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=-0.144 (geometry expectation), obs r_group=-0.415, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Vis | MPC] r_group=-0.415 [-0.439, -0.390] t=-31.44 p=3.494e-17 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Vis | MPC] targets/SN-vertex median=3555 IQR=[3477, 3642] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.240 (geometry expectation), obs r_group=+0.512, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SomMot | MPC] r_group=+0.512 [+0.480, +0.543] t=+27.95 p=2.795e-16 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SomMot | MPC] targets/SN-vertex median=3256 IQR=[3096, 3442] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | MPC | Limbic] q_moran=9.990e-04 q_topo=1.000e+00
+[compute FDR | MPC | Default] q_moran=9.990e-04 q_topo=1.399e-03
+[compute FDR | MPC | Cont] q_moran=9.990e-04 q_topo=1.399e-03
+[compute FDR | MPC | SalVentAttn] q_moran=9.990e-04 q_topo=1.399e-03
+[compute FDR | MPC | DorsAttn] q_moran=9.990e-04 q_topo=1.399e-03
+[compute FDR | MPC | Vis] q_moran=9.990e-04 q_topo=1.000e+00
+[compute FDR | MPC | SomMot] q_moran=9.990e-04 q_topo=1.399e-03
+[FC] preloading 18 connectomes once for reuse across networks...
+[compute | FC] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=-0.022 (geometry expectation), obs r_group=-0.030, p_topo=9.131e-01 (one-sided upper-tail)
+[compute | Limbic | FC] r_group=-0.030 [-0.051, -0.009] t=-2.97 p=8.646e-03 (subject-level) | p_moran=4.136e-01 (spatial null) | p_topo=9.131e-01 (topological null) | n=18 (n_perm=1000)
+[sparsity | Limbic | FC] targets/SN-vertex median=3867 IQR=[3679, 3965] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.042 (geometry expectation), obs r_group=-0.089, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Default | FC] r_group=-0.089 [-0.114, -0.063] t=-7.23 p=1.409e-06 (subject-level) | p_moran=9.391e-02 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | Default | FC] targets/SN-vertex median=2608 IQR=[2336, 2979] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.218 (geometry expectation), obs r_group=-0.004, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Cont | FC] r_group=-0.004 [-0.055, +0.048] t=-0.15 p=8.793e-01 (subject-level) | p_moran=9.391e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | Cont | FC] targets/SN-vertex median=3184 IQR=[2897, 3452] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.114 (geometry expectation), obs r_group=+0.129, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SalVentAttn | FC] r_group=+0.129 [+0.101, +0.156] t=+9.79 p=2.119e-08 (subject-level) | p_moran=2.897e-02 (spatial null) | p_topo=9.990e-04 (topological null) | n=18 (n_perm=1000)
+[sparsity | SalVentAttn | FC] targets/SN-vertex median=3739 IQR=[3624, 3815] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.219 (geometry expectation), obs r_group=+0.162, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | DorsAttn | FC] r_group=+0.162 [+0.132, +0.192] t=+11.11 p=3.242e-09 (subject-level) | p_moran=1.099e-02 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | DorsAttn | FC] targets/SN-vertex median=3664 IQR=[3523, 3821] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.022 (geometry expectation), obs r_group=-0.080, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Vis | FC] r_group=-0.080 [-0.144, -0.015] t=-2.60 p=1.887e-02 (subject-level) | p_moran=5.395e-02 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | Vis | FC] targets/SN-vertex median=3380 IQR=[3281, 3511] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=-0.065 (geometry expectation), obs r_group=-0.093, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | SomMot | FC] r_group=-0.093 [-0.157, -0.028] t=-3.01 p=7.912e-03 (subject-level) | p_moran=4.096e-02 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | SomMot | FC] targets/SN-vertex median=3153 IQR=[3033, 3324] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | FC | Limbic] q_moran=4.825e-01 q_topo=1.000e+00
+[compute FDR | FC | Default] q_moran=1.315e-01 q_topo=1.000e+00
+[compute FDR | FC | Cont] q_moran=9.391e-01 q_topo=1.000e+00
+[compute FDR | FC | SalVentAttn] q_moran=9.441e-02 q_topo=6.993e-03
+[compute FDR | FC | DorsAttn] q_moran=7.692e-02 q_topo=1.000e+00
+[compute FDR | FC | Vis] q_moran=9.441e-02 q_topo=1.000e+00
+[compute FDR | FC | SomMot] q_moran=9.441e-02 q_topo=1.000e+00
+[compute] figure-data caches written: df_2b_label_both.csv, df_2b_network_stats_*_both.csv, df_2b_network_subject_r_*_both.csv
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.827 (geometry expectation), obs r_group=+0.965, p_topo=9.990e-04 (one-sided upper-tail)
+[control | positive] obs r_group=+0.965, p_topo=9.990e-04 (expected reject)
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.863 (geometry expectation), obs r_group=+0.829, p_topo=1.000e+00 (one-sided upper-tail)
+[control | negative] obs r_group=+0.829, p_topo=1.000e+00 (expected n.s.)
+[control] topological-null control figure written to figure_2_supp_topo_control.svg
+[Figure 2A] scatter + lollipop figure written to figure_2a_distance_metric.svg
+[Figure 2B] bubble-matrix summary written to figure_2b_network_summary_both.svg
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-23 18:26:54
+  --hemi: both
+  --panel: both
+  --stage: both
+  --n_rand: 1000
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC/FC weights : positive connections only (weighted-mean projection)
+Null models    : Moran spectral randomisation (map smoothness, all measures) + geometry-preserving topological null (wiring specificity, SC/MPC/FC)
+Stage / panel  : stage=both, panel=both, hemi=both
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loaded cached fsLR-5k MPC gradient (t1_gradient1_SalVentAttn) from df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1028, n_edges=3998392, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+[FC gradient] flipped sign so the default-mode network sits at the low (default-mode) end.
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06507687 0.05652771 0.04587616 0.04080785 0.02930041 0.0248962
+ 0.02141152 0.01790186 0.01574277 0.01363902]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07213035 0.05670261 0.04671686 0.04262806 0.02975918 0.02759623
+ 0.02246464 0.01936789 0.01591434 0.01452765]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07174909 0.0576005  0.04797758 0.04141052 0.03150997 0.02790015
+ 0.02209617 0.01891142 0.01665035 0.01488045]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07201533 0.0540723  0.04587488 0.04014614 0.02984984 0.02641465
+ 0.02240931 0.01921446 0.01620986 0.01440252]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07233027 0.05375015 0.04764357 0.04442422 0.03081914 0.02812276
+ 0.02247495 0.01960471 0.01685837 0.01544457]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.0733092  0.05518287 0.04800148 0.04356643 0.02994433 0.02742928
+ 0.02270689 0.01949572 0.01630666 0.01523715]
+[compute | SC] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.028 (geometry expectation), obs r_group=-0.040, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Limbic | SC] r_group=-0.040 [-0.051, -0.028] t=-7.03 p=1.477e-06 (subject-level) | p_moran=7.752e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Limbic | SC] targets/SN-vertex median=151 IQR=[75, 266] | frac SN vertices with <=10 targets: 0.03
+[compute | SC] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.251 (geometry expectation), obs r_group=+0.168, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Default | SC] r_group=+0.168 [+0.157, +0.179] t=+31.63 p=3.143e-17 (subject-level) | p_moran=1.638e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Default | SC] targets/SN-vertex median=238 IQR=[152, 350] | frac SN vertices with <=10 targets: 0.02
+[compute | SC] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.517 (geometry expectation), obs r_group=+0.519, p_topo=1.039e-01 (one-sided upper-tail)
+[compute | Cont | SC] r_group=+0.519 [+0.510, +0.527] t=+99.73 p=3.802e-26 (subject-level) | p_moran=2.997e-03 (spatial null) | p_topo=1.039e-01 (topological null) | n=19 (n_perm=1000)
+[sparsity | Cont | SC] targets/SN-vertex median=366 IQR=[253, 500] | frac SN vertices with <=10 targets: 0.04
+[compute | SC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.250 (geometry expectation), obs r_group=+0.335, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SalVentAttn | SC] r_group=+0.335 [+0.326, +0.344] t=+71.67 p=1.433e-23 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SalVentAttn | SC] targets/SN-vertex median=333 IQR=[198, 511] | frac SN vertices with <=10 targets: 0.00
+[compute | SC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.252 (geometry expectation), obs r_group=+0.164, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | DorsAttn | SC] r_group=+0.164 [+0.144, +0.184] t=+16.74 p=2.037e-12 (subject-level) | p_moran=2.887e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | DorsAttn | SC] targets/SN-vertex median=313 IQR=[206, 472] | frac SN vertices with <=10 targets: 0.00
+[compute | SC] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.089 (geometry expectation), obs r_group=+0.049, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Vis | SC] r_group=+0.049 [+0.022, +0.075] t=+3.88 p=1.108e-03 (subject-level) | p_moran=6.583e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Vis | SC] targets/SN-vertex median=80 IQR=[24, 149] | frac SN vertices with <=10 targets: 0.18
+[compute | SC] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=-0.110 (geometry expectation), obs r_group=-0.021, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SomMot | SC] r_group=-0.021 [-0.036, -0.005] t=-2.72 p=1.403e-02 (subject-level) | p_moran=8.072e-01 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SomMot | SC] targets/SN-vertex median=176 IQR=[111, 292] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | SC | Limbic] q_moran=8.072e-01 q_topo=1.000e+00
+[compute FDR | SC | Default] q_moran=3.823e-01 q_topo=1.000e+00
+[compute FDR | SC | Cont] q_moran=1.049e-02 q_topo=2.424e-01
+[compute FDR | SC | SalVentAttn] q_moran=6.993e-03 q_topo=3.497e-03
+[compute FDR | SC | DorsAttn] q_moran=5.052e-01 q_topo=1.000e+00
+[compute FDR | SC | Vis] q_moran=8.072e-01 q_topo=1.000e+00
+[compute FDR | SC | SomMot] q_moran=8.072e-01 q_topo=3.497e-03
+[GD] preloading 19 connectomes once for reuse across networks...
+[compute | GD] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[compute | Limbic | GD] r_group=-0.001 [-0.005, +0.002] t=-0.76 p=4.585e-01 (subject-level) | p_moran=9.910e-01 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Limbic | GD] targets/SN-vertex median=4012 IQR=[4012, 4022] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[compute | Default | GD] r_group=+0.219 [+0.216, +0.223] t=+124.70 p=6.857e-28 (subject-level) | p_moran=9.990e-02 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Default | GD] targets/SN-vertex median=3175 IQR=[3175, 3485] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[compute | Cont | GD] r_group=+0.408 [+0.404, +0.412] t=+187.01 p=4.680e-31 (subject-level) | p_moran=9.790e-02 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Cont | GD] targets/SN-vertex median=3682 IQR=[3682, 3868] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[compute | SalVentAttn | GD] r_group=+0.308 [+0.304, +0.312] t=+152.30 p=1.880e-29 (subject-level) | p_moran=1.998e-03 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | SalVentAttn | GD] targets/SN-vertex median=3678 IQR=[3678, 3757] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[compute | DorsAttn | GD] r_group=+0.375 [+0.366, +0.384] t=+78.31 p=2.928e-24 (subject-level) | p_moran=8.991e-03 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | DorsAttn | GD] targets/SN-vertex median=3793 IQR=[3793, 3817] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[compute | Vis | GD] r_group=-0.151 [-0.162, -0.141] t=-29.56 p=1.039e-16 (subject-level) | p_moran=8.192e-02 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Vis | GD] targets/SN-vertex median=3624 IQR=[3623, 3624] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[compute | SomMot | GD] r_group=-0.094 [-0.102, -0.086] t=-25.21 p=1.712e-15 (subject-level) | p_moran=3.906e-01 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | SomMot | GD] targets/SN-vertex median=3390 IQR=[3390, 3458] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | GD | Limbic] q_moran=9.910e-01 q_topo=nan
+[compute FDR | GD | Default] q_moran=1.399e-01 q_topo=nan
+[compute FDR | GD | Cont] q_moran=1.399e-01 q_topo=nan
+[compute FDR | GD | SalVentAttn] q_moran=1.399e-02 q_topo=nan
+[compute FDR | GD | DorsAttn] q_moran=3.147e-02 q_topo=nan
+[compute FDR | GD | Vis] q_moran=1.399e-01 q_topo=nan
+[compute FDR | GD | SomMot] q_moran=4.557e-01 q_topo=nan
+[MPC] preloading 19 connectomes once for reuse across networks...
+[compute | MPC] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=-0.101 (geometry expectation), obs r_group=-0.290, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Limbic | MPC] r_group=-0.290 [-0.325, -0.255] t=-16.36 p=3.000e-12 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Limbic | MPC] targets/SN-vertex median=4043 IQR=[4016, 4067] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.199 (geometry expectation), obs r_group=+0.359, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | Default | MPC] r_group=+0.359 [+0.340, +0.378] t=+35.79 p=3.514e-18 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | Default | MPC] targets/SN-vertex median=3318 IQR=[3300, 3334] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.192 (geometry expectation), obs r_group=+0.364, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | Cont | MPC] r_group=+0.364 [+0.333, +0.394] t=+22.83 p=9.681e-15 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | Cont | MPC] targets/SN-vertex median=3790 IQR=[3760, 3813] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.276 (geometry expectation), obs r_group=+0.445, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SalVentAttn | MPC] r_group=+0.445 [+0.420, +0.469] t=+33.14 p=1.374e-17 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SalVentAttn | MPC] targets/SN-vertex median=3726 IQR=[3702, 3750] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.244 (geometry expectation), obs r_group=+0.326, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | DorsAttn | MPC] r_group=+0.326 [+0.297, +0.354] t=+22.39 p=1.356e-14 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | DorsAttn | MPC] targets/SN-vertex median=3800 IQR=[3751, 3851] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=-0.144 (geometry expectation), obs r_group=-0.415, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Vis | MPC] r_group=-0.415 [-0.439, -0.390] t=-31.44 p=3.494e-17 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Vis | MPC] targets/SN-vertex median=3555 IQR=[3477, 3642] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.240 (geometry expectation), obs r_group=+0.512, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SomMot | MPC] r_group=+0.512 [+0.480, +0.543] t=+27.95 p=2.795e-16 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SomMot | MPC] targets/SN-vertex median=3256 IQR=[3096, 3442] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | MPC | Limbic] q_moran=9.990e-04 q_topo=1.000e+00
+[compute FDR | MPC | Default] q_moran=9.990e-04 q_topo=1.399e-03
+[compute FDR | MPC | Cont] q_moran=9.990e-04 q_topo=1.399e-03
+[compute FDR | MPC | SalVentAttn] q_moran=9.990e-04 q_topo=1.399e-03
+[compute FDR | MPC | DorsAttn] q_moran=9.990e-04 q_topo=1.399e-03
+[compute FDR | MPC | Vis] q_moran=9.990e-04 q_topo=1.000e+00
+[compute FDR | MPC | SomMot] q_moran=9.990e-04 q_topo=1.399e-03
+[FC] preloading 18 connectomes once for reuse across networks...
+[compute | FC] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=-0.022 (geometry expectation), obs r_group=-0.030, p_topo=9.131e-01 (one-sided upper-tail)
+[compute | Limbic | FC] r_group=-0.030 [-0.051, -0.009] t=-2.97 p=8.646e-03 (subject-level) | p_moran=4.136e-01 (spatial null) | p_topo=9.131e-01 (topological null) | n=18 (n_perm=1000)
+[sparsity | Limbic | FC] targets/SN-vertex median=3867 IQR=[3679, 3965] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.042 (geometry expectation), obs r_group=-0.089, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Default | FC] r_group=-0.089 [-0.114, -0.063] t=-7.23 p=1.409e-06 (subject-level) | p_moran=9.391e-02 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | Default | FC] targets/SN-vertex median=2608 IQR=[2336, 2979] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.218 (geometry expectation), obs r_group=-0.004, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Cont | FC] r_group=-0.004 [-0.055, +0.048] t=-0.15 p=8.793e-01 (subject-level) | p_moran=9.391e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | Cont | FC] targets/SN-vertex median=3184 IQR=[2897, 3452] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.114 (geometry expectation), obs r_group=+0.129, p_topo=9.990e-04 (one-sided upper-tail)
+[compute | SalVentAttn | FC] r_group=+0.129 [+0.101, +0.156] t=+9.79 p=2.119e-08 (subject-level) | p_moran=2.897e-02 (spatial null) | p_topo=9.990e-04 (topological null) | n=18 (n_perm=1000)
+[sparsity | SalVentAttn | FC] targets/SN-vertex median=3739 IQR=[3624, 3815] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.219 (geometry expectation), obs r_group=+0.162, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | DorsAttn | FC] r_group=+0.162 [+0.132, +0.192] t=+11.11 p=3.242e-09 (subject-level) | p_moran=1.099e-02 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | DorsAttn | FC] targets/SN-vertex median=3664 IQR=[3523, 3821] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.022 (geometry expectation), obs r_group=-0.080, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | Vis | FC] r_group=-0.080 [-0.144, -0.015] t=-2.60 p=1.887e-02 (subject-level) | p_moran=5.395e-02 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | Vis | FC] targets/SN-vertex median=3380 IQR=[3281, 3511] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=-0.065 (geometry expectation), obs r_group=-0.093, p_topo=1.000e+00 (one-sided upper-tail)
+[compute | SomMot | FC] r_group=-0.093 [-0.157, -0.028] t=-3.01 p=7.912e-03 (subject-level) | p_moran=4.096e-02 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | SomMot | FC] targets/SN-vertex median=3153 IQR=[3033, 3324] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | FC | Limbic] q_moran=4.825e-01 q_topo=1.000e+00
+[compute FDR | FC | Default] q_moran=1.315e-01 q_topo=1.000e+00
+[compute FDR | FC | Cont] q_moran=9.391e-01 q_topo=1.000e+00
+[compute FDR | FC | SalVentAttn] q_moran=9.441e-02 q_topo=6.993e-03
+[compute FDR | FC | DorsAttn] q_moran=7.692e-02 q_topo=1.000e+00
+[compute FDR | FC | Vis] q_moran=9.441e-02 q_topo=1.000e+00
+[compute FDR | FC | SomMot] q_moran=9.441e-02 q_topo=1.000e+00
+[compute] figure-data caches written: df_2b_label_both.csv, df_2b_network_stats_*_both.csv, df_2b_network_subject_r_*_both.csv
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.827 (geometry expectation), obs r_group=+0.965, p_topo=9.990e-04 (one-sided upper-tail)
+[control | positive] obs r_group=+0.965, p_topo=9.990e-04 (expected reject)
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.863 (geometry expectation), obs r_group=+0.829, p_topo=1.000e+00 (one-sided upper-tail)
+[control | negative] obs r_group=+0.829, p_topo=1.000e+00 (expected n.s.)
+[control] topological-null control figure written to figure_2_supp_topo_control.svg
+[Figure 2A] scatter + lollipop figure written to figure_2a_distance_metric.svg
+[Figure 2B] bubble-matrix summary written to figure_2b_network_summary_both.svg
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-25 17:45:15
+  --hemi: both
+  --panel: both
+  --stage: compute
+  --n_rand: 1000
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC/FC weights : positive connections only (weighted-mean projection)
+Null models    : Moran spectral randomisation (map smoothness, all measures) + geometry-preserving topological null (wiring specificity, SC/MPC/FC)
+Stage / panel  : stage=compute, panel=both, hemi=both
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loaded cached fsLR-5k MPC gradient (t1_gradient1_SalVentAttn) from df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1028, n_edges=3998392, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+[FC gradient] flipped sign so the default-mode network sits at the low (default-mode) end.
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06507687 0.05652771 0.04587616 0.04080785 0.02930041 0.0248962
+ 0.02141152 0.01790186 0.01574277 0.01363902]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07213035 0.05670261 0.04671686 0.04262806 0.02975918 0.02759623
+ 0.02246464 0.01936789 0.01591434 0.01452765]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07174909 0.0576005  0.04797758 0.04141052 0.03150997 0.02790015
+ 0.02209617 0.01891142 0.01665035 0.01488045]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07201533 0.0540723  0.04587488 0.04014614 0.02984984 0.02641465
+ 0.02240931 0.01921446 0.01620986 0.01440252]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07233027 0.05375015 0.04764357 0.04442422 0.03081914 0.02812276
+ 0.02247495 0.01960471 0.01685837 0.01544457]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.0733092  0.05518287 0.04800148 0.04356643 0.02994433 0.02742928
+ 0.02270689 0.01949572 0.01630666 0.01523715]
+[compute | SC] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.028 (geometry expectation), obs r_group=-0.040, p_topo=9.990e-04 (excess-magnitude)
+[compute | Limbic | SC] r_group=-0.040 [-0.051, -0.028] t=-7.03 p=1.477e-06 (subject-level) | p_moran=7.752e-01 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | Limbic | SC] targets/SN-vertex median=151 IQR=[75, 266] | frac SN vertices with <=10 targets: 0.03
+[compute | SC] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.251 (geometry expectation), obs r_group=+0.168, p_topo=1.000e+00 (excess-magnitude)
+[compute | Default | SC] r_group=+0.168 [+0.157, +0.179] t=+31.63 p=3.143e-17 (subject-level) | p_moran=1.638e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Default | SC] targets/SN-vertex median=238 IQR=[152, 350] | frac SN vertices with <=10 targets: 0.02
+[compute | SC] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.517 (geometry expectation), obs r_group=+0.519, p_topo=1.039e-01 (excess-magnitude)
+[compute | Cont | SC] r_group=+0.519 [+0.510, +0.527] t=+99.73 p=3.802e-26 (subject-level) | p_moran=2.997e-03 (spatial null) | p_topo=1.039e-01 (topological null) | n=19 (n_perm=1000)
+[sparsity | Cont | SC] targets/SN-vertex median=366 IQR=[253, 500] | frac SN vertices with <=10 targets: 0.04
+[compute | SC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.250 (geometry expectation), obs r_group=+0.335, p_topo=9.990e-04 (excess-magnitude)
+[compute | SalVentAttn | SC] r_group=+0.335 [+0.326, +0.344] t=+71.67 p=1.433e-23 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SalVentAttn | SC] targets/SN-vertex median=333 IQR=[198, 511] | frac SN vertices with <=10 targets: 0.00
+[compute | SC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.252 (geometry expectation), obs r_group=+0.164, p_topo=1.000e+00 (excess-magnitude)
+[compute | DorsAttn | SC] r_group=+0.164 [+0.144, +0.184] t=+16.74 p=2.037e-12 (subject-level) | p_moran=2.887e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | DorsAttn | SC] targets/SN-vertex median=313 IQR=[206, 472] | frac SN vertices with <=10 targets: 0.00
+[compute | SC] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.089 (geometry expectation), obs r_group=+0.049, p_topo=1.000e+00 (excess-magnitude)
+[compute | Vis | SC] r_group=+0.049 [+0.022, +0.075] t=+3.88 p=1.108e-03 (subject-level) | p_moran=6.583e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | Vis | SC] targets/SN-vertex median=80 IQR=[24, 149] | frac SN vertices with <=10 targets: 0.18
+[compute | SC] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=-0.110 (geometry expectation), obs r_group=-0.021, p_topo=1.000e+00 (excess-magnitude)
+[compute | SomMot | SC] r_group=-0.021 [-0.036, -0.005] t=-2.72 p=1.403e-02 (subject-level) | p_moran=8.072e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=19 (n_perm=1000)
+[sparsity | SomMot | SC] targets/SN-vertex median=176 IQR=[111, 292] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | SC | Limbic] q_moran=8.072e-01 q_topo=3.497e-03
+[compute FDR | SC | Default] q_moran=3.823e-01 q_topo=1.000e+00
+[compute FDR | SC | Cont] q_moran=1.049e-02 q_topo=2.424e-01
+[compute FDR | SC | SalVentAttn] q_moran=6.993e-03 q_topo=3.497e-03
+[compute FDR | SC | DorsAttn] q_moran=5.052e-01 q_topo=1.000e+00
+[compute FDR | SC | Vis] q_moran=8.072e-01 q_topo=1.000e+00
+[compute FDR | SC | SomMot] q_moran=8.072e-01 q_topo=1.000e+00
+[GD] preloading 19 connectomes once for reuse across networks...
+[compute | GD] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[compute | Limbic | GD] r_group=-0.001 [-0.005, +0.002] t=-0.76 p=4.585e-01 (subject-level) | p_moran=9.910e-01 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Limbic | GD] targets/SN-vertex median=4012 IQR=[4012, 4022] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[compute | Default | GD] r_group=+0.219 [+0.216, +0.223] t=+124.70 p=6.857e-28 (subject-level) | p_moran=9.990e-02 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Default | GD] targets/SN-vertex median=3175 IQR=[3175, 3485] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[compute | Cont | GD] r_group=+0.408 [+0.404, +0.412] t=+187.01 p=4.680e-31 (subject-level) | p_moran=9.790e-02 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Cont | GD] targets/SN-vertex median=3682 IQR=[3682, 3868] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[compute | SalVentAttn | GD] r_group=+0.308 [+0.304, +0.312] t=+152.30 p=1.880e-29 (subject-level) | p_moran=1.998e-03 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | SalVentAttn | GD] targets/SN-vertex median=3678 IQR=[3678, 3757] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[compute | DorsAttn | GD] r_group=+0.375 [+0.366, +0.384] t=+78.31 p=2.928e-24 (subject-level) | p_moran=8.991e-03 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | DorsAttn | GD] targets/SN-vertex median=3793 IQR=[3793, 3817] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[compute | Vis | GD] r_group=-0.151 [-0.162, -0.141] t=-29.56 p=1.039e-16 (subject-level) | p_moran=8.192e-02 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | Vis | GD] targets/SN-vertex median=3624 IQR=[3623, 3624] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[compute | SomMot | GD] r_group=-0.094 [-0.102, -0.086] t=-25.21 p=1.712e-15 (subject-level) | p_moran=3.906e-01 (spatial null) | p_topo=nan (topological null) | n=19 (n_perm=1000)
+[sparsity | SomMot | GD] targets/SN-vertex median=3390 IQR=[3390, 3458] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | GD | Limbic] q_moran=9.910e-01 q_topo=nan
+[compute FDR | GD | Default] q_moran=1.399e-01 q_topo=nan
+[compute FDR | GD | Cont] q_moran=1.399e-01 q_topo=nan
+[compute FDR | GD | SalVentAttn] q_moran=1.399e-02 q_topo=nan
+[compute FDR | GD | DorsAttn] q_moran=3.147e-02 q_topo=nan
+[compute FDR | GD | Vis] q_moran=1.399e-01 q_topo=nan
+[compute FDR | GD | SomMot] q_moran=4.557e-01 q_topo=nan
+[MPC] preloading 19 connectomes once for reuse across networks...
+[compute | MPC] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=-0.101 (geometry expectation), obs r_group=-0.290, p_topo=9.990e-04 (excess-magnitude)
+[compute | Limbic | MPC] r_group=-0.290 [-0.325, -0.255] t=-16.36 p=3.000e-12 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | Limbic | MPC] targets/SN-vertex median=4043 IQR=[4016, 4067] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.199 (geometry expectation), obs r_group=+0.359, p_topo=9.990e-04 (excess-magnitude)
+[compute | Default | MPC] r_group=+0.359 [+0.340, +0.378] t=+35.79 p=3.514e-18 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | Default | MPC] targets/SN-vertex median=3318 IQR=[3300, 3334] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.192 (geometry expectation), obs r_group=+0.364, p_topo=9.990e-04 (excess-magnitude)
+[compute | Cont | MPC] r_group=+0.364 [+0.333, +0.394] t=+22.83 p=9.681e-15 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | Cont | MPC] targets/SN-vertex median=3790 IQR=[3760, 3813] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.276 (geometry expectation), obs r_group=+0.445, p_topo=9.990e-04 (excess-magnitude)
+[compute | SalVentAttn | MPC] r_group=+0.445 [+0.420, +0.469] t=+33.14 p=1.374e-17 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SalVentAttn | MPC] targets/SN-vertex median=3726 IQR=[3702, 3750] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.244 (geometry expectation), obs r_group=+0.326, p_topo=9.990e-04 (excess-magnitude)
+[compute | DorsAttn | MPC] r_group=+0.326 [+0.297, +0.354] t=+22.39 p=1.356e-14 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | DorsAttn | MPC] targets/SN-vertex median=3800 IQR=[3751, 3851] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=-0.144 (geometry expectation), obs r_group=-0.415, p_topo=9.990e-04 (excess-magnitude)
+[compute | Vis | MPC] r_group=-0.415 [-0.439, -0.390] t=-31.44 p=3.494e-17 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | Vis | MPC] targets/SN-vertex median=3555 IQR=[3477, 3642] | frac SN vertices with <=10 targets: 0.00
+[compute | MPC] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[MPC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.240 (geometry expectation), obs r_group=+0.512, p_topo=9.990e-04 (excess-magnitude)
+[compute | SomMot | MPC] r_group=+0.512 [+0.480, +0.543] t=+27.95 p=2.795e-16 (subject-level) | p_moran=9.990e-04 (spatial null) | p_topo=9.990e-04 (topological null) | n=19 (n_perm=1000)
+[sparsity | SomMot | MPC] targets/SN-vertex median=3256 IQR=[3096, 3442] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | MPC | Limbic] q_moran=9.990e-04 q_topo=9.990e-04
+[compute FDR | MPC | Default] q_moran=9.990e-04 q_topo=9.990e-04
+[compute FDR | MPC | Cont] q_moran=9.990e-04 q_topo=9.990e-04
+[compute FDR | MPC | SalVentAttn] q_moran=9.990e-04 q_topo=9.990e-04
+[compute FDR | MPC | DorsAttn] q_moran=9.990e-04 q_topo=9.990e-04
+[compute FDR | MPC | Vis] q_moran=9.990e-04 q_topo=9.990e-04
+[compute FDR | MPC | SomMot] q_moran=9.990e-04 q_topo=9.990e-04
+[FC] preloading 18 connectomes once for reuse across networks...
+[compute | FC] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=-0.022 (geometry expectation), obs r_group=-0.030, p_topo=8.791e-02 (excess-magnitude)
+[compute | Limbic | FC] r_group=-0.030 [-0.051, -0.009] t=-2.97 p=8.646e-03 (subject-level) | p_moran=4.136e-01 (spatial null) | p_topo=8.791e-02 (topological null) | n=18 (n_perm=1000)
+[sparsity | Limbic | FC] targets/SN-vertex median=3867 IQR=[3679, 3965] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.042 (geometry expectation), obs r_group=-0.089, p_topo=9.990e-04 (excess-magnitude)
+[compute | Default | FC] r_group=-0.089 [-0.114, -0.063] t=-7.23 p=1.409e-06 (subject-level) | p_moran=9.391e-02 (spatial null) | p_topo=9.990e-04 (topological null) | n=18 (n_perm=1000)
+[sparsity | Default | FC] targets/SN-vertex median=2608 IQR=[2336, 2979] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.218 (geometry expectation), obs r_group=-0.004, p_topo=1.000e+00 (excess-magnitude)
+[compute | Cont | FC] r_group=-0.004 [-0.055, +0.048] t=-0.15 p=8.793e-01 (subject-level) | p_moran=9.391e-01 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | Cont | FC] targets/SN-vertex median=3184 IQR=[2897, 3452] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.114 (geometry expectation), obs r_group=+0.129, p_topo=9.990e-04 (excess-magnitude)
+[compute | SalVentAttn | FC] r_group=+0.129 [+0.101, +0.156] t=+9.79 p=2.119e-08 (subject-level) | p_moran=2.897e-02 (spatial null) | p_topo=9.990e-04 (topological null) | n=18 (n_perm=1000)
+[sparsity | SalVentAttn | FC] targets/SN-vertex median=3739 IQR=[3624, 3815] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.219 (geometry expectation), obs r_group=+0.162, p_topo=1.000e+00 (excess-magnitude)
+[compute | DorsAttn | FC] r_group=+0.162 [+0.132, +0.192] t=+11.11 p=3.242e-09 (subject-level) | p_moran=1.099e-02 (spatial null) | p_topo=1.000e+00 (topological null) | n=18 (n_perm=1000)
+[sparsity | DorsAttn | FC] targets/SN-vertex median=3664 IQR=[3523, 3821] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=+0.022 (geometry expectation), obs r_group=-0.080, p_topo=9.990e-04 (excess-magnitude)
+[compute | Vis | FC] r_group=-0.080 [-0.144, -0.015] t=-2.60 p=1.887e-02 (subject-level) | p_moran=5.395e-02 (spatial null) | p_topo=9.990e-04 (topological null) | n=18 (n_perm=1000)
+[sparsity | Vis | FC] targets/SN-vertex median=3380 IQR=[3281, 3511] | frac SN vertices with <=10 targets: 0.00
+[compute | FC] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[FC] topological null (clt): nbins=10, n_rand=1000; null mean=-0.065 (geometry expectation), obs r_group=-0.093, p_topo=9.990e-04 (excess-magnitude)
+[compute | SomMot | FC] r_group=-0.093 [-0.157, -0.028] t=-3.01 p=7.912e-03 (subject-level) | p_moran=4.096e-02 (spatial null) | p_topo=9.990e-04 (topological null) | n=18 (n_perm=1000)
+[sparsity | SomMot | FC] targets/SN-vertex median=3153 IQR=[3033, 3324] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | FC | Limbic] q_moran=4.825e-01 q_topo=1.231e-01
+[compute FDR | FC | Default] q_moran=1.315e-01 q_topo=1.748e-03
+[compute FDR | FC | Cont] q_moran=9.391e-01 q_topo=1.000e+00
+[compute FDR | FC | SalVentAttn] q_moran=9.441e-02 q_topo=1.748e-03
+[compute FDR | FC | DorsAttn] q_moran=7.692e-02 q_topo=1.000e+00
+[compute FDR | FC | Vis] q_moran=9.441e-02 q_topo=1.748e-03
+[compute FDR | FC | SomMot] q_moran=9.441e-02 q_topo=1.748e-03
+[compute] figure-data caches written: df_2b_label_both.csv, df_2b_network_stats_*_both.csv, df_2b_network_subject_r_*_both.csv
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.827 (geometry expectation), obs r_group=+0.965, p_topo=9.990e-04 (excess-magnitude)
+[control | positive] obs r_group=+0.965, p_topo=9.990e-04 (expected reject)
+[SC] topological null (exact): nbins=10, n_rand=1000; null mean=+0.863 (geometry expectation), obs r_group=+0.829, p_topo=1.000e+00 (excess-magnitude)
+[control | negative] obs r_group=+0.829, p_topo=1.000e+00 (expected n.s.)
+[control] topological-null control figure written to figure_2_supp_topo_control.svg
+save_brain_map: figure_2a_brain_SC_rho.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2a_brain_SC_rho.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2a_brain_GD_rho.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2a_brain_GD_rho.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2a_brain_MPC_rho.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2a_brain_MPC_rho.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2a_brain_FC_rho.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2a_brain_FC_rho.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+[Figure 2A] scatter + lollipop figure written to figure_2a_distance_metric.svg
+save_brain_map: figure_2b_brain_SC_rho_Cont.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_SC_rho_Cont.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_SC_rho_SalVentAttn.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_SC_rho_SalVentAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_SC_rho_Default.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_SC_rho_Default.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_SC_rho_DorsAttn.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_SC_rho_DorsAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_SC_rho_Vis.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_SC_rho_Vis.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_SC_rho_SomMot.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_SC_rho_SomMot.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_SC_rho_Limbic.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_SC_rho_Limbic.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_GD_rho_Cont.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_GD_rho_Cont.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_GD_rho_SalVentAttn.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_GD_rho_SalVentAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_GD_rho_Default.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_GD_rho_Default.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_GD_rho_DorsAttn.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_GD_rho_DorsAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_GD_rho_Vis.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_GD_rho_Vis.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_GD_rho_SomMot.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_GD_rho_SomMot.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_GD_rho_Limbic.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_GD_rho_Limbic.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_MPC_rho_Cont.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_MPC_rho_Cont.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_MPC_rho_SalVentAttn.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_MPC_rho_SalVentAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_MPC_rho_Default.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_MPC_rho_Default.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_MPC_rho_DorsAttn.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_MPC_rho_DorsAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_MPC_rho_Vis.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_MPC_rho_Vis.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_MPC_rho_SomMot.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_MPC_rho_SomMot.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_MPC_rho_Limbic.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_MPC_rho_Limbic.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_FC_rho_Cont.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_FC_rho_Cont.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_FC_rho_SalVentAttn.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_FC_rho_SalVentAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_FC_rho_Default.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_FC_rho_Default.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_FC_rho_DorsAttn.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_FC_rho_DorsAttn.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_FC_rho_Vis.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_FC_rho_Vis.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_FC_rho_SomMot.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_FC_rho_SomMot.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+save_brain_map: figure_2b_brain_FC_rho_Limbic.svg colorbar with 3 labels failed (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); retrying with no numeric labels.
+save_brain_map: rendering FAILED for figure_2b_brain_FC_rho_Limbic.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'). No brain screenshot written.
+[Figure 2B] bubble-matrix summary written to figure_2b_network_summary_both.svg
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-06-26 11:21:04
+  --hemi: both
+  --panel: 2b
+  --stage: compute
+  --n_rand: 50
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC/FC weights : positive connections only (weighted-mean projection)
+Null models    : Moran spectral randomisation (map smoothness, all measures) + geometry-preserving topological null (wiring specificity, SC/MPC/FC) + target-side FC-gradient spin null (anatomical alignment, all measures)
+Stage / panel  : stage=compute, panel=2b, hemi=both
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loaded cached fsLR-5k MPC gradient (t1_gradient1_SalVentAttn) from df_1a_both_fslr5k.tsv
+Building Betzel distance-stratified consensus mask + loading SC subjects...
+Betzel consensus mask built: density=0.1028, n_edges=3998392, nbins=10
+Loading group-mean geodesic distance (for Moran spatial-weight matrix)...
+[FC gradient] flipped sign so the default-mode network sits at the low (default-mode) end.
+Generating 50 FC-gradient spin surrogates (target-side null)...
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 587)
+Computing T1 gradients...
+Gradient lambdas: [0.06507687 0.05652771 0.04587616 0.04080785 0.02930041 0.0248962
+ 0.02141152 0.01790186 0.01574277 0.01363902]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1998)
+Computing T1 gradients...
+Gradient lambdas: [0.07213035 0.05670261 0.04671686 0.04262806 0.02975918 0.02759623
+ 0.02246464 0.01936789 0.01591434 0.01452765]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1081)
+Computing T1 gradients...
+Gradient lambdas: [0.07174909 0.0576005  0.04797758 0.04141052 0.03150997 0.02790015
+ 0.02209617 0.01891142 0.01665035 0.01488045]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 954)
+Computing T1 gradients...
+Gradient lambdas: [0.07201533 0.0540723  0.04587488 0.04014614 0.02984984 0.02641465
+ 0.02240931 0.01921446 0.01620986 0.01440252]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1344)
+Computing T1 gradients...
+Gradient lambdas: [0.07233027 0.05375015 0.04764357 0.04442422 0.03081914 0.02812276
+ 0.02247495 0.01960471 0.01685837 0.01544457]
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1716)
+Computing T1 gradients...
+Gradient lambdas: [0.0733092  0.05518287 0.04800148 0.04356643 0.02994433 0.02742928
+ 0.02270689 0.01949572 0.01630666 0.01523715]
+[compute | SC] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[SC] spin null: n_rand=50; null mean=+0.009 (~0 expected), obs r_group=-0.040, p_spin=6.471e-01 (two-sided)
+[SC] topological null (exact): nbins=10, n_rand=50; null mean=+0.027 (geometry expectation), obs r_group=-0.040, p_topo=1.961e-02 (excess-magnitude)
+[compute | Limbic | SC] r_group=-0.040 [-0.051, -0.028] t=-7.03 p=1.477e-06 (subject-level) | p_moran=7.255e-01 (spatial null) | p_topo=1.961e-02 (topological null) | p_spin=6.471e-01 (spin null) | n=19 (n_perm=50)
+[sparsity | Limbic | SC] targets/SN-vertex median=151 IQR=[75, 266] | frac SN vertices with <=10 targets: 0.03
+[compute | SC] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[SC] spin null: n_rand=50; null mean=+0.031 (~0 expected), obs r_group=+0.168, p_spin=2.157e-01 (two-sided)
+[SC] topological null (exact): nbins=10, n_rand=50; null mean=+0.251 (geometry expectation), obs r_group=+0.168, p_topo=1.000e+00 (excess-magnitude)
+[compute | Default | SC] r_group=+0.168 [+0.157, +0.179] t=+31.63 p=3.143e-17 (subject-level) | p_moran=1.961e-01 (spatial null) | p_topo=1.000e+00 (topological null) | p_spin=2.157e-01 (spin null) | n=19 (n_perm=50)
+[sparsity | Default | SC] targets/SN-vertex median=238 IQR=[152, 350] | frac SN vertices with <=10 targets: 0.02
+[compute | SC] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[SC] spin null: n_rand=50; null mean=+0.038 (~0 expected), obs r_group=+0.519, p_spin=3.922e-02 (two-sided)
+[SC] topological null (exact): nbins=10, n_rand=50; null mean=+0.517 (geometry expectation), obs r_group=+0.519, p_topo=2.157e-01 (excess-magnitude)
+[compute | Cont | SC] r_group=+0.519 [+0.510, +0.527] t=+99.73 p=3.802e-26 (subject-level) | p_moran=1.961e-02 (spatial null) | p_topo=2.157e-01 (topological null) | p_spin=3.922e-02 (spin null) | n=19 (n_perm=50)
+[sparsity | Cont | SC] targets/SN-vertex median=366 IQR=[253, 500] | frac SN vertices with <=10 targets: 0.04
+[compute | SC] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+[SC] spin null: n_rand=50; null mean=+0.041 (~0 expected), obs r_group=+0.335, p_spin=5.882e-02 (two-sided)
+[SC] topological null (exact): nbins=10, n_rand=50; null mean=+0.250 (geometry expectation), obs r_group=+0.335, p_topo=1.961e-02 (excess-magnitude)
+[compute | SalVentAttn | SC] r_group=+0.335 [+0.326, +0.344] t=+71.67 p=1.433e-23 (subject-level) | p_moran=1.961e-02 (spatial null) | p_topo=1.961e-02 (topological null) | p_spin=5.882e-02 (spin null) | n=19 (n_perm=50)
+[sparsity | SalVentAttn | SC] targets/SN-vertex median=333 IQR=[198, 511] | frac SN vertices with <=10 targets: 0.00
+[compute | SC] processing network: DorsAttn
+Moran null: 2 connected component(s) (block sizes=[488, 466]); surrogates generated per component.
+[SC] spin null: n_rand=50; null mean=+0.087 (~0 expected), obs r_group=+0.164, p_spin=5.294e-01 (two-sided)
+[SC] topological null (exact): nbins=10, n_rand=50; null mean=+0.252 (geometry expectation), obs r_group=+0.164, p_topo=1.000e+00 (excess-magnitude)
+[compute | DorsAttn | SC] r_group=+0.164 [+0.144, +0.184] t=+16.74 p=2.037e-12 (subject-level) | p_moran=2.745e-01 (spatial null) | p_topo=1.000e+00 (topological null) | p_spin=5.294e-01 (spin null) | n=19 (n_perm=50)
+[sparsity | DorsAttn | SC] targets/SN-vertex median=313 IQR=[206, 472] | frac SN vertices with <=10 targets: 0.00
+[compute | SC] processing network: Vis
+Moran null: 2 connected component(s) (block sizes=[672, 672]); surrogates generated per component.
+[SC] spin null: n_rand=50; null mean=-0.073 (~0 expected), obs r_group=+0.049, p_spin=8.824e-01 (two-sided)
+[SC] topological null (exact): nbins=10, n_rand=50; null mean=+0.090 (geometry expectation), obs r_group=+0.049, p_topo=1.000e+00 (excess-magnitude)
+[compute | Vis | SC] r_group=+0.049 [+0.022, +0.075] t=+3.88 p=1.108e-03 (subject-level) | p_moran=7.059e-01 (spatial null) | p_topo=1.000e+00 (topological null) | p_spin=8.824e-01 (spin null) | n=19 (n_perm=50)
+[sparsity | Vis | SC] targets/SN-vertex median=80 IQR=[24, 149] | frac SN vertices with <=10 targets: 0.18
+[compute | SC] processing network: SomMot
+Moran null: 2 connected component(s) (block sizes=[823, 893]); surrogates generated per component.
+[SC] spin null: n_rand=50; null mean=+0.014 (~0 expected), obs r_group=-0.021, p_spin=9.804e-01 (two-sided)
+[SC] topological null (exact): nbins=10, n_rand=50; null mean=-0.110 (geometry expectation), obs r_group=-0.021, p_topo=1.000e+00 (excess-magnitude)
+[compute | SomMot | SC] r_group=-0.021 [-0.036, -0.005] t=-2.72 p=1.403e-02 (subject-level) | p_moran=8.235e-01 (spatial null) | p_topo=1.000e+00 (topological null) | p_spin=9.804e-01 (spin null) | n=19 (n_perm=50)
+[sparsity | SomMot | SC] targets/SN-vertex median=176 IQR=[111, 292] | frac SN vertices with <=10 targets: 0.00
+[compute FDR | SC | Limbic] q_moran=8.235e-01 q_topo=6.863e-02 q_spin=9.059e-01
+[compute FDR | SC | Default] q_moran=4.575e-01 q_topo=1.000e+00 q_spin=5.033e-01
+[compute FDR | SC | Cont] q_moran=6.863e-02 q_topo=5.033e-01 q_spin=2.059e-01
+[compute FDR | SC | SalVentAttn] q_moran=6.863e-02 q_topo=6.863e-02 q_spin=2.059e-01
+[compute FDR | SC | DorsAttn] q_moran=4.804e-01 q_topo=1.000e+00 q_spin=9.059e-01
+[compute FDR | SC | Vis] q_moran=8.235e-01 q_topo=1.000e+00 q_spin=9.804e-01
+[compute FDR | SC | SomMot] q_moran=8.235e-01 q_topo=1.000e+00 q_spin=9.804e-01
+[GD] preloading 19 connectomes once for reuse across networks...
+[compute | GD] processing network: Limbic
+Moran null: 2 connected component(s) (block sizes=[296, 291]); surrogates generated per component.
+[GD] spin null: n_rand=50; null mean=+0.033 (~0 expected), obs r_group=-0.001, p_spin=9.804e-01 (two-sided)
+[compute | Limbic | GD] r_group=-0.001 [-0.005, +0.002] t=-0.76 p=4.585e-01 (subject-level) | p_moran=9.804e-01 (spatial null) | p_topo=nan (topological null) | p_spin=9.804e-01 (spin null) | n=19 (n_perm=50)
+[sparsity | Limbic | GD] targets/SN-vertex median=4012 IQR=[4012, 4022] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Default
+Moran null: 2 connected component(s) (block sizes=[1154, 844]); surrogates generated per component.
+[GD] spin null: n_rand=50; null mean=-0.002 (~0 expected), obs r_group=+0.219, p_spin=1.373e-01 (two-sided)
+[compute | Default | GD] r_group=+0.219 [+0.216, +0.223] t=+124.70 p=6.857e-28 (subject-level) | p_moran=1.373e-01 (spatial null) | p_topo=nan (topological null) | p_spin=1.373e-01 (spin null) | n=19 (n_perm=50)
+[sparsity | Default | GD] targets/SN-vertex median=3175 IQR=[3175, 3485] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: Cont
+Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates generated per component.
+[GD] spin null: n_rand=50; null mean=-0.004 (~0 expected), obs r_group=+0.408, p_spin=9.804e-02 (two-sided)
+[compute | Cont | GD] r_group=+0.408 [+0.404, +0.412] t=+187.01 p=4.680e-31 (subject-level) | p_moran=1.569e-01 (spatial null) | p_topo=nan (topological null) | p_spin=9.804e-02 (spin null) | n=19 (n_perm=50)
+[sparsity | Cont | GD] targets/SN-vertex median=3682 IQR=[3682, 3868] | frac SN vertices with <=10 targets: 0.00
+[compute | GD] processing network: SalVentAttn
+Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.

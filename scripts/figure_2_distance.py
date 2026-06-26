@@ -117,8 +117,9 @@ from src.logging_utils import setup_manuscript_logger
 from src.connectome_processing import (
     build_consensus_mask, compute_projection_subjects,
     compute_moran_null_projection, compute_topological_null_projection,
+    compute_spin_null_projection, make_fc_spin_surrogates,
     compute_dominant_target_network,
-    benjamini_hochberg, load_subject_matrix,
+    benjamini_hochberg, load_subject_matrix, _fisher_z_group,
 )
 
 logger = logging.getLogger(__name__)
@@ -160,6 +161,12 @@ def get_parser() -> argparse.ArgumentParser:
              "compute always refreshes the figures); 'plot' skips the heavy computation "
              "and redraws figures from the caches (fast aesthetic iteration). 'plot' "
              "requires a prior 'compute'/'both' run."
+    )
+    optional.add_argument(
+        "-n_rand", type=int, default=1000,
+        help="Number of surrogates for the Moran and topological nulls (default: 1000). "
+             "Lower (e.g. 300) for faster iteration; the add-one empirical p floor is "
+             "1/(1+n_rand), so keep 1000 for the final run."
     )
     return parser
 
@@ -318,23 +325,27 @@ def _run_projection(
     gd_cortex: np.ndarray, target_network_labels: np.ndarray,
     n_rand: int,
     *, mask_G: np.ndarray | None = None,
-    sc_subjects: list[np.ndarray] | None = None,
+    preloaded_subjects: list[np.ndarray] | None = None,
+    g_fc_spun_cortex: np.ndarray | None = None,
 ) -> dict:
-    """One-stop: per-subject projection + within-network Moran and topological nulls.
+    """One-stop: per-subject projection + Moran, topological and spin nulls.
 
-    The Moran spectral randomisation preserves the SAC of g_MPC and controls for map
-    smoothness; surrogates are generated per hemisphere block inside
-    `compute_moran_null_projection`. The geometry-preserving topological null
-    (SC/MPC/FC only) rewires the connectome within geodesic-distance bins and controls
-    for connectome geometry, isolating wiring specificity. GD gets no topological null
-    (its weights are pure distance), so `p_topo` is NaN there.
+    Three complementary nulls. The Moran spectral randomisation preserves the SAC of
+    g_MPC and controls for map smoothness (per hemisphere block, all measures). The
+    geometry-preserving topological null (SC/MPC/FC only) rewires the connectome within
+    geodesic-distance bins and controls for connectome geometry, isolating wiring
+    specificity; GD gets none (its weights are pure distance), so `p_topo` is NaN there.
+    The target-side spin null rotates g_FC and controls for the FC gradient's
+    autocorrelation independent of its anatomical position; being target-side it applies
+    to every measure (GD included) and complements the topological null's direction-
+    scrambling blind spot. `p_spin` is NaN only when no spun field is supplied.
     """
     result = compute_projection_subjects(
         files=files, modality=modality,
         g_fc_cortex=g_fc_cortex, g_mpc_cortex_at_sn=g_mpc_at_sn,
         sn_mask_cortex=sn_mask_cortex, other_mask_cortex=other_mask_cortex,
         df_yeo_surf_5k=df,
-        mask_G=mask_G, sc_subjects=sc_subjects,
+        mask_G=mask_G, preloaded_subjects=preloaded_subjects,
         target_network_labels=target_network_labels,
     )
 
@@ -343,19 +354,33 @@ def _run_projection(
         g_mpc_at_sn, sn_mask_cortex, gd_among_sn, result, n_rand,
     )
 
+    if g_fc_spun_cortex is not None:
+        spin = compute_spin_null_projection(
+            modality=modality, files=files, df_yeo_surf_5k=df,
+            g_fc_spun_cortex=g_fc_spun_cortex, g_mpc_cortex_at_sn=g_mpc_at_sn,
+            sn_mask_cortex=sn_mask_cortex, other_mask_cortex=other_mask_cortex,
+            result=result, preloaded_subjects=preloaded_subjects, mask_G=mask_G,
+        )
+    else:
+        spin = {"null_group_spin": None, "p_spin": np.nan, "null_std_spin": np.nan}
+
     if modality in TOPO_MODALITIES:
         gd_sn_to_other = gd_cortex[np.ix_(sn_mask_cortex, other_mask_cortex)]
+        # Dense connectomes (MPC/FC) use the analytic-moment CLT sampler (hundreds-thousands
+        # of edges/vertex make the per-vertex numerator ~Gaussian); sparse SC keeps the exact
+        # resampler (cheap, and it drives the positive/negative control).
+        topo_method = "clt" if modality in ("MPC", "FC") else "exact"
         topo = compute_topological_null_projection(
             modality=modality, files=files, df_yeo_surf_5k=df,
             g_fc_cortex=g_fc_cortex, g_mpc_cortex_at_sn=g_mpc_at_sn,
             sn_mask_cortex=sn_mask_cortex, other_mask_cortex=other_mask_cortex,
             gd_sn_to_other=gd_sn_to_other, result=result, n_rand=n_rand,
-            sc_subjects=sc_subjects, mask_G=mask_G,
+            preloaded_subjects=preloaded_subjects, mask_G=mask_G, method=topo_method,
         )
     else:
         topo = {"null_group_topo": None, "p_topo": np.nan, "null_std_topo": np.nan}
 
-    return {**result, **moran, **topo}
+    return {**result, **moran, **topo, **spin}
 
 
 def _embed_in_full_cortex(
@@ -632,12 +657,14 @@ def plot_figure_2a_scatter_lollipop(
                    edgecolor="none", rasterized=True)
         sns.regplot(x=g_mpc[valid], y=res["P_mean"][valid],
                     scatter=False, color="black", line_kws={"linewidth": 2.5}, ax=ax)
-        # Two nulls where both apply (SC/MPC/FC): p_moran (map smoothness) and p_topo
-        # (connectome geometry). GD has only p_moran.
+        # Up to three nulls: p_moran (map smoothness, all measures), p_topo (connectome
+        # geometry, SC/MPC/FC) and p_spin (FC-gradient anatomy, all measures).
         stat_txt = (f"$r={res['r_group']:+.2f}$\n"
                     f"$p_{{moran}}={res['p_moran']:.3f}$")
         if np.isfinite(res.get("p_topo", np.nan)):
             stat_txt += f"\n$p_{{topo}}={res['p_topo']:.3f}$"
+        if np.isfinite(res.get("p_spin", np.nan)):
+            stat_txt += f"\n$p_{{spin}}={res['p_spin']:.3f}$"
         ax.text(0.05, 0.95, stat_txt,
                 transform=ax.transAxes, va="top", fontweight="bold", fontsize=12)
         t = ax.set_title(title_txt.get(measure, measure), loc="left", pad=15)
@@ -773,6 +800,7 @@ def compute_network_results(
     networks: list[str] = ("SalVentAttn", "Limbic"),
     measures: tuple[str, ...] = ("SC", "GD", "MPC", "FC"),
     n_rand: int = 100, hemisphere: str = "both",
+    sphere_lh=None, sphere_rh=None,
 ) -> tuple[pd.DataFrame, dict]:
     """Compute stage: per network x measure projection + Moran null; persist all caches.
 
@@ -810,6 +838,17 @@ def compute_network_results(
     target_net_labels = df_yeo_surf_5k.loc[cortex_mask_full, "network"].values
     net_int_map = _net_int_map(df_yeo_surf_5k)
 
+    # Target-side spin null: rotate the (oriented) FC gradient once, reuse the spun field
+    # across every network and measure. Requires the spheres; skipped if not supplied.
+    if sphere_lh is not None and sphere_rh is not None:
+        logger.info(f"Generating {n_rand} FC-gradient spin surrogates (target-side null)...")
+        g_fc_spun_cortex = make_fc_spin_surrogates(
+            df_yeo_surf_5k, sphere_lh, sphere_rh, n_rand,
+        )
+    else:
+        g_fc_spun_cortex = None
+        logger.info("No spheres supplied; skipping the target-side spin null (p_spin=NaN).")
+
     # MPC gradient is measure-independent: compute (cache-aware) once per network.
     net_gradients = {}
     for network in networks:
@@ -820,10 +859,20 @@ def compute_network_results(
     results_by_measure: dict[str, list] = {}
     subject_ids_by_measure: dict[str, list] = {}
     for measure in measures:
-        subject_ids, files, m_mask_G, m_sc_subjects = _measure_inputs(
+        subject_ids, files, m_mask_G, preloaded = _measure_inputs(
             measure, df_pni, mask_G, sc_subjects,
         )
         subject_ids_by_measure[measure] = subject_ids
+
+        # Preload this measure's per-subject connectomes ONCE and reuse them across all
+        # networks and both nulls (SC arrives already preloaded). This avoids re-reading
+        # the same ~350 MB matrices from disk for every network x {projection,
+        # topological null}. Held one measure at a time, so peak memory stays ~one
+        # measure's worth on top of the persistent SC stack.
+        if preloaded is None:
+            logger.info(f"[{measure}] preloading {len(files)} connectomes once for "
+                        f"reuse across networks...")
+            preloaded = [load_subject_matrix(f, cortex_mask_full) for f in files]
 
         results_per_net = []
         for network in networks:
@@ -835,7 +884,8 @@ def compute_network_results(
                 g_fc_cortex=g_fc_cortex, g_mpc_at_sn=g_mpc_at_sn,
                 sn_mask_cortex=sn_mask_cortex, other_mask_cortex=other_mask_cortex,
                 gd_cortex=gd_cortex, target_network_labels=target_net_labels,
-                n_rand=n_rand, mask_G=m_mask_G, sc_subjects=m_sc_subjects,
+                n_rand=n_rand, mask_G=m_mask_G, preloaded_subjects=preloaded,
+                g_fc_spun_cortex=g_fc_spun_cortex,
             )
 
             logger.info(
@@ -844,6 +894,7 @@ def compute_network_results(
                 f"t={res['t']:+.2f} p={res['p']:.3e} (subject-level) | "
                 f"p_moran={res['p_moran']:.3e} (spatial null) | "
                 f"p_topo={res['p_topo']:.3e} (topological null) | "
+                f"p_spin={res['p_spin']:.3e} (spin null) | "
                 f"n={res['n']} (n_perm={n_rand})"
             )
 
@@ -878,12 +929,14 @@ def compute_network_results(
 
         q_moran = benjamini_hochberg(np.array([r["res"]["p_moran"] for r in results_per_net]))
         q_topo = benjamini_hochberg(np.array([r["res"]["p_topo"] for r in results_per_net]))
-        for rec, qm, qt in zip(results_per_net, q_moran, q_topo):
+        q_spin = benjamini_hochberg(np.array([r["res"]["p_spin"] for r in results_per_net]))
+        for rec, qm, qt, qs in zip(results_per_net, q_moran, q_topo, q_spin):
             rec["q_moran"] = qm
             rec["q_topo"] = qt
+            rec["q_spin"] = qs
             logger.info(
                 f"[compute FDR | {measure} | {rec['network']}] "
-                f"q_moran={qm:.3e} q_topo={qt:.3e}"
+                f"q_moran={qm:.3e} q_topo={qt:.3e} q_spin={qs:.3e}"
             )
 
         results_by_measure[measure] = results_per_net
@@ -908,6 +961,7 @@ def compute_network_results(
             "t": rec["res"]["t"], "p": rec["res"]["p"],
             "p_moran": rec["res"]["p_moran"], "q_moran": rec["q_moran"],
             "p_topo": rec["res"]["p_topo"], "q_topo": rec["q_topo"],
+            "p_spin": rec["res"]["p_spin"], "q_spin": rec["q_spin"],
         } for rec in results_per_net]
         pd.DataFrame(stats_rows).to_csv(
             project_root / f"data/dataframes/df_2b_network_stats_{measure}_{hemisphere}.csv",
@@ -934,8 +988,10 @@ def _obs_r_group(synth_g: np.ndarray, P_subjects_sn: np.ndarray, min_valid: int 
         m = valid_g & np.isfinite(P_s)
         if m.sum() >= min_valid:
             rs.append(spearmanr(synth_g[m], P_s[m])[0])
-    z = np.arctanh(np.clip(np.asarray(rs)[np.isfinite(rs)], -0.999, 0.999))
-    return float(np.tanh(z.mean())) if z.size else np.nan
+    # Reuse the shared Fisher-z aggregation so the control's observed value stays
+    # defined identically to the real statistic (per-subject mask varies, so the
+    # Spearman loop itself cannot use the vectorised `_rank_corr_columns`).
+    return _fisher_z_group(np.asarray(rs, dtype=float))["r_group"]
 
 
 def validate_topological_null(
@@ -988,7 +1044,7 @@ def validate_topological_null(
             g_fc_cortex=g_fc_cortex, g_mpc_cortex_at_sn=synth_g,
             sn_mask_cortex=sn_mask_cortex, other_mask_cortex=other_mask_cortex,
             gd_sn_to_other=gd_sn_to_other, result={"r_group": obs}, n_rand=n_rand,
-            sc_subjects=sc_subjects, mask_G=mask_G,
+            preloaded_subjects=sc_subjects, mask_G=mask_G,
         )
         controls[label] = {"obs": obs, **topo}
         logger.info(
@@ -1098,13 +1154,16 @@ def load_results_from_cache(
                 "ci_low": float(srow["ci_low"]), "ci_high": float(srow["ci_high"]),
                 "t": float(srow["t"]), "p": float(srow["p"]),
                 "p_moran": float(srow["p_moran"]), "n": int(srow["n"]),
-                # p_topo/q_topo absent in caches predating the topological null.
+                # p_topo/q_topo absent in caches predating the topological null;
+                # p_spin/q_spin absent in caches predating the spin null.
                 "p_topo": float(srow["p_topo"]) if "p_topo" in srow.index else np.nan,
+                "p_spin": float(srow["p_spin"]) if "p_spin" in srow.index else np.nan,
             }
             records.append({
                 "network": network, "res": res, "g_mpc_at_sn": g_mpc_at_sn,
                 "dominant_int": dominant_int, "q_moran": float(srow["q_moran"]),
                 "q_topo": float(srow["q_topo"]) if "q_topo" in srow.index else np.nan,
+                "q_spin": float(srow["q_spin"]) if "q_spin" in srow.index else np.nan,
             })
         results_by_measure[measure] = records
     return results_by_measure
@@ -1125,19 +1184,23 @@ def main():
     logger.info("GD weights     : 1/GD (within-hemisphere)")
     logger.info("MPC/FC weights : positive connections only (weighted-mean projection)")
     logger.info("Null models    : Moran spectral randomisation (map smoothness, all measures) + "
-                "geometry-preserving topological null (wiring specificity, SC/MPC/FC)")
+                "geometry-preserving topological null (wiring specificity, SC/MPC/FC) + "
+                "target-side FC-gradient spin null (anatomical alignment, all measures)")
     logger.info(f"Stage / panel  : stage={args.stage}, panel={args.panel}, hemi={args.hemi}")
     logger.info(f"Script path: {script_path}")
     logger.info(f"Project root: {project_root}")
 
     surf5k_lh_infl = read_surface(project_root / "data/surfaces/fsLR-5k.L.inflated.surf.gii", itype="gii")
     surf5k_rh_infl = read_surface(project_root / "data/surfaces/fsLR-5k.R.inflated.surf.gii", itype="gii")
+    # Spheres drive the target-side FC-gradient spin null (compute stage only).
+    surf5k_lh_sphere = read_surface(project_root / "data/surfaces/fsLR-5k.L.sphere.surf.gii", itype="gii")
+    surf5k_rh_sphere = read_surface(project_root / "data/surfaces/fsLR-5k.R.sphere.surf.gii", itype="gii")
 
     # SC is the primary modality (axonal, independent of the MPC gradient) and fixes
     # the shared network ordering reused by every figure.
     networks = ["Limbic", "Default", "Cont", "SalVentAttn", "DorsAttn", "Vis", "SomMot"]
     measures = ("SC", "GD", "MPC", "FC")
-    n_rand = 1000
+    n_rand = args.n_rand
     df_label_path = project_root / f"data/dataframes/df_2b_label_{args.hemi}.csv"
 
     if args.stage in ("compute", "both"):
@@ -1188,15 +1251,22 @@ def main():
 
         cortex_mask_full = df_yeo_surf_5k["hemisphere"].notna().values
         logger.info("Loading group-mean geodesic distance (for Moran spatial-weight matrix)...")
-        gd_stack = [load_subject_matrix(f, cortex_mask_full)
-                    for f in df_pni["path_dist_5k"].tolist()]
-        gd_cortex = np.mean(np.stack(gd_stack, axis=0), axis=0)
-        del gd_stack
+        # Accumulate a running sum (one float64 buffer + one transient matrix per
+        # subject) instead of materialising the whole stack and an np.stack copy,
+        # which would peak at ~2x the (n_sub, n_cortex, n_cortex) array.
+        gd_files = df_pni["path_dist_5k"].tolist()
+        gd_acc = None
+        for f in gd_files:
+            M = load_subject_matrix(f, cortex_mask_full)
+            gd_acc = M.astype(np.float64) if gd_acc is None else gd_acc + M
+        gd_cortex = (gd_acc / len(gd_files)).astype(np.float32)
+        del gd_acc
 
         df_yeo_surf_5k, results_by_measure = compute_network_results(
             df_yeo_surf_5k, df_pni, project_root,
             mask_G=mask_G, sc_subjects=sc_subjects, gd_cortex=gd_cortex,
             networks=networks, measures=measures, n_rand=n_rand, hemisphere=args.hemi,
+            sphere_lh=surf5k_lh_sphere, sphere_rh=surf5k_rh_sphere,
         )
         df_yeo_surf_5k.to_csv(df_label_path, index=False)
         logger.info(f"[compute] figure-data caches written: {df_label_path.name}, "

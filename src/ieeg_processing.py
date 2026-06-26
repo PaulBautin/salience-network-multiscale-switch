@@ -440,27 +440,88 @@ def extract_band_power(pxx_raw: np.ndarray, freq: np.ndarray, band: tuple[float,
     return np.log10(bp + 1e-12)
 
 
-def compute_psd_vectorized(data: np.ndarray, fs: float, fmin: float = 0.5, fmax: float = 80.0) -> tuple[np.ndarray, np.ndarray]:
+def compute_spectral_parameters(
+    pxx: np.ndarray,
+    freq: np.ndarray,
+    bands: dict[str, tuple[float, float]] | None = None,
+    fmin: float = 1.0,
+    fmax: float = 80.0,
+    aperiodic_mode: str = "knee",
+    peak_width_limits: tuple[float, float] = (1.0, 12.0),
+    max_n_peaks: int = 6,
+    min_peak_height: float = 0.05,
+) -> dict:
     """
-    Compute relative PSD for all channels simultaneously (no preprocessing).
+    Parameterise power spectra into an aperiodic exponent and oscillatory band power.
 
-    Unlike ``preprocess_and_compute_psd_ieeg``, this function skips filtering,
-    downsampling, and demeaning — use it when the data are already preprocessed.
+    A single ``specparam`` fit (formerly FOOOF; Donoghue et al., 2020) decomposes each
+    spectrum into an aperiodic component $L(f) = b - \\log_{10}(k + f^{\\chi})$ and a
+    set of Gaussian oscillatory peaks, from which two non-redundant measures are
+    returned: the aperiodic exponent $\\chi$ and, per requested band, the power of the
+    strongest oscillatory peak *above the aperiodic fit*. Deriving band power from the
+    periodic component (rather than integrating the raw PSD) makes it orthogonal to the
+    exponent, so the two measures do not re-encode the same 1/f change. Fitting in
+    ``'knee'`` mode suits the broadband iEEG range (0.5--80 Hz), where the aperiodic
+    component bends at low frequency, and the per-channel unit-sum PSD normalisation
+    only shifts the aperiodic offset, leaving both measures unchanged.
 
     Args:
-        data: Array of shape (n_channels, n_times).
-        fs: Sampling frequency in Hz.
-        fmin: Lower frequency bound in Hz.
-        fmax: Upper frequency bound in Hz.
+        pxx: PSD array of shape (n_spectra, n_frequencies) or (n_frequencies,); the
+            last axis is frequency. Power is supplied in linear units (``specparam``
+            log-transforms internally).
+        freq: Frequency axis in Hz, shape (n_frequencies,).
+        bands: Mapping of band name to ``(fmin, fmax)`` in Hz for the oscillatory
+            band-power readout; if ``None`` only the exponent is returned.
+        fmin: Lower bound of the fitting range in Hz (the lowest bins are excluded
+            because filter roll-off makes them unreliable).
+        fmax: Upper bound of the fitting range in Hz.
+        aperiodic_mode: ``specparam`` aperiodic mode, ``'knee'`` or ``'fixed'``.
+        peak_width_limits: (min, max) Gaussian peak bandwidth in Hz; the lower limit
+            must exceed twice the frequency resolution.
+        max_n_peaks: Maximum number of oscillatory peaks fitted per spectrum.
+        min_peak_height: Minimum peak height above the aperiodic fit (log power).
 
     Returns:
-        f_band: Frequencies within [fmin, fmax], shape (n_frequencies,).
-        pxx_rel: PSD normalised by total power, shape (n_channels, n_frequencies).
+        dict with:
+            - ``'exponent'``: aperiodic exponent $\\chi$ (positive for $1/f$-like
+              spectra), shape ``pxx.shape[:-1]``; NaN where the fit failed to converge.
+            - ``'band_power'``: ``{name: array}`` of oscillatory peak power for each
+              requested band, same shape as ``'exponent'``; NaN where no peak was
+              detected in the band (i.e. no oscillation) or the fit failed.
+
+    Raises:
+        ImportError: If ``specparam`` is not installed.
     """
-    f, pxx = welch(data, fs=fs, nperseg=int(2 * fs), noverlap=int(fs), window="hamming", axis=-1)
-    mask = (f >= fmin) & (f <= fmax)
-    pxx_rel = pxx[..., mask] / (np.sum(pxx, axis=-1, keepdims=True) + 1e-12)
-    return f[mask], pxx_rel
+    try:
+        from specparam import SpectralGroupModel
+        from specparam.data.periodic import get_band_peak_group
+    except ImportError as exc:  # pragma: no cover - environment guard
+        raise ImportError(
+            "compute_spectral_parameters requires the `specparam` package "
+            "(pip install specparam). It is a hard dependency of the iEEG spectral "
+            "analysis."
+        ) from exc
+
+    out_shape = np.shape(pxx)[:-1]
+    spectra = np.atleast_2d(pxx).astype(float)
+    fg = SpectralGroupModel(
+        peak_width_limits=list(peak_width_limits),
+        max_n_peaks=max_n_peaks,
+        min_peak_height=min_peak_height,
+        aperiodic_mode=aperiodic_mode,
+        verbose=False,
+    )
+    fg.fit(freq, spectra, freq_range=[fmin, fmax])
+    exponent = fg.get_params("aperiodic", "exponent").reshape(out_shape)
+
+    band_power = {}
+    for name, (lo, hi) in (bands or {}).items():
+        # get_band_peak_group -> (n_spectra, 3) [centre freq, power, bandwidth] of the
+        # strongest peak in the band; column 1 is the peak power above the aperiodic fit.
+        peaks = np.atleast_2d(get_band_peak_group(fg, (lo, hi)))
+        band_power[name] = peaks[:, 1].reshape(out_shape)
+
+    return {"exponent": exponent, "band_power": band_power}
 
 
 def compute_gradient_quantiles(

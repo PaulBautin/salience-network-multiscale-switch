@@ -66,43 +66,62 @@ influence surface vertices in proportion to their modelled spatial sensitivity
 rather than through a single nearest-vertex assignment. The analyses below were
 carried out within one hemisphere at a time.
 
-**Band power along the microstructural gradient.** Sensitivity-weighted relative
-band power was mapped to the surface for each canonical frequency band, and within
-the target network its value at each covered vertex was correlated (Spearman) with
-the within-network MPC gradient. Significance was assessed against a within-network
-Moran spectral-randomisation null (see [Shared Methods](shared.md#moran-spectral-randomisation-within-network)),
-with the two-tailed empirical $p$-value computed from the add-one estimator
+**Spectral measures along the microstructural gradient.** Two electrophysiological
+measures were derived from a single per-channel spectral parameterisation
+(`specparam`/FOOOF; Donoghue et al., 2020), mapped to the surface by
+sensitivity-weighted averaging, and, within the target network, correlated
+(Spearman) with the within-network MPC gradient at every vertex carrying both iEEG
+coverage and a defined gradient value. Each channel spectrum was fitted once in knee
+mode over 1–80 Hz with explicit Gaussian peak modelling. The primary measure was the
+aperiodic (1/f) exponent, a theoretically motivated electrophysiological index of
+cortical hierarchy and microstructural differentiation (Gao et al., 2020). The
+secondary measure was the oscillatory peak power in the five canonical bands — the
+power of the strongest periodic peak above the aperiodic fit, which is orthogonal to
+the exponent and therefore does not re-encode the same 1/f change (a vertex with no
+detected peak carries zero oscillatory power) — with the five band correlations
+corrected for multiple comparisons by the Benjamini–Hochberg procedure. For every
+measure, significance
+was assessed against a within-network Moran spatial null
+(see [Shared Methods](shared.md#moran-spectral-randomisation-within-network)), the
+spatial graph fitted once on the set of covered, gradient-defined vertices, with the
+two-tailed empirical $p$-value from the add-one estimator
 $p = (1 + k)/(1 + n_\text{perm})$.
 
-**Electrophysiological-similarity projection.** The spectral content of the iEEG
-recordings was treated as a connectivity measure, by analogy with functional
-connectivity, and entered into the same gradient-weighted projection used in
-[Figure 2](figure_2.md#the-projection-statistic). For every covered surface vertex
-a power spectral density fingerprint was obtained by sensitivity-weighted averaging
-of channel spectra and $z$-scored across frequencies. The electrophysiological
-similarity between two vertices was defined as the positive part of the Pearson
-correlation between their spectral fingerprints, giving a vertex-by-vertex
-non-negative similarity that plays the role of a connection weight. For each
-source-network vertex $i$ the projection score is the similarity-weighted mean of
-the functional-connectivity (FC) gradient across its targets,
+**Spectral-similarity projection.** The similarity of regional power spectra — not
+the temporal coupling between signals — was used as the weight in the
+gradient-weighted projection of
+[Figure 2](figure_2.md#the-projection-statistic); it is accordingly a measure of
+spectral similarity rather than of functional connectivity and is interpreted as
+such. For every covered surface vertex a power spectral density fingerprint was
+obtained by sensitivity-weighted averaging of channel spectra and $z$-scored across
+frequencies, and the spectral similarity between two vertices was the positive part
+of the Pearson correlation between their fingerprints. For each source-network
+vertex $i$ the projection score is the similarity-weighted mean of the
+functional-connectivity (FC) gradient across its targets,
 
-$$P_i = \frac{\sum_{j} \text{ES}^{+}_{ij}\, g^{\mathrm{FC}}_j}{\sum_{j} \text{ES}^{+}_{ij}}, \qquad j \in \{\text{cortical vertices outside the source network}\},$$
+$$P_i = \frac{\sum_{j} \text{SS}^{+}_{ij}\, g^{\mathrm{FC}}_j}{\sum_{j} \text{SS}^{+}_{ij}}, \qquad j \in \{\text{cortical vertices outside the source network}\},$$
 
-where $\text{ES}^{+}_{ij}$ is the non-negative spectral similarity and
-$g^{\mathrm{FC}}_j$ the FC gradient at target $j$. The FC gradient polarity is
-arbitrary, so it was oriented by anatomy — flipped where necessary so the
-default-mode network occupied the low end and task-positive systems the high end —
-and the chosen orientation was logged. Vertices with fewer than ten contributing
-targets were left undefined.
+where $\text{SS}^{+}_{ij}$ is the non-negative spectral similarity and
+$g^{\mathrm{FC}}_j$ the FC gradient at target $j$ — the same cohort principal FC
+gradient used in [Figure 2](figure_2.md), evaluated on the fsLR-32k surface the
+sensitivity maps require and oriented by anatomy so the default-mode network occupies
+the low end. Because two vertices sampled by overlapping leadfields share a
+sensitivity-averaged spectrum and are therefore similar for instrumental rather than
+neural reasons, source–target pairs whose sensitivity profiles had a cosine
+similarity above $0.1$ were excluded from the projection as leakage. To establish
+that the spectral similarity contributed information beyond spatial geometry, the
+projection was recomputed over the same target set with uniform weights and with
+inverse-Euclidean-distance weights, and the three correlations were reported
+together. Vertices with fewer than ten contributing targets were left undefined.
 
-Because the iEEG spectral fingerprints are aggregated across the cohort, inference
-was performed at the group level: the projection was computed once and summarised
-by a single Spearman correlation between the within-network MPC gradient and the
-projection score across source-network vertices. Spatial significance was the
-within-network Moran spectral-randomisation null
-(see [Shared Methods](shared.md#moran-spectral-randomisation-within-network)),
-with surrogates of the MPC gradient generated within the analysed hemisphere and
-the two-tailed empirical $p$-value taken from the add-one estimator
-$p = (1 + k)/(1 + n_\text{perm})$. For display, the projection was additionally
-summarised as its mean restricted to each target network, giving a per-target-network
-readout of the spectral-similarity-weighted FC-gradient position.
+Because the iEEG spectra are aggregated across the cohort, inference was performed
+at the group level: a single Spearman correlation between the within-network MPC
+gradient and the projection across source-network vertices, with spatial
+significance from the within-network Moran null
+(see [Shared Methods](shared.md#moran-spectral-randomisation-within-network);
+surrogates of the MPC gradient generated within the analysed hemisphere, add-one
+empirical $p$). Both source and target vertices were restricted to the locations of
+iEEG coverage, a non-uniform convenience sample of cortex; the projection therefore
+probes the FC gradient only where electrodes were implanted, and the group statistic
+does not model between-subject variability. For display, the projection was
+additionally summarised as its mean restricted to each target network.

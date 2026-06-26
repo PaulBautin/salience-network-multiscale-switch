@@ -1113,3 +1113,39 @@ Found existing gradient table at /local_raid/data/pbautin/software/salience-netw
 Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
 Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
 Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-06-23 15:06:07
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Participants   : N=30 (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)
+T1 profiles    : acq-T1map, fsLR-32k surface, 14 intracortical depths
+Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Computing T1 gradients...
+Gradient lambdas: [0.07763772 0.05966429 0.04939547 0.04525525 0.03117482 0.02897912
+ 0.02392563 0.02059947 0.01662663 0.01541668]
+Participants   : N=19 (MICA-PNI, ses-a1, healthy controls matched to MICA-MICs)
+T1 profiles    : acq-T1map, fsLR-5k surface, 14 intracortical depths
+MPC            : fsLR-5k vertex-level MPC matrix
+Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, fsLR-5k
+FC             : resting-state (desc-me_task-rest_bold), fsLR-5k (optional)
+Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment
+Loading profiles for 19 subjects...
+Final array shape: (19, 14, 1141)
+Computing T1 gradients...
+Gradient lambdas: [0.0706654  0.05396823 0.04487807 0.04053916 0.02897161 0.02576176
+ 0.02205733 0.01960564 0.01574612 0.01369666]
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg

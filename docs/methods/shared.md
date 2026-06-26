@@ -101,12 +101,35 @@ reassignment preserves each source vertex's degree, its multiset of weights, and
 edge-length distribution, while randomising only the identity of the target — and
 hence the value of the projected map at the target. Because edge length is preserved,
 the null distribution of the group statistic is centred on the *geometry expectation*
-rather than on zero, so an observed value in its tail isolates targeting specificity
-from distance dependence. The rewiring is applied per subject (the subject is the unit
-of inference), the per-subject statistic is recomputed on the rewired connectome and
-aggregated across subjects by the Fisher-z mean, and the two-tailed empirical p-value
-again uses the add-one estimator $p = (1 + k)/(1 + n)$. The null is defined for any
+rather than on zero, so an observed value whose **magnitude** exceeds that of the
+surrogates isolates targeting specificity from distance dependence. The rewiring is
+applied per subject (the subject is the unit of inference), the per-subject statistic is
+recomputed on the rewired connectome and aggregated across subjects by the Fisher-z
+mean. Because the surrogates are centred on the geometry expectation, the test is
+directional — the alternative is that the observed alignment *exceeds* what geometry
+alone produces — but it is evaluated on magnitude: the within-network microstructural
+gradient is a diffusion-map eigenvector of arbitrary polarity, and since the observed
+statistic and the surrogates share that same fixed gradient they lie on the same side of
+zero, so the empirical p-value is the excess-magnitude add-one estimator $p = (1 +
+\#\{|\text{null}| \ge |\text{obs}|\})/(1 + n)$. This is invariant to the eigenvector's
+arbitrary sign (a fixed upper-tail estimator would spuriously fail whenever the gradient
+came out sign-negative; a two-sided test around zero would conflate the non-zero geometry
+offset with the effect). The null is defined for any
 weight matrix and is therefore applied to the structural, microstructural, and
 functional connectivity measures, but not to the geodesic-distance measure, whose
 weights are a deterministic function of distance and are left essentially unchanged by
 a within-bin reassignment.
+
+For the structural-connectivity measure the surrogate projection is sampled explicitly
+(each edge's target is redrawn). For the densely connected microstructural and functional
+measures (hundreds to thousands of candidate targets per source vertex) the same null is
+evaluated with an algebraically equivalent shortcut: the resampled projection numerator at
+a source vertex is a sum of independent within-bin draws, so its mean and variance are
+available in closed form — $\mathbb{E}=\sum_b W_b\,\mu_b$ and
+$\mathrm{Var}=\sum_b (\sum_{e\in b} w_e^2)\,\sigma_b^2$, where $W_b$ is the summed edge
+weight in distance-bin $b$ and $\mu_b,\sigma_b^2$ the mean and variance of that bin's target
+map values. With many independent terms per vertex the numerator is Gaussian by the central
+limit theorem, so each surrogate is drawn from the matching normal rather than by explicit
+reassignment, leaving the test statistic unchanged while removing the per-surrogate
+resampling cost. Because the two samplers share the same per-vertex mean and variance, they
+agree up to Monte-Carlo error.
