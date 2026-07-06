@@ -133,3 +133,24 @@ limit theorem, so each surrogate is drawn from the matching normal rather than b
 reassignment, leaving the test statistic unchanged while removing the per-surrogate
 resampling cost. Because the two samplers share the same per-vertex mean and variance, they
 agree up to Monte-Carlo error.
+
+### Target-side spin null (FC-gradient rotation)
+
+The Moran null randomises the *source* map and the topological null rewires the
+*connectome*; a third null acts on the *target* map. The projection target axis is the
+principal FC gradient $g^{\mathrm{FC}}$, which carries strong spatial autocorrelation
+and is anatomically registered to the connectome. To ask whether the alignment depends
+on that anatomical registration rather than on the gradient's autocorrelation alone,
+$g^{\mathrm{FC}}$ was rotated on the sphere with `SpinPermutations` (Alexander-Bloch et
+al., 2018), each hemisphere rotated independently. Every spin preserves the full
+(anisotropic) spatial structure of the FC gradient while destroying its alignment to
+anatomy. For each spin the per-subject projection was recomputed on the **real**
+connectome — only the target axis is rotated — and the per-subject Spearman against the
+fixed source gradient $g^{\mathrm{MPC}}$ aggregated across subjects by the Fisher-z mean;
+a vertex rotated in from the medial wall carries NaN and drops from both the numerator
+and denominator of that spin's projection. Because the rotation removes the gradient's
+anatomical alignment, the null is centred on zero, so the empirical $p_{\mathrm{spin}}$
+is the two-tailed add-one estimator $p = (1 + k)/(1 + n)$, already invariant to the
+arbitrary polarity of $g^{\mathrm{MPC}}$. Being target-side, the spin null applies to
+every modality, including geodesic distance, and complements the topological null, whose
+within-bin reassignment scrambles target direction but not the target field's structure.

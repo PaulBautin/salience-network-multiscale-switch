@@ -37,6 +37,7 @@ from brainspace.null_models import SpinPermutations
 import logging
 
 from src.atlas_load import load_yeo_atlas, load_econo_atlas, convert_states_str2int
+from src.connectome_processing import empirical_p_twosided, benjamini_hochberg
 from src.plot_colors import cmap_types, cmap_types_mw
 from src.logging_utils import setup_manuscript_logger
 
@@ -74,7 +75,8 @@ def cortical_type_analysis(df_yeo_surf: pd.DataFrame, project_root: Path, hemisp
     # Hemisphere selection is applied to the per-network mask, not to df_yeo_surf itself,
     # because medial-wall vertices are absent from the 'hemisphere' column and filtering
     # the DataFrame would shrink it below 32492 rows, causing out-of-bounds spin indices.
-    n_rand = 100
+    # 1000 spins matches figures 2 and 3 and keeps the add-one p floor at ~1e-3.
+    n_rand = 1000
     sp = SpinPermutations(n_rep=n_rand, random_state=0)
     sp.fit(sphere32k_lh, points_rh=sphere32k_rh)
 
@@ -118,6 +120,22 @@ def cortical_type_analysis(df_yeo_surf: pd.DataFrame, project_root: Path, hemisp
         all_data[net_name] = df
 
     logger.info(f"[Figure 1C] Spin permutations: n_rep={n_rand}, random_state=0")
+
+    # Spin-permutation enrichment test for the focus network (SalVentAttn): per cortical
+    # type, the two-sided add-one empirical p comparing the observed composition against
+    # the spin-null distribution (centred on the null mean so it tests deviation in either
+    # direction), Benjamini-Hochberg-corrected across the seven types. Reported alongside
+    # the descriptive z-scores below.
+    sal_null = all_data["SalVentAttn"]          # (n_rand, n_types), columns = type labels
+    sal_obs = {label_map[t]: real_data["SalVentAttn"][t] for t in range(1, 8)}
+    sal_p = []
+    for lbl in type_labels:
+        null_vals = sal_null[lbl].to_numpy()
+        null_mean = null_vals.mean()
+        sal_p.append(empirical_p_twosided(null_vals - null_mean, sal_obs[lbl] - null_mean))
+    sal_q = benjamini_hochberg(np.array(sal_p))
+    for lbl, p_val, q_val in zip(type_labels, sal_p, sal_q):
+        logger.info(f"[Figure 1C] SalVentAttn {lbl}: spin enrichment p={p_val:.3e}, FDR q={q_val:.3e}")
 
     n_cols = 4
     sal_idx = np.where(state_name == "SalVentAttn")[0][0]
@@ -183,7 +201,7 @@ def main():
     logger.info(f"Hemisphere     : {args.hemi}")
     logger.info(f"Cortical types : von Economo-Koskinas atlas (7 types: Kon, Eu-III, Eu-II, Eu-I, Dys, Ag, Other)")
     logger.info(f"Analysis       : cortical type composition per network vs spin permutation null")
-    logger.info(f"Null model     : SpinPermutations (n_rep=100, random_state=0)")
+    logger.info(f"Null model     : SpinPermutations (n_rep=1000, random_state=0)")
     logger.info(f"Script path: {script_path}")
     logger.info(f"Project root: {project_root}")
 

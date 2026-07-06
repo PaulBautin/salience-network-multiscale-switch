@@ -1384,3 +1384,294 @@ PSD computed once: 4960 channels x 160 freqs; sensitivity stack (4960, 32492)
 [Figure 3B] leakage mask removed 2102720/90288564 source-target pairs (cosine > 0.1).
 [Figure 3B] baselines vs MPC-gradient | uniform r=-0.181, distance r=+0.154 (spectral-similarity r=-0.044)
 [Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=-0.044, Moran permutation p=5.634e-01 (n_perm=1000, n_src=3502)
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-07-06 12:50:31
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield, fsLR-32k surface, bipolar derivation (|Sens1 - Sens2|)
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo 7-network labels
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 35 subjects, 5102 contacts
+Cache not found. Loading and processing channel info...
+Channel info saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl.
+Channel data: 37 subjects, 4960 bipolar channels
+Variable channel lengths (360136 to 1202320 samples); truncating all to 360136.
+PSD computed once: 4960 channels x 160 freqs; sensitivity stack (4960, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3502
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.266, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3502)
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.104, Moran permutation p=1.658e-01 (n_perm=1000, n_vertices=3502)
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.348, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3502)
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=+0.011, Moran permutation p=8.681e-01 (n_perm=1000, n_vertices=3502)
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.054, Moran permutation p=4.775e-01 (n_perm=1000, n_vertices=3502)
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=-0.051, Moran permutation p=3.876e-01 (n_perm=1000, n_vertices=3502)
+[Figure 3B] Band delta: FDR q=0.415
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.868
+[Figure 3B] Band beta: FDR q=0.597
+[Figure 3B] Band gamma: FDR q=0.597
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3502); target vertices: 25782
+[Figure 3B] leakage mask removed 2102720/90288564 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.181, distance r=+0.154 (spectral-similarity r=-0.044)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=-0.044, Moran permutation p=5.634e-01 (n_perm=1000, n_src=3502)
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-07-06 14:25:00
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-scaled thresholds (0.001, 0.05xmax) -> LH+RH fold
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo 7-network labels
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 35 subjects, 5163 contacts
+Loading cached channel info from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl...
+Channel data: 37 subjects, 4960 bipolar channels
+Variable channel lengths (360136 to 1202320 samples); truncating all to 360136.
+PSD computed once: 4960 channels x 160 freqs; sensitivity stack (4960, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3489
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.188, Moran permutation p=1.099e-02 (n_perm=1000, n_vertices=3489)
+plot_surf rendering failed for /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_sensitivity_map_LH.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); skipping screenshot.
+plot_surf rendering failed for /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_sensitivity_map_LH_salience.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); skipping screenshot.
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.029, Moran permutation p=6.074e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.294, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.024, Moran permutation p=6.583e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.038, Moran permutation p=5.624e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=+0.010, Moran permutation p=8.501e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band delta: FDR q=0.823
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.823
+[Figure 3B] Band beta: FDR q=0.823
+[Figure 3B] Band gamma: FDR q=0.850
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3489); target vertices: 25113
+[Figure 3B] leakage mask removed 218402/87945726 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.195, distance r=+0.219 (spectral-similarity r=+0.165)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.165, Moran permutation p=7.992e-03 (n_perm=1000, n_src=3489)
+plot_surf rendering failed for /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_3b_ieeg_mica_es_map_LH.svg (AttributeError: 'VTKMethodWrapper' object has no attribute 'lookupTable'); skipping screenshot.
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-07-06 14:38:13
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-scaled thresholds (0.001, 0.05xmax) -> LH+RH fold
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo 7-network labels
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 35 subjects, 5163 contacts
+Loading cached channel info from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl...
+Channel data: 37 subjects, 4960 bipolar channels
+Variable channel lengths (360136 to 1202320 samples); truncating all to 360136.
+PSD computed once: 4960 channels x 160 freqs; sensitivity stack (4960, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3489
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.188, Moran permutation p=1.099e-02 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.029, Moran permutation p=6.074e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.294, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.024, Moran permutation p=6.583e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.038, Moran permutation p=5.624e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=+0.010, Moran permutation p=8.501e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band delta: FDR q=0.823
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.823
+[Figure 3B] Band beta: FDR q=0.823
+[Figure 3B] Band gamma: FDR q=0.850
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3489); target vertices: 25113
+[Figure 3B] leakage mask removed 218402/87945726 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.195, distance r=+0.219 (spectral-similarity r=+0.165)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.165, Moran permutation p=7.992e-03 (n_perm=1000, n_src=3489)
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-07-06 14:44:59
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-scaled thresholds (0.001, 0.05xmax) -> LH+RH fold
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo 7-network labels
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 35 subjects, 5163 contacts
+Loading cached channel info from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl...
+Channel data: 37 subjects, 4960 bipolar channels
+Variable channel lengths (360136 to 1202320 samples); truncating all to 360136.
+PSD computed once: 4960 channels x 160 freqs; sensitivity stack (4960, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3489
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.188, Moran permutation p=1.099e-02 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.029, Moran permutation p=6.074e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.294, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.024, Moran permutation p=6.583e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.038, Moran permutation p=5.624e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=+0.010, Moran permutation p=8.501e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band delta: FDR q=0.823
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.823
+[Figure 3B] Band beta: FDR q=0.823
+[Figure 3B] Band gamma: FDR q=0.850
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3489); target vertices: 25113
+[Figure 3B] leakage mask removed 218402/87945726 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.195, distance r=+0.219 (spectral-similarity r=+0.165)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.165, Moran permutation p=7.992e-03 (n_perm=1000, n_src=3489)
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-07-06 15:09:50
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-scaled thresholds (0.001, 0.05xmax) -> LH+RH fold
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo 7-network labels
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 35 subjects, 5163 contacts
+Loading cached channel info from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl...
+Channel data: 37 subjects, 4960 bipolar channels
+Variable channel lengths (360136 to 1202320 samples); truncating all to 360136.
+PSD computed once: 4960 channels x 160 freqs; sensitivity stack (4960, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3489
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.188, Moran permutation p=1.099e-02 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.029, Moran permutation p=6.074e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.294, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.024, Moran permutation p=6.583e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.038, Moran permutation p=5.624e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=+0.010, Moran permutation p=8.501e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band delta: FDR q=0.823
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.823
+[Figure 3B] Band beta: FDR q=0.823
+[Figure 3B] Band gamma: FDR q=0.850
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3489); target vertices: 25113
+[Figure 3B] leakage mask removed 218402/87945726 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.195, distance r=+0.219 (spectral-similarity r=+0.165)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.165, Moran permutation p=7.992e-03 (n_perm=1000, n_src=3489)
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-07-06 15:31:16
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-scaled thresholds (0.001, 0.05xmax) -> LH+RH fold
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo 7-network labels
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 35 subjects, 5163 contacts
+Loading cached channel info from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl...
+Channel data: 37 subjects, 4960 bipolar channels
+Variable channel lengths (360136 to 1202320 samples); truncating all to 360136.
+PSD computed once: 4960 channels x 160 freqs; sensitivity stack (4960, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3489
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.188, Moran permutation p=1.099e-02 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.029, Moran permutation p=6.074e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.294, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.024, Moran permutation p=6.583e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.038, Moran permutation p=5.624e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=+0.010, Moran permutation p=8.501e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band delta: FDR q=0.823
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.823
+[Figure 3B] Band beta: FDR q=0.823
+[Figure 3B] Band gamma: FDR q=0.850
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3489); target vertices: 25113
+[Figure 3B] leakage mask removed 218402/87945726 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.195, distance r=+0.219 (spectral-similarity r=+0.165)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.165, Moran permutation p=7.992e-03 (n_perm=1000, n_src=3489)
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-07-06 15:44:17
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-scaled thresholds (0.001, 0.05xmax) -> LH+RH fold
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo 7-network labels
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 35 subjects, 5163 contacts
+Loading cached channel info from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl...
+Channel data: 37 subjects, 4960 bipolar channels
+Variable channel lengths (360136 to 1202320 samples); truncating all to 360136.
+PSD computed once: 4960 channels x 160 freqs; sensitivity stack (4960, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3489
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.188, Moran permutation p=1.099e-02 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.029, Moran permutation p=6.074e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.294, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.024, Moran permutation p=6.583e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.038, Moran permutation p=5.624e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=+0.010, Moran permutation p=8.501e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band delta: FDR q=0.823
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.823
+[Figure 3B] Band beta: FDR q=0.823
+[Figure 3B] Band gamma: FDR q=0.850
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3489); target vertices: 25113
+[Figure 3B] leakage mask removed 218402/87945726 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.195, distance r=+0.219 (spectral-similarity r=+0.165)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.165, Moran permutation p=7.992e-03 (n_perm=1000, n_src=3489)

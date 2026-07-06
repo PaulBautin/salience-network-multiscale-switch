@@ -1,5 +1,24 @@
 # `src/ieeg_processing`
 
+### `compute_vertex_areas`
+
+```python
+compute_vertex_areas(vertices: np.ndarray, faces: np.ndarray) -> np.ndarray
+```
+
+Barycentric (hat-function) per-vertex surface areas of a triangular mesh — each vertex receives one third of the area of every triangle it belongs to. Matches electroMICA's `areasv`, used to normalise channel sensitivities to a per-area density before thresholding. MATLAB-style 1-based `faces` are detected and converted automatically.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `vertices` | `np.ndarray` | Vertex coordinates, shape `(n_vertices, 3)`, in millimetres. |
+| `faces` | `np.ndarray` | Triangle vertex indices, shape `(n_faces, 3)`. |
+
+**Returns** `np.ndarray` of per-vertex area, shape `(n_vertices,)`.
+
+---
+
 ### `load_original_data_files`
 
 ```python
@@ -33,23 +52,45 @@ Vertex indices are offset so that LH vertices are `0–32491` and RH vertices ar
 ```python
 load_sensitivity_info(
     root_dir: str = '/host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA',
-    *,
-    threshold: float = 0.001,
-) -> pd.DataFrame
+) -> tuple[pd.DataFrame, dict]
 ```
 
-Load and aggregate surface-based contact sensitivity maps from leadfield `.mat` files.
-
-Sensitivity maps are rectified, thresholded, and summed across hemispheres per contact.
+Load per-hemisphere **signed** contact sensitivity maps from leadfield `.mat` files, plus the surface vertex areas used to threshold them. The signed leadfield is preserved (no rectification) and the two hemispheres are kept separate, because a bipolar channel's sensitivity is the *difference* of its contacts' signed maps — deferred to [`build_bipolar_sensitivity`](#build_bipolar_sensitivity).
 
 **Parameters**
 
 | Name | Type | Description |
 |------|------|-------------|
 | `root_dir` | `str` | Root of the electroMICA derivatives. |
-| `threshold` | `float` | Minimum absolute sensitivity value retained. Default `0.001`. |
 
-**Returns** `pd.DataFrame` with columns: `Subject`, `Session`, `ContactName`, `ContactSensitivityMap`.
+**Returns** `tuple[pd.DataFrame, dict]` — (1) a DataFrame with columns `Subject`, `Session`, `ContactName`, `Sens_L`, `Sens_R` (signed `(32492,)` maps per hemisphere, zeros where absent); (2) `areas`, a mapping `(Subject, Session) -> {"L": areas_L, "R": areas_R}` of per-vertex surface areas.
+
+---
+
+### `build_bipolar_sensitivity`
+
+```python
+build_bipolar_sensitivity(
+    df_channels: pd.DataFrame,
+    areas: dict,
+    *,
+    global_thresh: float = 0.001,
+    rel_thresh: float = 0.05,
+) -> np.ndarray
+```
+
+Assemble bipolar-channel surface sensitivities following electroMICA `ComputeFeatureMaps`: per hemisphere, take the **signed difference** of the two contacts' leadfields, threshold the per-area density (absolute floor `global_thresh` and channel-relative floor `rel_thresh × second-largest density`), rectify, then fold the two hemispheres onto one fsLR-32k template by summing magnitudes (`|L1_LH − L2_LH| + |L1_RH − L2_RH|`).
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `df_channels` | `pd.DataFrame` | One row per bipolar channel with `Subject`, `Session`, and the signed contact maps `Sens1_L`, `Sens1_R`, `Sens2_L`, `Sens2_R`. |
+| `areas` | `dict` | `(Subject, Session) -> {"L", "R"}` per-vertex surface areas, from `load_sensitivity_info`. |
+| `global_thresh` | `float` | Absolute density noise floor (Vm/A). Default `0.001`. |
+| `rel_thresh` | `float` | Channel-relative density floor fraction. Default `0.05`. |
+
+**Returns** `np.ndarray` of shape `(n_channels, 32492)`, non-negative, row-aligned with `df_channels`.
 
 ---
 

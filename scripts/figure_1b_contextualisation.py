@@ -77,11 +77,9 @@ def context_analysis(df_yeo_surf: pd.DataFrame, surf_32k, modalities: list[str],
     if hemisphere in ('LH', 'RH'):
         net_mask = net_mask & df_yeo_surf['hemisphere'].eq(hemisphere)
     x = zscore(df_yeo_surf.loc[net_mask, 't1_gradient1_SalVentAttn'].values)
-    # Moran spatial autocorrelation model
-    w = mesh_elements.get_ring_distance(surf_32k, n_ring=1, mask=net_mask.values)
-    w.data **= -1
-    msr = moran.MoranRandomization(n_rep=n_rep, procedure='singleton', tol=1e-6, random_state=0)
-    msr.fit(w)
+    # Full-surface indices of the network vertices, so a per-modality finite subset can
+    # be mapped back to a whole-surface mask for the Moran graph (see the loop below).
+    net_idx = np.flatnonzero(net_mask.values)
 
     # Plot
     fig, axes = plt.subplots(
@@ -102,14 +100,22 @@ def context_analysis(df_yeo_surf: pd.DataFrame, surf_32k, modalities: list[str],
         ax_stem = axes[row, 1]
         y = df_yeo_surf.loc[net_mask, label].values
         # Score the correlation only where both the gradient and the modality are
-        # finite. The Moran model needs a value at every masked vertex, so feed it a
-        # NaN-filled vector, but evaluate observed and surrogate r on the same finite
-        # subset so no artificial zeros bias the statistic.
+        # finite, and build the Moran spatial graph on that same finite subset so the
+        # surrogate field carries only real values. Filling NaNs with 0 and randomising
+        # the full masked vector (the previous approach) injected artificial zeros into
+        # the spatial-autocorrelation structure and biased the surrogates even at the
+        # retained vertices; this mirrors the finite-subset null in figure_3_ieeg_mica.
         finite = np.isfinite(x) & np.isfinite(y)
-        rand = msr.randomize(np.nan_to_num(y))
+        finite_mask = np.zeros(df_yeo_surf.shape[0], dtype=bool)
+        finite_mask[net_idx[finite]] = True
+        w = mesh_elements.get_ring_distance(surf_32k, n_ring=1, mask=finite_mask)
+        w.data **= -1
+        msr = moran.MoranRandomization(n_rep=n_rep, procedure='singleton', tol=1e-6, random_state=0)
+        msr.fit(w)
+        rand = msr.randomize(y[finite])
         sns.regplot(x=x[finite], y=y[finite], ax=ax, scatter_kws={"s": 20, "alpha": 0.1, "edgecolors":'none', 'rasterized':True}, line_kws={"color": "black", "lw":2.5})
         r_obs, _ = spearmanr(x[finite], y[finite])
-        r_rand = np.asarray([spearmanr(x[finite], d[finite])[0] for d in rand])
+        r_rand = np.asarray([spearmanr(x[finite], surr)[0] for surr in rand])
         pv_rand = empirical_p_twosided(r_rand, r_obs)
         logger.info(f"[Figure 1B] {label}: MPC-gradient vs {label} | Spearman r={r_obs:.3f}, Moran permutation p={pv_rand:.3e} (n_perm={n_rep})")
         stats_text = f"$r={r_obs:.2f}$\n$p={pv_rand:.3f}$"
@@ -167,7 +173,9 @@ def main():
     args = parser.parse_args()
     script_path = Path(__file__).resolve()
     project_root = script_path.parent.parent
-    n_rep = 100
+    # 1000 surrogates matches figures 2 and 3 and keeps the add-one p floor at
+    # 1/(1+1000) ~ 1e-3 for stable spatial-null p-values.
+    n_rep = 1000
 
     logger = setup_manuscript_logger("figure_1b_contextualisation", project_root, args)
     logger.info(f"Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels")

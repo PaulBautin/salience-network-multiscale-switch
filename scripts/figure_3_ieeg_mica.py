@@ -61,7 +61,7 @@ from scipy.spatial.distance import cdist
 import logging
 
 from src.atlas_load import convert_states_str2int, compute_network_mask
-from src.ieeg_processing import load_sensitivity_info, load_original_data_files, preprocess_and_compute_psd_ieeg, compute_spectral_parameters, compute_gradient_quantiles
+from src.ieeg_processing import load_sensitivity_info, build_bipolar_sensitivity, load_original_data_files, preprocess_and_compute_psd_ieeg, compute_spectral_parameters, compute_gradient_quantiles
 from src.connectome_processing import empirical_p_twosided, benjamini_hochberg, _weighted_mean_projection
 from src.plot_colors import yeo7_rgb, yeo7_abbrev
 from src.logging_utils import setup_manuscript_logger
@@ -108,14 +108,12 @@ def _orient_fc_gradient(fc_vals: np.ndarray, networks: np.ndarray, label: str = 
     return fc_vals
 
 
-def _pct_color_range(values: np.ndarray, lo: float = 5.0, hi: float = 95.0):
+def _pct_color_range(values: np.ndarray, lo: float = 0.0, hi: float = 100.0):
     """Percentile colour range for a surface map (``None`` if no finite values).
 
-    Spreads skewed data across a sequential colormap by clipping the display range
-    to the [lo, hi] percentiles of the finite values, so most of the dynamic range
-    is used rather than bunching near one end. Coverage maps are strongly
-    right-skewed (a few vertices sit directly under electrodes), so the default
-    clips the top 5% as well, keeping the mid-range variation visible.
+    With the default [0, 100] bounds this spans the full finite data range (no
+    clipping); narrower ``lo``/``hi`` percentiles would instead spread skewed data
+    across a sequential colormap by trimming the extremes.
     """
     finite = values[np.isfinite(values)]
     if finite.size == 0:
@@ -206,12 +204,13 @@ def get_parser() -> argparse.ArgumentParser:
     optional.add_argument(
         "-hemi",
         type=str,
-        default="RH",
+        default="LH",
         choices=["LH", "RH"],
-        help="Hemisphere for analysis: 'LH' or 'RH' (default: RH). 'both' is not "
-             "supported here: the sensitivity maps are bilateral-summed onto a single "
-             "fsLR-32k hemisphere space and the gradient/Moran geometry are evaluated "
-             "one hemisphere at a time, so the analysis runs per hemisphere."
+        help="Hemisphere for analysis: 'LH' or 'RH' (default: LH). 'both' is not "
+             "supported here: bipolar sensitivities from both hemispheres are folded "
+             "onto a single fsLR-32k template (see build_bipolar_sensitivity) and the "
+             "gradient/Moran geometry are evaluated one hemisphere at a time, so the "
+             "analysis runs per hemisphere."
     )
     optional.add_argument(
         "-network",
@@ -376,7 +375,7 @@ def frequency_band_analysis_sensitivity(f: np.ndarray, pxx_raw: np.ndarray, sens
         size=(725, 300), zoom=1.4, share='both', nan_color=(220, 220, 220, 1), cmap="coolwarm", color_range='sym')
 
     # Sensitivity coverage maps (whole-brain + salience): total per-vertex sensitivity
-    # from the fit channels, spread across the Purples map via a 5-95th-percentile range.
+    # from the fit channels, spread across the Purples map over the full data range.
     surf_cov = sens_good_sum.astype(float)
     surf_cov[surf_cov == 0] = np.nan
     cov_wb = surf_cov.copy()
@@ -384,13 +383,13 @@ def frequency_band_analysis_sensitivity(f: np.ndarray, pxx_raw: np.ndarray, sens
     _screenshot_hemi(surf_hemi_infl, cov_wb,
         project_root / f"results/figures/figure_3b_ieeg_mica_sensitivity_map_{hemi}.svg",
         size=(725, 300), zoom=1.3, color_bar='right', share='both', nan_color=(220, 220, 220, 1),
-        cmap="Purples", color_range=_pct_color_range(cov_wb))
+        cmap="Purples", color_range=_pct_color_range(cov_wb, 10, 99))
     cov_sal = surf_cov.copy()
     cov_sal[~mask_hemi] = np.nan
     _screenshot_hemi(surf_hemi_infl, cov_sal,
         project_root / f"results/figures/figure_3b_ieeg_mica_sensitivity_map_{hemi}_salience.svg",
         size=(725, 300), zoom=1.3, color_bar='right', share='both', nan_color=(220, 220, 220, 1),
-        cmap="Purples", color_range=_pct_color_range(cov_sal))
+        cmap="Purples", color_range=_pct_color_range(cov_sal, 10, 99))
 
     # ----- SECONDARY measure: oscillatory band power (FDR-corrected across bands) -----
     # Per-band peak power from the same specparam fit (periodic component, orthogonal to
@@ -721,7 +720,7 @@ def main():
 
     logger = setup_manuscript_logger("figure_3_ieeg_mica", project_root, args)
     logger.info(f"Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)")
-    logger.info(f"Sensitivity maps: electroMICA leadfield, fsLR-32k surface, bipolar derivation (|Sens1 - Sens2|)")
+    logger.info(f"Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-scaled thresholds (0.001, 0.05xmax) -> LH+RH fold")
     logger.info(f"Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned")
     logger.info(f"PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum")
     logger.info(f"Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz")
@@ -744,8 +743,8 @@ def main():
     logger.info(f"Loading gradient dataframe from {path_df_1a}")
     df_yeo_surf = pd.read_csv(path_df_1a, sep="\t")
 
-    # Load sensitivity for each contact information.
-    df_sensitivity = load_sensitivity_info(root_dir=ieeg_deriv)
+    # Load signed per-hemisphere contact sensitivities and per-subject vertex areas.
+    df_sensitivity, sens_areas = load_sensitivity_info(root_dir=ieeg_deriv)
     logger.info(f"Sensitivity maps loaded: {df_sensitivity['Subject'].nunique()} subjects, {len(df_sensitivity)} contacts")
 
     # Load channel information
@@ -762,12 +761,17 @@ def main():
         logger.info(f"Channel info saved to {cache_path}.")
     logger.info(f"Channel data: {df_channel_data['Subject'].nunique()} subjects, {len(df_channel_data)} bipolar channels")
 
-    # Align sensitivity maps by contact name
+    # Attach each bipolar channel's two contacts' signed per-hemisphere leadfields
+    # (Sens1_{L,R} = first contact, Sens2_{L,R} = second contact).
     df_channel_data[['ContactName1', 'ContactName2']] = df_channel_data[['ContactName1', 'ContactName2']].apply(lambda c: c.str.upper())
-    df1 = df_channel_data.merge(df_sensitivity, left_on=['Subject', 'Session', 'ContactName1'], right_on=['Subject', 'Session', 'ContactName'], how='left').rename(columns={'ContactSensitivityMap': 'Sens1'})
-    df2 = df1.merge(df_sensitivity, left_on=['Subject', 'Session', 'ContactName2'], right_on=['Subject', 'Session', 'ContactName'], how='left').rename(columns={'ContactSensitivityMap': 'Sens2'})
-    df2['SensitivityMap_bip'] = df2['Sens1'] - df2['Sens2']
-    df2['SensitivityMap_bip'] = df2['SensitivityMap_bip'].map(lambda x: np.abs(x) if isinstance(x, np.ndarray) else np.zeros(N_LH))
+    df1 = df_channel_data.merge(
+        df_sensitivity, left_on=['Subject', 'Session', 'ContactName1'],
+        right_on=['Subject', 'Session', 'ContactName'], how='left'
+    ).rename(columns={'Sens_L': 'Sens1_L', 'Sens_R': 'Sens1_R'}).drop(columns='ContactName')
+    df2 = df1.merge(
+        df_sensitivity, left_on=['Subject', 'Session', 'ContactName2'],
+        right_on=['Subject', 'Session', 'ContactName'], how='left'
+    ).rename(columns={'Sens_L': 'Sens2_L', 'Sens_R': 'Sens2_R'}).drop(columns='ContactName')
 
     # Compute the Welch PSD and stack the bipolar sensitivity maps ONCE; both the
     # spectral (slope/band) and spectral-similarity analyses reuse them (the PSD is the
@@ -779,7 +783,9 @@ def main():
     data_matrix = np.vstack([np.asarray(sig)[:min_len] for sig in df2['Data']])
     fs = df2['SamplingRate'].iloc[0]
     f, pxx_raw = preprocess_and_compute_psd_ieeg(data_matrix, fs)
-    sens = np.nan_to_num(np.vstack(df2['SensitivityMap_bip'].values), nan=0.0)
+    # electroMICA-faithful bipolar sensitivity (row-aligned with df2 / pxx_raw):
+    # per-hemisphere signed difference -> area-scaled thresholds -> abs -> LH+RH fold.
+    sens = np.nan_to_num(build_bipolar_sensitivity(df2, sens_areas), nan=0.0)
     logger.info(f"PSD computed once: {pxx_raw.shape[0]} channels x {pxx_raw.shape[1]} freqs; sensitivity stack {sens.shape}")
 
     # Primary: aperiodic-exponent (1/f slope) and secondary FDR band power vs MPC gradient.

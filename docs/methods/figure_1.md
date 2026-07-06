@@ -49,14 +49,17 @@ both myelin- and cell-sensitive stains:
 | Parvalbumin | AHEAD dataset (200 µm) | interneuron staining intensity |
 
 Acquisition and provenance of the histological volumes are described in
-[Data Acquisition](datasets.md#bigbrain-dataset). Each map was correlated with the
-qT1 gradient vertex-wise within the SN mask using the Spearman rank coefficient,
-restricted to vertices where both the gradient and the modality were finite.
-Because cortical maps carry strong spatial autocorrelation, statistical
-significance was assessed against a within-network Moran spectral randomisation
-null
+[Data Acquisition](datasets.md#bigbrain-dataset). The mean qT1 map and the qT1
+gradient both derive from the same intracortical qT1 profiles, so the qT1 row is a
+within-contrast consistency check rather than independent corroboration; the
+post-mortem BigBrain and AHEAD stains provide the cross-contrast, cross-modality
+validation. Each map was correlated with the qT1 gradient vertex-wise within the SN
+mask using the Spearman rank coefficient, restricted to vertices where both the
+gradient and the modality were finite. Because cortical maps carry strong spatial
+autocorrelation, statistical significance was assessed against a within-network
+Moran spectral randomisation null
 ([Shared Methods — Moran spectral randomisation](shared.md#moran-spectral-randomisation-within-network))
-rather than the parametric distribution.
+fitted on that same finite vertex subset, rather than the parametric distribution.
 
 ## Figure 1c — Cortical type composition
 
@@ -77,4 +80,8 @@ effectively absent. The proportion of each cortical type within the SN was
 compared with its proportion across the remainder of the cortex, and enrichment
 was evaluated against a spin-permutation null
 ([Shared Methods — Spin-test permutations](shared.md#spin-test-permutations-whole-brain))
-to control for spatial autocorrelation.
+to control for spatial autocorrelation. Per cortical type, a two-tailed add-one
+empirical $p$-value compared the observed composition against the spin-null
+distribution (centred on the null mean so deviation in either direction is tested),
+and the seven type tests were corrected for multiple comparisons by the
+Benjamini–Hochberg procedure.

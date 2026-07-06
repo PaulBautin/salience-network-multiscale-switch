@@ -152,14 +152,26 @@ the empirical connection density — a wiring-aligned map (expected to be reject
 geometry-only map (expected to be retained) — verifying that the null discriminates
 specific wiring from geometry rather than from sparsity.
 
+Both nulls above act on the source map or the connectome; a third, complementary null
+acts on the projection target. The principal FC gradient defining the target axis is
+itself strongly autocorrelated and anatomically registered to the connectome, so a
+target-side spin null ([Shared Methods — Target-side spin
+null](shared.md#target-side-spin-null-fc-gradient-rotation)) rotated the FC gradient on
+the sphere and recomputed the projection on the real connectome for each spin, testing
+whether the alignment depends on the gradient's anatomical registration beyond its
+autocorrelation. Being target-side, this null applies to every measure, geodesic
+distance included; its surrogates are centred on zero, so $p_{\mathrm{spin}}$ is the
+two-tailed add-one estimator. The Moran, topological, and spin $p$ values were each
+Benjamini–Hochberg-corrected within their measure across the seven networks.
+
 Panel 2A (`figure_2a_distance_metric.svg`) is laid out with one row per connectivity
 measure (SC, GD, MPC, FC) and two columns. The left column plots, for the salience
 network, each vertex's within-network MPC gradient — on a single shared bottom x-axis,
 as the gradient is the same vector for every measure — against that measure's
 connectivity-weighted projection $P$, with points coloured by their dominant target
 network and annotated with the group correlation $\bar r$, the spatial-null
-$p_{\mathrm{moran}}$, and — for the measures that receive it (SC, MPC, FC) — the
-topological-null $p_{\mathrm{topo}}$. For visualisation, the group-mean projection is standardised
+$p_{\mathrm{moran}}$, the target-side $p_{\mathrm{spin}}$, and — for the measures that
+receive it (SC, MPC, FC) — the topological-null $p_{\mathrm{topo}}$. For visualisation, the group-mean projection is standardised
 (z-scored) per network and measure; because the per-subject statistic is rank-based
 (Spearman), this monotone rescale leaves $\bar r$ and $p_{\mathrm{moran}}$ unchanged.
 The right column summarises the same statistic across all seven

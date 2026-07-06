@@ -129,7 +129,7 @@ def load_mni_ieeg_data(ieeg_deriv, project_root, df_yeo_surf, surf32k_lh_infl, s
     surf_lh = mesh.mesh_creation.build_polydata(points=data_dict['NodesLeft'], cells=data_dict['FacesLeft'] - 1)
     surf_rh = mesh.mesh_creation.build_polydata(points=data_dict['NodesRight'], cells=data_dict['FacesRight'] - 1)
     mesh.mesh_io.write_surface(surf_lh, str(project_root / 'data/surfaces/ieeg_surfaces/surf_lh_ieeg_atlas.surf.gii'))
-    mesh.mesh_io.write_surface(surf_rh, str(project_root / 'data/surfaces/ieeg_surfaces/surf_lh_ieeg_atlas.surf.gii'))
+    mesh.mesh_io.write_surface(surf_rh, str(project_root / 'data/surfaces/ieeg_surfaces/surf_rh_ieeg_atlas.surf.gii'))
 
     # Electrode projection on cortical surface
     vertices = np.vstack((data_dict['NodesLeft'], data_dict['NodesRight']))
@@ -207,8 +207,13 @@ def correlation_analysis_scatter(surf, df_data, sampling_frequency, df_yeo_surf,
     axes[0].set_ylim([-3,3])
     axes[0].set_aspect('equal')
 
+    # Per-network mean ES difference. NOTE: no spatial null is computed for this panel
+    # yet (the channel-level test above uses a parametric Spearman p); the bars are the
+    # raw per-network means with no error bars. A spatial null (spin/Moran on the
+    # channel layout) is pending — see the review plan, item F1 — so the bars are not
+    # annotated with a significance claim.
     df_data_net = df_data[['network', 'corr_diff', 'colors', 'bigbrain_g2']].dropna().groupby('network').mean().reset_index().sort_values(by='bigbrain_g2')
-    axes[1].barh(df_data_net['network'], df_data_net['corr_diff'], color=df_data_net['colors'], edgecolor='black', alpha=0.8, capsize=3, label='Spin null mean ± 95% CI')
+    axes[1].barh(df_data_net['network'], df_data_net['corr_diff'], color=df_data_net['colors'], edgecolor='black', alpha=0.8, label='Mean ES difference per network')
     axes[1].axvline(0, color='black', linewidth=1)
     axes[1].set_xlabel("Mean ES$_{top}$ - ES$_{bottom}$")
     axes[1].yaxis.set_label_position("right")

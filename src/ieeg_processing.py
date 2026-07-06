@@ -14,6 +14,40 @@ from vtkmodules.vtkFiltersSources import vtkSphereSource
 
 logger = logging.getLogger(__name__)
 
+# fsLR-32k vertices per hemisphere.
+N_LH = 32492
+
+
+def compute_vertex_areas(vertices: np.ndarray, faces: np.ndarray) -> np.ndarray:
+    """Barycentric (hat-function) per-vertex surface areas of a triangular mesh.
+
+    Each vertex is assigned one third of the area of every triangle it belongs to
+    -- the integral over the surface of the piecewise-linear hat function that is 1
+    at the vertex and 0 at its neighbours. This matches the ``areasv`` routine used
+    by electroMICA (``ComputeFeatureMaps``) to normalise channel sensitivities to a
+    per-area density before thresholding.
+
+    Args:
+        vertices: Vertex coordinates, shape (n_vertices, 3), in millimetres.
+        faces: Triangle vertex indices, shape (n_faces, 3). MATLAB-style 1-based
+            indexing is detected and converted to 0-based automatically.
+
+    Returns:
+        np.ndarray: Per-vertex area, shape (n_vertices,).
+    """
+    v = np.asarray(vertices, dtype=float)
+    f = np.asarray(faces)
+    if f.min() == 1:  # MATLAB 1-based faces
+        f = f - 1
+    tri = v[f]  # (n_faces, 3, 3)
+    tri_area = 0.5 * np.linalg.norm(
+        np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0]), axis=1
+    )
+    areas = np.zeros(v.shape[0])
+    for k in range(3):
+        np.add.at(areas, f[:, k], tri_area / 3.0)
+    return areas
+
 
 def load_original_data_files(
     root: str = '/host/verges/tank/data/BIDS_iEEG/original',
@@ -104,8 +138,9 @@ def load_channel_info(root_dir: str = '/host/verges/tank/data/BIDS_iEEG/derivati
     Surface vertex indices are returned in a **combined-hemisphere convention**:
     LH vertices are numbered 0–32491 and RH vertices 32492–64983, consistent
     with the 64984-vertex fsLR-32k whole-brain surface used elsewhere in this
-    pipeline (cf. ``load_sensitivity_info``, which folds both hemispheres into
-    a single 32k space using bilateral summation).
+    pipeline (contrast ``load_sensitivity_info`` /
+    ``build_bipolar_sensitivity``, which fold the two hemispheres onto a single
+    32k template after the per-hemisphere bipolar difference).
 
     Returns
     -------
@@ -230,49 +265,40 @@ def load_channel_info(root_dir: str = '/host/verges/tank/data/BIDS_iEEG/derivati
 
 def load_sensitivity_info(
     root_dir: str = '/host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA',
-    *,
-    threshold: float = 0.001,
-) -> pd.DataFrame:
+) -> tuple[pd.DataFrame, dict]:
     """
-    Load and aggregate surface-based contact sensitivity maps from electroMICA
-    leadfield derivatives.
+    Load per-hemisphere **signed** contact sensitivity maps from electroMICA
+    leadfield derivatives, plus the surface vertex areas needed to threshold them.
 
-    electroMICA stores one leadfield .mat file per hemisphere (hemi-L, hemi-R),
-    each containing a ContactSensitivityMap of shape (n_contacts, 32492) for
-    the fsLR-32k surface of that hemisphere. This function sums the LH and RH
-    maps element-wise, yielding a single (32492,) bilateral sensitivity vector
-    per contact.
-
-    **Bilateral-sum design rationale**: fsLR-32k is a bilaterally symmetric
-    template, so vertex index *i* on LH and vertex *i* on RH occupy
-    approximately homologous cortical positions. Summing both hemispheres into
-    the same 32k vertex space means that channels whose primary sensitivity lies
-    on the "other" hemisphere still contribute to the surface projection,
-    effectively doubling the number of channels that inform any given vertex.
-    This is appropriate for group-level analyses where contacts are distributed
-    across both hemispheres and the goal is maximal coverage.
-
-    Contacts whose summed map is entirely zero after thresholding are excluded.
+    electroMICA stores one leadfield ``.mat`` per hemisphere (hemi-L, hemi-R), each
+    holding a ``ContactSensitivityMap`` of shape (n_contacts, 32492) -- the signed
+    leadfield (potential per unit normal-oriented cortical dipole, Vm/A) on that
+    hemisphere's fsLR-32k midthickness surface. The sign is physically meaningful:
+    a bipolar channel's sensitivity is the *difference* of its two contacts' signed
+    maps (``ComputeFeatureMaps``), so this function keeps the raw signed values and
+    the two hemispheres separate. Rectification, thresholding and the bipolar
+    difference are deferred to :func:`build_bipolar_sensitivity`, which combines
+    contact pairs the way electroMICA does.
 
     Args:
         root_dir (str): Root directory containing electroMICA derivatives.
             Expected layout:
             ``<root_dir>/sub-PX*/ses-01/model/
               *_leadfield_hemi-{L,R}_space-nativepro_surf-fsLR-32k_label-midthickness.mat``
-        threshold (float): Minimum absolute sensitivity value retained before
-            hemisphere summation. Vertices below this value are set to zero.
 
     Returns:
-        pd.DataFrame: One row per unique (Subject, Session, ContactName) with
-            columns:
-            - Subject
-            - Session
-            - ContactName  — physical electrode identifier (electroMICA
-              ``ContactName``), upper-cased; distinct from bipolar
-              ``ChannelName`` (e.g. "LCi1" vs "LCi1-LCi2").
-            - ContactSensitivityMap — bilateral sensitivity array of shape
-              (32492,), computed as the element-wise sum of the LH and RH
-              fsLR-32k sensitivity maps for that contact.
+        tuple[pd.DataFrame, dict]:
+            - df with one row per (Subject, Session, ContactName):
+                - Subject, Session
+                - ContactName — physical electrode identifier (upper-cased);
+                  distinct from bipolar ``ChannelName`` ("LCi1" vs "LCi1-LCi2").
+                - Sens_L, Sens_R — signed sensitivity arrays of shape (32492,) on
+                  the LH and RH surfaces (zeros where that hemisphere's file lacks
+                  the contact).
+            - areas: mapping ``(Subject, Session) -> {"L": areas_L, "R": areas_R}``
+              of per-vertex surface areas (shape (32492,)) from each hemisphere's
+              midthickness surface, used to normalise sensitivity to a per-area
+              density before thresholding.
     """
     pattern = os.path.join(root_dir, "sub-PX*", "ses-01", "model", "*_leadfield_hemi-*_space-nativepro_surf-fsLR-32k_label-midthickness.mat")
     mat_files = glob.glob(pattern)
@@ -281,7 +307,9 @@ def load_sensitivity_info(
     pat_ses = re.compile(r"ses-(\d+)")
     pat_hemi = re.compile(r"hemi-(L|R)")
 
-    records = []
+    # (subject, session, contact) -> {"Sens_L": arr, "Sens_R": arr}
+    contacts: dict = {}
+    areas: dict = {}
 
     for filepath in mat_files:
         match_sub = pat_sub.search(filepath)
@@ -307,7 +335,7 @@ def load_sensitivity_info(
             continue
 
         contact_names = [str(c).strip().upper() for c in mat["ContactName"]]
-        sensitivity = np.asarray(mat["ContactSensitivityMap"])
+        sensitivity = np.asarray(mat["ContactSensitivityMap"], dtype=float)
 
         if sensitivity.ndim != 2:
             raise ValueError(
@@ -320,36 +348,127 @@ def load_sensitivity_info(
                 f"{sensitivity.shape[0]} vs {len(contact_names)} names"
             )
 
-        # Rectify, threshold, and drop contacts whose map is entirely zero
-        sensitivity = np.abs(sensitivity)
-        sensitivity[sensitivity < threshold] = 0.0
-        active = sensitivity.any(axis=1)
-        contact_names = np.asarray(contact_names)[active]
-        sensitivity = sensitivity[active]
-
-        for name, sens in zip(contact_names, sensitivity):
-            records.append(
-                {
-                    "Subject": subject,
-                    "Session": session,
-                    "ContactName": name,
-                    "Hemi": hemi,
-                    "ContactSensitivityMap": sens,
-                }
+        # Per-vertex surface areas for this subject/hemisphere (from the leadfield's
+        # own midthickness mesh), used to normalise sensitivity to a density before
+        # thresholding, exactly as electroMICA does.
+        if {"Vertices", "Faces"}.issubset(mat):
+            areas.setdefault((subject, session), {})[hemi] = compute_vertex_areas(
+                mat["Vertices"], mat["Faces"]
             )
 
-    if not records:
-        return pd.DataFrame(columns=["Subject", "Session", "ContactName", "ContactSensitivityMap"])
-    df = pd.DataFrame.from_records(records)
+        # Keep the raw SIGNED leadfield; the bipolar difference and thresholds are
+        # applied later (see build_bipolar_sensitivity).
+        col = f"Sens_{hemi}"
+        for name, sens in zip(contact_names, sensitivity):
+            contacts.setdefault((subject, session, name), {})[col] = sens
 
-    # Sum LH and RH sensitivity maps element-wise into a single (32492,) bilateral
-    # vector per contact. Sort by Hemi first so the order is deterministic (L then R)
-    # before stacking, which matters if any caller inspects per-hemisphere contributions.
-    df = df.sort_values("Hemi")
-    df = (df.groupby(["Subject", "Session", "ContactName"], as_index=False, sort=False)
-          .agg(ContactSensitivityMap=("ContactSensitivityMap", lambda x: np.sum(np.stack(x.tolist()), axis=0))))
+    if not contacts:
+        return (
+            pd.DataFrame(columns=["Subject", "Session", "ContactName", "Sens_L", "Sens_R"]),
+            areas,
+        )
 
-    return df
+    # One row per contact carrying both signed hemisphere maps (zeros where a
+    # hemisphere's leadfield file did not include that contact).
+    zeros = np.zeros(N_LH)
+    rows = [
+        {
+            "Subject": subject,
+            "Session": session,
+            "ContactName": name,
+            "Sens_L": maps.get("Sens_L", zeros),
+            "Sens_R": maps.get("Sens_R", zeros),
+        }
+        for (subject, session, name), maps in contacts.items()
+    ]
+    df = pd.DataFrame.from_records(rows)
+
+    return df, areas
+
+
+def _threshold_channel_sensitivity(
+    chan: np.ndarray,
+    areas: np.ndarray,
+    global_thresh: float,
+    rel_thresh: float,
+) -> np.ndarray:
+    """Rectify a signed channel leadfield and zero sub-threshold vertices.
+
+    Reproduces electroMICA's two thresholds, both applied to the per-area
+    sensitivity *density* ``|chan| / area`` (Vm/A): a common absolute noise floor
+    (``global_thresh``) and a channel-dependent relative floor equal to
+    ``rel_thresh`` times the channel's second-largest density (a single-vertex-
+    outlier-robust proxy for the maximum). Retained values are returned as
+    magnitudes (the projection weights); vertices below either floor are 0.
+
+    Args:
+        chan: Signed channel leadfield, shape (n_channels, n_vertices).
+        areas: Per-vertex surface areas, shape (n_channels, n_vertices).
+        global_thresh: Absolute density floor (electroMICA ``GlobalTresh``, 0.001).
+        rel_thresh: Relative density floor fraction (electroMICA ``ChanTresh``, 0.05).
+
+    Returns:
+        np.ndarray: Non-negative thresholded sensitivity, shape of ``chan``.
+    """
+    mag = np.abs(chan)
+    density = mag / (areas + 1e-12)
+    # electroMICA `so[:, 1]`: the channel's second-largest area-normalised density.
+    second_max = np.sort(density, axis=1)[:, -2]
+    thresh_density = np.maximum(global_thresh, second_max * rel_thresh)[:, None]
+    mag[density < thresh_density] = 0.0
+    return mag
+
+
+def build_bipolar_sensitivity(
+    df_channels: pd.DataFrame,
+    areas: dict,
+    *,
+    global_thresh: float = 0.001,
+    rel_thresh: float = 0.05,
+) -> np.ndarray:
+    """Assemble bipolar-channel surface sensitivities the electroMICA way.
+
+    For each bipolar channel the sensitivity is the **signed difference of its two
+    contacts' leadfields**, computed per hemisphere, then thresholded (see
+    :func:`_threshold_channel_sensitivity`) and rectified. The two hemispheres are
+    finally folded onto a single fsLR-32k template by summing their magnitudes,
+    ``|L1_LH - L2_LH| + |L1_RH - L2_RH|`` -- a deliberate coverage choice (contacts
+    on either hemisphere inform the homologous template vertex), applied *after* the
+    per-hemisphere signed difference so opposite-sign contacts do not cancel
+    prematurely. This differs from electroMICA proper (which keeps hemispheres
+    separate) only in that final fold.
+
+    Args:
+        df_channels: One row per bipolar channel, with columns ``Subject``,
+            ``Session`` and the four signed contact maps ``Sens1_L``, ``Sens1_R``,
+            ``Sens2_L``, ``Sens2_R`` (each shape (32492,); missing entries treated
+            as zero).
+        areas: ``(Subject, Session) -> {"L": areas_L, "R": areas_R}`` per-vertex
+            surface areas from :func:`load_sensitivity_info`.
+        global_thresh: Absolute density noise floor (Vm/A).
+        rel_thresh: Channel-relative density floor fraction.
+
+    Returns:
+        np.ndarray: Non-negative bipolar sensitivity, shape (n_channels, 32492),
+        row-aligned with ``df_channels``.
+    """
+    zeros = np.zeros(N_LH)
+
+    def _stack(col: str) -> np.ndarray:
+        return np.vstack([v if isinstance(v, np.ndarray) else zeros
+                          for v in df_channels[col]])
+
+    def _areas(hemi: str) -> np.ndarray:
+        # Fall back to unit areas if a subject's mesh was unavailable, so the
+        # density thresholds degrade to a plain sensitivity threshold.
+        return np.vstack([areas.get((s, ss), {}).get(hemi, np.ones(N_LH))
+                          for s, ss in zip(df_channels["Subject"], df_channels["Session"])])
+
+    chan_L = _stack("Sens1_L") - _stack("Sens2_L")
+    chan_R = _stack("Sens1_R") - _stack("Sens2_R")
+    sens_L = _threshold_channel_sensitivity(chan_L, _areas("L"), global_thresh, rel_thresh)
+    sens_R = _threshold_channel_sensitivity(chan_R, _areas("R"), global_thresh, rel_thresh)
+    return sens_L + sens_R
 
 
 def preprocess_and_compute_psd_ieeg(

@@ -43,28 +43,47 @@ frequency bands:
 ### MNI open iEEG atlas (Figure 3a)
 
 Channel coordinates are provided in MNI152 stereotactic space. Each channel was
-assigned to its nearest vertex on the fsLR-32k surface, and band-power values were
-averaged across channels mapped to the same vertex. The network used to stratify
-channels along the microstructural gradient is configurable through the
-`-network` flag, which accepts any of the seven Yeo networks (default
-`SalVentAttn`), allowing whole-brain or network-specific analyses without changes
-to the code. Within the target network, channels falling in the lowest and highest
-quartiles of the qT1 gradient were identified, and the electrophysiological
-similarity difference between these two groups (ES$_\text{top}$ − ES$_\text{bottom}$)
-was correlated with the BigBrain G2 histological gradient across all channels
-outside the target network.
+assigned to its nearest vertex on the fsLR-32k surface. Because fsLR-32k is a
+bilaterally symmetric template and the gradient is evaluated one hemisphere at a
+time, every contact was projected onto the analysis hemisphere (default right) at its
+homologous vertex and read against that hemisphere's qT1 gradient; this bilateral
+homology assumption mirrors the hemispheric fold used for the MICA cohort
+and maximises channel coverage of the gradient. Band-power values were averaged
+across channels mapped to the same vertex. The network used to stratify channels along
+the microstructural gradient is configurable through the `-network` flag, which accepts
+any of the seven Yeo networks (default `SalVentAttn`), allowing whole-brain or
+network-specific analyses without changes to the code. Within the target network,
+channels falling in the lowest and highest quartiles of the qT1 gradient were
+identified, and the electrophysiological similarity difference between these two groups
+(ES$_\text{top}$ − ES$_\text{bottom}$) — defined from the absolute power-spectrum
+correlation, in contrast to the positive-part spectral similarity used for the MICA
+cohort — was correlated with the BigBrain G2 histological gradient across all channels
+outside the target network. This panel reports the Spearman correlation with its
+parametric $p$-value; unlike the within-network panels it is not yet evaluated against
+a spatial-autocorrelation null, and the per-network bars are descriptive means without
+an associated significance test.
 
 ### MICA iEEG dataset (Figure 3b)
 
-For the MICA cohort, each electrode contact carries a subject-specific sensitivity
-map derived from a leadfield model in the electroMICA pipeline, defined on the
-fsLR-32k surface. Each contact's sensitivity map was rectified (absolute value),
-thresholded at 0.001, and aggregated across hemispheres to give a per-contact
-spatial weighting vector. Spectral quantities were projected onto the surface by
-weighting each contact's contribution by its sensitivity map, so that contacts
-influence surface vertices in proportion to their modelled spatial sensitivity
-rather than through a single nearest-vertex assignment. The analyses below were
-carried out within one hemisphere at a time.
+For the MICA cohort, each electrode contact carries a subject-specific signed
+leadfield (sensitivity map) from the electroMICA pipeline (von Ellenrieder et al.,
+2021), defined separately for each hemisphere on the fsLR-32k midthickness surface.
+Following electroMICA, the sensitivity of a bipolar channel was computed as the
+difference between the signed leadfields of its two constituent contacts, evaluated
+independently within each hemisphere; the sign of the leadfield is retained through
+this subtraction, as the recorded channel is the potential difference of its
+contacts. Two thresholds were then applied to each channel's area-normalised
+sensitivity density (sensitivity divided by the per-vertex surface area): a common
+absolute noise floor of $0.001~\text{Vm/A}$ and a channel-specific relative floor at
+$5\%$ of the channel's second-largest density; vertices below either floor were set
+to zero. The two hemispheres were finally folded onto a single fsLR-32k template by
+summing the rectified per-hemisphere sensitivities, so that contacts on either
+hemisphere inform the homologous template vertex and channel coverage is maximised.
+Spectral quantities were projected onto the surface by a sensitivity-weighted average
+across channels (the electroMICA smoothed feature map), so that contacts influence
+surface vertices in proportion to their modelled spatial sensitivity rather than
+through a single nearest-vertex assignment. The analyses below were carried out
+within one hemisphere at a time (default left).
 
 **Spectral measures along the microstructural gradient.** Two electrophysiological
 measures were derived from a single per-channel spectral parameterisation
