@@ -761,31 +761,22 @@ def main():
         logger.info(f"Channel info saved to {cache_path}.")
     logger.info(f"Channel data: {df_channel_data['Subject'].nunique()} subjects, {len(df_channel_data)} bipolar channels")
 
-    # Attach each bipolar channel's two contacts' signed per-hemisphere leadfields
-    # (Sens1_{L,R} = first contact, Sens2_{L,R} = second contact).
+    # Contact names index into the electroMICA leadfields (upper-cased there too).
     df_channel_data[['ContactName1', 'ContactName2']] = df_channel_data[['ContactName1', 'ContactName2']].apply(lambda c: c.str.upper())
-    df1 = df_channel_data.merge(
-        df_sensitivity, left_on=['Subject', 'Session', 'ContactName1'],
-        right_on=['Subject', 'Session', 'ContactName'], how='left'
-    ).rename(columns={'Sens_L': 'Sens1_L', 'Sens_R': 'Sens1_R'}).drop(columns='ContactName')
-    df2 = df1.merge(
-        df_sensitivity, left_on=['Subject', 'Session', 'ContactName2'],
-        right_on=['Subject', 'Session', 'ContactName'], how='left'
-    ).rename(columns={'Sens_L': 'Sens2_L', 'Sens_R': 'Sens2_R'}).drop(columns='ContactName')
 
     # Compute the Welch PSD and stack the bipolar sensitivity maps ONCE; both the
     # spectral (slope/band) and spectral-similarity analyses reuse them (the PSD is the
     # expensive step, previously run twice).
-    lengths = [len(sig) for sig in df2['Data']]
+    lengths = [len(sig) for sig in df_channel_data['Data']]
     min_len, max_len = min(lengths), max(lengths)
     if min_len != max_len:
         logger.warning(f"Variable channel lengths ({min_len} to {max_len} samples); truncating all to {min_len}.")
-    data_matrix = np.vstack([np.asarray(sig)[:min_len] for sig in df2['Data']])
-    fs = df2['SamplingRate'].iloc[0]
+    data_matrix = np.vstack([np.asarray(sig)[:min_len] for sig in df_channel_data['Data']])
+    fs = df_channel_data['SamplingRate'].iloc[0]
     f, pxx_raw = preprocess_and_compute_psd_ieeg(data_matrix, fs)
-    # electroMICA-faithful bipolar sensitivity (row-aligned with df2 / pxx_raw):
+    # electroMICA-faithful bipolar sensitivity (row-aligned with df_channel_data / pxx_raw):
     # per-hemisphere signed difference -> area-scaled thresholds -> abs -> LH+RH fold.
-    sens = np.nan_to_num(build_bipolar_sensitivity(df2, sens_areas), nan=0.0)
+    sens = np.nan_to_num(build_bipolar_sensitivity(df_channel_data, df_sensitivity, sens_areas), nan=0.0)
     logger.info(f"PSD computed once: {pxx_raw.shape[0]} channels x {pxx_raw.shape[1]} freqs; sensitivity stack {sens.shape}")
 
     # Primary: aperiodic-exponent (1/f slope) and secondary FDR band power vs MPC gradient.

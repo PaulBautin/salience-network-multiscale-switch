@@ -72,6 +72,7 @@ Load per-hemisphere **signed** contact sensitivity maps from leadfield `.mat` fi
 ```python
 build_bipolar_sensitivity(
     df_channels: pd.DataFrame,
+    df_sensitivity: pd.DataFrame,
     areas: dict,
     *,
     global_thresh: float = 0.001,
@@ -79,13 +80,14 @@ build_bipolar_sensitivity(
 ) -> np.ndarray
 ```
 
-Assemble bipolar-channel surface sensitivities following electroMICA `ComputeFeatureMaps`: per hemisphere, take the **signed difference** of the two contacts' leadfields, threshold the per-area density (absolute floor `global_thresh` and channel-relative floor `rel_thresh × second-largest density`), rectify, then fold the two hemispheres onto one fsLR-32k template by summing magnitudes (`|L1_LH − L2_LH| + |L1_RH − L2_RH|`).
+Assemble bipolar-channel surface sensitivities following electroMICA `ComputeFeatureMaps`: pair each channel with its two contacts' signed leadfields, per hemisphere take the **signed difference**, threshold the per-area density (absolute floor `global_thresh` and channel-relative floor `rel_thresh × second-largest density`), rectify, then fold the two hemispheres onto one fsLR-32k template by summing magnitudes (`|L1_LH − L2_LH| + |L1_RH − L2_RH|`). Channels are processed per `(Subject, Session)` so each mesh's area vector is applied once.
 
 **Parameters**
 
 | Name | Type | Description |
 |------|------|-------------|
-| `df_channels` | `pd.DataFrame` | One row per bipolar channel with `Subject`, `Session`, and the signed contact maps `Sens1_L`, `Sens1_R`, `Sens2_L`, `Sens2_R`. |
+| `df_channels` | `pd.DataFrame` | One row per bipolar channel with `Subject`, `Session`, `ContactName1`, `ContactName2`. |
+| `df_sensitivity` | `pd.DataFrame` | Per-contact signed maps (`Subject`, `Session`, `ContactName`, `Sens_L`, `Sens_R`) from `load_sensitivity_info`; contacts absent here contribute zero. |
 | `areas` | `dict` | `(Subject, Session) -> {"L", "R"}` per-vertex surface areas, from `load_sensitivity_info`. |
 | `global_thresh` | `float` | Absolute density noise floor (Vm/A). Default `0.001`. |
 | `rel_thresh` | `float` | Channel-relative density floor fraction. Default `0.05`. |

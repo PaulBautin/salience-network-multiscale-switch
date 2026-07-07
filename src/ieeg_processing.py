@@ -12,6 +12,9 @@ from scipy.signal import butter, filtfilt, resample_poly, welch
 
 from vtkmodules.vtkFiltersSources import vtkSphereSource
 
+from brainspace.mesh.array_operations import compute_point_area
+from brainspace.mesh.mesh_creation import build_polydata
+
 logger = logging.getLogger(__name__)
 
 # fsLR-32k vertices per hemisphere.
@@ -25,7 +28,8 @@ def compute_vertex_areas(vertices: np.ndarray, faces: np.ndarray) -> np.ndarray:
     -- the integral over the surface of the piecewise-linear hat function that is 1
     at the vertex and 0 at its neighbours. This matches the ``areasv`` routine used
     by electroMICA (``ComputeFeatureMaps``) to normalise channel sensitivities to a
-    per-area density before thresholding.
+    per-area density before thresholding; it delegates to brainspace's
+    ``compute_point_area(..., area_as='one_third')``.
 
     Args:
         vertices: Vertex coordinates, shape (n_vertices, 3), in millimetres.
@@ -35,18 +39,11 @@ def compute_vertex_areas(vertices: np.ndarray, faces: np.ndarray) -> np.ndarray:
     Returns:
         np.ndarray: Per-vertex area, shape (n_vertices,).
     """
-    v = np.asarray(vertices, dtype=float)
     f = np.asarray(faces)
     if f.min() == 1:  # MATLAB 1-based faces
         f = f - 1
-    tri = v[f]  # (n_faces, 3, 3)
-    tri_area = 0.5 * np.linalg.norm(
-        np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0]), axis=1
-    )
-    areas = np.zeros(v.shape[0])
-    for k in range(3):
-        np.add.at(areas, f[:, k], tri_area / 3.0)
-    return areas
+    surf = build_polydata(points=np.asarray(vertices, dtype=float), cells=f)
+    return compute_point_area(surf, area_as='one_third')
 
 
 def load_original_data_files(
@@ -355,6 +352,12 @@ def load_sensitivity_info(
             areas.setdefault((subject, session), {})[hemi] = compute_vertex_areas(
                 mat["Vertices"], mat["Faces"]
             )
+        else:
+            logger.warning(
+                f"Leadfield {os.path.basename(filepath)} lacks Vertices/Faces; "
+                f"sub-{subject} ses-{session} hemi-{hemi} thresholds will fall back "
+                f"to unit areas (plain sensitivity threshold)."
+            )
 
         # Keep the raw SIGNED leadfield; the bipolar difference and thresholds are
         # applied later (see build_bipolar_sensitivity).
@@ -403,7 +406,7 @@ def _threshold_channel_sensitivity(
 
     Args:
         chan: Signed channel leadfield, shape (n_channels, n_vertices).
-        areas: Per-vertex surface areas, shape (n_channels, n_vertices).
+        areas: Per-vertex surface areas, shape (n_vertices,), broadcast over channels.
         global_thresh: Absolute density floor (electroMICA ``GlobalTresh``, 0.001).
         rel_thresh: Relative density floor fraction (electroMICA ``ChanTresh``, 0.05).
 
@@ -412,8 +415,9 @@ def _threshold_channel_sensitivity(
     """
     mag = np.abs(chan)
     density = mag / (areas + 1e-12)
-    # electroMICA `so[:, 1]`: the channel's second-largest area-normalised density.
-    second_max = np.sort(density, axis=1)[:, -2]
+    # electroMICA `so[:, 1]`: the channel's second-largest area-normalised density
+    # (partial sort — the full ordering is never needed).
+    second_max = np.partition(density, -2, axis=1)[:, -2]
     thresh_density = np.maximum(global_thresh, second_max * rel_thresh)[:, None]
     mag[density < thresh_density] = 0.0
     return mag
@@ -421,6 +425,7 @@ def _threshold_channel_sensitivity(
 
 def build_bipolar_sensitivity(
     df_channels: pd.DataFrame,
+    df_sensitivity: pd.DataFrame,
     areas: dict,
     *,
     global_thresh: float = 0.001,
@@ -428,21 +433,26 @@ def build_bipolar_sensitivity(
 ) -> np.ndarray:
     """Assemble bipolar-channel surface sensitivities the electroMICA way.
 
-    For each bipolar channel the sensitivity is the **signed difference of its two
-    contacts' leadfields**, computed per hemisphere, then thresholded (see
-    :func:`_threshold_channel_sensitivity`) and rectified. The two hemispheres are
-    finally folded onto a single fsLR-32k template by summing their magnitudes,
-    ``|L1_LH - L2_LH| + |L1_RH - L2_RH|`` -- a deliberate coverage choice (contacts
-    on either hemisphere inform the homologous template vertex), applied *after* the
-    per-hemisphere signed difference so opposite-sign contacts do not cancel
-    prematurely. This differs from electroMICA proper (which keeps hemispheres
-    separate) only in that final fold.
+    Each bipolar channel is paired with its two contacts' signed leadfields (looked
+    up from ``df_sensitivity`` by ``ContactName``), and its sensitivity is the
+    **signed difference** of those leadfields, computed per hemisphere, then
+    thresholded (see :func:`_threshold_channel_sensitivity`) and rectified. The two
+    hemispheres are finally folded onto a single fsLR-32k template by summing their
+    magnitudes, ``|L1_LH - L2_LH| + |L1_RH - L2_RH|`` -- a deliberate coverage choice
+    (contacts on either hemisphere inform the homologous template vertex), applied
+    *after* the per-hemisphere signed difference so opposite-sign contacts do not
+    cancel prematurely. This differs from electroMICA proper (which keeps hemispheres
+    separate) only in that final fold. Channels are processed per (Subject, Session)
+    so each mesh's per-vertex area vector is applied once (broadcast over the group's
+    channels) rather than tiled per channel.
 
     Args:
         df_channels: One row per bipolar channel, with columns ``Subject``,
-            ``Session`` and the four signed contact maps ``Sens1_L``, ``Sens1_R``,
-            ``Sens2_L``, ``Sens2_R`` (each shape (32492,); missing entries treated
-            as zero).
+            ``Session``, ``ContactName1``, ``ContactName2`` (contact names matching
+            ``df_sensitivity``).
+        df_sensitivity: Per-contact signed maps from :func:`load_sensitivity_info`,
+            with columns ``Subject``, ``Session``, ``ContactName``, ``Sens_L``,
+            ``Sens_R`` (each shape (32492,)). Contacts absent here contribute zero.
         areas: ``(Subject, Session) -> {"L": areas_L, "R": areas_R}`` per-vertex
             surface areas from :func:`load_sensitivity_info`.
         global_thresh: Absolute density noise floor (Vm/A).
@@ -452,23 +462,28 @@ def build_bipolar_sensitivity(
         np.ndarray: Non-negative bipolar sensitivity, shape (n_channels, 32492),
         row-aligned with ``df_channels``.
     """
-    zeros = np.zeros(N_LH)
+    zeros = (np.zeros(N_LH), np.zeros(N_LH))
+    lookup = {(r.Subject, r.Session, r.ContactName): (r.Sens_L, r.Sens_R)
+              for r in df_sensitivity.itertuples(index=False)}
 
-    def _stack(col: str) -> np.ndarray:
-        return np.vstack([v if isinstance(v, np.ndarray) else zeros
-                          for v in df_channels[col]])
+    df_channels = df_channels.reset_index(drop=True)
+    out = np.zeros((len(df_channels), N_LH))
+    for (subject, session), grp in df_channels.groupby(["Subject", "Session"], sort=False):
+        area = areas.get((subject, session), {})
 
-    def _areas(hemi: str) -> np.ndarray:
-        # Fall back to unit areas if a subject's mesh was unavailable, so the
-        # density thresholds degrade to a plain sensitivity threshold.
-        return np.vstack([areas.get((s, ss), {}).get(hemi, np.ones(N_LH))
-                          for s, ss in zip(df_channels["Subject"], df_channels["Session"])])
+        def _diff(hemi_idx: int) -> np.ndarray:
+            """Signed L1 - L2 leadfield difference for this group, one hemisphere."""
+            c1 = np.vstack([lookup.get((subject, session, n), zeros)[hemi_idx] for n in grp["ContactName1"]])
+            c2 = np.vstack([lookup.get((subject, session, n), zeros)[hemi_idx] for n in grp["ContactName2"]])
+            return c1 - c2
 
-    chan_L = _stack("Sens1_L") - _stack("Sens2_L")
-    chan_R = _stack("Sens1_R") - _stack("Sens2_R")
-    sens_L = _threshold_channel_sensitivity(chan_L, _areas("L"), global_thresh, rel_thresh)
-    sens_R = _threshold_channel_sensitivity(chan_R, _areas("R"), global_thresh, rel_thresh)
-    return sens_L + sens_R
+        sens = sum(
+            _threshold_channel_sensitivity(_diff(i), area.get(hemi, np.ones(N_LH)),
+                                           global_thresh, rel_thresh)
+            for i, hemi in enumerate(("L", "R"))
+        )
+        out[grp.index.to_numpy()] = sens
+    return out
 
 
 def preprocess_and_compute_psd_ieeg(
