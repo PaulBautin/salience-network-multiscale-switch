@@ -1675,3 +1675,1406 @@ PSD computed once: 4960 channels x 160 freqs; sensitivity stack (4960, 32492)
 [Figure 3B] leakage mask removed 218402/87945726 source-target pairs (cosine > 0.1).
 [Figure 3B] baselines vs MPC-gradient | uniform r=-0.195, distance r=+0.219 (spectral-similarity r=+0.165)
 [Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.165, Moran permutation p=7.992e-03 (n_perm=1000, n_src=3489)
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-07-07 10:46:53
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-scaled thresholds (0.001, 0.05xmax) -> LH+RH fold
+Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo 7-network labels
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 35 subjects, 5163 contacts
+Loading cached channel info from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_data_df.pkl...
+Channel data: 37 subjects, 4960 bipolar channels
+Variable channel lengths (360136 to 1202320 samples); truncating all to 360136.
+PSD computed once: 4960 channels x 160 freqs; sensitivity stack (4960, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3489
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.188, Moran permutation p=1.099e-02 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.029, Moran permutation p=6.074e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.294, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.024, Moran permutation p=6.583e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.038, Moran permutation p=5.624e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=+0.010, Moran permutation p=8.501e-01 (n_perm=1000, n_vertices=3489)
+[Figure 3B] Band delta: FDR q=0.823
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.823
+[Figure 3B] Band beta: FDR q=0.823
+[Figure 3B] Band gamma: FDR q=0.850
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3489); target vertices: 25113
+[Figure 3B] leakage mask removed 218402/87945726 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.195, distance r=+0.219 (spectral-similarity r=+0.165)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.165, Moran permutation p=7.992e-03 (n_perm=1000, n_src=3489)
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-10-09 13:05:04
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-normalised density thresholds (0.001 Vm/A absolute, 5% of the channel's second-largest density) -> LH+RH fold
+Preprocessing  : truncated to the shortest recording, Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k LH, Schaefer-400, Yeo 7-network labels
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 37 subjects, 5423 contacts
+Raw recordings : /host/verges/tank/data/BIDS_iEEG/original
+Channel PSD cache not found; computing from 38 recordings in /host/verges/tank/data/BIDS_iEEG/original.
+Variable channel lengths (360136 to 1200591 samples); truncating all to 360136.
+Channel PSD saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_psd.pkl.
+Channel data: 38 subjects, 5065 bipolar channels
+sub-PX004 ses-01: 127/127 contacts have no leadfield (treated as zero); 115/115 channels affected.
+120/5065 channels have no suprathreshold sensitivity; they carry no weight in the surface projections.
+PSD computed once: 5065 channels x 160 freqs; sensitivity stack (5065, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3493
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.195, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.033, Moran permutation p=5.904e-01 (n_perm=1000, n_vertices=3493)
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.278, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.016, Moran permutation p=7.832e-01 (n_perm=1000, n_vertices=3493)
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.032, Moran permutation p=6.154e-01 (n_perm=1000, n_vertices=3493)
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=-0.010, Moran permutation p=8.731e-01 (n_perm=1000, n_vertices=3493)
+[Figure 3B] Band delta: FDR q=0.873
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.873
+[Figure 3B] Band beta: FDR q=0.873
+[Figure 3B] Band gamma: FDR q=0.873
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3493); target vertices: 25098
+[Figure 3B] leakage mask removed 194024/87893196 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.202, distance r=+0.219 (spectral-similarity r=+0.180)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.180, Moran permutation p=3.996e-03 (n_perm=1000, n_src=3493)
+[Figure 3B] channel PSD correlation matrix: 4657/5065 channels (120 without sensitivity excluded)
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-10-13 11:21:36
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: RH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-normalised density thresholds (0.001 Vm/A absolute, 5% of the channel's second-largest density) -> LH+RH fold
+Preprocessing  : truncated to the shortest recording, Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; supplementary: spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Gradient       : bilateral SN MPC gradient of Figure 1 (df_1a_both.tsv); statistics on RH network vertices
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels; maps shown on both hemispheres (LH+RH folded template)
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Sensitivity maps loaded: 37 subjects, 5423 contacts
+Raw recordings : /host/verges/tank/data/BIDS_iEEG/original
+Loading cached channel PSD from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_psd.pkl
+Channel data: 38 subjects, 5065 bipolar channels
+sub-PX004 ses-01: 127/127 contacts have no leadfield (treated as zero); 115/115 channels affected.
+120/5065 channels have no suprathreshold sensitivity; they carry no weight in the surface projections.
+PSD computed once: 5065 channels x 160 freqs; sensitivity stack (5065, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 4088
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.291, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=4088)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.135, Moran permutation p=5.994e-03 (n_perm=1000, n_vertices=4088)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.185, Moran permutation p=1.998e-03 (n_perm=1000, n_vertices=4088)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=+0.112, Moran permutation p=2.997e-02 (n_perm=1000, n_vertices=4088)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=-0.067, Moran permutation p=2.148e-01 (n_perm=1000, n_vertices=4088)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=+0.012, Moran permutation p=8.052e-01 (n_perm=1000, n_vertices=4088)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: FDR q=0.015
+[Figure 3B] Band theta: FDR q=0.010
+[Figure 3B] Band alpha: FDR q=0.050
+[Figure 3B] Band beta: FDR q=0.268
+[Figure 3B] Band gamma: FDR q=0.805
+[Figure 3B] exponent: Moran-null r 95% interval [-0.100, +0.098], median +0.000
+[Figure 3B] delta: Moran-null r 95% interval [-0.097, +0.091], median -0.001
+[Figure 3B] theta: Moran-null r 95% interval [-0.109, +0.116], median -0.000
+[Figure 3B] alpha: Moran-null r 95% interval [-0.102, +0.104], median +0.002
+[Figure 3B] beta: Moran-null r 95% interval [-0.103, +0.102], median -0.004
+[Figure 3B] gamma: Moran-null r 95% interval [-0.102, +0.103], median -0.000
+[Figure 3B] test summary saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_3b_spectral_stats_RH.csv
+[Figure 3B] spectra bin 1/5: 818 vertices, gradient median -1.16
+[Figure 3B] spectra bin 2/5: 817 vertices, gradient median -0.61
+[Figure 3B] spectra bin 3/5: 818 vertices, gradient median -0.18
+[Figure 3B] spectra bin 4/5: 817 vertices, gradient median +0.33
+[Figure 3B] spectra bin 5/5: 818 vertices, gradient median +1.21
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 4091 (covered+gradient: 4088); target vertices: 24512
+[Figure 3B] leakage mask removed 226952/100278592 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.188, distance r=+0.489 (spectral-similarity r=+0.109)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.109, Moran permutation p=6.693e-02 (n_perm=1000, n_src=4088)
+[Figure 3B] channel PSD correlation matrix: 4658/5065 channels (120 without sensitivity excluded)
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-10-13 11:33:51
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: RH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-normalised density thresholds (0.001 Vm/A absolute, 5% of the channel's second-largest density) -> LH+RH fold
+Preprocessing  : truncated to the shortest recording, Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; supplementary: spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Gradient       : bilateral SN MPC gradient of Figure 1 (df_1a_both.tsv); statistics on RH network vertices
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels; maps shown on both hemispheres (LH+RH folded template)
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Sensitivity maps loaded: 37 subjects, 5423 contacts
+Raw recordings : /host/verges/tank/data/BIDS_iEEG/original
+Loading cached channel PSD from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_psd.pkl
+Channel data: 38 subjects, 5065 bipolar channels
+sub-PX004 ses-01: 127/127 contacts have no leadfield (treated as zero); 115/115 channels affected.
+120/5065 channels have no suprathreshold sensitivity; they carry no weight in the surface projections.
+PSD computed once: 5065 channels x 160 freqs; sensitivity stack (5065, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 4088
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.291, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=4088)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.135, Moran permutation p=5.994e-03 (n_perm=1000, n_vertices=4088)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.185, Moran permutation p=1.998e-03 (n_perm=1000, n_vertices=4088)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=+0.112, Moran permutation p=2.997e-02 (n_perm=1000, n_vertices=4088)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=-0.067, Moran permutation p=2.148e-01 (n_perm=1000, n_vertices=4088)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=+0.012, Moran permutation p=8.052e-01 (n_perm=1000, n_vertices=4088)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: FDR q=0.015
+[Figure 3B] Band theta: FDR q=0.010
+[Figure 3B] Band alpha: FDR q=0.050
+[Figure 3B] Band beta: FDR q=0.268
+[Figure 3B] Band gamma: FDR q=0.805
+[Figure 3B] exponent: Moran-null r 95% interval [-0.100, +0.098], median +0.000
+[Figure 3B] delta: Moran-null r 95% interval [-0.097, +0.091], median -0.001
+[Figure 3B] theta: Moran-null r 95% interval [-0.109, +0.116], median -0.000
+[Figure 3B] alpha: Moran-null r 95% interval [-0.102, +0.104], median +0.002
+[Figure 3B] beta: Moran-null r 95% interval [-0.103, +0.102], median -0.004
+[Figure 3B] gamma: Moran-null r 95% interval [-0.102, +0.103], median -0.000
+[Figure 3B] test summary saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_3b_spectral_stats_RH.csv
+[Figure 3B] spectra bin 1/5: 818 vertices, gradient median -1.16
+[Figure 3B] spectra bin 2/5: 817 vertices, gradient median -0.61
+[Figure 3B] spectra bin 3/5: 818 vertices, gradient median -0.18
+[Figure 3B] spectra bin 4/5: 817 vertices, gradient median +0.33
+[Figure 3B] spectra bin 5/5: 818 vertices, gradient median +1.21
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 4091 (covered+gradient: 4088); target vertices: 24512
+[Figure 3B] leakage mask removed 226952/100278592 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.188, distance r=+0.489 (spectral-similarity r=+0.109)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.109, Moran permutation p=6.693e-02 (n_perm=1000, n_src=4088)
+[Figure 3B] channel PSD correlation matrix: 4658/5065 channels (120 without sensitivity excluded)
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-10-13 11:53:55
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-normalised density thresholds (0.001 Vm/A absolute, 5% of the channel's second-largest density) -> LH+RH fold
+Preprocessing  : truncated to the shortest recording, Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; supplementary: spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels; maps shown on both hemispheres (LH+RH folded template)
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Gradient       : SN MPC gradient from df_1a_LH.tsv; statistics on LH network vertices
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 37 subjects, 5423 contacts
+Raw recordings : /host/verges/tank/data/BIDS_iEEG/original
+Loading cached channel PSD from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_psd.pkl
+Channel data: 38 subjects, 5065 bipolar channels
+sub-PX004 ses-01: 127/127 contacts have no leadfield (treated as zero); 115/115 channels affected.
+120/5065 channels have no suprathreshold sensitivity; they carry no weight in the surface projections.
+PSD computed once: 5065 channels x 160 freqs; sensitivity stack (5065, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3493
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.195, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.033, Moran permutation p=5.904e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.278, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.016, Moran permutation p=7.832e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.032, Moran permutation p=6.154e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=-0.010, Moran permutation p=8.731e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: FDR q=0.873
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.873
+[Figure 3B] Band beta: FDR q=0.873
+[Figure 3B] Band gamma: FDR q=0.873
+[Figure 3B] exponent: Moran-null r 95% interval [-0.129, +0.126], median -0.002
+[Figure 3B] delta: Moran-null r 95% interval [-0.113, +0.104], median +0.003
+[Figure 3B] theta: Moran-null r 95% interval [-0.129, +0.114], median -0.003
+[Figure 3B] alpha: Moran-null r 95% interval [-0.115, +0.112], median +0.000
+[Figure 3B] beta: Moran-null r 95% interval [-0.126, +0.112], median -0.002
+[Figure 3B] gamma: Moran-null r 95% interval [-0.109, +0.109], median +0.001
+[Figure 3B] test summary saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_3b_spectral_stats_LH.csv
+[Figure 3B] spectra bin 1/5: 699 vertices, gradient median -1.23
+[Figure 3B] spectra bin 2/5: 698 vertices, gradient median -0.69
+[Figure 3B] spectra bin 3/5: 699 vertices, gradient median -0.11
+[Figure 3B] spectra bin 4/5: 698 vertices, gradient median +0.57
+[Figure 3B] spectra bin 5/5: 699 vertices, gradient median +1.39
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3493); target vertices: 25098
+[Figure 3B] leakage mask removed 194024/87893196 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.202, distance r=+0.219 (spectral-similarity r=+0.180)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.180, Moran permutation p=3.996e-03 (n_perm=1000, n_src=3493)
+[Figure 3B] channel PSD correlation matrix: 4657/5065 channels (120 without sensitivity excluded)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-10-13 12:23:55
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-normalised density thresholds (0.001 Vm/A absolute, 5% of the channel's second-largest density) -> LH+RH fold
+Preprocessing  : truncated to the shortest recording, Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; supplementary: spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels; maps shown on both hemispheres (LH+RH folded template)
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Gradient       : SN MPC gradient from df_1a_LH.tsv; statistics on LH network vertices
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 37 subjects, 5423 contacts
+Raw recordings : /host/verges/tank/data/BIDS_iEEG/original
+Loading cached channel PSD from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_psd.pkl
+Channel data: 38 subjects, 5065 bipolar channels
+sub-PX004 ses-01: 127/127 contacts have no leadfield (treated as zero); 115/115 channels affected.
+120/5065 channels have no suprathreshold sensitivity; they carry no weight in the surface projections.
+PSD computed once: 5065 channels x 160 freqs; sensitivity stack (5065, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3493
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.195, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.033, Moran permutation p=5.904e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.278, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.016, Moran permutation p=7.832e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.032, Moran permutation p=6.154e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=-0.010, Moran permutation p=8.731e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: FDR q=0.873
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.873
+[Figure 3B] Band beta: FDR q=0.873
+[Figure 3B] Band gamma: FDR q=0.873
+[Figure 3B] exponent: Moran-null r 95% interval [-0.129, +0.126], median -0.002
+[Figure 3B] delta: Moran-null r 95% interval [-0.113, +0.104], median +0.003
+[Figure 3B] theta: Moran-null r 95% interval [-0.129, +0.114], median -0.003
+[Figure 3B] alpha: Moran-null r 95% interval [-0.115, +0.112], median +0.000
+[Figure 3B] beta: Moran-null r 95% interval [-0.126, +0.112], median -0.002
+[Figure 3B] gamma: Moran-null r 95% interval [-0.109, +0.109], median +0.001
+[Figure 3B] test summary saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_3b_spectral_stats_LH.csv
+[Figure 3B] spectra bin 1/5: 699 vertices, gradient median -1.23
+[Figure 3B] spectra bin 2/5: 698 vertices, gradient median -0.69
+[Figure 3B] spectra bin 3/5: 699 vertices, gradient median -0.11
+[Figure 3B] spectra bin 4/5: 698 vertices, gradient median +0.57
+[Figure 3B] spectra bin 5/5: 699 vertices, gradient median +1.39
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3493); target vertices: 25098
+[Figure 3B] leakage mask removed 194024/87893196 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.202, distance r=+0.219 (spectral-similarity r=+0.180)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.180, Moran permutation p=3.996e-03 (n_perm=1000, n_src=3493)
+[Figure 3B] channel PSD correlation matrix: 4657/5065 channels (120 without sensitivity excluded)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-10-13 12:38:35
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-normalised density thresholds (0.001 Vm/A absolute, 5% of the channel's second-largest density) -> LH+RH fold
+Preprocessing  : truncated to the shortest recording, Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; supplementary: spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels; maps shown on both hemispheres (LH+RH folded template)
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Gradient       : SN MPC gradient from df_1a_LH.tsv; statistics on LH network vertices
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 37 subjects, 5423 contacts
+Raw recordings : /host/verges/tank/data/BIDS_iEEG/original
+Loading cached channel PSD from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_psd.pkl
+Channel data: 38 subjects, 5065 bipolar channels
+sub-PX004 ses-01: 127/127 contacts have no leadfield (treated as zero); 115/115 channels affected.
+120/5065 channels have no suprathreshold sensitivity; they carry no weight in the surface projections.
+PSD computed once: 5065 channels x 160 freqs; sensitivity stack (5065, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3493
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.195, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.033, Moran permutation p=5.904e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.278, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.016, Moran permutation p=7.832e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.032, Moran permutation p=6.154e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=-0.010, Moran permutation p=8.731e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: FDR q=0.873
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.873
+[Figure 3B] Band beta: FDR q=0.873
+[Figure 3B] Band gamma: FDR q=0.873
+[Figure 3B] exponent: Moran-null r 95% interval [-0.129, +0.126], median -0.002
+[Figure 3B] delta: Moran-null r 95% interval [-0.113, +0.104], median +0.003
+[Figure 3B] theta: Moran-null r 95% interval [-0.129, +0.114], median -0.003
+[Figure 3B] alpha: Moran-null r 95% interval [-0.115, +0.112], median +0.000
+[Figure 3B] beta: Moran-null r 95% interval [-0.126, +0.112], median -0.002
+[Figure 3B] gamma: Moran-null r 95% interval [-0.109, +0.109], median +0.001
+[Figure 3B] test summary saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_3b_spectral_stats_LH.csv
+[Figure 3B] spectra bin 1/5: 699 vertices, gradient median -1.23
+[Figure 3B] spectra bin 2/5: 698 vertices, gradient median -0.69
+[Figure 3B] spectra bin 3/5: 699 vertices, gradient median -0.11
+[Figure 3B] spectra bin 4/5: 698 vertices, gradient median +0.57
+[Figure 3B] spectra bin 5/5: 699 vertices, gradient median +1.39
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3493); target vertices: 25098
+[Figure 3B] leakage mask removed 194024/87893196 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.202, distance r=+0.219 (spectral-similarity r=+0.180)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.180, Moran permutation p=3.996e-03 (n_perm=1000, n_src=3493)
+[Figure 3B] channel PSD correlation matrix: 4657/5065 channels (120 without sensitivity excluded)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-10-13 13:13:04
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-normalised density thresholds (0.001 Vm/A absolute, 5% of the channel's second-largest density) -> LH+RH fold
+Preprocessing  : truncated to the shortest recording, Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; supplementary: spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels; maps shown on both hemispheres (LH+RH folded template)
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Gradient       : SN MPC gradient from df_1a_LH.tsv; statistics on LH network vertices
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 37 subjects, 5423 contacts
+Raw recordings : /host/verges/tank/data/BIDS_iEEG/original
+Channel PSD cache /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_psd.pkl is stale (recordings or parameters changed); recomputing.
+Variable channel lengths (360136 to 1200591 samples); truncating all to 360136.
+Channel PSD saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_psd.pkl.
+Channel data: 38 subjects, 5065 bipolar channels
+sub-PX004 ses-01: 127/127 contacts have no leadfield (treated as zero); 115/115 channels affected.
+120/5065 channels have no suprathreshold sensitivity; they carry no weight in the surface projections.
+PSD computed once: 5065 channels x 160 freqs; sensitivity stack (5065, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3493
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.195, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.033, Moran permutation p=5.904e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.278, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.016, Moran permutation p=7.832e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.032, Moran permutation p=6.154e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=-0.010, Moran permutation p=8.731e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: FDR q=0.873
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.873
+[Figure 3B] Band beta: FDR q=0.873
+[Figure 3B] Band gamma: FDR q=0.873
+[Figure 3B] exponent: Moran-null r 95% interval [-0.129, +0.126], median -0.002
+[Figure 3B] delta: Moran-null r 95% interval [-0.113, +0.104], median +0.003
+[Figure 3B] theta: Moran-null r 95% interval [-0.129, +0.114], median -0.003
+[Figure 3B] alpha: Moran-null r 95% interval [-0.115, +0.112], median +0.000
+[Figure 3B] beta: Moran-null r 95% interval [-0.126, +0.112], median -0.002
+[Figure 3B] gamma: Moran-null r 95% interval [-0.109, +0.109], median +0.001
+[Figure 3B] test summary saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_3b_spectral_stats_LH.csv
+[Figure 3B] spectra bin 1/5: 699 vertices, gradient median -1.23
+[Figure 3B] spectra bin 2/5: 698 vertices, gradient median -0.69
+[Figure 3B] spectra bin 3/5: 699 vertices, gradient median -0.11
+[Figure 3B] spectra bin 4/5: 698 vertices, gradient median +0.57
+[Figure 3B] spectra bin 5/5: 699 vertices, gradient median +1.39
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3493); target vertices: 25098
+[Figure 3B] leakage mask removed 194024/87893196 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.202, distance r=+0.219 (spectral-similarity r=+0.180)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.180, Moran permutation p=3.996e-03 (n_perm=1000, n_src=3493)
+[Figure 3B] channel PSD correlation matrix: 4657/5065 channels (120 without sensitivity excluded)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-10-13 14:28:24
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-normalised density thresholds (0.001 Vm/A absolute, 5% of the channel's second-largest density) -> LH+RH fold
+Preprocessing  : truncated to the shortest recording, Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; supplementary: spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels; maps shown on both hemispheres (LH+RH folded template)
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Gradient       : SN MPC gradient from df_1a_LH.tsv; statistics on LH network vertices
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 37 subjects, 5423 contacts
+Raw recordings : /host/verges/tank/data/BIDS_iEEG/original
+Loading cached stage-W channel PSD from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_psd.pkl
+Channel data: 38 subjects, 5065 bipolar channels
+sub-PX004 ses-01: 127/127 contacts have no leadfield (treated as zero); 115/115 channels affected.
+120/5065 channels have no suprathreshold sensitivity; they carry no weight in the surface projections.
+PSD computed once: 5065 channels x 160 freqs; sensitivity stack (5065, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3493
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.195, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.033, Moran permutation p=5.904e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.278, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.016, Moran permutation p=7.832e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.032, Moran permutation p=6.154e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=-0.010, Moran permutation p=8.731e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: FDR q=0.873
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.873
+[Figure 3B] Band beta: FDR q=0.873
+[Figure 3B] Band gamma: FDR q=0.873
+[Figure 3B] exponent: Moran-null r 95% interval [-0.129, +0.126], median -0.002
+[Figure 3B] delta: Moran-null r 95% interval [-0.113, +0.104], median +0.003
+[Figure 3B] theta: Moran-null r 95% interval [-0.129, +0.114], median -0.003
+[Figure 3B] alpha: Moran-null r 95% interval [-0.115, +0.112], median +0.000
+[Figure 3B] beta: Moran-null r 95% interval [-0.126, +0.112], median -0.002
+[Figure 3B] gamma: Moran-null r 95% interval [-0.109, +0.109], median +0.001
+[Figure 3B] test summary saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_3b_spectral_stats_LH.csv
+[Figure 3B] main forest rows (significant): exponent, theta
+[Figure 3B] spectra bin 1/5: 699 vertices, gradient median -1.23
+[Figure 3B] spectra bin 2/5: 698 vertices, gradient median -0.69
+[Figure 3B] spectra bin 3/5: 699 vertices, gradient median -0.11
+[Figure 3B] spectra bin 4/5: 698 vertices, gradient median +0.57
+[Figure 3B] spectra bin 5/5: 699 vertices, gradient median +1.39
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3493); target vertices: 25098
+[Figure 3B] leakage mask removed 194024/87893196 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.202, distance r=+0.219 (spectral-similarity r=+0.180)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.180, Moran permutation p=3.996e-03 (n_perm=1000, n_src=3493)
+[Figure 3B] channel PSD correlation matrix: 4657/5065 channels (120 without sensitivity excluded)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-10-13 16:29:18
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-normalised density thresholds (0.001 Vm/A absolute, 5% of the channel's second-largest density) -> LH+RH fold
+Preprocessing  : truncated to the shortest recording, Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; supplementary: spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels; maps shown on both hemispheres (LH+RH folded template)
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Gradient       : SN MPC gradient from df_1a_LH.tsv; statistics on LH network vertices
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 37 subjects, 5423 contacts
+Raw recordings : /host/verges/tank/data/BIDS_iEEG/original
+Loading cached stage-W channel PSD from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_psd.pkl
+Channel data: 38 subjects, 5065 bipolar channels
+sub-PX004 ses-01: 127/127 contacts have no leadfield (treated as zero); 115/115 channels affected.
+120/5065 channels have no suprathreshold sensitivity; they carry no weight in the surface projections.
+PSD computed once: 5065 channels x 160 freqs; sensitivity stack (5065, 32492)
+[Figure 3B] inferential vertices (covered source-network with gradient): 3493
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.195, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=+0.033, Moran permutation p=5.904e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.278, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.016, Moran permutation p=7.832e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.032, Moran permutation p=6.154e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=-0.010, Moran permutation p=8.731e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: FDR q=0.873
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.873
+[Figure 3B] Band beta: FDR q=0.873
+[Figure 3B] Band gamma: FDR q=0.873
+[Figure 3B] exponent: Moran-null r 95% interval [-0.129, +0.126], median -0.002
+[Figure 3B] delta: Moran-null r 95% interval [-0.113, +0.104], median +0.003
+[Figure 3B] theta: Moran-null r 95% interval [-0.129, +0.114], median -0.003
+[Figure 3B] alpha: Moran-null r 95% interval [-0.115, +0.112], median +0.000
+[Figure 3B] beta: Moran-null r 95% interval [-0.126, +0.112], median -0.002
+[Figure 3B] gamma: Moran-null r 95% interval [-0.109, +0.109], median +0.001
+[Figure 3B] test summary saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_3b_spectral_stats_LH.csv
+[Figure 3B] main forest rows (significant): exponent, theta
+[Figure 3B] spectra bin 1/5: 699 vertices, gradient median -1.23
+[Figure 3B] spectra bin 2/5: 698 vertices, gradient median -0.69
+[Figure 3B] spectra bin 3/5: 699 vertices, gradient median -0.11
+[Figure 3B] spectra bin 4/5: 698 vertices, gradient median +0.57
+[Figure 3B] spectra bin 5/5: 699 vertices, gradient median +1.39
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3493); target vertices: 25098
+[Figure 3B] leakage mask removed 194024/87893196 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.202, distance r=+0.219 (spectral-similarity r=+0.180)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.180, Moran permutation p=3.996e-03 (n_perm=1000, n_src=3493)
+[Figure 3B] channel PSD correlation matrix: 4657/5065 channels (120 without sensitivity excluded)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-10-14 10:40:07
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-normalised density thresholds (0.001 Vm/A absolute, 5% of the channel's second-largest density) -> LH+RH fold
+Preprocessing  : truncated to the shortest recording, Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Spectral model : specparam, knee mode (knee >= 0), Gaussian peaks, 1-45 Hz (below the 60 Hz notch and the 80 Hz low-pass transition band); peak width 1-12 Hz, <= 6 peaks, min height 0.05, threshold 2 SD
+Peak bands     : delta 1-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-45 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; supplementary: spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels; maps shown on both hemispheres (LH+RH folded template)
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Gradient       : SN MPC gradient from df_1a_LH.tsv; statistics on LH network vertices
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 37 subjects, 5423 contacts
+Raw recordings : /host/verges/tank/data/BIDS_iEEG/original
+Loading cached stage-W channel PSD from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_psd.pkl
+Channel data: 38 subjects, 5065 bipolar channels
+sub-PX004 ses-01: 127/127 contacts have no leadfield (treated as zero); 115/115 channels affected.
+120/5065 channels have no suprathreshold sensitivity; they carry no weight in the surface projections.
+PSD computed once: 5065 channels x 160 freqs; sensitivity stack (5065, 32492)
+[Figure 3B] specparam methods report:
+======================================================================
+                              REPORTING                               
+ Reports using spectral parameterization should include (at minimum): 
+                   - the code version that was used                   
+                    - the fit modes that were used                    
+              - the algorithm & settings that were used               
+                  - the frequency range that was fit                  
+======================================================================
+======================================================================
+                             CODE VERSION                             
+                               2.0.0rc7                               
+======================================================================
+======================================================================
+                              ALGORITHM                               
+                             spectral_fit                             
+                          ALGORITHM SETTINGS                          
+                   peak_width_limits : [1.0, 12.0]                    
+                           max_n_peaks : 6                            
+                        min_peak_height : 0.05                        
+                         peak_threshold : 2.0                         
+======================================================================
+======================================================================
+                              FIT RANGE                               
+                The model was fit from 1.0 to 45.0 Hz.                
+======================================================================
+Fit modes: aperiodic 'knee', periodic 'gaussian'; aperiodic bounds: knee >= 0; metrics: error_mae, gof_rsquared
+
+[Figure 3B] fit quality: 5065 fits; R^2 median 0.992 (IQR 0.984-0.996), R^2 < 0.9 in 50; MAE median 0.042; peaks per fit mean 3.90; knee frequency median 5.9 Hz (IQR 2.5-11.8), below the fit range (< 1 Hz) in 701
+[Figure 3B] inferential vertices (covered source-network with gradient): 3493
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.118, Moran permutation p=4.296e-02 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=-0.093, Moran permutation p=8.092e-02 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.261, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.025, Moran permutation p=6.733e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.078, Moran permutation p=2.168e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=-0.062, Moran permutation p=2.278e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: FDR q=0.202
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.673
+[Figure 3B] Band beta: FDR q=0.285
+[Figure 3B] Band gamma: FDR q=0.285
+[Figure 3B] exponent: Moran-null r 95% interval [-0.118, +0.112], median -0.005
+[Figure 3B] delta: Moran-null r 95% interval [-0.104, +0.103], median +0.000
+[Figure 3B] theta: Moran-null r 95% interval [-0.124, +0.119], median -0.003
+[Figure 3B] alpha: Moran-null r 95% interval [-0.121, +0.113], median -0.001
+[Figure 3B] beta: Moran-null r 95% interval [-0.125, +0.111], median -0.004
+[Figure 3B] gamma: Moran-null r 95% interval [-0.100, +0.100], median +0.003
+[Figure 3B] test summary saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_3b_spectral_stats_LH.csv
+[Figure 3B] main forest rows (significant): exponent, theta
+[Figure 3B] spectra bin 1/5: 699 vertices, gradient median -1.23
+[Figure 3B] spectra bin 2/5: 698 vertices, gradient median -0.69
+[Figure 3B] spectra bin 3/5: 699 vertices, gradient median -0.11
+[Figure 3B] spectra bin 4/5: 698 vertices, gradient median +0.57
+[Figure 3B] spectra bin 5/5: 699 vertices, gradient median +1.39
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3493); target vertices: 25098
+[Figure 3B] leakage mask removed 194024/87893196 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.202, distance r=+0.219 (spectral-similarity r=+0.180)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.180, Moran permutation p=3.996e-03 (n_perm=1000, n_src=3493)
+[Figure 3B] channel PSD correlation matrix: 4657/5065 channels (120 without sensitivity excluded)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+========================================================================
+SCRIPT : figure_3_ieeg_mica
+DATE   : 2026-10-14 11:07:30
+  --ieeg_deriv: /host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA
+  --hemi: LH
+  --network: SalVentAttn
+========================================================================
+Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01, stage-W wakefulness)
+Sensitivity maps: electroMICA leadfield (signed), fsLR-32k; per-hemi bipolar difference |L1-L2| -> area-normalised density thresholds (0.001 Vm/A absolute, 5% of the channel's second-largest density) -> LH+RH fold
+Preprocessing  : truncated to the shortest recording, Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned
+PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum
+Spectral model : specparam, knee mode (knee >= 0), Gaussian peaks, 1-45 Hz (below the 60 Hz notch and the 80 Hz low-pass transition band); peak width 1-12 Hz, <= 6 peaks, min height 0.05, threshold 2 SD
+Peak bands     : delta 1-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-45 Hz
+Statistic      : aperiodic exponent (primary) + FDR-corrected band power vs MPC gradient; supplementary: spectral-similarity-weighted projection of the FC gradient (group level)
+Null model     : within-network Moran randomization (n_rep=1000, procedure=singleton, random_state=0), add-one empirical p
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels; maps shown on both hemispheres (LH+RH folded template)
+Analysis network: SalVentAttn
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_3_ieeg_mica.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Gradient       : SN MPC gradient from df_1a_LH.tsv; statistics on LH network vertices
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+Sensitivity maps loaded: 37 subjects, 5423 contacts
+Raw recordings : /host/verges/tank/data/BIDS_iEEG/original
+Loading cached stage-W channel PSD from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_3_channel_psd.pkl
+Channel data: 38 subjects, 5065 bipolar channels
+sub-PX004 ses-01: 127/127 contacts have no leadfield (treated as zero); 115/115 channels affected.
+120/5065 channels have no suprathreshold sensitivity; they carry no weight in the surface projections.
+PSD computed once: 5065 channels x 160 freqs; sensitivity stack (5065, 32492)
+[Figure 3B] specparam methods report:
+======================================================================
+                              REPORTING                               
+ Reports using spectral parameterization should include (at minimum): 
+                   - the code version that was used                   
+                    - the fit modes that were used                    
+              - the algorithm & settings that were used               
+                  - the frequency range that was fit                  
+======================================================================
+======================================================================
+                             CODE VERSION                             
+                               2.0.0rc7                               
+======================================================================
+======================================================================
+                              ALGORITHM                               
+                             spectral_fit                             
+                          ALGORITHM SETTINGS                          
+                   peak_width_limits : [1.0, 12.0]                    
+                           max_n_peaks : 6                            
+                        min_peak_height : 0.05                        
+                         peak_threshold : 2.0                         
+======================================================================
+======================================================================
+                              FIT RANGE                               
+                The model was fit from 1.0 to 45.0 Hz.                
+======================================================================
+Fit modes: aperiodic 'knee', periodic 'gaussian'; aperiodic bounds: knee >= 0; metrics: error_mae, gof_rsquared
+
+[Figure 3B] fit quality: 5065 fits; R^2 median 0.992 (IQR 0.984-0.996), R^2 < 0.9 in 50; MAE median 0.042; peaks per fit mean 3.90; knee frequency median 5.9 Hz (IQR 2.5-11.8), below the fit range (< 1 Hz) in 701
+[Figure 3B] inferential vertices (covered source-network with gradient): 3493
+[Figure 3B] aperiodic exponent vs MPC-gradient | Spearman r=+0.118, Moran permutation p=4.296e-02 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: oscillatory power vs MPC-gradient | Spearman r=-0.093, Moran permutation p=8.092e-02 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band theta: oscillatory power vs MPC-gradient | Spearman r=+0.261, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band alpha: oscillatory power vs MPC-gradient | Spearman r=-0.025, Moran permutation p=6.733e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band beta: oscillatory power vs MPC-gradient | Spearman r=+0.078, Moran permutation p=2.168e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band gamma: oscillatory power vs MPC-gradient | Spearman r=-0.062, Moran permutation p=2.278e-01 (n_perm=1000, n_vertices=3493)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 3B] Band delta: FDR q=0.202
+[Figure 3B] Band theta: FDR q=0.005
+[Figure 3B] Band alpha: FDR q=0.673
+[Figure 3B] Band beta: FDR q=0.285
+[Figure 3B] Band gamma: FDR q=0.285
+[Figure 3B] exponent: Moran-null r 95% interval [-0.118, +0.112], median -0.005
+[Figure 3B] delta: Moran-null r 95% interval [-0.104, +0.103], median +0.000
+[Figure 3B] theta: Moran-null r 95% interval [-0.124, +0.119], median -0.003
+[Figure 3B] alpha: Moran-null r 95% interval [-0.121, +0.113], median -0.001
+[Figure 3B] beta: Moran-null r 95% interval [-0.125, +0.111], median -0.004
+[Figure 3B] gamma: Moran-null r 95% interval [-0.100, +0.100], median +0.003
+[Figure 3B] test summary saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_3b_spectral_stats_LH.csv
+[Figure 3B] main forest rows (significant): exponent, theta
+[Figure 3B] spectra bin 1/5: 699 vertices, gradient median -1.23
+[Figure 3B] spectra bin 2/5: 698 vertices, gradient median -0.69
+[Figure 3B] spectra bin 3/5: 699 vertices, gradient median -0.11
+[Figure 3B] spectra bin 4/5: 698 vertices, gradient median +0.57
+[Figure 3B] spectra bin 5/5: 699 vertices, gradient median +1.39
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[FC gradient] flipped sign so the default-mode network sits at the low end.
+[Figure 3B] source SalVentAttn vertices: 3502 (covered+gradient: 3493); target vertices: 25098
+[Figure 3B] leakage mask removed 194024/87893196 source-target pairs (cosine > 0.1).
+[Figure 3B] baselines vs MPC-gradient | uniform r=-0.202, distance r=+0.219 (spectral-similarity r=+0.180)
+[Figure 3B] spectral-similarity projection vs SalVentAttn MPC-gradient | Spearman r_group=+0.180, Moran permutation p=3.996e-03 (n_perm=1000, n_src=3493)
+[Figure 3B] channel PSD correlation matrix: 4657/5065 channels (120 without sensitivity excluded)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1

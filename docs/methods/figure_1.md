@@ -33,33 +33,33 @@ vertices with $g_v \geq q_{0.75}$ the superior pole (highest quartile); the
 intervening 50 % of vertices were excluded from the pole contrast. Mean qT1
 intensity profiles across the 14 equivolumetric depths were then computed for the
 inferior pole, the superior pole, and for all individual SN vertices coloured by
-their gradient value.
+their gradient value. For a compact laminar summary, SN vertices were also divided
+into five equal-count bins at the quintiles of the gradient distribution, and qT1
+intensity at each of the 14 depths was averaged across subjects and across the
+vertices of each bin.
 
 ## Figure 1b — Histological contextualisation
 
-The in vivo qT1 gradient was contextualised against four microstructural maps
-sampled on the fsLR-32k surface, spanning in vivo and post-mortem contrasts and
-both myelin- and cell-sensitive stains:
+The in vivo qT1 gradient was contextualised against three post-mortem histological
+maps sampled on the fsLR-32k surface, spanning cell-body, nerve-fibre and
+interneuron stains:
 
 | Modality | Source | Measure |
 |----------|--------|---------|
-| qT1 | MICA-PNI 7 T dataset, fsLR-32k | mean qT1 intensity across subjects and depths |
 | BigBrain | BigBrain open-access reconstruction (100 µm) | inverted cell-body staining intensity |
 | Bielschowsky | AHEAD dataset (200 µm) | nerve-fibre staining intensity |
 | Parvalbumin | AHEAD dataset (200 µm) | interneuron staining intensity |
 
 Acquisition and provenance of the histological volumes are described in
-[Data Acquisition](datasets.md#bigbrain-dataset). The mean qT1 map and the qT1
-gradient both derive from the same intracortical qT1 profiles, so the qT1 row is a
-within-contrast consistency check rather than independent corroboration; the
-post-mortem BigBrain and AHEAD stains provide the cross-contrast, cross-modality
-validation. Each map was correlated with the qT1 gradient vertex-wise within the SN
+[Data Acquisition](datasets.md#bigbrain-dataset). Each map was correlated with the qT1 gradient vertex-wise within the SN
 mask using the Spearman rank coefficient, restricted to vertices where both the
 gradient and the modality were finite. Because cortical maps carry strong spatial
 autocorrelation, statistical significance was assessed against a within-network
 Moran spectral randomisation null
 ([Shared Methods — Moran spectral randomisation](shared.md#moran-spectral-randomisation-within-network))
-fitted on that same finite vertex subset, rather than the parametric distribution.
+fitted on that same finite vertex subset, rather than the parametric distribution;
+the central 95% (2.5th–97.5th percentiles) of the 1,000 null correlations was reported
+alongside each observed correlation.
 
 ## Figure 1c — Cortical type composition
 

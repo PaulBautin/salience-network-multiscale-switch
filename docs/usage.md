@@ -13,7 +13,8 @@ Scripts cache intermediate results as TSV/CSV in `data/dataframes/` and skip rec
 | [`figure_1c_cortical_types.py`](#figure-1c) | 1c | Von Economo cortical type distribution |
 | [`figure_2_distance.py`](#figure-2) | 2 | Connectivity-weighted MPC gradient projection correlated with the FC gradient |
 | [`figure_3_ieeg_mni.py`](#figure-3-mni) | 3 | iEEG spectral analysis — MNI open atlas |
-| [`figure_3_ieeg_mica.py`](#figure-3-mica) | 3 | iEEG spectral analysis — MICA dataset |
+| [`figure_3_ieeg_mica.py`](#figure-3-mica) | 3b | iEEG spectral analysis — MICA dataset |
+| [`figure_3c_ieeg_states.py`](#figure-3c-states) | 3c | iEEG aperiodic exponent across wakefulness, N2 and N3 sleep — MICA dataset |
 
 ---
 
@@ -37,7 +38,9 @@ python scripts/figure_1a_t1map.py \
 **Outputs**
 
 - `results/figures/figure_1a_profiles.svg`
+- `results/figures/figure_1a_strata.svg` — stratigraphy columns: mean qT1 at each of the 14 depths for each gradient quintile (one block per depth, coloured by raw qT1 on a linear grey scale as a qT1 map is displayed (black = lowest, white = highest plotted value); outlined columns, caps below them in the quintile's gradient colour). Same 6-in canvas, font and axes box as `figure_1a_profiles.svg`, so pial and WM sit at the same heights in both.
 - `results/figures/figure_1a_brain.svg`
+- `results/figures/figure_1a_brain_zoom.svg` (brain row with circular zoom insets of the `SALIENCE_ZOOM_ROIS` regions, coolwarm on the shared ±2 SD `SALIENCE_Z_RANGE`, SN border traced in black (`mask_outline`) on the brains and insets; its top 300 pt overlay `figure_1a_brain.svg` exactly, and insets are drawn for the `-hemi` regions only) and `figure_1a_brain_zoom_roi.svg` (the inset row alone, same 1450-pt width and columns, to stack 300 pt below `figure_1a_brain.svg`)
 - `data/dataframes/figure_1a_pni_to_mics{,_5k}.csv` (subject → file-path tables)
 - `data/dataframes/df_1a_<hemi>.tsv`, `df_1a_<hemi>_fslr5k.tsv` (surface table + gradient cache)
 
@@ -59,11 +62,12 @@ python scripts/figure_1b_contextualisation.py -hemi LH
 
 **Outputs**
 
-- `results/figures/figure_1b_correlations.svg`
-- `results/figures/figure_1b_brain_t1map.svg`
-- `results/figures/figure_1b_brain_bigbrain.svg`
-- `results/figures/figure_1b_brain_biel.svg`
-- `results/figures/figure_1b_brain_parva.svg`
+- `results/figures/figure_1b_forest.svg` — context comparison (`plot_forest`): per histological map (BigBrain, Bielschowsky, Parvalbumin), the observed Spearman r (black dot, filled if the Moran p < 0.05) against the central 95% of its 1,000 Moran-null r's (grey bar, tick at the null median), on one signed r axis with r and the Moran p (labelled $p_{m}$) written above each bar. Drawn at its final size: its rows are level with the insets of the three `figure_1b_zoom_*.svg` rows stacked in that order and shown 150 mm wide (`ZOOM_ROW_WIDTH_MM`), with the forest's top aligned with the first zoom row, and its width and x-axis span copy the Figure 1a profiles panel as laid out in Figure 1, so placed at the profiles panel's x both x axes line up.
+- `results/figures/figure_1b_correlations_supp.svg` — supplementary vertex scatter (gradient vs map, fit line, r / p) and Spearman |r| stem per map
+- `results/figures/figure_1b_correlations_circle.svg` — half-polar bar plot of |r| per map (blue positive, red negative)
+- `results/figures/figure_1b_brain_{bigbrain,t1map,biel,parva}.svg` — `plot_hemispheres` screenshots of each map's raw values on the SN (coolwarm)
+- `data/dataframes/df_1b_context_stats.csv` — per map: `r`, `p`, `null_lo` / `null_med` / `null_hi` (2.5th / 50th / 97.5th percentile of the null r's), `n_vertices`, `n_perm`
+- `results/figures/figure_1b_zoom_{bigbrain,biel,parva}.svg` — region zoom-ins of each histological map (inset row only, no brains, no region names), titled with the map name: the `SALIENCE_ZOOM_ROIS` regions of the `-hemi` hemisphere(s), on the same 1450-pt window and columns as `figure_1a_brain_zoom*.svg`. The maps are z-scored within the SN like the MPC gradient and share its fixed ±2 SD range (`SALIENCE_Z_RANGE`, colour bar labelled −2 / +2, z), drawn in `CustomCmap_histology` (stain colours: violet below / ochre above the SN mean): same lightness profile as the gradient's coolwarm, so a given z reads with the same weight, with different hues so histology and gradient stay distinguishable. The SN border is traced in black (`mask_outline`), as in Figures 1a and 1c
 
 ---
 
@@ -72,16 +76,19 @@ python scripts/figure_1b_contextualisation.py -hemi LH
 **`scripts/figure_1c_cortical_types.py`** — Maps Von Economo cortical types onto the salience network and tests for non-random type distributions using spin permutations.
 
 ```bash
-python scripts/figure_1c_cortical_types.py -pni_deriv /path/to/BIDS_PNI/derivatives/micapipe_v0.2.0
+python scripts/figure_1c_cortical_types.py -hemi both
 ```
 
 | Flag | Required | Default | Description |
 |------|----------|---------|-------------|
-| `-pni_deriv` | no | — | Path to PNI micapipe derivatives (for surface loading) |
+| `-hemi` | no | `both` | Hemisphere: `both`, `LH`, or `RH` (selects `df_1a_<hemi>.tsv` and the network mask) |
+
+Requires `data/dataframes/df_1a_<hemi>.tsv` (run `figure_1a_t1map.py` with the matching `-hemi` first).
 
 **Outputs**
 
 - `results/figures/figure_1c_brain_economo.svg`
+- `results/figures/figure_1c_brain_economo_zoom.svg` (brain row with circular zoom insets of the `SALIENCE_ZOOM_ROIS` regions, as Figure 1a; cortical types on the whole cortex with the SN border traced in black (`mask_outline`), where `figure_1c_brain_economo.svg` marks it with black border vertices; its top 300 pt overlay that file; the colour bar shows the cortical-type colours as blocks without end labels, as in that file) and `figure_1c_brain_economo_zoom_roi.svg` (the inset row alone, to stack 300 pt below `figure_1c_brain_economo.svg`)
 - `results/figures/figure_1c_type_salience.svg`
 
 ---
@@ -126,43 +133,102 @@ The expensive projection + Moran nulls are separated from drawing by `-stage`. `
 
 ## Figure 3 MNI
 
-**`scripts/figure_3_ieeg_mni.py`** — Computes PSD and band power from the MNI open iEEG atlas, maps channels to fsLR-32k surface vertices, and correlates band power with the T1 gradient.
+**`scripts/figure_3_ieeg_mni.py`** — Computes the PSD of the MNI open iEEG atlas channels, maps them to fsLR-32k vertices (projected onto the `-hemi` hemisphere), and correlates the electrophysiological-similarity difference between gradient-top and gradient-bottom target-network channels (ES<sub>top</sub> − ES<sub>bottom</sub>) with the BigBrain G2 gradient across the channels outside the target network. Significance is a Moran spectral-randomisation null on the channel layout (inverse Euclidean distances between channel positions, 1,000 surrogates, add-one *p*).
 
 ```bash
 python scripts/figure_3_ieeg_mni.py \
-  -pni_deriv /path/to/BIDS_PNI/derivatives/micapipe_v0.2.0 \
   -ieeg_deriv /path/to/MNI_ieeg/MatlabFile.mat
 ```
 
 | Flag | Required | Default | Description |
 |------|----------|---------|-------------|
-| `-pni_deriv` | yes | — | Path to PNI micapipe derivatives directory |
 | `-ieeg_deriv` | yes | — | Path to the MNI iEEG atlas MATLAB file (`.mat`) |
-| `-hemi` | no | `RH` | Hemisphere: `both`, `LH`, or `RH` |
+| `-hemi` | no | `RH` | Hemisphere the channels are projected onto: `both`, `LH`, or `RH` |
+| `-network` | no | `SalVentAttn` | Yeo 7-network used to stratify channels along the gradient |
 
-**Outputs** — `results/figures/figure_3a_ieeg_mni_*.svg`
+Requires `data/dataframes/df_1a_{hemi}.tsv`, or `df_1a_both.tsv` restricted to the hemisphere when the hemisphere's own table is missing (as `figure_2_distance.py`).
+
+**Outputs** — `results/figures/figure_3a_ieeg_mni_*.svg`: the channel scatter (ES difference vs BigBrain G2, r / Moran *p*) with per-network mean bars (`*_corr_scatter.svg`), and channel and smoothed surface maps of the ES difference (`*_channel_corr_diff*.svg`).
 
 ---
 
 ## Figure 3 MICA
 
-**`scripts/figure_3_ieeg_mica.py`** — Applies the iEEG spectral pipeline to the MICA intracranial EEG dataset using subject-specific leadfield sensitivity maps. Sensitivity-weighted band power is correlated with the within-network MPC gradient, and the spectral similarity between surface vertices is used as a connectivity measure to project the FC gradient (the Figure 2 gradient-weighted projection, group-level variant) and test it against the MPC gradient. Significance for both analyses is a within-network Moran spectral-randomisation null with the add-one empirical *p*.
+**`scripts/figure_3_ieeg_mica.py`** — Applies the iEEG spectral pipeline to the MICA intracranial EEG dataset using subject-specific leadfield sensitivity maps. Each channel spectrum is parameterised once (`specparam` 2.0, knee mode with the knee bounded to *k* ≥ 0, `SPEC_FIT_RANGE` = 1–45 Hz, below the 60 Hz notch of the recordings and the 80 Hz low-pass transition band) into the aperiodic exponent (primary) and the oscillatory peak power of five canonical bands clipped to the fit range (`SPEC_BANDS`: delta 1–4 Hz … gamma 30–45 Hz; secondary, FDR-corrected), projected onto the surface by sensitivity weighting, and correlated with the salience-network MPC gradient on the network vertices of the `-hemi` hemisphere (left by default, as the rest of the paper). Significance is a within-network Moran spectral-randomisation null with the add-one empirical *p*. Because the sensitivities of both hemispheres are folded onto one fsLR-32k template, the maps are shown on both hemispheres, laid out as the Figure 1 zoom rows. As a supplementary analysis, the spectral similarity between surface vertices (similarity of power spectra, not connectivity) weights a projection of the FC gradient (the Figure 2 gradient-weighted projection, group-level variant), reported with its uniform- and distance-weighted baselines.
 
 ```bash
 python scripts/figure_3_ieeg_mica.py \
   -ieeg_deriv /path/to/BIDS_iEEG/derivatives/electroMICA \
-  -hemi RH
+  -hemi LH
 ```
 
 | Flag | Required | Default | Description |
 |------|----------|---------|-------------|
 | `-ieeg_deriv` | yes | — | Path to electroMICA derivatives directory |
-| `-hemi` | no | `RH` | Hemisphere: `LH` or `RH` (the sensitivity maps are evaluated one hemisphere at a time) |
+| `-ieeg_raw` | no | `<ieeg_deriv>/../../original` | Root of the original recordings (`<root>/sub-PX*/ses-01/*stage-W.mat`) |
+| `-hemi` | no | `LH` | Hemisphere of the statistics: `LH` or `RH` (maps are shown on both hemispheres) |
 | `-network` | no | `SalVentAttn` | Yeo 7-network analysis target |
 
-Requires `data/dataframes/df_1a_{hemi}.tsv` (run `figure_1a_t1map.py` with the matching `-hemi` first).
+Requires `data/dataframes/df_1a_{hemi}.tsv` (run `figure_1a_t1map.py` with the matching `-hemi` first); as in `figure_2_distance.py`, `df_1a_both.tsv` restricted to the hemisphere is used when the hemisphere's own table is missing.
 
-**Outputs** — `results/figures/figure_3b_ieeg_mica_*.svg`: the primary aperiodic-exponent (1/f slope) scatter (`*_slope_corr_{hemi}.svg`) and brain map (`*_slope_map_{hemi}.svg`); the FDR-corrected oscillatory band-power panels (`*_psd_{hemi}.svg`, `*_band_power_corr_{hemi}.svg`, `*_{band}_map_{hemi}.svg`, `*_sensitivity_map_{hemi}.svg`); and the spectral-similarity projection scatter (`*_es_scatter_{hemi}.svg`), projection brain map (`*_es_map_{hemi}.svg`), and the channel-level PSD correlation matrix (`*_corr_{hemi}.svg`).
+The per-channel PSD is cached in `data/dataframes/figure_3_channel_psd.pkl` (a few MB, not tracked). The cache is keyed on every recording's path, size and modification time and on the PSD parameters, so it is rebuilt automatically when the raw data change; a rebuild reads the recordings one subject at a time. The previous raw-signal cache, `figure_3_channel_data_df.pkl`, is no longer used and can be deleted.
+
+**Outputs** (`results/figures/figure_3b_ieeg_mica_*`, `{hemi}` = hemisphere of the statistics)
+
+All brain figures use the Figure 1 zoom-row window (1450 × 300, zoom 1.3, colour-bar column; region names at 30 pt, inset-row titles at 36 pt) with the four `SALIENCE_ZOOM_ROIS` regions. Each map comes as `*_zoom_{hemi}.svg` (brain row, marker circles, insets and region names, as `figure_1a_brain_zoom.svg`) and `*_zoom_roi_{hemi}.svg` (inset row alone, titled, colour bar drawn, no region names, as the `figure_1b_zoom_*` rows). The spectral maps show each template value on the network vertices of both hemispheres, z-scored there, on the shared ±2 SD range (`SALIENCE_Z_RANGE`, colour bar −2 / +2, z) in `CustomCmap_ieeg` (green below / plum above the SN mean). Every map traces the target-network border in black (`mask_outline`: the vertices just outside the network, i.e. the outer side of `salience_border`), on the brains and magnified in the insets.
+
+- `*_exponent_zoom[_roi]_{hemi}.svg`, `*_{delta,theta,alpha,beta,gamma}_zoom[_roi]_{hemi}.svg` — aperiodic exponent and oscillatory peak power per band (a vertex whose channels show no peak in the band carries 0).
+- `*_forest_{hemi}.svg` — test summary of the measures with an uncorrected Moran *p* < 0.05 only, one row each, in table order: the observed Spearman r (black dot, filled if *p* < 0.05) against the central 95% of its 1,000 Moran-null r's (grey bar, tick at the null median), with r and the uncorrected Moran *p* (labelled $p_{m}$) written above each bar; the band FDR *q* (across the five bands) is in the CSV. Drawn at its final size on the `figure_1b_forest.svg` canvas (same width, x-axis span and font): its rows are level with the `*_zoom_roi_{hemi}.svg` rows of those measures stacked in that order and shown 150 mm wide, with the forest's top aligned with the first row. `*_forest_supp_{hemi}.svg` (supplementary) is the complete forest of all six measures (exponent, δ, θ, α, β, γ), level with all six inset rows.
+- `*_spectra_{hemi}.svg` — the inferential vertices split into quintiles of the MPC gradient: mean sensitivity-weighted spectrum per quintile (left, log-log, over the 1–45 Hz fit range) and mean flattened spectrum (right, log10 power above each channel's fitted aperiodic component), lines in the coolwarm colour of the quintile's median gradient (as the `figure_1a_strata.svg` caps), canonical bands shaded. Means only.
+- `*_coverage_zoom[_roi]_{hemi}.svg`, `*_coverage_sn_zoom[_roi]_{hemi}.svg` — summed sensitivity of the fitted channels on the whole cortex and on the network vertices (both hemispheres), `Purples` over the 10th–99th percentiles (colour-bar ends labelled with those values).
+- `data/dataframes/df_3b_spectral_stats_{hemi}.csv` — per measure: `r`, `p`, `q` (bands only), `null_lo` / `null_med` / `null_hi` (2.5th / 50th / 97.5th percentile of the null r's), `n_vertices`, `n_perm`.
+
+Supplementary:
+
+- `*_specparam_qc_supp_{hemi}.svg` — `specparam` fit check (`plot_fit_quality`): the *R*² distribution of the channel fits and the four fits with the lowest, median and highest *R*² (spectrum, full model, aperiodic fit). The log also records `specparam`'s methods report (version, algorithm, settings, fit range, modes and bounds) and a fit-quality summary (`fit_quality_summary`); no fit is excluded on these metrics.
+- `*_slope_corr_supp_{hemi}.svg`, `*_band_power_corr_supp_{hemi}.svg` — vertex scatter plots of each measure against the MPC gradient (fit line, r / *p* or *q*).
+- `*_es_scatter_supp_{hemi}.svg` — spectral-similarity projection against the MPC gradient (points coloured by dominant target network; r / *p*, plus the distance- and uniform-weighted baseline r's) and the per-target-network mean projection.
+- `*_es_zoom[_roi]_supp_{hemi}.svg` — spectral-similarity projection on the `-hemi` network vertices (the other hemisphere is empty; insets of that hemisphere's regions), `CustomCmap_ieeg` on ±2 SD.
+- `*_corr_supp_{hemi}.svg` — channel-level PSD correlation matrix, ordered by the network of each channel's peak-sensitivity vertex.
+
+---
+
+## Figure 3c states
+
+**`scripts/figure_3c_ieeg_states.py`** — State dependence of the MICA iEEG aperiodic exponent along the MPC gradient. The same bipolar channels were recorded in wakefulness (stage-W), N2 and N3 sleep; the first 180 s of every recording are preprocessed and parameterised as in Figure 3b (`MICA_PSD_PARAMS`; `specparam` knee mode with *k* ≥ 0, 1–45 Hz, same settings in every state) and the exponent is projected onto the folded fsLR-32k template through the bipolar sensitivity maps. Each state's exponent is correlated with the gradient on the network vertices of the `-hemi` hemisphere (FDR across the three states), and the correlations of every pair of states are compared against paired Moran surrogates of the gradient (FDR across the three pairs); the within-channel change from wakefulness to N3 is tested as well (supplementary). Significance is the within-network Moran null with the add-one empirical *p*. Main panels: one brain row per state with the forest of the significant states level with them, and the exponent of each gradient quintile across the states with the per-state correlations.
+
+```bash
+python scripts/figure_3c_ieeg_states.py \
+  -ieeg_deriv /path/to/BIDS_iEEG/derivatives/electroMICA \
+  -hemi LH
+```
+
+| Flag | Required | Default | Description |
+|------|----------|---------|-------------|
+| `-ieeg_deriv` | yes | — | Path to electroMICA derivatives directory |
+| `-ieeg_raw` | no | `<ieeg_deriv>/../../original` | Root of the original recordings (`<root>/sub-PX*/ses-01/*stage-{W,N2,N3}.mat`) |
+| `-hemi` | no | `LH` | Hemisphere of the statistics: `LH` or `RH` (maps are shown on both hemispheres) |
+| `-network` | no | `SalVentAttn` | Yeo 7-network analysis target |
+
+Requires `data/dataframes/df_1a_{hemi}.tsv` (or `df_1a_both.tsv`), as Figure 3 MICA. The per-state channel PSDs are cached in `data/dataframes/figure_3c_channel_psd_{W,N2,N3}.pkl` (not tracked; keyed on the recordings, state, analysed length and PSD parameters). Only channels recorded in all three states are analysed, and channels whose specparam fit fails in any state are dropped.
+
+**Outputs** (`results/figures/figure_3c_ieeg_states_*`, `{hemi}` = hemisphere of the statistics)
+
+Brain figures use the Figure 1 window (1450 × 300, zoom 1.3, region names at 30 pt, titles at 36 pt) with the `SALIENCE_ZOOM_ROIS` insets; maps show each template value on the network vertices of both hemispheres (folded template), z-scored there, `CustomCmap_ieeg` on ±2 SD (colour bar −2 / +2, z), with the network border traced (`mask_outline`).
+
+- `*_exponent_{W,N2,N3}_zoom_{hemi}.svg` — one brain row with insets and region names per state (untitled; the state is in the file name).
+- `*_forest_{hemi}.svg` — `plot_forest` of the per-state tests (r and uncorrected Moran *p*, labelled $p_{m}$, as the quintile panel), its rows level with the three state rows stacked in W, N2, N3 order and shown 150 mm wide; only states with *p* < 0.05 are drawn, the other slots are left empty (the FDR *q* across the three states is in the CSV).
+- `*_quintiles_{hemi}.svg` — 6-in panel: mean exponent (absolute values) of each MPC-gradient quintile of the inferential vertices in wakefulness, N2 and N3, lines in the coolwarm colour of the quintile's median gradient (as the `figure_1a_strata.svg` caps). Under each state its Spearman r with the gradient and Moran *p*, labelled $p_{m}$ (uncorrected, as the forest; FDR *q* in the CSV). Means only. The between-state comparisons of the correlations are reported in the CSV and the log.
+- `data/dataframes/df_3c_state_stats_{hemi}.csv` — per test: `delta_N3_W`, `exponent_W`, `exponent_N2`, `exponent_N3` (`r` = Spearman r with the gradient) and `diff_W_N2`, `diff_W_N3`, `diff_N2_N3` (`r` = difference of the two states' correlations); `p`, `q` (FDR across the three states or the three pairs), `null_lo` / `null_med` / `null_hi` (2.5th / 50th / 97.5th percentile of the null r's or differences), `n_vertices`, `n_perm`.
+
+Supplementary:
+
+- `*_specparam_qc_{W,N2,N3}_supp_{hemi}.svg` — `specparam` fit check of each state (`plot_fit_quality`, as Figure 3b); the log records the methods report and each state's fit-quality summary.
+- `*_delta_zoom_supp_{hemi}.svg` — brain row of the change of the exponent from wakefulness to N3.
+- `*_{delta_N3_W,exponent_W,exponent_N2,exponent_N3}_zoom_roi_supp_{hemi}.svg` — inset rows of the change and of each state (titled, colour bar, no region names), as the Figure 1b rows.
+- `*_forest_supp_{hemi}.svg` — complete `plot_forest` of the four tests, its rows level with those four inset rows stacked in that order and shown 150 mm wide.
+- `*_bands_quintiles_supp_{hemi}.svg` — every frequency band (`SPEC_BANDS`, the canonical bands clipped to the fit range): one 6-in panel per band, as the main exponent panel, with each quintile's mean oscillatory peak power (above the aperiodic fit, log10; no detected peak = 0, as Figure 3b) across the states and, under each state, its Spearman r with the gradient and Moran *p*, labelled $p_{m}$ (uncorrected; the FDR *q* across the five bands within the state is in the CSV).
+- `data/dataframes/df_3c_band_state_stats_{hemi}.csv` — per band: rows `{band}_{W,N2,N3}` (`r` = Spearman r with the gradient, `q` across the five bands within the state) and `{band}_diff_{W_N2,W_N3,N2_N3}` (`r` = difference of the two states' correlations, paired Moran surrogates, `q` across the three pairs within the band); `band`, `test`, `p`, `null_lo` / `null_med` / `null_hi`, `n_vertices`, `n_perm`.
 
 ---
 

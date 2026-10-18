@@ -1,7 +1,12 @@
+import contextlib
 import glob
+import io
 import logging
 import os
+import pickle
 import re
+import warnings
+from pathlib import Path
 
 import nibabel as nib
 import numpy as np
@@ -19,6 +24,22 @@ logger = logging.getLogger(__name__)
 
 # fsLR-32k vertices per hemisphere.
 N_LH = 32492
+
+# Preprocessing / Welch parameters of the MICA iEEG analyses (Figures 3b and 3c), passed
+# to preprocess_and_compute_psd_ieeg and part of the channel-PSD cache key.
+MICA_PSD_PARAMS = dict(fmin=0.5, fmax=80.0, fs_target=200.0, filter_order=4, window_sec=2.0, overlap_sec=1.0)
+
+# Canonical frequency bands (Hz), spanning the 0.5-80 Hz preprocessing band.
+FREQ_BANDS = {"delta": (0.5, 4), "theta": (4, 8), "alpha": (8, 13), "beta": (13, 30), "gamma": (30, 80)}
+
+# specparam fit range (Hz) of the MICA iEEG analyses (Figures 3b and 3c). It stops below
+# the 60 Hz line-noise notch of the recordings and the transition band of the 80 Hz
+# low-pass of MICA_PSD_PARAMS: specparam advises against fitting filtered-out frequencies.
+SPEC_FIT_RANGE = (1.0, 45.0)
+
+# Oscillatory peak-power readout bands (Hz) of Figures 3b and 3c: the canonical bands
+# clipped to the fit range, where peaks can be fitted (delta 1-4 Hz, gamma 30-45 Hz).
+SPEC_BANDS = {name: (max(lo, SPEC_FIT_RANGE[0]), min(hi, SPEC_FIT_RANGE[1])) for name, (lo, hi) in FREQ_BANDS.items()}
 
 
 def compute_vertex_areas(vertices: np.ndarray, faces: np.ndarray) -> np.ndarray:
@@ -46,80 +67,200 @@ def compute_vertex_areas(vertices: np.ndarray, faces: np.ndarray) -> np.ndarray:
     return compute_point_area(surf, area_as='one_third')
 
 
-def load_original_data_files(
+def list_original_data_files(
     root: str = '/host/verges/tank/data/BIDS_iEEG/original',
-) -> pd.DataFrame:
+    stage: str = 'W',
+) -> list[str]:
     """
-    Load original iEEG MATLAB files and return bipolar channel-level data.
-
-    Each row corresponds to one **bipolar channel** from one subject/session
-    pair. In the electroMICA terminology, a *channel* is a differential
-    recording between two physical *contacts*: ``ChannelName`` stores the pair
-    (e.g. ``"LCi1-LCi2"``), while ``ContactName1`` and ``ContactName2`` hold
-    the individual contact identifiers that index into the electroMICA
-    leadfield/sensitivity files.
+    List the iEEG recordings of one vigilance state of the original MICA dataset.
 
     Args:
-        root (str): Root directory of the BIDS iEEG dataset. Expected layout:
-            ``<root>/sub-PX*/ses-01/*stage-W.mat``
+        root (str): Root directory of the BIDS iEEG recordings. Expected layout:
+            ``<root>/sub-PX*/ses-01/*stage-<stage>.mat``
+        stage (str): Vigilance state: ``'W'`` (wakefulness), ``'N2'`` or ``'N3'``.
 
     Returns:
-        pd.DataFrame: Bipolar channel data with columns:
-            - Subject
-            - Session
-            - ChannelName    — bipolar pair label (e.g. ``"LCi1-LCi2"``)
-            - SamplingRate
-            - Data           — raw signal array, shape (n_samples,)
-            - ContactName1   — first contact of the bipolar pair (upper element)
-            - ContactName2   — second contact of the bipolar pair (lower element)
+        list[str]: Sorted file paths, so that downstream channel order (and any
+        cache keyed on this list) is deterministic.
+    """
+    return sorted(glob.glob(f"{root}/sub-PX*/ses-01/*stage-{stage}.mat"))
+
+
+def compute_original_psd(
+    root: str = '/host/verges/tank/data/BIDS_iEEG/original',
+    stage: str = 'W',
+    duration_s: float | None = None,
+    **psd_kwargs,
+) -> tuple[pd.DataFrame, np.ndarray, np.ndarray]:
+    """
+    Welch PSD of every bipolar channel in the original iEEG MATLAB recordings.
+
+    Each row of the returned table is one **bipolar channel** from one
+    subject/session pair. In the electroMICA terminology, a *channel* is a
+    differential recording between two physical *contacts*: ``ChannelName``
+    stores the pair (e.g. ``"LCi1-LCi2"``), while ``ContactName1`` and
+    ``ContactName2`` hold the individual contact identifiers that index into the
+    electroMICA leadfield/sensitivity files.
+
+    All recordings are truncated to the length of the shortest one (or to its first
+    ``duration_s`` seconds, e.g. to match vigilance states) before preprocessing,
+    so every channel's spectrum is estimated from the same number of samples. The shortest length is read from the MATLAB file headers first,
+    then the files are streamed one at a time through
+    :func:`preprocess_and_compute_psd_ieeg`, so only one subject's raw signal is
+    held in memory. Every preprocessing step acts along the time axis
+    independently per channel, so this matches processing all channels as one
+    matrix. Truncation is by sample count, so all recordings must share one
+    sampling rate.
+
+    Args:
+        root (str): Root directory of the BIDS iEEG recordings (see
+            :func:`list_original_data_files`).
+        stage (str): Vigilance state of the recordings: ``'W'``, ``'N2'`` or ``'N3'``.
+        duration_s (float | None): Analysed length in seconds (from the start of each
+            recording); ``None`` uses the shortest recording.
+        **psd_kwargs: Forwarded to :func:`preprocess_and_compute_psd_ieeg`
+            (``fmin``, ``fmax``, ``fs_target``, ``filter_order``, ``window_sec``,
+            ``overlap_sec``).
+
+    Returns:
+        tuple[pd.DataFrame, np.ndarray, np.ndarray]:
+            - Channel table with columns:
+                - Subject
+                - Session
+                - ChannelName    — bipolar pair label (e.g. ``"LCi1-LCi2"``)
+                - SamplingRate
+                - ContactName1   — first contact of the bipolar pair (upper element)
+                - ContactName2   — second contact of the bipolar pair (lower element)
+            - freq: frequencies in Hz, shape (n_frequencies,).
+            - pxx: normalized PSD, shape (n_channels, n_frequencies), row-aligned
+              with the channel table.
+
+    Raises:
+        ValueError: If no recording is found, a file's ``Data`` shape does not
+            match its channel count, the recordings use more than one sampling
+            rate, or ``duration_s`` exceeds the shortest recording.
     """
     pattern = re.compile(r"sub-(PX\d+)/ses-(\d+)")
-    files = glob.glob(f"{root}/sub-PX*/ses-01/*stage-W.mat")
 
-    rows = []
-
-    for filepath in files:
+    # Pass 1: header-only reads (channel names, sampling rate, Data shape).
+    headers = []
+    for filepath in list_original_data_files(root, stage):
         match = pattern.search(filepath)
         if match is None:
+            logger.warning(f"Skipping {filepath}: path does not match sub-PX*/ses-*.")
             continue
 
-        subject, session = match.groups()
-
-        mat = sio.loadmat(filepath, simplify_cells=True)
-        required_keys = {"ChannelName", "Data", "SamplingRate"}
-        if not required_keys.issubset(mat):
+        shapes = {name: shape for name, shape, _ in sio.whosmat(filepath)}
+        missing = {"ChannelName", "Data", "SamplingRate"} - set(shapes)
+        if missing:
+            logger.warning(f"Skipping {os.path.basename(filepath)}: missing {sorted(missing)}.")
             continue
 
-        channel_names = [str(c) for c in mat["ChannelName"]]
-        fs = float(mat["SamplingRate"])
-        data = np.asarray(mat["Data"])
-
-        if data.ndim != 2:
-            raise ValueError(f"Unexpected data shape in {filepath}: {data.shape}")
-
-        # Enforce (n_channels, n_samples)
-        if data.shape[0] != len(channel_names):
-            if data.shape[1] == len(channel_names):
-                data = data.T
-            else:
-                raise ValueError(
-                    f"Channel count mismatch in {filepath}: "
-                    f"{data.shape} vs {len(channel_names)} names"
-                )
-
-        for ch_name, ch_data in zip(channel_names, data):
-            rows.append(
-                {
-                    "Subject": subject,
-                    "Session": session,
-                    "ChannelName": ch_name,
-                    "SamplingRate": fs,
-                    "Data": ch_data,
-                }
+        meta = sio.loadmat(filepath, variable_names=["ChannelName", "SamplingRate"], simplify_cells=True)
+        channel_names = [str(c) for c in np.atleast_1d(meta["ChannelName"])]
+        shape = shapes["Data"]
+        if len(shape) != 2 or len(channel_names) not in shape:
+            raise ValueError(
+                f"Channel count mismatch in {filepath}: "
+                f"{shape} vs {len(channel_names)} names"
             )
+        n_samples = shape[1] if shape[0] == len(channel_names) else shape[0]
+        headers.append((filepath, *match.groups(), channel_names, float(meta["SamplingRate"]), n_samples))
+
+    if not headers:
+        raise ValueError(f"No stage-{stage} recordings found under {root}.")
+
+    rates = sorted({h[4] for h in headers})
+    if len(rates) > 1:
+        raise ValueError(
+            f"Recordings use several sampling rates {rates}; truncation to a common "
+            f"sample count requires a single rate."
+        )
+    fs = rates[0]
+
+    lengths = [h[5] for h in headers]
+    min_len, max_len = min(lengths), max(lengths)
+    if min_len != max_len:
+        logger.warning(f"Variable channel lengths ({min_len} to {max_len} samples); truncating all to {min_len}.")
+    if duration_s is not None:
+        n_dur = int(round(duration_s * fs))
+        if n_dur > min_len:
+            raise ValueError(f"duration_s={duration_s} s ({n_dur} samples) exceeds the shortest "
+                             f"stage-{stage} recording ({min_len} samples).")
+        min_len = n_dur
+        logger.info(f"stage-{stage}: analysing the first {duration_s:g} s ({n_dur} samples) of each recording.")
+
+    # Pass 2: one subject at a time -> truncate -> preprocess -> PSD.
+    rows, pxx_parts, freq = [], [], None
+    for filepath, subject, session, channel_names, _, _ in headers:
+        data = np.asarray(sio.loadmat(filepath, variable_names=["Data"])["Data"])
+        if data.shape[0] != len(channel_names):  # enforce (n_channels, n_samples)
+            data = data.T
+        data = np.ascontiguousarray(data[:, :min_len], dtype=float)
+        f, pxx = preprocess_and_compute_psd_ieeg(data, fs, **psd_kwargs)
+        if freq is None:
+            freq = f
+        pxx_parts.append(pxx)
+        rows.extend(
+            {"Subject": subject, "Session": session, "ChannelName": name, "SamplingRate": fs}
+            for name in channel_names
+        )
+
     df = pd.DataFrame(rows)
     df[['ContactName1', 'ContactName2']] = df['ChannelName'].str.split('-', n=1, expand=True)
-    return df
+    return df, freq, np.vstack(pxx_parts)
+
+
+def load_or_compute_channel_psd(
+    raw_root: str,
+    cache_path,
+    stage: str = 'W',
+    duration_s: float | None = None,
+    **psd_kwargs,
+) -> tuple[pd.DataFrame, np.ndarray, np.ndarray]:
+    """
+    :func:`compute_original_psd`, cached against its inputs.
+
+    The cache holds the channel table, frequency axis and PSD (a few MB) with a key
+    built from every recording's relative path, size and modification time plus
+    ``stage``, ``duration_s`` and ``psd_kwargs``. Any change to the recordings or
+    parameters invalidates it, so the figures are never built from data that no
+    longer matches the source.
+
+    Args:
+        raw_root (str): Root of the original recordings (see :func:`list_original_data_files`).
+        cache_path: Pickle file of the cache.
+        stage (str): Vigilance state: ``'W'``, ``'N2'`` or ``'N3'``.
+        duration_s (float | None): Analysed length in seconds (see :func:`compute_original_psd`).
+        **psd_kwargs: Forwarded to :func:`preprocess_and_compute_psd_ieeg` (e.g. ``MICA_PSD_PARAMS``).
+
+    Returns:
+        tuple[pd.DataFrame, np.ndarray, np.ndarray]: Channel table, frequencies and
+        PSD, as :func:`compute_original_psd`.
+    """
+    cache_path = Path(cache_path)
+    files = list_original_data_files(raw_root, stage)
+    key = {
+        "files": [(os.path.relpath(fp, raw_root), os.stat(fp).st_size, os.stat(fp).st_mtime_ns) for fp in files],
+        "stage": stage,
+        "duration_s": duration_s,
+        "psd_params": psd_kwargs,
+    }
+    if cache_path.exists():
+        with open(cache_path, 'rb') as fh:
+            cached = pickle.load(fh)
+        if cached.get("key") == key:
+            logger.info(f"Loading cached stage-{stage} channel PSD from {cache_path}")
+            return cached["channels"], cached["freq"], cached["pxx"]
+        logger.info(f"Channel PSD cache {cache_path} is stale (recordings or parameters changed); recomputing.")
+    else:
+        logger.info(f"Channel PSD cache not found; computing from {len(files)} stage-{stage} recordings in {raw_root}.")
+    channels, freq, pxx = compute_original_psd(raw_root, stage=stage, duration_s=duration_s, **psd_kwargs)
+    with open(cache_path, 'wb') as fh:
+        pickle.dump({"key": key, "channels": channels, "freq": freq, "pxx": pxx}, fh,
+                    protocol=pickle.HIGHEST_PROTOCOL)
+    logger.info(f"Channel PSD saved to {cache_path}.")
+    return channels, freq, pxx
 
 
 def load_channel_info(root_dir: str = '/host/verges/tank/data/BIDS_iEEG/derivatives/electroMICA') -> pd.DataFrame:
@@ -314,6 +455,7 @@ def load_sensitivity_info(
         match_hemi = pat_hemi.search(filepath)
 
         if match_sub is None or match_ses is None or match_hemi is None:
+            logger.warning(f"Skipping leadfield {filepath}: cannot parse subject/session/hemisphere from its path.")
             continue
 
         subject, session, hemi = (
@@ -324,11 +466,13 @@ def load_sensitivity_info(
 
         try:
             mat = sio.loadmat(filepath, simplify_cells=True)
-        except (OSError, ValueError):
+        except (OSError, ValueError) as e:
+            logger.warning(f"Skipping leadfield {os.path.basename(filepath)}: unreadable ({type(e).__name__}: {e}).")
             continue
 
-        required_keys = {"ContactName", "ContactSensitivityMap"}
-        if not required_keys.issubset(mat):
+        missing = {"ContactName", "ContactSensitivityMap"} - set(mat)
+        if missing:
+            logger.warning(f"Skipping leadfield {os.path.basename(filepath)}: missing {sorted(missing)}.")
             continue
 
         contact_names = [str(c).strip().upper() for c in mat["ContactName"]]
@@ -403,6 +547,8 @@ def _threshold_channel_sensitivity(
     ``rel_thresh`` times the channel's second-largest density (a single-vertex-
     outlier-robust proxy for the maximum). Retained values are returned as
     magnitudes (the projection weights); vertices below either floor are 0.
+    NaN leadfield values are treated as zero sensitivity, so they neither
+    propagate nor disable the channel's thresholds.
 
     Args:
         chan: Signed channel leadfield, shape (n_channels, n_vertices).
@@ -413,7 +559,7 @@ def _threshold_channel_sensitivity(
     Returns:
         np.ndarray: Non-negative thresholded sensitivity, shape of ``chan``.
     """
-    mag = np.abs(chan)
+    mag = np.abs(np.nan_to_num(chan, nan=0.0))
     density = mag / (areas + 1e-12)
     # electroMICA `so[:, 1]`: the channel's second-largest area-normalised density
     # (partial sort — the full ordering is never needed).
@@ -452,7 +598,9 @@ def build_bipolar_sensitivity(
             ``df_sensitivity``).
         df_sensitivity: Per-contact signed maps from :func:`load_sensitivity_info`,
             with columns ``Subject``, ``Session``, ``ContactName``, ``Sens_L``,
-            ``Sens_R`` (each shape (32492,)). Contacts absent here contribute zero.
+            ``Sens_R`` (each shape (32492,)). Contacts absent here contribute zero;
+            a warning reports, per (Subject, Session), how many contacts and
+            channels this affects.
         areas: ``(Subject, Session) -> {"L": areas_L, "R": areas_R}`` per-vertex
             surface areas from :func:`load_sensitivity_info`.
         global_thresh: Absolute density noise floor (Vm/A).
@@ -471,19 +619,75 @@ def build_bipolar_sensitivity(
     for (subject, session), grp in df_channels.groupby(["Subject", "Session"], sort=False):
         area = areas.get((subject, session), {})
 
-        def _diff(hemi_idx: int) -> np.ndarray:
-            """Signed L1 - L2 leadfield difference for this group, one hemisphere."""
-            c1 = np.vstack([lookup.get((subject, session, n), zeros)[hemi_idx] for n in grp["ContactName1"]])
-            c2 = np.vstack([lookup.get((subject, session, n), zeros)[hemi_idx] for n in grp["ContactName2"]])
-            return c1 - c2
+        names = pd.unique(grp[["ContactName1", "ContactName2"]].to_numpy().ravel())
+        missing = [n for n in names if (subject, session, n) not in lookup]
+        if missing:
+            n_hit = int((grp["ContactName1"].isin(missing) | grp["ContactName2"].isin(missing)).sum())
+            logger.warning(
+                f"sub-{subject} ses-{session}: {len(missing)}/{len(names)} contacts have no "
+                f"leadfield (treated as zero); {n_hit}/{len(grp)} channels affected."
+            )
 
-        sens = sum(
-            _threshold_channel_sensitivity(_diff(i), area.get(hemi, np.ones(N_LH)),
-                                           global_thresh, rel_thresh)
+        # Signed contact leadfields, looked up once per group: (Sens_L, Sens_R) per channel.
+        maps1 = [lookup.get((subject, session, n), zeros) for n in grp["ContactName1"]]
+        maps2 = [lookup.get((subject, session, n), zeros) for n in grp["ContactName2"]]
+        out[grp.index.to_numpy()] = sum(
+            _threshold_channel_sensitivity(
+                np.vstack([m[i] for m in maps1]) - np.vstack([m[i] for m in maps2]),
+                area.get(hemi, np.ones(N_LH)), global_thresh, rel_thresh,
+            )
             for i, hemi in enumerate(("L", "R"))
         )
-        out[grp.index.to_numpy()] = sens
     return out
+
+
+def project_channel_measure(channel_vals: np.ndarray, sens: np.ndarray) -> np.ndarray:
+    """
+    Sensitivity-weighted projection of per-channel values onto the surface.
+
+    Each surface vertex receives the sensitivity-weighted average of the per-channel
+    values (the electroMICA smoothed feature map); vertices with no sensitivity
+    (uncovered) are returned as NaN.
+
+    Args:
+        channel_vals: Per-channel values, shape (n_channels,) for a scalar measure or
+            (k, n_channels) for k values per channel (e.g. a spectrum).
+        sens: Bipolar sensitivity maps, shape (n_channels, n_vertices)
+            (see :func:`build_bipolar_sensitivity`; NaN zeroed).
+
+    Returns:
+        np.ndarray: Shape (n_vertices,) or (k, n_vertices).
+    """
+    sens_sum = np.sum(sens, axis=0)
+    surf = (channel_vals @ sens) / (sens_sum + 1e-12)
+    surf[..., sens_sum == 0] = np.nan
+    return surf
+
+
+def mirror_to_cortex(template_vals: np.ndarray, df_surf: pd.DataFrame, network: str | None = None) -> np.ndarray:
+    """
+    Show a folded template-hemisphere map on both fsLR-32k hemispheres.
+
+    The bipolar sensitivities fold both hemispheres onto one fsLR-32k template
+    (:func:`build_bipolar_sensitivity`), so template vertex i stands for left vertex i
+    and its homologue, right vertex ``N_LH + i``. The value is placed on both, kept on
+    labelled cortex (or on ``network`` vertices when given) and NaN elsewhere.
+
+    Args:
+        template_vals: Per-template-vertex values, shape (N_LH,).
+        df_surf: Surface table over both hemispheres with ``hemisphere`` and
+            ``network`` columns (e.g. ``df_yeo_surf``).
+        network: Yeo network to keep; ``None`` keeps all labelled cortex.
+
+    Returns:
+        np.ndarray: Shape (2 * N_LH,), LH then RH.
+    """
+    full = np.tile(np.asarray(template_vals, dtype=float), 2)
+    keep = df_surf['hemisphere'].notna().to_numpy()
+    if network is not None:
+        keep &= (df_surf['network'] == network).to_numpy()
+    full[~keep] = np.nan
+    return full
 
 
 def preprocess_and_compute_psd_ieeg(
@@ -578,12 +782,15 @@ def compute_spectral_parameters(
     pxx: np.ndarray,
     freq: np.ndarray,
     bands: dict[str, tuple[float, float]] | None = None,
-    fmin: float = 1.0,
-    fmax: float = 80.0,
+    fmin: float = SPEC_FIT_RANGE[0],
+    fmax: float = SPEC_FIT_RANGE[1],
     aperiodic_mode: str = "knee",
     peak_width_limits: tuple[float, float] = (1.0, 12.0),
     max_n_peaks: int = 6,
     min_peak_height: float = 0.05,
+    peak_threshold: float = 2.0,
+    nonnegative_knee: bool = True,
+    return_model: bool = False,
 ) -> dict:
     """
     Parameterise power spectra into an aperiodic exponent and oscillatory band power.
@@ -594,10 +801,15 @@ def compute_spectral_parameters(
     returned: the aperiodic exponent $\\chi$ and, per requested band, the power of the
     strongest oscillatory peak *above the aperiodic fit*. Deriving band power from the
     periodic component (rather than integrating the raw PSD) makes it orthogonal to the
-    exponent, so the two measures do not re-encode the same 1/f change. Fitting in
-    ``'knee'`` mode suits the broadband iEEG range (0.5--80 Hz), where the aperiodic
-    component bends at low frequency, and the per-channel unit-sum PSD normalisation
-    only shifts the aperiodic offset, leaving both measures unchanged.
+    exponent, so the two measures do not re-encode the same 1/f change. The settings
+    follow the specparam 2.0 guidance: one model and one set of settings for every
+    spectrum; a fit range (``SPEC_FIT_RANGE``, 1--45 Hz) that excludes the line-noise
+    notch of the recordings and the transition band of the 80 Hz low-pass, since
+    filtered-out frequencies should not be fitted; and, in ``'knee'`` mode, the knee
+    bounded to $k \\ge 0$ (specparam's ``ap_bounds`` setting), so a spectrum without a
+    knee in the fit range reduces to the fixed power law ($k = 0$) instead of taking a
+    non-physical negative knee. The per-channel unit-sum PSD normalisation only shifts
+    the aperiodic offset, leaving both measures unchanged.
 
     Args:
         pxx: PSD array of shape (n_spectra, n_frequencies) or (n_frequencies,); the
@@ -605,30 +817,53 @@ def compute_spectral_parameters(
             log-transforms internally).
         freq: Frequency axis in Hz, shape (n_frequencies,).
         bands: Mapping of band name to ``(fmin, fmax)`` in Hz for the oscillatory
-            band-power readout; if ``None`` only the exponent is returned.
+            band-power readout (e.g. ``SPEC_BANDS``); every band must lie within the
+            fit range. If ``None`` only the aperiodic parameters are returned.
         fmin: Lower bound of the fitting range in Hz (the lowest bins are excluded
-            because filter roll-off makes them unreliable).
+            because the high-pass makes them unreliable).
         fmax: Upper bound of the fitting range in Hz.
         aperiodic_mode: ``specparam`` aperiodic mode, ``'knee'`` or ``'fixed'``.
-        peak_width_limits: (min, max) Gaussian peak bandwidth in Hz; the lower limit
-            must exceed twice the frequency resolution.
+        peak_width_limits: (min, max) Gaussian peak bandwidth in Hz; specparam
+            recommends a lower limit of about twice the frequency resolution.
         max_n_peaks: Maximum number of oscillatory peaks fitted per spectrum.
-        min_peak_height: Minimum peak height above the aperiodic fit (log power).
+        min_peak_height: Minimum peak height above the aperiodic fit (log10 power).
+        peak_threshold: Relative peak-detection threshold, in standard deviations of
+            the flattened spectrum.
+        nonnegative_knee: In ``'knee'`` mode, bound the knee to $k \\ge 0$.
+        return_model: Also return the fitted ``SpectralGroupModel`` (for fit checks,
+            e.g. :func:`plot_fit_quality`).
 
     Returns:
         dict with:
             - ``'exponent'``: aperiodic exponent $\\chi$ (positive for $1/f$-like
               spectra), shape ``pxx.shape[:-1]``; NaN where the fit failed to converge.
+            - ``'offset'``: aperiodic offset $b$ (log10 power), same shape.
+            - ``'knee'``: aperiodic knee $k$, same shape; 0 in ``'fixed'`` mode, for
+              which $L(f) = b - \\log_{10}(f^{\\chi})$ is the knee formula with $k = 0$.
+              With ``'offset'`` and ``'exponent'`` it gives the fitted aperiodic
+              component through :func:`aperiodic_component`.
+            - ``'knee_freq'``: knee frequency $k^{1/\\chi}$ in Hz (specparam's
+              ``compute_knee_frequency``; Gao et al., 2020), same shape; a value below
+              ``fmin`` places the knee below the fit range. NaN in ``'fixed'`` mode.
+            - ``'r_squared'``, ``'mae'``: goodness of fit ($R^2$) and mean absolute
+              error (log10 power) of each fit, same shape.
+            - ``'n_peaks'``: number of oscillatory peaks fitted per spectrum, same shape.
             - ``'band_power'``: ``{name: array}`` of oscillatory peak power for each
               requested band, same shape as ``'exponent'``; NaN where no peak was
               detected in the band (i.e. no oscillation) or the fit failed.
+            - ``'report'``: specparam's methods report (code version, algorithm,
+              settings, fit range), as text.
+            - ``'model'``: the fitted ``SpectralGroupModel``, if ``return_model``.
 
     Raises:
         ImportError: If ``specparam`` is not installed.
+        ValueError: If a band extends outside the fit range ``[fmin, fmax]``.
     """
     try:
         from specparam import SpectralGroupModel
         from specparam.data.periodic import get_band_peak_group
+        from specparam.params.aperiodic import compute_knee_frequency
+        from specparam.reports.methods import methods_report_info
     except ImportError as exc:  # pragma: no cover - environment guard
         raise ImportError(
             "compute_spectral_parameters requires the `specparam` package "
@@ -636,17 +871,43 @@ def compute_spectral_parameters(
             "analysis."
         ) from exc
 
+    outside = {name: rng for name, rng in (bands or {}).items() if rng[0] < fmin or rng[1] > fmax}
+    if outside:
+        raise ValueError(f"Bands {outside} extend outside the fit range [{fmin:g}, {fmax:g}] Hz; "
+                         f"no peak can be fitted there (use bands clipped to the fit range, e.g. SPEC_BANDS).")
+
     out_shape = np.shape(pxx)[:-1]
     spectra = np.atleast_2d(pxx).astype(float)
+    algorithm_settings = None
+    if aperiodic_mode == "knee" and nonnegative_knee:
+        # (offset, knee, exponent) bounds: only the knee is restricted, to k >= 0.
+        algorithm_settings = {"ap_bounds": ((-np.inf, 0.0, -np.inf), (np.inf, np.inf, np.inf))}
     fg = SpectralGroupModel(
         peak_width_limits=list(peak_width_limits),
         max_n_peaks=max_n_peaks,
         min_peak_height=min_peak_height,
+        peak_threshold=peak_threshold,
         aperiodic_mode=aperiodic_mode,
+        metrics=["error_mae", "gof_rsquared"],
+        algorithm_settings=algorithm_settings,
         verbose=False,
     )
     fg.fit(freq, spectra, freq_range=[fmin, fmax])
     exponent = fg.get_params("aperiodic", "exponent").reshape(out_shape)
+    offset = fg.get_params("aperiodic", "offset").reshape(out_shape)
+    if aperiodic_mode == "knee":
+        knee = fg.get_params("aperiodic", "knee").reshape(out_shape)
+        with np.errstate(invalid="ignore", divide="ignore"):
+            knee_freq = np.asarray(compute_knee_frequency(knee, exponent), dtype=float)
+    else:
+        knee, knee_freq = np.zeros(out_shape), np.full(out_shape, np.nan)
+
+    # Peak table rows are [CF, PW, BW, spectrum index]; count the peaks of each spectrum.
+    peak_table = np.atleast_2d(fg.get_params("periodic"))
+    n_peaks = np.zeros(spectra.shape[0], dtype=int)
+    if peak_table.size:
+        valid_rows = np.isfinite(peak_table[:, 0])
+        n_peaks = np.bincount(peak_table[valid_rows, -1].astype(int), minlength=spectra.shape[0])
 
     band_power = {}
     for name, (lo, hi) in (bands or {}).items():
@@ -655,7 +916,124 @@ def compute_spectral_parameters(
         peaks = np.atleast_2d(get_band_peak_group(fg, (lo, hi)))
         band_power[name] = peaks[:, 1].reshape(out_shape)
 
-    return {"exponent": exponent, "band_power": band_power}
+    report = io.StringIO()
+    with contextlib.redirect_stdout(report):
+        methods_report_info(fg, concise=True)
+    # The specparam report lists neither the fit modes nor the aperiodic bounds.
+    report.write(f"Fit modes: aperiodic '{aperiodic_mode}', periodic 'gaussian'; aperiodic bounds: "
+                 f"{'knee >= 0' if algorithm_settings else 'none'}; metrics: error_mae, gof_rsquared\n")
+
+    out = {"exponent": exponent, "offset": offset, "knee": knee, "knee_freq": knee_freq.reshape(out_shape),
+           "r_squared": np.asarray(fg.results.get_metrics("gof", "rsquared"), dtype=float).reshape(out_shape),
+           "mae": np.asarray(fg.results.get_metrics("error", "mae"), dtype=float).reshape(out_shape),
+           "n_peaks": n_peaks.reshape(out_shape), "band_power": band_power, "report": report.getvalue()}
+    if return_model:
+        out["model"] = fg
+    return out
+
+
+def aperiodic_component(
+    freq: np.ndarray,
+    offset: np.ndarray,
+    knee: np.ndarray,
+    exponent: np.ndarray,
+) -> np.ndarray:
+    """
+    Fitted aperiodic component $L(f) = b - \\log_{10}(k + f^{\\chi})$ in log10 power.
+
+    Evaluates the ``specparam`` aperiodic model from the parameters returned by
+    :func:`compute_spectral_parameters`; subtracting it from the log10 power spectrum
+    leaves the periodic (oscillatory) residual, i.e. the flattened spectrum.
+
+    Args:
+        freq: Frequencies in Hz, shape (n_frequencies,).
+        offset: Aperiodic offset $b$, any shape ``S``.
+        knee: Aperiodic knee $k$ (0 for ``'fixed'`` mode), shape ``S``.
+        exponent: Aperiodic exponent $\\chi$, shape ``S``.
+
+    Returns:
+        np.ndarray: Aperiodic component, shape ``S + (n_frequencies,)``.
+    """
+    offset, knee, exponent = (np.asarray(a, dtype=float)[..., None] for a in (offset, knee, exponent))
+    return offset - np.log10(knee + np.asarray(freq, dtype=float) ** exponent)
+
+
+def fit_quality_summary(spec: dict, fmin: float = SPEC_FIT_RANGE[0], mask: np.ndarray | None = None) -> str:
+    """One-line description of the fits returned by :func:`compute_spectral_parameters`.
+
+    Reports, over the converged fits (optionally restricted by ``mask``): the median and
+    interquartile range of $R^2$ and the number of fits with $R^2 < 0.9$ (descriptive,
+    no exclusion), the median mean absolute error, the mean number of peaks per fit (a
+    high value can indicate over-fitting), and the median knee frequency with the number
+    of fits whose knee lies below the fit range (``< fmin``).
+
+    Args:
+        spec: Output of :func:`compute_spectral_parameters`.
+        fmin: Lower bound of the fit range in Hz.
+        mask: Optional boolean selection of the spectra.
+
+    Returns:
+        str: The summary.
+    """
+    keep = np.isfinite(spec["exponent"]) if mask is None else (np.asarray(mask, dtype=bool) & np.isfinite(spec["exponent"]))
+    r2, mae, kf = spec["r_squared"][keep], spec["mae"][keep], spec["knee_freq"][keep]
+    text = (f"{int(keep.sum())} fits; R^2 median {np.median(r2):.3f} (IQR {np.percentile(r2, 25):.3f}-"
+            f"{np.percentile(r2, 75):.3f}), R^2 < 0.9 in {int((r2 < 0.9).sum())}; MAE median {np.median(mae):.3f}; "
+            f"peaks per fit mean {np.mean(spec['n_peaks'][keep]):.2f}")
+    if np.isfinite(kf).any():
+        text += (f"; knee frequency median {np.nanmedian(kf):.1f} Hz (IQR {np.nanpercentile(kf, 25):.1f}-"
+                 f"{np.nanpercentile(kf, 75):.1f}), below the fit range (< {fmin:g} Hz) in {int((kf < fmin).sum())}")
+    return text
+
+
+def plot_fit_quality(model, path, n: int = 4, labels: list[str] | None = None, title: str | None = None) -> None:
+    """Fit check of a ``specparam`` group fit: worst, median and best fits.
+
+    Following the specparam guidance on checking model fits, draws the distribution of
+    the fits' $R^2$ and, below it, the ``n`` fits with the lowest $R^2$ (possible
+    under-fitting or artefactual spectra), the ``n`` around the median and the ``n``
+    with the highest $R^2$ (possible over-fitting), each as specparam's model plot
+    (spectrum, full model and aperiodic fit; log-frequency axis) titled with its $R^2$.
+    Failed fits (NaN $R^2$) are left out.
+
+    Args:
+        model: Fitted ``SpectralGroupModel`` (``compute_spectral_parameters(...,
+            return_model=True)['model']``).
+        path: Output file (format from the extension).
+        n: Number of fits per row.
+        labels: Optional name of every spectrum (e.g. subject and channel), shown in
+            the panel titles.
+        title: Optional figure title.
+    """
+    import matplotlib.pyplot as plt
+
+    r2 = np.asarray(model.results.get_metrics("gof", "rsquared"), dtype=float)
+    finite = np.flatnonzero(np.isfinite(r2))
+    order = finite[np.argsort(r2[finite])]
+    mid = len(order) // 2
+    rows = {"Lowest $R^2$": order[:n], "Median $R^2$": order[max(mid - n // 2, 0):max(mid - n // 2, 0) + n],
+            "Highest $R^2$": order[-n:]}
+
+    fig = plt.figure(figsize=(3.6 * n, 3.0 * (len(rows) + 1)))
+    grid = fig.add_gridspec(len(rows) + 1, n, hspace=0.6, wspace=0.35)
+    ax = fig.add_subplot(grid[0, :])
+    ax.hist(r2[finite], bins=60, color="0.4")
+    ax.set_xlabel("$R^2$")
+    ax.set_ylabel("Fits")
+    ax.set_title(f"{finite.size} fits: median $R^2$ = {np.median(r2[finite]):.3f}" + (f" ({title})" if title else ""))
+    for row, (name, idx) in enumerate(rows.items(), start=1):
+        for col, i in enumerate(idx):
+            ax = fig.add_subplot(grid[row, col])
+            model.get_model(int(i), regenerate=True).plot(ax=ax, plt_log=True, add_legend=(row == 1 and col == 0))
+            ax.set_title(f"{name}: {r2[i]:.3f}" + (f"\n{labels[i]}" if labels is not None else ""), fontsize=9)
+            ax.tick_params(labelsize=8)
+            ax.xaxis.label.set_size(8)
+            ax.yaxis.label.set_size(8)
+    with warnings.catch_warnings():
+        # specparam's model plot marks its axes for tight_layout; the grid is laid out above.
+        warnings.filterwarnings("ignore", message="This figure includes Axes that are not compatible")
+        fig.savefig(path, bbox_inches="tight")
+    plt.close(fig)
 
 
 def compute_gradient_quantiles(

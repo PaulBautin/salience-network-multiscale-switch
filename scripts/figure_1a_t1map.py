@@ -45,6 +45,7 @@ from brainspace.plotting import plot_hemispheres
 from src.atlas_load import load_yeo_atlas, load_yeo_surf_5k, load_t1_salience_profiles, compute_t1map, compute_network_mask
 from src.gradient_computation import compute_t1_gradient
 from src.logging_utils import setup_manuscript_logger
+from src.surface_plotting import plot_hemispheres_zoom, salience_zoom_rois, mask_outline, SALIENCE_Z_RANGE, SALIENCE_Z_LABELS
 
 logger = logging.getLogger(__name__)
 
@@ -94,6 +95,23 @@ PATHS_5K = [
 ]
 REQUIRED_5K = ["path_t1_profile_5k", "path_mpc_5k", "path_sc_5k",
                "path_sc_dist_5k", "path_dist_5k"]  # FC optional
+
+# Axes box (pt from the top-left of the 432-pt, 6-in canvas) shared by the profiles and
+# strata panels, so pial and WM sit at the same heights in both. It is the box
+# tight_layout gave the profiles panel at 21 pt; figure_1b_contextualisation's
+# PROFILES_AXIS_PT copies its x span for the forest plot.
+PANEL_CANVAS_PT = 432.0
+PANEL_AXES_PT = dict(left=92.72, right=386.01, top=22.68, bottom=358.0)
+# Depth axis of both panels (0 = pial, 1 = WM, pial at the top), with the 5 % margin
+# matplotlib's autoscale gave the profiles panel, so pial/WM sit at the same heights.
+PANEL_YLIM = (1.05, -0.05)
+
+
+def _apply_panel_axes(fig) -> None:
+    """Place a 6-in panel's axes on ``PANEL_AXES_PT`` (instead of tight_layout)."""
+    c = PANEL_CANVAS_PT
+    fig.subplots_adjust(left=PANEL_AXES_PT['left'] / c, right=PANEL_AXES_PT['right'] / c,
+                        top=1 - PANEL_AXES_PT['top'] / c, bottom=1 - PANEL_AXES_PT['bottom'] / c)
 
 
 def get_parser():
@@ -167,35 +185,178 @@ def plot_gradient_profiles(
     bottom_profiles = np.mean(t1_salience_profiles[:, :, bottom_mask], axis=0)
     top_profiles = np.mean(t1_salience_profiles[:, :, top_mask], axis=0)
 
-    # Plotting setup
-    fig, ax = plt.subplots(figsize=(6, 6))
-    custom_cmap = plt.get_cmap("coolwarm")
-    norm = mpl.colors.Normalize(vmin=-3, vmax=3)
-    colors = custom_cmap(norm(grad_sn))
+    # Font: the 6-in panel is shown at ~0.41x in the Figure 1 layout, so 21 pt reads
+    # like the ~8.8-pt text of the zoom rows (30 pt shown at ~0.29x).
+    with plt.rc_context({'font.size': 21}):
+        # Plotting setup
+        fig, ax = plt.subplots(figsize=(6, 6))
+        custom_cmap = plt.get_cmap("coolwarm")
+        norm = mpl.colors.Normalize(*SALIENCE_Z_RANGE)
+        colors = custom_cmap(norm(grad_sn))
 
-    y_axis = np.linspace(0, 1, profiles.shape[0])
+        y_axis = np.linspace(0, 1, profiles.shape[0])
 
-    # Plot individual profiles (Consider LineCollection here in the future if this loop is slow)
-    for i, col in enumerate(colors):
-        ax.plot(profiles[:, i] / 1000, y_axis, color=col, alpha=0.1, rasterized=True)
+        # Plot individual profiles (Consider LineCollection here in the future if this loop is slow)
+        for i, col in enumerate(colors):
+            ax.plot(profiles[:, i] / 1000, y_axis, color=col, alpha=0.1, rasterized=True)
 
-    ax.plot(np.mean(bottom_profiles, axis=1) / 1000, y_axis, color='b', alpha=0.8, label='bottom 25%')
-    ax.plot(np.mean(top_profiles, axis=1) / 1000, y_axis, color='r', alpha=0.8, label='top 25%')
+        ax.plot(np.mean(bottom_profiles, axis=1) / 1000, y_axis, color='b', alpha=0.8, label='bottom 25%')
+        ax.plot(np.mean(top_profiles, axis=1) / 1000, y_axis, color='r', alpha=0.8, label='top 25%')
     
-    # Aesthetics
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    plt.legend(frameon=False, loc='lower right', bbox_to_anchor=(1, 0.1))
-    plt.xlim(1.4, 2.5)
-    plt.ylabel("Intracortical depth")
-    plt.xlabel("Long. relaxation time (s)")
-    plt.axhline(y=0, color='k', linestyle='--', linewidth=1)
-    plt.axhline(y=1, color='k', linestyle='--', linewidth=1)
-    plt.yticks([0, 1], ['pial', 'WM'])
-    plt.gca().invert_yaxis()
-    plt.grid(False)
-    plt.tight_layout()
-    plt.savefig(screenshot_path)
+        # Aesthetics
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        plt.legend(frameon=False, loc='lower right', bbox_to_anchor=(1, 0.1))
+        plt.xlim(1.4, 2.5)
+        plt.ylabel("Intracortical depth")
+        plt.xlabel("Long. relaxation time (s)")
+        plt.axhline(y=0, color='k', linestyle='--', linewidth=1)
+        plt.axhline(y=1, color='k', linestyle='--', linewidth=1)
+        plt.yticks([0, 1], ['pial', 'WM'])
+        plt.ylim(*PANEL_YLIM)
+        plt.grid(False)
+        _apply_panel_axes(fig)
+        plt.savefig(screenshot_path)
+        plt.close(fig)
+
+
+def plot_gradient_strata(
+    df_yeo_surf: pd.DataFrame,
+    t1_salience_profiles: np.ndarray,
+    screenshot_path: Path,
+    network: str = 'SalVentAttn',
+    hemisphere: str = 'both',
+    n_bins: int = 5,
+) -> None:
+    """Stratigraphy columns: mean qT1 at each depth for each gradient quantile bin.
+
+    Network vertices are split into ``n_bins`` equal-count bins of the MPC gradient
+    (quintiles by default) and each bin is drawn as one column of blocks, one block
+    per sampled depth (pial at the top, white matter at the bottom). Each block is
+    coloured by the raw qT1 averaged over subjects and the bin's vertices on a linear
+    grey scale, as a qT1 map is displayed: black at the lowest and white at the
+    highest plotted value (the window spans exactly the blocks' range, which maximises
+    the contrast between columns without clipping any block). Each column is outlined
+    so its brightest block stays visible on a white page, and a cap below it takes the
+    coolwarm colour of the bin's median gradient value (same scale as the brain map).
+    Blocks are vector rectangles, so the sampling stays visible in the SVG. The
+    vertex axis of `t1_salience_profiles` follows the masked rows of `df_yeo_surf`,
+    as in :func:`plot_gradient_profiles`.
+
+    Parameters
+    ----------
+    df_yeo_surf : pd.DataFrame
+        Surface table carrying the `t1_gradient1_{network}` column.
+    t1_salience_profiles : np.ndarray, shape (n_subjects, n_depths, n_network_vertices)
+        Per-subject T1 profiles (ms) for the network vertices.
+    screenshot_path : Path
+        Output SVG path.
+    network : str
+        Yeo 7-network label whose gradient defines the bins.
+    hemisphere : {'both', 'LH', 'RH'}
+        Restricts the vertices (and the bin edges) to one hemisphere.
+    n_bins : int
+        Number of equal-count gradient bins (columns).
+    """
+    grad_col = f"t1_gradient1_{network}"
+    net_mask = compute_network_mask(df_yeo_surf, network, hemisphere)
+    grad_sn = df_yeo_surf.loc[net_mask, grad_col].to_numpy()
+    bins = pd.qcut(grad_sn, n_bins, labels=False)
+    mean_profiles = np.mean(t1_salience_profiles, axis=0) / 1000  # (n_depths, n_vertices), seconds
+    strata = np.stack([mean_profiles[:, bins == k].mean(axis=1) for k in range(n_bins)])  # (n_bins, n_depths)
+    medians = [np.median(grad_sn[bins == k]) for k in range(n_bins)]
+    for k in range(n_bins):
+        logger.info(f"[Figure 1A] strata bin {k + 1}/{n_bins}: {int((bins == k).sum())} vertices, "
+                    f"gradient median {medians[k]:+.2f}")
+
+    n_depths = strata.shape[1]
+    # Linear grey scale windowed on the blocks' own range (black = lowest, white = highest).
+    t1_norm = mpl.colors.Normalize(vmin=strata.min(), vmax=strata.max())
+    t1_cmap = plt.get_cmap('gray')
+    grad_cmap, grad_norm = plt.get_cmap('coolwarm'), mpl.colors.Normalize(*SALIENCE_Z_RANGE)
+    col_w, band_h = 0.8, 1.0 / n_depths  # wide columns: abutting greys compare better
+
+    # Same canvas, font and axes box as figure_1a_profiles.svg (6-in panel shown at
+    # ~0.41x in the Figure 1 layout, so 21 pt reads like the ~8.8-pt zoom-row text).
+    with plt.rc_context({'font.size': 21}):
+        fig, ax = plt.subplots(figsize=(6, 6))
+        for k in range(n_bins):
+            for d in range(n_depths):
+                color = t1_cmap(t1_norm(strata[k, d]))
+                # Edge in the face colour hides antialiasing seams between blocks.
+                ax.add_patch(mpl.patches.Rectangle((k - col_w / 2, d * band_h), col_w, band_h,
+                                                   facecolor=color, edgecolor=color, linewidth=0.3))
+            ax.add_patch(mpl.patches.Rectangle((k - col_w / 2, 0), col_w, 1, fill=False,
+                                               edgecolor='0.4', linewidth=0.8))
+            ax.add_patch(mpl.patches.Rectangle((k - col_w / 2, 1.01), col_w, 0.03, clip_on=False,
+                                               facecolor=grad_cmap(grad_norm(medians[k])), edgecolor='none'))
+        ax.axhline(y=0, color='k', linestyle='--', linewidth=1)
+        ax.axhline(y=1, color='k', linestyle='--', linewidth=1)
+        ax.set_xlim(-0.6, n_bins + 0.2)  # free space on the right for the colour bar
+        ax.set_ylim(*PANEL_YLIM)  # pial at the top, same heights as the profiles panel
+        ax.set_yticks([0, 1], ['pial', 'WM'])
+        ax.set_ylabel("Intracortical depth")
+        ax.set_xticks(range(n_bins), [f"Q{k + 1}" for k in range(n_bins)])
+        ax.tick_params(axis='x', length=0)
+        ax.set_xlabel("MPC gradient (quintiles)" if n_bins == 5 else f"MPC gradient ({n_bins} bins)")
+        for side in ('top', 'right', 'bottom'):
+            ax.spines[side].set_visible(False)
+        _apply_panel_axes(fig)
+        # Colour bar in the free right end of the axes box (middle 60 % of its height),
+        # its tick labels and title in the right margin.
+        c, box = PANEL_CANVAS_PT, PANEL_AXES_PT
+        h = box['bottom'] - box['top']
+        cax = fig.add_axes([352 / c, 1 - (box['bottom'] - 0.2 * h) / c, 9 / c, 0.6 * h / c])
+        cb = fig.colorbar(mpl.cm.ScalarMappable(norm=t1_norm, cmap=t1_cmap), cax=cax)
+        cb.ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(0.1))
+        cb.ax.yaxis.set_major_formatter(mpl.ticker.FormatStrFormatter('%.1f'))
+        cb.set_label("qT1 (s)")
+        cb.outline.set_edgecolor('0.4')
+        cb.outline.set_linewidth(0.8)
+        plt.savefig(screenshot_path)
+        plt.close(fig)
+
+
+def plot_brain_zoom(
+    df_yeo_surf: pd.DataFrame,
+    surf_lh,
+    surf_rh,
+    out_dir: Path,
+    hemisphere: str = 'both',
+) -> None:
+    """Brain row of the SalVentAttn MPC gradient with zoom insets of ``SALIENCE_ZOOM_ROIS``.
+
+    Writes ``figure_1a_brain_zoom.svg`` (brain row, marker circles, lines, insets,
+    colour bar) and ``figure_1a_brain_zoom_roi.svg`` (the inset row alone). Both use
+    the window geometry of ``figure_1a_brain.svg`` (1450 x 300, zoom 1.3, colour
+    bar right): its brain row overlays that file exactly, and the inset row placed
+    300 pt below it reproduces the full figure. Insets are drawn only for regions in
+    the analysed ``hemisphere``, since the gradient is undefined on the other one. The
+    SalVentAttn border (``mask_outline``) is traced on the brains and insets.
+
+    Parameters
+    ----------
+    df_yeo_surf : pd.DataFrame
+        fsLR-32k surface table with ``label`` and ``t1_gradient1_SalVentAttn`` columns.
+    surf_lh, surf_rh : BSPolyData
+        Inflated fsLR-32k hemispheres.
+    out_dir : Path
+        Output directory.
+    hemisphere : {'both', 'LH', 'RH'}
+        Hemisphere(s) the gradient was computed on.
+    """
+    rois = salience_zoom_rois(df_yeo_surf, hemisphere)
+    values = df_yeo_surf['t1_gradient1_SalVentAttn'].to_numpy()
+    # Same window as the plot_hemispheres call that writes figure_1a_brain.svg. Labels at
+    # 30 pt: the 1450-pt rows are shown at ~0.29x in the Figure 1 layout (~8.8 pt, as 1b).
+    kwargs = dict(size=(1450, 300), zoom=1.3, color_bar=True, cmap='coolwarm', color_range=SALIENCE_Z_RANGE,
+                  nan_color=(220, 220, 220, 1), label_fontsize=30,
+                  outline=mask_outline(surf_lh, surf_rh, df_yeo_surf['network'].eq('SalVentAttn').to_numpy()))
+    plot_hemispheres_zoom(surf_lh, surf_rh, values, rois, cbar_labels=SALIENCE_Z_LABELS, cbar_title='z',
+                          filename=out_dir / "figure_1a_brain_zoom.svg", **kwargs)
+    plot_hemispheres_zoom(surf_lh, surf_rh, values, rois, roi_only=True,
+                          filename=out_dir / "figure_1a_brain_zoom_roi.svg", **kwargs)
+    plt.close('all')
 
 
 def _filtered_pni_subjects(mica_pni_csv: Path) -> pd.DataFrame:
@@ -354,15 +515,22 @@ def main():
     logger.info(f"Generating qt1 profiles figure at {screenshot_path}")
     plot_gradient_profiles(df_yeo_surf, t1_salience_profiles, screenshot_path, network='SalVentAttn', hemisphere=args.hemi)
 
+    screenshot_path = project_root / "results/figures/figure_1a_strata.svg"
+    logger.info(f"Generating qt1 stratigraphy columns at {screenshot_path}")
+    plot_gradient_strata(df_yeo_surf, t1_salience_profiles, screenshot_path, network='SalVentAttn', hemisphere=args.hemi)
+
     screenshot_path = project_root / "results/figures/figure_1a_brain.svg"
     logger.info(f"Generating brain hemispheres screenshot at {screenshot_path}")
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=df_yeo_surf['t1_gradient1_SalVentAttn'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
-        nan_color=(220, 220, 220, 1), cmap='coolwarm', color_range=(-3,3), transparent_bg=True, screenshot=True, filename=screenshot_path, cb__numberOfLabels=0)
+        nan_color=(220, 220, 220, 1), cmap='coolwarm', color_range=SALIENCE_Z_RANGE, transparent_bg=True, screenshot=True, filename=screenshot_path, cb__numberOfLabels=0)
+
+    logger.info("Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)")
+    plot_brain_zoom(df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, project_root / "results/figures", hemisphere=args.hemi)
 
     screenshot_path = project_root / "results/figures/figure_1a_brain_5k.svg"
     logger.info(f"Generating brain hemispheres screenshot at {screenshot_path}")
     plot_hemispheres(surf5k_lh_infl, surf5k_rh_infl, array_name=df_yeo_surf_5k['t1_gradient1_SalVentAttn'].values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
-        nan_color=(220, 220, 220, 1), cmap='coolwarm', color_range=(-3,3), transparent_bg=True, screenshot=True, filename=screenshot_path, cb__numberOfLabels=0)
+        nan_color=(220, 220, 220, 1), cmap='coolwarm', color_range=SALIENCE_Z_RANGE, transparent_bg=True, screenshot=True, filename=screenshot_path, cb__numberOfLabels=0)
 
 
 if __name__ == "__main__":

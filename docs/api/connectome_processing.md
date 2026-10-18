@@ -277,6 +277,46 @@ Two-tailed empirical permutation p-value via the add-one estimator $p = (1+k)/(1
 
 ---
 
+### `moran_spearman`
+
+```python
+moran_spearman(x: np.ndarray, y: np.ndarray, msr) -> tuple[float, float, np.ndarray]
+```
+
+Spearman correlation of `x` and `y` against a Moran spatial null on `y`: `x` is held fixed and `y` is randomised by the pre-fitted `MoranRandomization` `msr`, whose graph must be restricted to the vertices `x` and `y` index (e.g. the finite vertices of a network). Spearman is rank-based, so the surrogates need no rescaling.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `x` | `np.ndarray` | Fixed map, shape `(n_vertices,)`. |
+| `y` | `np.ndarray` | Randomised map (e.g. the MPC gradient), same shape. |
+| `msr` | `MoranRandomization` | Fitted Moran randomization on the same vertices. |
+
+**Returns** `(r, p, r_null)` — observed correlation, add-one two-sided empirical p ([`empirical_p_twosided`](#empirical_p_twosided)) and the null correlations.
+
+---
+
+### `moran_spearman_difference`
+
+```python
+moran_spearman_difference(x_a: np.ndarray, x_b: np.ndarray, y: np.ndarray, msr) -> tuple[float, float, np.ndarray]
+```
+
+Difference of two maps' Spearman correlations with a shared map `y`, against a Moran null: the observed `r(x_a, y) − r(x_b, y)` is compared with the differences obtained when the same Moran surrogates of `y` are correlated with both maps, so the null keeps the dependence between `x_a` and `x_b` and the spatial autocorrelation of `y`.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `x_a`, `x_b` | `np.ndarray` | The two maps, shape `(n_vertices,)` (e.g. one measure in two states). |
+| `y` | `np.ndarray` | Shared map randomised by the null (e.g. the MPC gradient). |
+| `msr` | `MoranRandomization` | Fitted Moran randomization on the same vertices. |
+
+**Returns** `(d, p, d_null)` — observed difference, add-one two-sided empirical p ([`empirical_p_twosided`](#empirical_p_twosided)) and the null differences.
+
+---
+
 ### `empirical_p_upper`
 
 ```python

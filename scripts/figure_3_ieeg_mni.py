@@ -33,9 +33,11 @@ from brainspace.mesh.mesh_io import read_surface
 from brainspace.datasets import load_conte69
 from brainspace import mesh
 from brainspace.mesh.array_operations import smooth_array
+from brainspace.null_models import moran
 
-from scipy.stats import spearmanr, zscore
+from scipy.stats import zscore
 from scipy.spatial import cKDTree
+from scipy.spatial.distance import cdist
 from scipy.io import loadmat
 
 import matplotlib.pyplot as plt
@@ -47,6 +49,8 @@ from src.atlas_load import load_yeo_atlas, load_bigbrain_gradients, convert_stat
 from src.ieeg_processing import preprocess_and_compute_psd_ieeg, plot_surface_sphere, compute_gradient_quantiles
 from src.plot_colors import yeo7_rgba, yeo7_rgb
 from src.logging_utils import setup_manuscript_logger
+from src.connectome_processing import moran_spearman
+from src.surface_plotting import format_pvalue
 
 logger = logging.getLogger(__name__)
 
@@ -194,24 +198,36 @@ def correlation_analysis_scatter(surf, df_data, sampling_frequency, df_yeo_surf,
     df_data['network_int'] = convert_states_str2int(df_data['network'].values)[0]
     df_data['colors'] = [yeo7_rgb[int(k)] for k in df_data["network_int"]]
 
-    corr, pval = spearmanr(df_data['corr_diff'], df_data['bigbrain_g2'], nan_policy="omit")
+    # Spearman correlation across the channels with both values, against a Moran spectral
+    # randomisation null on the channel layout: the channels are scattered points, so the
+    # spatial weights are inverse Euclidean distances between their template (fsLR-32k
+    # midthickness) positions, floored at 1 mm for channels sharing a vertex. BigBrain G2
+    # is randomised and the channel ES difference held fixed; add-one two-sided p.
+    use = (df_data['corr_diff'].notna() & df_data['bigbrain_g2'].notna()).to_numpy()
+    coords = np.asarray(load_conte69(join=True).GetPoints())[df_data.loc[use, 'ChannelIndices_conte69'].to_numpy()]
+    weights = 1.0 / np.maximum(cdist(coords, coords), 1.0)
+    np.fill_diagonal(weights, 0.0)
+    msr = moran.MoranRandomization(n_rep=1000, procedure='singleton', tol=1e-6, random_state=0)
+    msr.fit(weights)
+    corr, pval, r_null = moran_spearman(df_data.loc[use, 'corr_diff'].to_numpy(),
+                                        df_data.loc[use, 'bigbrain_g2'].to_numpy(), msr)
+    logger.info(f"[Figure 3A] ES difference vs BigBrain G2 | Spearman r={corr:+.3f}, Moran permutation p={pval:.3e} "
+                f"(n_perm=1000, n_channels={int(use.sum())}; null r 95% "
+                f"[{np.percentile(r_null, 2.5):+.3f}, {np.percentile(r_null, 97.5):+.3f}])")
 
     # Correlation plots
     fig, axes = plt.subplots(1, 2, figsize=(12, 6))
     axes[0].scatter(df_data['corr_diff'], df_data['bigbrain_g2'], color=np.stack(df_data['colors'].to_numpy()), s=10, alpha=0.9, rasterized=True)
     sns.regplot(x=df_data['corr_diff'], y=df_data['bigbrain_g2'], scatter=False, color="black", line_kws={"linewidth": 1}, ax=axes[0])
-    axes[0].text(0.05, 0.95, f"r = {corr:.2f}\np = {pval:.2e}", transform=axes[0].transAxes, va="top")
+    axes[0].text(0.05, 0.95, f"r = {corr:.2f}\np = {format_pvalue(pval)}", transform=axes[0].transAxes, va="top")
     axes[0].set_ylabel('BigBrain Gradient 2')
     axes[0].set_xlabel("ES$_{top}$ - ES$_{bottom}$")
     axes[0].set_xlim([-3,3])
     axes[0].set_ylim([-3,3])
     axes[0].set_aspect('equal')
 
-    # Per-network mean ES difference. NOTE: no spatial null is computed for this panel
-    # yet (the channel-level test above uses a parametric Spearman p); the bars are the
-    # raw per-network means with no error bars. A spatial null (spin/Moran on the
-    # channel layout) is pending — see the review plan, item F1 — so the bars are not
-    # annotated with a significance claim.
+    # Per-network mean ES difference: descriptive (raw per-network means, no error bars
+    # and no significance test; the channel-level correlation above carries the Moran p).
     df_data_net = df_data[['network', 'corr_diff', 'colors', 'bigbrain_g2']].dropna().groupby('network').mean().reset_index().sort_values(by='bigbrain_g2')
     axes[1].barh(df_data_net['network'], df_data_net['corr_diff'], color=df_data_net['colors'], edgecolor='black', alpha=0.8, label='Mean ES difference per network')
     axes[1].axvline(0, color='black', linewidth=1)
@@ -275,7 +291,7 @@ def main():
     logger.info(f"Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned")
     logger.info(f"PSD            : Welch method, Hamming window 2s, overlap 1s, normalized to unit sum")
     logger.info(f"Frequency bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, beta 13-30 Hz, gamma 30-80 Hz")
-    logger.info(f"Null model     : Moran randomization (n_rep=100, procedure=singleton, random_state=0)")
+    logger.info(f"Null model     : Moran randomization on the channel layout (inverse Euclidean distance, n_rep=1000, procedure=singleton, random_state=0), add-one empirical p")
     logger.info(f"Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels")
     logger.info(f"Analysis network: {network}")
 
@@ -291,9 +307,14 @@ def main():
     df_yeo_surf = load_yeo_atlas(micapipe=project_root, surf_32k=surf_32k)
 
     ######### Part 1 -- T1 map
+    # As figure_2_distance.py / figure_3_ieeg_mica.py: the hemisphere's own gradient
+    # table, else the 'both' table (a safe superset; the hemisphere's vertices subset it).
     path_df_1a = project_root / f'data/dataframes/df_1a_{args.hemi}.tsv'
     if not path_df_1a.exists():
-        raise FileNotFoundError(f"Gradient dataframe not found at {path_df_1a}. Run figure_1a_t1map.py with -hemi {args.hemi} first.")
+        path_df_1a = project_root / 'data/dataframes/df_1a_both.tsv'
+    if not path_df_1a.exists():
+        raise FileNotFoundError(f"No gradient dataframe (df_1a_{args.hemi}.tsv or df_1a_both.tsv) in "
+                                f"{path_df_1a.parent}. Run figure_1a_t1map.py with -hemi {args.hemi} first.")
     logger.info(f"Loading gradient dataframe from {path_df_1a}")
     df_yeo_surf = pd.read_csv(path_df_1a, sep="\t")
 

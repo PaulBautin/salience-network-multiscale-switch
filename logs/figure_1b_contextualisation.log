@@ -978,3 +978,592 @@ Loading gradient dataframe from /local_raid/data/pbautin/software/salience-netwo
 [Figure 1B] T1map: MPC-gradient vs T1map | Spearman r=-0.191, Moran permutation p=9.901e-03 (n_perm=100)
 [Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=9.901e-03 (n_perm=100)
 [Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.901e-03 (n_perm=100)
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 15:17:39
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), T1map (in-vivo MRI), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg
+[zoom] lh_lateral: None -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: None -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: None -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: None -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating T1map region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_t1map.svg
+[zoom] lh_lateral: None -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: None -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: None -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: None -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg
+[zoom] lh_lateral: None -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: None -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: None -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: None -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg
+[zoom] lh_lateral: None -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: None -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: None -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: None -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] T1map: MPC-gradient vs T1map | Spearman r=-0.191, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 15:31:46
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), T1map (in-vivo MRI), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating T1map region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_t1map.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] T1map: MPC-gradient vs T1map | Spearman r=-0.191, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 15:37:33
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), T1map (in-vivo MRI), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating T1map region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_t1map.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] T1map: MPC-gradient vs T1map | Spearman r=-0.191, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 15:47:41
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 15:53:59
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg (colour range -1.51 to 1.903, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg (colour range -1.896 to 1.84, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg (colour range -2.134 to 1.724, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 16:13:21
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg (colour range -1.51 to 1.903, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg (colour range -1.896 to 1.84, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg (colour range -2.134 to 1.724, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] BigBrain: Moran-null r 95% interval [-0.094, +0.103] (median +0.003), n_vertices=7593
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Bielschowsky: Moran-null r 95% interval [-0.090, +0.087] (median -0.000), n_vertices=7569
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Parvalbumin: Moran-null r 95% interval [-0.098, +0.099] (median +0.000), n_vertices=7569
+Context statistics saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1b_context_stats.csv
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 16:18:52
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg (colour range -1.51 to 1.903, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg (colour range -1.896 to 1.84, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg (colour range -2.134 to 1.724, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] BigBrain: Moran-null r 95% interval [-0.094, +0.103] (median +0.003), n_vertices=7593
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Bielschowsky: Moran-null r 95% interval [-0.090, +0.087] (median -0.000), n_vertices=7569
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Parvalbumin: Moran-null r 95% interval [-0.098, +0.099] (median +0.000), n_vertices=7569
+Context statistics saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1b_context_stats.csv
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 16:24:29
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg (colour range -1.51 to 1.903, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg (colour range -1.896 to 1.84, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg (colour range -2.134 to 1.724, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] BigBrain: Moran-null r 95% interval [-0.094, +0.103] (median +0.003), n_vertices=7593
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Bielschowsky: Moran-null r 95% interval [-0.090, +0.087] (median -0.000), n_vertices=7569
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Parvalbumin: Moran-null r 95% interval [-0.098, +0.099] (median +0.000), n_vertices=7569
+Context statistics saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1b_context_stats.csv
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 16:31:24
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg (colour range -1.51 to 1.903, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg (colour range -1.896 to 1.84, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg (colour range -2.134 to 1.724, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] BigBrain: Moran-null r 95% interval [-0.094, +0.103] (median +0.003), n_vertices=7593
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Bielschowsky: Moran-null r 95% interval [-0.090, +0.087] (median -0.000), n_vertices=7569
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Parvalbumin: Moran-null r 95% interval [-0.098, +0.099] (median +0.000), n_vertices=7569
+Context statistics saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1b_context_stats.csv
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 16:35:07
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg (colour range -1.51 to 1.903, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg (colour range -1.896 to 1.84, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg (colour range -2.134 to 1.724, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] BigBrain: Moran-null r 95% interval [-0.094, +0.103] (median +0.003), n_vertices=7593
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Bielschowsky: Moran-null r 95% interval [-0.090, +0.087] (median -0.000), n_vertices=7569
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Parvalbumin: Moran-null r 95% interval [-0.098, +0.099] (median +0.000), n_vertices=7569
+Context statistics saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1b_context_stats.csv
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 16:39:07
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg (colour range -1.51 to 1.903, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg (colour range -1.896 to 1.84, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg (colour range -2.134 to 1.724, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] BigBrain: Moran-null r 95% interval [-0.094, +0.103] (median +0.003), n_vertices=7593
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Bielschowsky: Moran-null r 95% interval [-0.090, +0.087] (median -0.000), n_vertices=7569
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Parvalbumin: Moran-null r 95% interval [-0.098, +0.099] (median +0.000), n_vertices=7569
+Context statistics saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1b_context_stats.csv
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 16:44:57
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg (colour range -1.51 to 1.903, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg (colour range -1.896 to 1.84, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg (colour range -2.134 to 1.724, 2nd-98th percentile of the inset vertices)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] BigBrain: Moran-null r 95% interval [-0.094, +0.103] (median +0.003), n_vertices=7593
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Bielschowsky: Moran-null r 95% interval [-0.090, +0.087] (median -0.000), n_vertices=7569
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Parvalbumin: Moran-null r 95% interval [-0.098, +0.099] (median +0.000), n_vertices=7569
+Context statistics saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1b_context_stats.csv
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 17:38:57
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] BigBrain: Moran-null r 95% interval [-0.094, +0.103] (median +0.003), n_vertices=7593
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Bielschowsky: Moran-null r 95% interval [-0.090, +0.087] (median -0.000), n_vertices=7569
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Parvalbumin: Moran-null r 95% interval [-0.098, +0.099] (median +0.000), n_vertices=7569
+Context statistics saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1b_context_stats.csv
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 17:45:28
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] BigBrain: Moran-null r 95% interval [-0.094, +0.103] (median +0.003), n_vertices=7593
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Bielschowsky: Moran-null r 95% interval [-0.090, +0.087] (median -0.000), n_vertices=7569
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Parvalbumin: Moran-null r 95% interval [-0.098, +0.099] (median +0.000), n_vertices=7569
+Context statistics saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1b_context_stats.csv
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-09 17:50:59
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD)
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+Generating BigBrain region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_bigbrain.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Bielschowsky region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_biel.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating Parvalbumin region zoom-ins at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1b_zoom_parva.svg
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] BigBrain: Moran-null r 95% interval [-0.094, +0.103] (median +0.003), n_vertices=7593
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000)
+[Figure 1B] Bielschowsky: Moran-null r 95% interval [-0.090, +0.087] (median -0.000), n_vertices=7569
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000)
+[Figure 1B] Parvalbumin: Moran-null r 95% interval [-0.098, +0.099] (median +0.000), n_vertices=7569
+Context statistics saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1b_context_stats.csv
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-13 12:38:35
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD); T1map (in-vivo MRI) brain map only
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0), on the finite SN vertices of each map
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=7593; null r 95% [-0.094, +0.103])
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000, n_vertices=7569; null r 95% [-0.090, +0.087])
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=7569; null r 95% [-0.098, +0.099])
+[Figure 1B] context statistics saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1b_context_stats.csv
+Generating context zoom rows (figure_1b_zoom_*.svg) and forest (figure_1b_forest.svg)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-14 11:14:37
+  --hemi: LH
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD); T1map (in-vivo MRI) brain map only
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0), on the finite SN vertices of each map
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_LH.tsv
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.232, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=3502; null r 95% [-0.135, +0.138])
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.036, Moran permutation p=5.564e-01 (n_perm=1000, n_vertices=3489; null r 95% [-0.120, +0.122])
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.195, Moran permutation p=4.995e-03 (n_perm=1000, n_vertices=3489; null r 95% [-0.131, +0.131])
+[Figure 1B] context statistics saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1b_context_stats.csv
+Generating context zoom rows (figure_1b_zoom_*.svg) and forest (figure_1b_forest.svg)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+========================================================================
+SCRIPT : figure_1b_contextualisation
+DATE   : 2026-10-14 11:25:00
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD); T1map (in-vivo MRI) brain map only
+Null model     : Moran randomization (n_rep=1000, procedure=singleton, random_state=0), on the finite SN vertices of each map
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1b_contextualisation.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+Loading gradient dataframe from /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv
+[Figure 1B] BigBrain: MPC-gradient vs BigBrain | Spearman r=0.301, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=7593; null r 95% [-0.094, +0.103])
+[Figure 1B] Bielschowsky: MPC-gradient vs Bielschowsky | Spearman r=-0.092, Moran permutation p=4.296e-02 (n_perm=1000, n_vertices=7569; null r 95% [-0.090, +0.087])
+[Figure 1B] Parvalbumin: MPC-gradient vs Parvalbumin | Spearman r=0.269, Moran permutation p=9.990e-04 (n_perm=1000, n_vertices=7569; null r 95% [-0.098, +0.099])
+[Figure 1B] context statistics saved to /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1b_context_stats.csv
+Generating context zoom rows (figure_1b_zoom_*.svg) and forest (figure_1b_forest.svg)
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: lh_medial -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: rh_medial -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: rh_lateral -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1

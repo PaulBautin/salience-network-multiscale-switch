@@ -40,6 +40,7 @@ from src.atlas_load import load_yeo_atlas, load_econo_atlas, convert_states_str2
 from src.connectome_processing import empirical_p_twosided, benjamini_hochberg
 from src.plot_colors import cmap_types, cmap_types_mw
 from src.logging_utils import setup_manuscript_logger
+from src.surface_plotting import plot_hemispheres_zoom, salience_zoom_rois, mask_outline
 
 logger = logging.getLogger(__name__)
 
@@ -143,19 +144,25 @@ def cortical_type_analysis(df_yeo_surf: pd.DataFrame, project_root: Path, hemisp
                    if i != sal_idx and n != "medial_wall"]
     n_rows = int(np.ceil(len(other_names) / (n_cols - 1)))
 
-    # Standalone SalVentAttn panel saved separately for the manuscript figure
-    fig, ax_sal = plt.subplots(figsize=(6, 6))
-    df = all_data["SalVentAttn"][type_labels]
-    sns.barplot(data=df, ax=ax_sal, color='lightgrey')
-    rdict = {label_map.get(k, k): v for k, v in real_data["SalVentAttn"].items()}
-    sns.scatterplot(x=list(rdict.keys()), y=list(rdict.values()), color=cmap_types_mw.colors, s=100, edgecolors='none', ax=ax_sal)
-    ax_sal.set_ylim(0, 60)
-    ax_sal.tick_params(axis='x', labelrotation=90)
-    ax_sal.set_ylabel("Salience percentage (%)")
-    ax_sal.spines['top'].set_visible(False)
-    ax_sal.spines['right'].set_visible(False)
-    plt.tight_layout()
-    plt.savefig(project_root / "results/figures/figure_1c_type_salience.svg")
+    # Standalone SalVentAttn panel saved separately for the manuscript figure. Font: the
+    # 6-in panel is shown at ~0.41x in the Figure 1 layout, so 21 pt reads like the
+    # ~8.8-pt text of the zoom rows (30 pt shown at ~0.29x), as in figure_1a_profiles.
+    with plt.rc_context({'font.size': 21}):
+        fig, ax_sal = plt.subplots(figsize=(6, 6))
+        # The six cortical types only: 'Other' (unassigned vertices) is left out of this
+        # panel (it stays in the composition and enrichment statistics logged above).
+        shown_types = [t for t in type_labels if t != 'Other']
+        df = all_data["SalVentAttn"][shown_types]
+        sns.barplot(data=df, ax=ax_sal, color='lightgrey')
+        rdict = {label_map[k]: v for k, v in real_data["SalVentAttn"].items() if label_map[k] in shown_types}
+        sns.scatterplot(x=list(rdict.keys()), y=list(rdict.values()), color=cmap_types_mw.colors[:len(shown_types)], s=100, edgecolors='none', ax=ax_sal)
+        ax_sal.set_ylim(0, 60)
+        ax_sal.tick_params(axis='x', labelrotation=90)
+        ax_sal.set_ylabel("Salience percentage (%)")
+        ax_sal.spines['top'].set_visible(False)
+        ax_sal.spines['right'].set_visible(False)
+        plt.tight_layout()
+        plt.savefig(project_root / "results/figures/figure_1c_type_salience.svg")
 
     # Overview panel: SalVentAttn spans the full left column, other networks fill the grid
     fig = plt.figure(figsize=(16, 8))
@@ -222,6 +229,27 @@ def main():
     plt_values = df_yeo_surf['surf_type'].values * df_yeo_surf['salience_border'].values
     plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=plt_values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
         nan_color=(0, 0, 0, 1), cmap=cmap_types, transparent_bg=True, screenshot=True, filename=screenshot_path, cb__numberOfLabels=0)
+
+    # Same brain row with circular zoom insets of the salience regions, as Figure 1a:
+    # figure_1c_brain_economo_zoom.svg overlays figure_1c_brain_economo.svg, and the
+    # inset row alone (_roi) stacks 300 pt below it. The salience-network border is traced
+    # as in Figures 1a and 3b (mask_outline: the vertices just outside the network, a
+    # line over the cortical types) instead of the black NaN border vertices above. The
+    # colour bar shows the categorical type colours as blocks without end labels
+    # (min/max would be meaningless for types), as in figure_1c_brain_economo.svg; the
+    # type bar plot names the colours. Labels at 30 pt: the 1450-pt rows are shown at
+    # ~0.29x in the Figure 1 layout (~8.8 pt).
+    rois = salience_zoom_rois(df_yeo_surf, args.hemi)
+    sn_outline = mask_outline(surf32k_lh_infl, surf32k_rh_infl, df_yeo_surf['network'].eq('SalVentAttn').to_numpy())
+    zoom_values = df_yeo_surf['surf_type'].values
+    zoom_kwargs = dict(size=(1450, 300), zoom=1.3, color_bar=True, cmap=cmap_types.name,
+                       nan_color=(0, 0, 0, 1), label_fontsize=30, outline=sn_outline)
+    logger.info("Generating brain zoom-inset figures (figure_1c_brain_economo_zoom*.svg)")
+    plot_hemispheres_zoom(surf32k_lh_infl, surf32k_rh_infl, zoom_values, rois, cbar_labels=('', ''),
+                          filename=project_root / "results/figures/figure_1c_brain_economo_zoom.svg", **zoom_kwargs)
+    plot_hemispheres_zoom(surf32k_lh_infl, surf32k_rh_infl, zoom_values, rois, roi_only=True,
+                          filename=project_root / "results/figures/figure_1c_brain_economo_zoom_roi.svg", **zoom_kwargs)
+    plt.close('all')
 
     cortical_type_analysis(df_yeo_surf, project_root, hemisphere=args.hemi)
 

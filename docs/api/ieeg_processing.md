@@ -1,5 +1,29 @@
 # `src/ieeg_processing`
 
+### `MICA_PSD_PARAMS`
+
+`dict` — preprocessing / Welch parameters of the MICA iEEG analyses (Figures 3b and 3c), passed to [`preprocess_and_compute_psd_ieeg`](#preprocess_and_compute_psd_ieeg) and part of the channel-PSD cache key: `fmin=0.5`, `fmax=80.0`, `fs_target=200.0`, `filter_order=4`, `window_sec=2.0`, `overlap_sec=1.0`.
+
+---
+
+### `FREQ_BANDS`
+
+`dict` — canonical frequency bands (Hz), spanning the 0.5–80 Hz preprocessing band: delta `(0.5, 4)`, theta `(4, 8)`, alpha `(8, 13)`, beta `(13, 30)`, gamma `(30, 80)`.
+
+---
+
+### `SPEC_FIT_RANGE`
+
+`tuple` — `specparam` fit range (Hz) of the MICA iEEG analyses (Figures 3b and 3c): `(1.0, 45.0)`. It stops below the 60 Hz line-noise notch of the recordings and the transition band of the 80 Hz low-pass of [`MICA_PSD_PARAMS`](#mica_psd_params), as `specparam` advises against fitting filtered-out frequencies.
+
+---
+
+### `SPEC_BANDS`
+
+`dict` — oscillatory peak-power readout bands (Hz) of Figures 3b and 3c: [`FREQ_BANDS`](#freq_bands) clipped to [`SPEC_FIT_RANGE`](#spec_fit_range), where peaks can be fitted: delta `(1.0, 4)`, theta `(4, 8)`, alpha `(8, 13)`, beta `(13, 30)`, gamma `(30, 45.0)`.
+
+---
+
 ### `compute_vertex_areas`
 
 ```python
@@ -19,17 +43,81 @@ Barycentric (hat-function) per-vertex surface areas of a triangular mesh — eac
 
 ---
 
-### `load_original_data_files`
+### `list_original_data_files`
 
 ```python
-load_original_data_files(root: str = '/host/verges/tank/data/BIDS_iEEG/original') -> pd.DataFrame
+list_original_data_files(
+    root: str = '/host/verges/tank/data/BIDS_iEEG/original',
+    stage: str = 'W',
+) -> list[str]
 ```
 
-Load MICA iEEG MATLAB files and return bipolar channel-level data.
+List the recordings of one vigilance state of the original MICA iEEG dataset, sorted so that channel order (and any cache keyed on the list) is deterministic.
 
-Scans `root` for `*stage-W.mat` files matching `sub-PX*/ses-01/`. Each row corresponds to one **bipolar channel** from one subject/session pair. In electroMICA terminology, a *channel* is a differential recording between two physical *contacts*: `ChannelName` stores the pair (e.g. `"LCi1-LCi2"`), while `ContactName1` and `ContactName2` hold the individual contact identifiers used to index sensitivity/leadfield files.
+**Parameters**
 
-**Returns** `pd.DataFrame` with columns: `Subject`, `Session`, `ChannelName` (bipolar pair), `SamplingRate`, `Data`, `ContactName1`, `ContactName2`.
+| Name | Type | Description |
+|------|------|-------------|
+| `root` | `str` | Root of the iEEG recordings; files are matched as `<root>/sub-PX*/ses-01/*stage-<stage>.mat`. |
+| `stage` | `str` | Vigilance state: `'W'` (wakefulness), `'N2'` or `'N3'`. Default `'W'`. |
+
+**Returns** `list[str]` of sorted file paths.
+
+---
+
+### `compute_original_psd`
+
+```python
+compute_original_psd(
+    root: str = '/host/verges/tank/data/BIDS_iEEG/original',
+    stage: str = 'W',
+    duration_s: float | None = None,
+    **psd_kwargs,
+) -> tuple[pd.DataFrame, np.ndarray, np.ndarray]
+```
+
+Welch PSD of every **bipolar channel** in the original recordings. In electroMICA terminology, a *channel* is a differential recording between two physical *contacts*: `ChannelName` stores the pair (e.g. `"LCi1-LCi2"`), while `ContactName1` and `ContactName2` hold the contact identifiers used to index the leadfield files. All recordings are truncated to the shortest recording's length, read from the MATLAB file headers (or to their first `duration_s` seconds, e.g. to match vigilance states), then streamed one subject at a time through [`preprocess_and_compute_psd_ieeg`](#preprocess_and_compute_psd_ieeg), so only one subject's raw signal is held in memory.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `root` | `str` | Root of the iEEG recordings (see [`list_original_data_files`](#list_original_data_files)). |
+| `stage` | `str` | Vigilance state: `'W'`, `'N2'` or `'N3'`. Default `'W'`. |
+| `duration_s` | `float \| None` | Analysed length in seconds from the start of each recording; `None` uses the shortest recording. |
+| `**psd_kwargs` | | Forwarded to `preprocess_and_compute_psd_ieeg` (`fmin`, `fmax`, `fs_target`, `filter_order`, `window_sec`, `overlap_sec`). |
+
+**Returns** `(channels, freq, pxx)` — a DataFrame with columns `Subject`, `Session`, `ChannelName` (bipolar pair), `SamplingRate`, `ContactName1`, `ContactName2`; the frequency axis in Hz; and the normalized PSD of shape `(n_channels, n_frequencies)`, row-aligned with `channels`.
+
+**Raises** `ValueError` if no recording is found, a file's `Data` shape does not match its channel count, the recordings use more than one sampling rate (truncation is by sample count), or `duration_s` exceeds the shortest recording.
+
+---
+
+### `load_or_compute_channel_psd`
+
+```python
+load_or_compute_channel_psd(
+    raw_root: str,
+    cache_path,
+    stage: str = 'W',
+    duration_s: float | None = None,
+    **psd_kwargs,
+) -> tuple[pd.DataFrame, np.ndarray, np.ndarray]
+```
+
+[`compute_original_psd`](#compute_original_psd), cached in a pickle (a few MB) whose key is every recording's relative path, size and modification time plus `stage`, `duration_s` and `psd_kwargs`; any change to the recordings or parameters invalidates it.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `raw_root` | `str` | Root of the original recordings. |
+| `cache_path` | path | Pickle file of the cache. |
+| `stage` | `str` | Vigilance state: `'W'`, `'N2'` or `'N3'`. Default `'W'`. |
+| `duration_s` | `float \| None` | Analysed length in seconds (see `compute_original_psd`). |
+| `**psd_kwargs` | | Forwarded to `preprocess_and_compute_psd_ieeg` (e.g. `MICA_PSD_PARAMS`). |
+
+**Returns** `(channels, freq, pxx)`, as `compute_original_psd`.
 
 ---
 
@@ -55,7 +143,7 @@ load_sensitivity_info(
 ) -> tuple[pd.DataFrame, dict]
 ```
 
-Load per-hemisphere **signed** contact sensitivity maps from leadfield `.mat` files, plus the surface vertex areas used to threshold them. The signed leadfield is preserved (no rectification) and the two hemispheres are kept separate, because a bipolar channel's sensitivity is the *difference* of its contacts' signed maps — deferred to [`build_bipolar_sensitivity`](#build_bipolar_sensitivity).
+Load per-hemisphere **signed** contact sensitivity maps from leadfield `.mat` files, plus the surface vertex areas used to threshold them. The signed leadfield is preserved (no rectification) and the two hemispheres are kept separate, because a bipolar channel's sensitivity is the *difference* of its contacts' signed maps — deferred to [`build_bipolar_sensitivity`](#build_bipolar_sensitivity). Files that cannot be parsed, read, or lack `ContactName`/`ContactSensitivityMap` are skipped with a logged warning.
 
 **Parameters**
 
@@ -80,19 +168,58 @@ build_bipolar_sensitivity(
 ) -> np.ndarray
 ```
 
-Assemble bipolar-channel surface sensitivities following electroMICA `ComputeFeatureMaps`: pair each channel with its two contacts' signed leadfields, per hemisphere take the **signed difference**, threshold the per-area density (absolute floor `global_thresh` and channel-relative floor `rel_thresh × second-largest density`), rectify, then fold the two hemispheres onto one fsLR-32k template by summing magnitudes (`|L1_LH − L2_LH| + |L1_RH − L2_RH|`). Channels are processed per `(Subject, Session)` so each mesh's area vector is applied once.
+Assemble bipolar-channel surface sensitivities following electroMICA `ComputeFeatureMaps`: pair each channel with its two contacts' signed leadfields, per hemisphere take the **signed difference**, threshold the per-area density (absolute floor `global_thresh` and channel-relative floor `rel_thresh × second-largest density`), rectify, then fold the two hemispheres onto one fsLR-32k template by summing magnitudes (`|L1_LH − L2_LH| + |L1_RH − L2_RH|`). NaN leadfield values are treated as zero before thresholding. Channels are processed per `(Subject, Session)` so each mesh's area vector is applied once; contacts with no leadfield are treated as zero and reported in a logged warning per `(Subject, Session)`.
 
 **Parameters**
 
 | Name | Type | Description |
 |------|------|-------------|
 | `df_channels` | `pd.DataFrame` | One row per bipolar channel with `Subject`, `Session`, `ContactName1`, `ContactName2`. |
-| `df_sensitivity` | `pd.DataFrame` | Per-contact signed maps (`Subject`, `Session`, `ContactName`, `Sens_L`, `Sens_R`) from `load_sensitivity_info`; contacts absent here contribute zero. |
+| `df_sensitivity` | `pd.DataFrame` | Per-contact signed maps (`Subject`, `Session`, `ContactName`, `Sens_L`, `Sens_R`) from `load_sensitivity_info`; contacts absent here contribute zero (logged). |
 | `areas` | `dict` | `(Subject, Session) -> {"L", "R"}` per-vertex surface areas, from `load_sensitivity_info`. |
 | `global_thresh` | `float` | Absolute density noise floor (Vm/A). Default `0.001`. |
 | `rel_thresh` | `float` | Channel-relative density floor fraction. Default `0.05`. |
 
 **Returns** `np.ndarray` of shape `(n_channels, 32492)`, non-negative, row-aligned with `df_channels`.
+
+---
+
+### `project_channel_measure`
+
+```python
+project_channel_measure(channel_vals: np.ndarray, sens: np.ndarray) -> np.ndarray
+```
+
+Sensitivity-weighted projection of per-channel values onto the surface (the electroMICA smoothed feature map): each vertex receives the sensitivity-weighted average of the channel values; vertices without sensitivity are NaN.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `channel_vals` | `np.ndarray` | Shape `(n_channels,)` for a scalar measure or `(k, n_channels)` for k values per channel (e.g. a spectrum). |
+| `sens` | `np.ndarray` | Bipolar sensitivity maps, shape `(n_channels, n_vertices)` (NaN zeroed). |
+
+**Returns** `np.ndarray` of shape `(n_vertices,)` or `(k, n_vertices)`.
+
+---
+
+### `mirror_to_cortex`
+
+```python
+mirror_to_cortex(template_vals: np.ndarray, df_surf: pd.DataFrame, network: str | None = None) -> np.ndarray
+```
+
+Show a folded template-hemisphere map on both fsLR-32k hemispheres: because [`build_bipolar_sensitivity`](#build_bipolar_sensitivity) folds both hemispheres onto one template, template vertex *i* stands for left vertex *i* and right vertex `N_LH + i`, and the value is placed on both, kept on labelled cortex (or on `network` vertices) and NaN elsewhere.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `template_vals` | `np.ndarray` | Per-template-vertex values, shape `(32492,)`. |
+| `df_surf` | `pd.DataFrame` | Surface table over both hemispheres with `hemisphere` and `network` columns. |
+| `network` | `str \| None` | Yeo network to keep; `None` keeps all labelled cortex. |
+
+**Returns** `np.ndarray` of shape `(64984,)`, LH then RH.
 
 ---
 
@@ -166,12 +293,15 @@ compute_spectral_parameters(
     pxx: np.ndarray,
     freq: np.ndarray,
     bands: dict[str, tuple[float, float]] | None = None,
-    fmin: float = 1.0,
-    fmax: float = 80.0,
+    fmin: float = SPEC_FIT_RANGE[0],
+    fmax: float = SPEC_FIT_RANGE[1],
     aperiodic_mode: str = "knee",
     peak_width_limits: tuple[float, float] = (1.0, 12.0),
     max_n_peaks: int = 6,
     min_peak_height: float = 0.05,
+    peak_threshold: float = 2.0,
+    nonnegative_knee: bool = True,
+    return_model: bool = False,
 ) -> dict
 ```
 
@@ -179,26 +309,104 @@ Parameterise power spectra with a single `specparam` fit (FOOOF; Donoghue et al.
 2020) into an aperiodic exponent and per-band oscillatory peak power. Deriving band
 power from the periodic component (peak power above the aperiodic fit) makes it
 orthogonal to the exponent, so the two measures do not re-encode the same 1/f change.
-Fitting in `'knee'` mode suits the broadband iEEG range, and the per-channel unit-sum
-PSD normalisation only shifts the aperiodic offset, leaving both measures unchanged.
+The settings follow the `specparam` 2.0 guidance: one model and one set of settings for
+every spectrum, a fit range ([`SPEC_FIT_RANGE`](#spec_fit_range)) that excludes
+filtered-out frequencies, and, in `'knee'` mode, the knee bounded to *k* ≥ 0 (the
+`ap_bounds` algorithm setting), so a spectrum without a knee in the fit range reduces
+to the fixed power law. The per-channel unit-sum PSD normalisation only shifts the
+aperiodic offset, leaving both measures unchanged.
 
 **Parameters**
 
 | Name | Type | Description |
 |------|------|-------------|
-| `pxx` | `np.ndarray` | PSD, shape `(n_spectra, n_frequencies)` or `(n_frequencies,)`; linear power. |
+| `pxx` | `np.ndarray` | PSD, shape `(n_spectra, n_frequencies)` or `(n_frequencies,)`, linear power. |
 | `freq` | `np.ndarray` | Frequency axis in Hz. |
-| `bands` | `dict[str, tuple[float, float]] \| None` | Band name → `(fmin, fmax)` for the oscillatory readout; `None` returns only the exponent. |
-| `fmin` | `float` | Lower bound of the fitting range in Hz. Default `1.0`. |
-| `fmax` | `float` | Upper bound of the fitting range in Hz. Default `80.0`. |
+| `bands` | `dict \| None` | `{name: (fmin, fmax)}` for the peak-power readout (e.g. [`SPEC_BANDS`](#spec_bands)); every band must lie within the fit range. `None` returns the aperiodic parameters only. |
+| `fmin` | `float` | Lower bound of the fit range (Hz). Default `1.0`. |
+| `fmax` | `float` | Upper bound of the fit range (Hz). Default `45.0`. |
 | `aperiodic_mode` | `str` | `specparam` aperiodic mode, `'knee'` or `'fixed'`. Default `'knee'`. |
-| `peak_width_limits` | `tuple[float, float]` | (min, max) Gaussian peak bandwidth in Hz. |
-| `max_n_peaks` | `int` | Maximum oscillatory peaks per spectrum. Default `6`. |
-| `min_peak_height` | `float` | Minimum peak height above the aperiodic fit. Default `0.05`. |
+| `peak_width_limits` | `tuple[float, float]` | (min, max) Gaussian peak bandwidth in Hz; `specparam` recommends a lower limit of about twice the frequency resolution. |
+| `max_n_peaks` | `int` | Maximum number of peaks per spectrum. |
+| `min_peak_height` | `float` | Minimum peak height above the aperiodic fit (log10 power). |
+| `peak_threshold` | `float` | Relative peak-detection threshold, in standard deviations of the flattened spectrum. Default `2.0`. |
+| `nonnegative_knee` | `bool` | In `'knee'` mode, bound the knee to *k* ≥ 0. Default `True`. |
+| `return_model` | `bool` | Also return the fitted `SpectralGroupModel` (for [`plot_fit_quality`](#plot_fit_quality)). Default `False`. |
 
-**Returns** `dict` — `'exponent'`: aperiodic exponent χ, shape `pxx.shape[:-1]` (NaN where the fit failed); `'band_power'`: `{name: array}` of oscillatory peak power per band, same shape (NaN where no peak was detected or the fit failed).
+**Returns** `dict` — `'exponent'`: aperiodic exponent χ, shape `pxx.shape[:-1]` (NaN where the fit failed); `'offset'`: aperiodic offset *b* (log10 power), same shape; `'knee'`: aperiodic knee *k*, same shape (0 in `'fixed'` mode, whose model is the knee model with *k* = 0); `'knee_freq'`: knee frequency *k*<sup>1/χ</sup> in Hz (`specparam`'s `compute_knee_frequency`; Gao et al., 2020), a value below `fmin` placing the knee below the fit range (NaN in `'fixed'` mode); `'r_squared'`, `'mae'`: goodness of fit and mean absolute error of each fit; `'n_peaks'`: peaks fitted per spectrum; `'band_power'`: `{name: array}` of oscillatory peak power per band, same shape (NaN where no peak was detected or the fit failed); `'report'`: `specparam`'s methods report (code version, algorithm, settings, fit range) with the fit modes and bounds, as text; `'model'`: the fitted `SpectralGroupModel`, if `return_model`. `'offset'`, `'knee'` and `'exponent'` give the fitted aperiodic component through [`aperiodic_component`](#aperiodic_component).
 
-**Raises** `ImportError` — if `specparam` is not installed (a hard dependency of the iEEG spectral analysis).
+**Raises** `ImportError` — if `specparam` is not installed (a hard dependency of the iEEG spectral analysis). `ValueError` — if a band extends outside the fit range.
+
+---
+
+### `aperiodic_component`
+
+```python
+aperiodic_component(
+    freq: np.ndarray,
+    offset: np.ndarray,
+    knee: np.ndarray,
+    exponent: np.ndarray,
+) -> np.ndarray
+```
+
+Evaluate the fitted `specparam` aperiodic component $L(f) = b - \log_{10}(k + f^{\chi})$
+in log10 power from the parameters returned by
+[`compute_spectral_parameters`](#compute_spectral_parameters). Subtracting it from the
+log10 power spectrum leaves the periodic residual (the flattened spectrum).
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `freq` | `np.ndarray` | Frequencies in Hz, shape `(n_frequencies,)`. |
+| `offset` | `np.ndarray` | Aperiodic offset *b*, any shape `S`. |
+| `knee` | `np.ndarray` | Aperiodic knee *k* (0 for `'fixed'` mode), shape `S`. |
+| `exponent` | `np.ndarray` | Aperiodic exponent χ, shape `S`. |
+
+**Returns** `np.ndarray` — aperiodic component, shape `S + (n_frequencies,)`.
+
+---
+
+### `fit_quality_summary`
+
+```python
+fit_quality_summary(spec: dict, fmin: float = SPEC_FIT_RANGE[0], mask: np.ndarray | None = None) -> str
+```
+
+One-line description of the fits returned by [`compute_spectral_parameters`](#compute_spectral_parameters), over the converged fits: median and interquartile range of *R*², number of fits with *R*² < 0.9 (descriptive, no exclusion), median mean absolute error, mean number of peaks per fit, and the median knee frequency with the number of knees below the fit range.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `spec` | `dict` | Output of [`compute_spectral_parameters`](#compute_spectral_parameters). |
+| `fmin` | `float` | Lower bound of the fit range (Hz). |
+| `mask` | `np.ndarray \| None` | Optional boolean selection of the spectra. |
+
+**Returns** `str` — the summary.
+
+---
+
+### `plot_fit_quality`
+
+```python
+plot_fit_quality(model, path, n: int = 4, labels: list[str] | None = None, title: str | None = None) -> None
+```
+
+Fit check of a `specparam` group fit, following the `specparam` guidance on checking model fits: the *R*² distribution and, below it, the `n` fits with the lowest *R*² (possible under-fitting or artefactual spectra), the `n` around the median and the `n` with the highest *R*² (possible over-fitting), each drawn with `specparam`'s model plot (spectrum, full model, aperiodic fit; log-frequency axis). Failed fits are left out.
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `model` | `SpectralGroupModel` | Fitted group (`compute_spectral_parameters(..., return_model=True)['model']`). |
+| `path` | `str \| Path` | Output file (format from the extension). |
+| `n` | `int` | Fits per row. Default `4`. |
+| `labels` | `list[str] \| None` | Optional name of every spectrum, shown in the panel titles. |
+| `title` | `str \| None` | Optional figure title. |
+
+**Returns** `None`.
 
 ---
 

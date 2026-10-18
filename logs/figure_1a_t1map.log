@@ -1149,3 +1149,473 @@ Gradient lambdas: [0.0706654  0.05396823 0.04487807 0.04053916 0.02897161 0.0257
 Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
 Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
 Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-10-09 13:53:53
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics_5k.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)
+[zoom] lh_lateral: 'Anterior insula\n(aINS)' -> 1049 visible vertices, window radius 30.0 mm
+[zoom] lh_medial: 'Dorsal anterior\ncingulate cortex (dACC)' -> 557 visible vertices, window radius 31.5 mm
+[zoom] rh_medial: 'Precuneus\n(PCU)' -> 454 visible vertices, window radius 21.3 mm
+[zoom] rh_lateral: 'Inferior parietal\nlobule (IPL)' -> 1158 visible vertices, window radius 32.6 mm
+[zoom] lh_lateral: 'Anterior insula\n(aINS)' -> 1049 visible vertices, window radius 30.0 mm
+[zoom] lh_medial: 'Dorsal anterior\ncingulate cortex (dACC)' -> 557 visible vertices, window radius 31.5 mm
+[zoom] rh_medial: 'Precuneus\n(PCU)' -> 454 visible vertices, window radius 21.3 mm
+[zoom] rh_lateral: 'Inferior parietal\nlobule (IPL)' -> 1158 visible vertices, window radius 32.6 mm
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-10-09 15:13:26
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics_5k.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)
+[zoom] lh_lateral: 'Anterior insula\n(aINS)' -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: 'Dorsal anterior\ncingulate cortex (dACC)' -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: 'Precuneus\n(PCU)' -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: 'Inferior parietal\nlobule (IPL)' -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: 'Anterior insula\n(aINS)' -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: 'Dorsal anterior\ncingulate cortex (dACC)' -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: 'Precuneus\n(PCU)' -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: 'Inferior parietal\nlobule (IPL)' -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-10-09 15:16:48
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics_5k.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)
+[zoom] lh_lateral: 'Anterior insula\n(aINS)' -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: 'Dorsal anterior\ncingulate cortex (dACC)' -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: 'Precuneus\n(PCU)' -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: 'Inferior parietal\nlobule (IPL)' -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: 'Anterior insula\n(aINS)' -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: 'Dorsal anterior\ncingulate cortex (dACC)' -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: 'Precuneus\n(PCU)' -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: 'Inferior parietal\nlobule (IPL)' -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-10-09 16:18:00
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics_5k.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-10-09 17:14:40
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics_5k.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating qt1 stratigraphy columns at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_strata.svg
+[Figure 1A] strata bin 1/5: 1519 vertices, gradient median -1.24
+[Figure 1A] strata bin 2/5: 1518 vertices, gradient median -0.63
+[Figure 1A] strata bin 3/5: 1519 vertices, gradient median -0.12
+[Figure 1A] strata bin 4/5: 1518 vertices, gradient median +0.49
+[Figure 1A] strata bin 5/5: 1519 vertices, gradient median +1.44
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-10-09 17:16:22
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics_5k.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating qt1 stratigraphy columns at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_strata.svg
+[Figure 1A] strata bin 1/5: 1519 vertices, gradient median -1.24
+[Figure 1A] strata bin 2/5: 1518 vertices, gradient median -0.63
+[Figure 1A] strata bin 3/5: 1519 vertices, gradient median -0.12
+[Figure 1A] strata bin 4/5: 1518 vertices, gradient median +0.49
+[Figure 1A] strata bin 5/5: 1519 vertices, gradient median +1.44
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-10-09 17:17:41
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics_5k.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating qt1 stratigraphy columns at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_strata.svg
+[Figure 1A] strata bin 1/5: 1519 vertices, gradient median -1.24
+[Figure 1A] strata bin 2/5: 1518 vertices, gradient median -0.63
+[Figure 1A] strata bin 3/5: 1519 vertices, gradient median -0.12
+[Figure 1A] strata bin 4/5: 1518 vertices, gradient median +0.49
+[Figure 1A] strata bin 5/5: 1519 vertices, gradient median +1.44
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-10-09 17:25:05
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics_5k.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating qt1 stratigraphy columns at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_strata.svg
+[Figure 1A] strata bin 1/5: 1519 vertices, gradient median -1.24
+[Figure 1A] strata bin 2/5: 1518 vertices, gradient median -0.63
+[Figure 1A] strata bin 3/5: 1519 vertices, gradient median -0.12
+[Figure 1A] strata bin 4/5: 1518 vertices, gradient median +0.49
+[Figure 1A] strata bin 5/5: 1519 vertices, gradient median +1.44
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-10-09 17:25:56
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics_5k.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating qt1 stratigraphy columns at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_strata.svg
+[Figure 1A] strata bin 1/5: 1519 vertices, gradient median -1.24
+[Figure 1A] strata bin 2/5: 1518 vertices, gradient median -0.63
+[Figure 1A] strata bin 3/5: 1519 vertices, gradient median -0.12
+[Figure 1A] strata bin 4/5: 1518 vertices, gradient median +0.49
+[Figure 1A] strata bin 5/5: 1519 vertices, gradient median +1.44
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-10-09 17:27:57
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics_5k.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating qt1 stratigraphy columns at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_strata.svg
+[Figure 1A] strata bin 1/5: 1519 vertices, gradient median -1.24
+[Figure 1A] strata bin 2/5: 1518 vertices, gradient median -0.63
+[Figure 1A] strata bin 3/5: 1519 vertices, gradient median -0.12
+[Figure 1A] strata bin 4/5: 1518 vertices, gradient median +0.49
+[Figure 1A] strata bin 5/5: 1519 vertices, gradient median +1.44
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-10-09 17:31:03
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics_5k.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating qt1 stratigraphy columns at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_strata.svg
+[Figure 1A] strata bin 1/5: 1519 vertices, gradient median -1.24
+[Figure 1A] strata bin 2/5: 1518 vertices, gradient median -0.63
+[Figure 1A] strata bin 3/5: 1519 vertices, gradient median -0.12
+[Figure 1A] strata bin 4/5: 1518 vertices, gradient median +0.49
+[Figure 1A] strata bin 5/5: 1519 vertices, gradient median +1.44
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-10-09 17:38:36
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics_5k.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating qt1 stratigraphy columns at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_strata.svg
+[Figure 1A] strata bin 1/5: 1519 vertices, gradient median -1.24
+[Figure 1A] strata bin 2/5: 1518 vertices, gradient median -0.63
+[Figure 1A] strata bin 3/5: 1519 vertices, gradient median -0.12
+[Figure 1A] strata bin 4/5: 1518 vertices, gradient median +0.49
+[Figure 1A] strata bin 5/5: 1519 vertices, gradient median +1.44
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg
+========================================================================
+SCRIPT : figure_1a_t1map
+DATE   : 2026-10-13 12:34:11
+  --pni_deriv: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+  --mics_deriv: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+  --hemi: both
+========================================================================
+Surface space  : fsLR-32k (Part 1) and fsLR-5k (Part 2)
+Parcellation   : Schaefer-400 with Yeo 7-network labels
+Network        : SalVentAttn (Salience/Ventral Attention)
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_1a_t1map.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+MICA-PNI derivatives: /data/mica/mica3/BIDS_PNI/derivatives/micapipe_v0.2.0
+MICA-MICs derivatives: /data/mica/mica3/BIDS_MICs/derivatives/micapipe_v0.2.0
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both.tsv. Loading...
+Loading profiles for 30 subjects...
+Final array shape: (30, 14, 7593)
+Found existing subject table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/figure_1a_pni_to_mics_5k.csv. Loading...
+Found existing gradient table at /local_raid/data/pbautin/software/salience-network-multiscale-switch/data/dataframes/df_1a_both_fslr5k.tsv. Loading...
+Generating qt1 profiles figure at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_profiles.svg
+Generating qt1 stratigraphy columns at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_strata.svg
+[Figure 1A] strata bin 1/5: 1519 vertices, gradient median -1.24
+[Figure 1A] strata bin 2/5: 1518 vertices, gradient median -0.63
+[Figure 1A] strata bin 3/5: 1519 vertices, gradient median -0.12
+[Figure 1A] strata bin 4/5: 1518 vertices, gradient median +0.49
+[Figure 1A] strata bin 5/5: 1519 vertices, gradient median +1.44
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain.svg
+Generating brain zoom-inset figures (figure_1a_brain_zoom*.svg)
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 1049 visible vertices, window radius 30.0 mm, magnification x2.2
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 557 visible vertices, window radius 31.5 mm, magnification x2.1
+[zoom] rh_medial: Precuneus (PCU) -> 454 visible vertices, window radius 21.3 mm, magnification x3.2
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 1158 visible vertices, window radius 32.6 mm, magnification x2.1
+Generating brain hemispheres screenshot at /local_raid/data/pbautin/software/salience-network-multiscale-switch/results/figures/figure_1a_brain_5k.svg

@@ -1141,6 +1141,45 @@ def empirical_p_twosided(null: np.ndarray, observed: float) -> float:
     return float((1 + k) / (1 + finite.size))
 
 
+def moran_spearman(x: np.ndarray, y: np.ndarray, msr) -> tuple[float, float, np.ndarray]:
+    """Spearman(x, y) against a Moran spatial null on ``y``.
+
+    ``x`` is held fixed and ``y`` is spatially randomised by the pre-fitted
+    ``MoranRandomization`` ``msr``, whose graph must be restricted to the vertices
+    ``x`` and ``y`` index (e.g. the finite vertices of a network). Spearman is
+    rank-based, so surrogates need no rescaling.
+
+    Returns
+    -------
+    tuple[float, float, np.ndarray]
+        Observed correlation, add-one two-sided empirical p-value
+        (:func:`empirical_p_twosided`) and the null correlations.
+    """
+    r, _ = spearmanr(x, y)
+    r_null = np.array([spearmanr(x, surr)[0] for surr in msr.randomize(y)])
+    return float(r), float(empirical_p_twosided(r_null, r)), r_null
+
+
+def moran_spearman_difference(x_a: np.ndarray, x_b: np.ndarray, y: np.ndarray, msr) -> tuple[float, float, np.ndarray]:
+    """Difference of two maps' Spearman correlations with ``y``, against a Moran null.
+
+    The observed ``r(x_a, y) - r(x_b, y)`` is compared with the differences obtained
+    when the same Moran surrogates of ``y`` (from the pre-fitted ``msr``, restricted to
+    the vertices the maps index) are correlated with both maps, so the null keeps the
+    dependence between ``x_a`` and ``x_b`` and the spatial autocorrelation of ``y``.
+
+    Returns
+    -------
+    tuple[float, float, np.ndarray]
+        Observed difference, add-one two-sided empirical p-value
+        (:func:`empirical_p_twosided`) and the null differences.
+    """
+    surrogates = msr.randomize(y)
+    d_obs = spearmanr(x_a, y)[0] - spearmanr(x_b, y)[0]
+    d_null = np.array([spearmanr(x_a, s)[0] - spearmanr(x_b, s)[0] for s in surrogates])
+    return float(d_obs), float(empirical_p_twosided(d_null, d_obs)), d_null
+
+
 def empirical_p_upper(null: np.ndarray, observed: float) -> float:
     """One-sided upper-tail empirical p-value via the add-one estimator `(1 + k)/(1 + n)`.
 

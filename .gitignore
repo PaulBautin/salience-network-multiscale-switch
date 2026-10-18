@@ -4,6 +4,7 @@ scripts/__pycache__
 __pycache__/
 **.pyc
 data/dataframes/figure_3_channel_data_df.pkl
+data/dataframes/figure_3_channel_psd.pkl
 env_salience/
 site/
 .claude

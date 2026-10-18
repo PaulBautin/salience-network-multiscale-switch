@@ -52,6 +52,7 @@ nav:
     - ieeg_processing: api/ieeg_processing.md
     - logging_utils: api/logging_utils.md
     - plot_colors: api/plot_colors.md
+    - surface_plotting: api/surface_plotting.md
   - Methods:
     - Data Acquisition: methods/datasets.md
     - Shared Methods: methods/shared.md

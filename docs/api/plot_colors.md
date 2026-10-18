@@ -70,3 +70,17 @@ Module-level color definitions for all network and cortical-type visualizations.
 ### `intrusion_cmap`
 
 `matplotlib.colors.ListedColormap` registered as `"CustomCmap_intrusion"`.
+
+---
+
+## Histological map colors (Figure 1b)
+
+### `histology_cmap`
+
+`matplotlib.colors.ListedColormap` registered as `"CustomCmap_histology"` — a diverging map in stain colours, cresyl violet (below the SN mean, LCh hue 300°) → light neutral grey → DAB ochre (above, hue 75°), the companion of the MPC gradient's `coolwarm` on the shared ±2 SD scale (`SALIENCE_Z_RANGE`). Built in CIELAB/LCh with coolwarm's lightness range (L* 38 at both ends, 89 at the midpoint, linear in between) and chroma rising to 45, so a given z reads with the same weight as in the gradient, the arms are symmetric, and the ends stay well apart under deuteranopia, while the hues mark the histological maps as a different quantity.
+
+---
+
+### `ieeg_cmap`
+
+`matplotlib.colors.ListedColormap` registered as `"CustomCmap_ieeg"` — the diverging map of the Figure 3b iEEG spectral maps (aperiodic exponent, oscillatory band power, spectral-similarity projection) z-scored within the SN: green (below the SN mean, LCh hue 135°) → light neutral grey → plum (above, hue 330°), on the shared ±2 SD scale (`SALIENCE_Z_RANGE`). Same lightness and chroma profile as `histology_cmap` (L* 38 → 89 → 38, chroma up to 45), so a given z reads with the same weight as in the gradient and histology maps, with hues distinct from both. The hue pair maximises the smallest end-to-end CIELAB distance under simulated deuteranopia, protanopia and tritanopia (Machado et al., 2009) among in-gamut pairs (ΔE ≥ 48).

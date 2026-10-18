@@ -58,8 +58,8 @@ All scripts are run from the **project root**. Pass `-h` to any script for the f
 | `scripts/figure_1b_contextualisation.py` | 1b — Multi-modal contextualization | `-hemi` (opt) |
 | `scripts/figure_1c_cortical_types.py` | 1c — Cortical types | `-pni_deriv` (opt) |
 | `scripts/figure_2_distance.py` | 2 — SC/GD/MPC differences at gradient extremes | `-hemi` (opt) |
-| `scripts/figure_3_ieeg_mni.py` | 3 — iEEG MNI open atlas | `-pni_deriv` (req), `-ieeg_deriv` (req, `.mat` file), `-hemi` (opt) |
-| `scripts/figure_3_ieeg_mica.py` | 3 — iEEG MICA dataset | `-ieeg_deriv` (req), `-hemi` (opt) |
+| `scripts/figure_3_ieeg_mni.py` | 3 — iEEG MNI open atlas | `-ieeg_deriv` (req, `.mat` file), `-hemi` (opt), `-network` (opt) |
+| `scripts/figure_3_ieeg_mica.py` | 3 — iEEG MICA dataset | `-ieeg_deriv` (req), `-ieeg_raw`, `-hemi`, `-network` (opt) |
 
 **Example — Figure 1a**
 

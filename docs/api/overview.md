@@ -31,4 +31,5 @@ Analysis columns (e.g. `T1map`, `BigBrain`, `t1_gradient1`) are appended by indi
 | [`connectome_processing`](connectome_processing.md) | Connectome I/O and the gradient-weighted connectivity projection (Figure 2) |
 | [`ieeg_processing`](ieeg_processing.md) | iEEG signal preprocessing, PSD estimation, and surface mapping |
 | [`logging_utils`](logging_utils.md) | Timestamped file + console logging for manuscript scripts |
-| [`plot_colors`](plot_colors.md) | Yeo 7-network and cortical-type color definitions; matplotlib colormap registration |
+| [`plot_colors`](plot_colors.md) | Yeo 7-network, cortical-type, histological-map and iEEG-map color definitions; matplotlib colormap registration |
+| [`surface_plotting`](surface_plotting.md) | brainspace surface renders composed in matplotlib; hemisphere row with circular zoom insets of regions of interest, traced region outlines, and an aligned forest-plot companion |
