@@ -164,26 +164,28 @@ distance included; its surrogates are centred on zero, so $p_{\mathrm{spin}}$ is
 two-tailed add-one estimator. The Moran, topological, and spin $p$ values were each
 Benjamini–Hochberg-corrected within their measure across the seven networks.
 
-Panel 2A (`figure_2a_distance_metric.svg`) is laid out with one row per connectivity
-measure (SC, GD, MPC, FC) and two columns. The left column plots, for the salience
-network, each vertex's within-network MPC gradient — on a single shared bottom x-axis,
-as the gradient is the same vector for every measure — against that measure's
-connectivity-weighted projection $P$, with points coloured by their dominant target
-network and annotated with the group correlation $\bar r$, the spatial-null
-$p_{\mathrm{moran}}$, the target-side $p_{\mathrm{spin}}$, and — for the measures that
-receive it (SC, MPC, FC) — the topological-null $p_{\mathrm{topo}}$. For visualisation, the group-mean projection is standardised
-(z-scored) per network and measure; because the per-subject statistic is rank-based
-(Spearman), this monotone rescale leaves $\bar r$ and $p_{\mathrm{moran}}$ unchanged.
-The right column summarises the same statistic across all seven
-Yeo networks as a horizontal network-coloured lollipop chart, encoding the effect
-magnitude $|\bar r|$ as stem length on a shared bottom $|r|$ axis in the shared network
-ordering; networks surviving the FDR-corrected Moran null (described next) are drawn
-with a filled marker and significance stars, the others faded and open. Magnitude
-rather than signed $\bar r$ is shown because the within-network MPC gradient is the
-first diffusion-map eigenvector, whose polarity is mathematically arbitrary and is not
-anchored across networks, so only $|\bar r|$ is comparable between networks. Both
-columns are views of the per-network computation reused for panel 2B, so the lollipop
-lengths equal the magnitudes in the panel 2B bubble matrix.
+Panel 2A follows the display convention of Figures 1 and 3. For the salience network,
+each connectivity measure (SC, GD, MPC, FC) is shown as a surface row of its
+connectivity-weighted projection $P$ on both hemispheres — the four canonical views
+with the salience-network zoom insets (anterior insula, dorsal anterior cingulate
+cortex, precuneus, inferior parietal lobule) and the inset row alone
+(`figure_2a_{measure}_zoom_{hemi}.svg` and `figure_2a_{measure}_zoom_roi_{hemi}.svg`) —
+with the network border traced on every brain and inset. The projection is standardised
+(z-scored) across the network's vertices and mapped with the connectivity companion
+colormap (`CustomCmap_connectivity`) on the shared $\pm 2$ SD scale (`SALIENCE_Z_RANGE`)
+used throughout Figures 1–3; because the per-subject statistic is rank-based (Spearman),
+this monotone rescale leaves $\bar r$ and $p_{\mathrm{moran}}$ unchanged. A forest plot
+(`figure_2a_forest_{hemi}.svg`) places one row per measure, level with the stacked inset
+rows, showing the salience-network group correlation $\bar r$ against the central 95 % of
+its within-network Moran null (grey band, median tick), the observed point filled where
+the uncorrected $p_{\mathrm{moran}} < 0.05$. The per-measure vertex scatters move to a
+supplement (`figure_2a_scatter_supp_{hemi}.svg`): one panel per measure plots that
+measure's z-scored projection against the within-network MPC gradient, points coloured by
+their dominant target network and annotated with $\bar r$, $p_{\mathrm{moran}}$, the
+target-side $p_{\mathrm{spin}}$, and — for the measures that receive it (SC, MPC, FC) —
+the topological-null $p_{\mathrm{topo}}$. The cross-network summary over all seven Yeo
+networks is carried by the panel 2B bubble matrix; all panel 2A inputs are views of the
+per-network computation reused for panel 2B.
 
 ## Across-network replication (panel 2B)
 

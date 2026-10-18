@@ -214,7 +214,8 @@ def _crop(img: np.ndarray, x_lo: int, x_hi: int, y_lo: int, y_hi: int) -> np.nda
     return out
 
 
-def _outline_alpha(surf, outline: np.ndarray, view: str, **render_kwargs) -> np.ndarray:
+def _outline_alpha(surf, outline: np.ndarray, view: str, *, sharpness: float = 1.0,
+                   **render_kwargs) -> np.ndarray:
     """Per-pixel opacity of an outline traced on the surface, from two brainspace renders.
 
     The outline vertices are rendered black on an otherwise white surface, and the
@@ -224,13 +225,19 @@ def _outline_alpha(surf, outline: np.ndarray, view: str, **render_kwargs) -> np.
     the outline, 0 elsewhere and off the surface. The line spans the triangles
     around the outline vertices (the scalars are interpolated across them); the
     opacity is scaled by ``_OUTLINE_GAIN`` so the line has an opaque core and
-    narrower soft edges.
+    narrower soft edges. ``sharpness`` raises the interpolated scalar to that power
+    before the gain, concentrating the darkening toward the outline vertices
+    (``sharpness > 1`` gives a crisper, narrower line without lightening its core);
+    ``1.0`` is the default soft falloff. On a coarse mesh (fsLR-5k) the one-triangle
+    band is physically wide, so a higher ``sharpness`` keeps the traced border from
+    reading as a thick fuzzy halo.
     """
     renders = [render_surface_view(surf, vals, view, cmap="binary", color_range=(0.0, 1.0),
                                    nan_color=(255, 255, 255, 1), **render_kwargs)[0]
                for vals in (np.asarray(outline, dtype=float), np.zeros(surf.n_points))]
     lum_mark, lum_ref = (im[..., :3].astype(float) @ np.array([0.2126, 0.7152, 0.0722]) for im in renders)
-    alpha = _OUTLINE_GAIN * (1 - lum_mark / np.maximum(lum_ref, 1e-6))
+    s = np.clip(1 - lum_mark / np.maximum(lum_ref, 1e-6), 0.0, 1.0)
+    alpha = _OUTLINE_GAIN * s ** sharpness
     return np.where(renders[1][..., 3] > 0, np.clip(alpha, 0.0, 1.0), 0.0)
 
 
@@ -264,6 +271,7 @@ def plot_hemispheres_zoom(
     line_width: float = 1.0,
     outline: np.ndarray | None = None,
     outline_color="black",
+    outline_sharpness: float = 1.0,
     dpi: int = 300,
 ) -> plt.Figure:
     """``plot_hemispheres`` row with circular zoom insets of regions of interest.
@@ -331,6 +339,10 @@ def plot_hemispheres_zoom(
             brainspace on the same camera (two extra renders per view), so hidden
             parts stay hidden.
         outline_color: Colour of the ``outline`` line.
+        outline_sharpness: Falloff power of the traced ``outline`` (see
+            ``_outline_alpha``); ``> 1`` gives a crisper, narrower line, useful on a
+            coarse mesh (fsLR-5k) where the one-triangle band is physically wide.
+            Default ``1.0`` (the Figure 1/3 soft falloff).
         dpi: Resolution of the embedded raster images when saving.
 
     Returns:
@@ -391,6 +403,7 @@ def plot_hemispheres_zoom(
         if outline is not None:
             # Darken the render by the outline's opacity, before any inset is cropped.
             alpha = _outline_alpha(surfs[hemi], np.asarray(outline, dtype=bool)[sl], cam_view,
+                                   sharpness=outline_sharpness,
                                    size=(view_px, height), scale=scale, zoom=zoom)[..., None]
             rgb = img[..., :3].astype(float) * (1 - alpha) + 255 * np.array(to_rgb(outline_color)) * alpha
             img = np.concatenate([np.round(rgb).astype(img.dtype), img[..., 3:]], axis=-1)

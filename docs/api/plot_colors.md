@@ -84,3 +84,9 @@ Module-level color definitions for all network and cortical-type visualizations.
 ### `ieeg_cmap`
 
 `matplotlib.colors.ListedColormap` registered as `"CustomCmap_ieeg"` — the diverging map of the Figure 3b iEEG spectral maps (aperiodic exponent, oscillatory band power, spectral-similarity projection) z-scored within the SN: green (below the SN mean, LCh hue 135°) → light neutral grey → plum (above, hue 330°), on the shared ±2 SD scale (`SALIENCE_Z_RANGE`). Same lightness and chroma profile as `histology_cmap` (L* 38 → 89 → 38, chroma up to 45), so a given z reads with the same weight as in the gradient and histology maps, with hues distinct from both. The hue pair maximises the smallest end-to-end CIELAB distance under simulated deuteranopia, protanopia and tritanopia (Machado et al., 2009) among in-gamut pairs (ΔE ≥ 48).
+
+---
+
+### `connectivity_cmap`
+
+`matplotlib.colors.ListedColormap` registered as `"CustomCmap_connectivity"` — the diverging map of the Figure 2a connectivity-weighted projection maps z-scored within the source network: azure (below the network mean, LCh hue 215°) → light neutral grey → orange (above, hue 35°), on the shared ±2 SD scale (`SALIENCE_Z_RANGE`). Same lightness and chroma profile as `histology_cmap` and `ieeg_cmap` (L* 38 → 89 → 38, chroma up to 45), so a given z reads with the same weight across Figures 1–3, with a hue pair distinct from the violet–ochre (histology) and green–plum (iEEG) families. The cool-to-warm sense follows the FC-gradient reading the projection carries (low $P$ = default-mode end, high $P$ = task-positive end).

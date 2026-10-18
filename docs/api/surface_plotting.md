@@ -152,6 +152,7 @@ plot_hemispheres_zoom(
     line_width: float = 1.0,
     outline: np.ndarray | None = None,
     outline_color="black",
+    outline_sharpness: float = 1.0,
     dpi: int = 300,
 ) -> plt.Figure
 ```
@@ -189,6 +190,7 @@ plot_hemispheres_zoom(
 | `line_width` | `float` | Line width (pt) of marker circles, inset outlines and lines. |
 | `outline` | `np.ndarray \| None` | Bool array over both hemispheres, shape `(n_lh + n_rh,)`, of vertices traced as a line over the map (two extra renders per view). |
 | `outline_color` | color | Colour of the `outline` line. Default `'black'`. |
+| `outline_sharpness` | `float` | Falloff power of the traced `outline`: `> 1` concentrates the darkening toward the boundary for a crisper, narrower line, useful on a coarse mesh (fsLR-5k) where the one-triangle band is physically wide. Default `1.0` (the Figure 1/3 soft falloff). |
 | `dpi` | `int` | Resolution of the embedded raster images when saving. |
 
 **Returns** `matplotlib.figure.Figure`. Its `inset_cy` attribute is the centre of the inset row in pt from the figure top; with the figure height (`fig.get_size_inches()[1] * 72`) it lets a companion panel align its rows with the insets.

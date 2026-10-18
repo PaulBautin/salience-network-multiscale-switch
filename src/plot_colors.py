@@ -142,3 +142,14 @@ mpl.colormaps.register(histology_cmap)
 # protanopia and tritanopia (Machado et al., 2009) among in-gamut pairs (CIELAB dE >= 48).
 ieeg_cmap = _lch_diverging("CustomCmap_ieeg", hue_low=135, hue_high=330, chroma_end=45)
 mpl.colormaps.register(ieeg_cmap)
+
+
+# Figure 2 connectivity-projection maps – fourth companion on the shared +/-2 SD scale,
+# for the gradient-weighted projection P z-scored within the source network: azure (below
+# the network mean) -> light neutral grey -> orange (above). Same lightness and chroma
+# profile as CustomCmap_histology / CustomCmap_ieeg, so a given z reads with the same
+# weight across figures, with a hue pair distinct from the violet-ochre (histology) and
+# green-plum (iEEG) families. The cool-to-warm sense follows the FC-gradient reading the
+# projection carries (low P = default-mode end, high P = task-positive end).
+connectivity_cmap = _lch_diverging("CustomCmap_connectivity", hue_low=215, hue_high=35, chroma_end=45)
+mpl.colormaps.register(connectivity_cmap)

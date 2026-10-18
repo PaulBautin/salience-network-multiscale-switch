@@ -44,13 +44,15 @@
 #
 # All matrices loaded at fsLR-5k (9684 vertices). Subject is the unit of inference.
 #
-# Figure 2A: figure-1B-style grid - one row per modality {SC, GD, MPC, FC}, two
-#            columns. Column 1 is the SalVentAttn scatter with the within-network MPC
-#            gradient on a single shared bottom x-axis and that measure's projection P
-#            on y (group r and spatial-null p_moran). Column 2 is a horizontal lollipop
-#            placing all 7 Yeo networks (stem length = |group r| on a shared bottom |r|
-#            axis, network-coloured, FDR-Moran-significant networks filled + starred).
-#            All inputs are views of the per-network computation (nothing recomputed).
+# Figure 2A: figure-1/3 norm - one SalVentAttn projection zoom row per modality
+#            {SC, GD, MPC, FC}. Each is a both-hemisphere four-view brain row with the
+#            salience zoom insets (aINS, dACC, PCU, IPL) and the inset row alone, on the
+#            shared +/-2 SD scale in CustomCmap_connectivity (the z-scored projection P),
+#            with the SN border traced. A forest places one row per modality (focus-network
+#            group r vs its Moran null 95% band, dot filled where p_moran < 0.05) level
+#            with the stacked inset rows. The per-measure vertex scatters move to a
+#            supplement. All inputs are views of the per-network computation (nothing
+#            recomputed).
 # Figure 2B: All 7 Yeo networks × {SC, GD, MPC, FC} - replicates the test per network
 #            for every connectivity measure. The headline panel is a bubble matrix
 #            (rows = networks, columns = measures; disc colour = group r, area = |r|,
@@ -58,8 +60,10 @@
 #            and per-network brain maps are retained as supplements.
 #
 # Outputs:
-#   results/figures/figure_2a_distance_metric.svg               (scatter + lollipop, 1B layout)
-#   results/figures/figure_2a_brain_{SC,GD,MPC,FC}_rho.svg      (SalVentAttn projection maps)
+#   results/figures/figure_2a_{SC,GD,MPC,FC}_zoom_{hemi}.svg        (brain row + insets)
+#   results/figures/figure_2a_{SC,GD,MPC,FC}_zoom_roi_{hemi}.svg    (inset row alone, titled)
+#   results/figures/figure_2a_forest_{hemi}.svg                     (r vs Moran null, 4 rows)
+#   results/figures/figure_2a_scatter_supp_{hemi}.svg              (per-measure vertex scatter)
 #   results/figures/figure_2b_distance_network_{measure}.svg   (per-measure scatter grid)
 #   results/figures/figure_2b_network_summary_{hemi}.svg       (bubble matrix, all measures)
 #   results/figures/figure_2b_brain_{measure}_rho_{network}.svg
@@ -112,8 +116,12 @@ from src.atlas_load import (
     convert_states_str2int, compute_network_mask,
 )
 from src.gradient_computation import compute_t1_gradient
-from src.plot_colors import yeo7_rgb, yeo7_abbrev
+from src.plot_colors import yeo7_rgb, yeo7_abbrev, connectivity_cmap
 from src.logging_utils import setup_manuscript_logger
+from src.surface_plotting import (
+    plot_hemispheres_zoom, salience_zoom_rois, mask_outline, plot_forest,
+    format_pvalue, SALIENCE_Z_RANGE, SALIENCE_Z_LABELS,
+)
 from src.connectome_processing import (
     build_consensus_mask, compute_projection_subjects,
     compute_moran_null_projection, compute_topological_null_projection,
@@ -130,6 +138,15 @@ plt.rcParams["text.usetex"] = False
 
 N_LH_5K = 4842
 N_TOTAL_5K = 9684
+
+# Figure 1 zoom-row window (as figure_1a/1b/1c and figure_3b): 1450 x 300, zoom 1.3,
+# colour-bar column, region names at 30 pt and inset-row titles at 36 pt; the rows are
+# shown ZOOM_ROW_WIDTH_MM wide in the figure layout (~0.29x, so 30 pt reads as ~8.8 pt).
+# outline_sharpness=3 crisps the SN border: the fsLR-5k mesh is coarse, so the default
+# soft one-triangle trace reads as a thick fuzzy halo here, unlike the fine fsLR-32k
+# borders of figures 1 and 3; a higher falloff power concentrates it into a thin line.
+ZOOM_KW = dict(size=(1450, 300), zoom=1.3, color_bar=True, nan_color=(220, 220, 220, 1),
+               label_fontsize=30, title_fontsize=36, outline_sharpness=3.0)
 
 # Modalities that receive the geometry-preserving topological null. GD is excluded: its
 # weights are 1/geodesic-distance, so a within-distance-bin target reassignment barely
@@ -567,163 +584,183 @@ def _colors_from_dominant_int(dominant_int: np.ndarray, fallback_color) -> np.nd
     return colors
 
 
-def plot_figure_2a_scatter_lollipop(
+# Full descriptive titles per modality (left-aligned over each panel, fig-1/3 style).
+_MODALITY_TITLES = {
+    "SC":  "Structural connectivity – SIFT2-weighted tractography",
+    "GD":  "Geodesic distance – cortical surface proximity",
+    "MPC": "Microstructural profile covariance – qT1 profile similarity",
+    "FC":  "Functional connectivity – resting-state BOLD",
+}
+
+
+def _plot_measure_zoom_fig2(
+    values: np.ndarray, prefix: str, title: str, *, rois: list[dict], surf_lh, surf_rh,
+    out_dir: Path, suffix: str, cmap: str, color_range: tuple[float, float],
+    cbar_labels: tuple[str, str], cbar_title: str | None,
+    outline: np.ndarray | None = None,
+) -> tuple[float, float]:
+    """Figure 1-style brain row with zoom insets, plus the inset row alone.
+
+    Writes ``{prefix}_zoom_{suffix}.svg`` (brain row with marker circles, insets and
+    region names, as ``figure_1a_brain_zoom.svg``) and ``{prefix}_zoom_roi_{suffix}.svg``
+    (the inset row alone, titled, colour bar drawn, no region names, as the Figure 1b/3b
+    zoom rows), both on the Figure 1 window (``ZOOM_KW``), with ``outline`` (the
+    source-network border from ``mask_outline``) traced on the brains and insets. Mirrors
+    ``figure_3_ieeg_mica._plot_measure_zoom``.
+
+    Returns
+    -------
+    tuple[float, float]
+        Inset-row centre and height (pt) of the ``_zoom_roi`` figure, which place the
+        forest-plot rows level with the stacked inset rows.
+    """
+    kwargs = dict(ZOOM_KW, cmap=cmap, color_range=color_range, cbar_labels=cbar_labels,
+                  cbar_title=cbar_title, outline=outline)
+    plot_hemispheres_zoom(surf_lh, surf_rh, values, rois,
+                          filename=out_dir / f"{prefix}_zoom_{suffix}.svg", **kwargs)
+    fig = plot_hemispheres_zoom(surf_lh, surf_rh, values,
+                                [dict(r, label=None) for r in rois], roi_only=True,
+                                draw_color_bar=True, title=title,
+                                filename=out_dir / f"{prefix}_zoom_roi_{suffix}.svg", **kwargs)
+    geometry = (fig.inset_cy, fig.get_size_inches()[1] * 72)
+    plt.close("all")
+    return geometry
+
+
+def plot_figure_2a_zoom_forest(
     results_by_measure: dict, measures: list, df_yeo_surf_5k: pd.DataFrame,
     surf5k_lh_infl, surf5k_rh_infl, project_root: Path,
-    focus_network: str = "SalVentAttn",
+    hemisphere: str = "both", focus_network: str = "SalVentAttn",
 ) -> None:
-    """Figure 2A: figure-1B-style grid — one modality row, scatter + lollipop columns.
+    """Figure 2A (Figure 1/3 norm): per-modality projection zoom rows + aligned forest.
 
-    Transposed to mirror ``figure_1b_contextualisation.context_analysis``: each
-    connectivity measure (SC, GD, MPC, FC) is a row, with two columns and a single
-    clear x-axis at the bottom of each.
+    For the focus network, each connectivity measure (SC, GD, MPC, FC) is drawn as a
+    Figure-1-style brain row with the ``SALIENCE_ZOOM_ROIS`` insets (aINS, dACC, PCU,
+    IPL) and the inset row alone, on the shared +/-2 SD scale in
+    ``CustomCmap_connectivity`` (the cached ``{network}_{measure}_P`` column is already
+    z-scored within the network), with the source-network border traced
+    (``mask_outline``). A ``plot_forest`` then places one row per measure — the
+    focus-network group $r$ against its within-network Moran null (95 % band, median
+    tick; dot filled where the uncorrected Moran $p<0.05$) — level with the stacked
+    inset rows, in the measure order of ``measures``.
 
-    - Column 0 (scatter): the focus network's within-network MPC gradient on the
-      shared x-axis (the same vector for every modality, so it is labelled only on
-      the bottom row) against that measure's connectivity-weighted projection P on y
-      (the per-row y-label names the modality). Points are coloured by dominant
-      target network; black regression line; group $r$ / spatial-null
-      $p_{\\mathrm{moran}}$ text box.
-    - Column 1 (lollipop): a horizontal stem per Yeo network, length $|\\bar r|$ on
-      the shared bottom |r| axis, network-coloured, FDR-Moran significant networks
-      ($q<0.05$) filled + starred (others faded/open), the value printed at the
-      marker. Networks share the single Figure 2B ordering (strongest at top).
+    All inputs are views of ``results_by_measure`` and the cached ``_P`` columns —
+    nothing is recomputed. The per-measure vertex scatters move to
+    ``figure_2a_scatter_supp_{hemi}.svg`` (``plot_figure_2a_scatter_supp``); the
+    cross-network summary stays in Figure 2B (``plot_network_bubble_matrix``).
+    """
+    measures = list(measures)
+    out_dir = project_root / "results/figures"
+    prefix = "figure_2a"
 
-    Magnitude (not signed $\\bar r$) is shown because each network's MPC gradient is
-    a diffusion-map eigenvector with arbitrary polarity, so only $|\\bar r|$ is
-    comparable across networks. All inputs are views of ``results_by_measure`` and
-    the cached ``{network}_{measure}_P`` columns — nothing is recomputed. The
-    focus-network projection maps are re-emitted under
-    ``figure_2a_brain_{measure}_rho.svg``.
+    # Source-network border (hemisphere-filtered) traced on every map, and the four
+    # salience zoom regions restricted to the drawn hemisphere(s).
+    net_mask = df_yeo_surf_5k["network"].eq(focus_network)
+    if hemisphere in ("LH", "RH"):
+        net_mask = net_mask & df_yeo_surf_5k["hemisphere"].eq(hemisphere)
+    outline = mask_outline(surf5k_lh_infl, surf5k_rh_infl, net_mask.to_numpy())
+    rois = salience_zoom_rois(df_yeo_surf_5k, hemisphere)
+
+    stats_rows, row_geometry = [], []
+    for measure in measures:
+        focus_rec = next(r for r in results_by_measure[measure]
+                         if r["network"] == focus_network)
+        res = focus_rec["res"]
+        P_full = df_yeo_surf_5k[f"{focus_network}_{measure}_P"].to_numpy(dtype=float)
+        geom = _plot_measure_zoom_fig2(
+            P_full, f"{prefix}_{measure}", _MODALITY_TITLES.get(measure, measure),
+            rois=rois, surf_lh=surf5k_lh_infl, surf_rh=surf5k_rh_infl, out_dir=out_dir,
+            suffix=hemisphere, cmap=connectivity_cmap.name,
+            color_range=SALIENCE_Z_RANGE, cbar_labels=SALIENCE_Z_LABELS, cbar_title="z",
+            outline=outline,
+        )
+        row_geometry.append(geom)
+        stats_rows.append(dict(
+            measure=measure, r=res["r_group"], p=res["p_moran"],
+            null_lo=res.get("moran_null_lo", np.nan),
+            null_med=res.get("moran_null_med", np.nan),
+            null_hi=res.get("moran_null_hi", np.nan),
+        ))
+
+    if len(set(row_geometry)) != 1:
+        raise RuntimeError(f"Inset rows differ in geometry {set(row_geometry)}; "
+                           f"the forest rows cannot be aligned.")
+    stats = pd.DataFrame(stats_rows)
+    # Symmetric forest x-range covering the observed r and the Moran-null band, rounded
+    # up to a 0.05 tick so the two ends and 0 read cleanly.
+    vmax = float(np.nanmax(np.abs(stats[["r", "null_lo", "null_hi"]].to_numpy())))
+    lim = max(0.1, np.ceil(vmax * 1.15 * 20) / 20)
+    plot_forest(stats, *row_geometry[0], out_dir / f"{prefix}_forest_{hemisphere}.svg",
+                xlim=(-lim, lim), xlabel="Spearman r")
+    plt.close("all")
+    logger.info(f"[Figure 2A] {len(measures)} projection zoom rows + forest written "
+                f"(figure_2a_*_zoom_roi_{hemisphere}.svg, figure_2a_forest_{hemisphere}.svg)")
+
+
+def plot_figure_2a_scatter_supp(
+    results_by_measure: dict, measures: list, df_yeo_surf_5k: pd.DataFrame,
+    project_root: Path, hemisphere: str = "both", focus_network: str = "SalVentAttn",
+) -> None:
+    """Supplementary Figure 2A: per-measure vertex scatter behind the forest.
+
+    One panel per connectivity measure: that measure's z-scored connectivity-weighted
+    projection P (x) against the focus network's within-network MPC gradient (y, shared),
+    points coloured by dominant target network, black regression line, and the group $r$
+    with the spatial-null $p_{\\mathrm{moran}}$ (and $p_{\\mathrm{topo}}$ /
+    $p_{\\mathrm{spin}}$ where available). Axis convention and panel size match the
+    figure 2b / figure 3b scatter grids (measure on x, gradient on y).
     """
     measures = list(measures)
     n_meas = len(measures)
     net_int_map = _net_int_map(df_yeo_surf_5k)
     focus_color = yeo7_rgb[int(net_int_map[focus_network])]
 
-    # Full descriptive titles per modality (left-aligned over each scatter, fig-1B style).
-    title_txt = {
-        "SC":  "Structural connectivity – SIFT2-weighted tractography",
-        "GD":  "Geodesic distance – cortical surface proximity",
-        "MPC": "Microstructural profile covariance – qT1 profile similarity",
-        "FC":  "Functional connectivity – resting-state BOLD",
-    }
-
-    # Shared network order (strongest at top) and the focus MPC gradient, which is
-    # identical across measures, so it sets one shared scatter x-range.
-    networks = [r["network"] for r in results_by_measure[measures[0]]]
-    n_net = len(networks)
-    ypos = {net: (n_net - 1) - j for j, net in enumerate(networks)}
     focus_g = next(r for r in results_by_measure[measures[0]]
                    if r["network"] == focus_network)["g_mpc_at_sn"]
     gfin = focus_g[np.isfinite(focus_g)]
     if gfin.size:
         gpad = 0.05 * (gfin.max() - gfin.min() or 1.0)
-        gxlim = (gfin.min() - gpad, gfin.max() + gpad)
+        gylim = (gfin.min() - gpad, gfin.max() + gpad)
     else:
-        gxlim = (-3, 3)
+        gylim = (-3, 3)
 
-    # Shared |r| axis with headroom for the printed value + stars to the marker's right.
-    all_abs_r = [abs(rec["res"]["r_group"])
-                 for m in measures for rec in results_by_measure[m]
-                 if np.isfinite(rec["res"]["r_group"])]
-    rmax = (max(all_abs_r) * 1.45) if all_abs_r else 1.0
-
-    fig, axes = plt.subplots(
-        n_meas, 2, figsize=(6.0, 2.8 * n_meas), squeeze=False,
-        gridspec_kw={"wspace": 0.35, "hspace": 0.4, "width_ratios": [1.0, 1.0]},
-    )
-
-    for row, measure in enumerate(measures):
-        records = results_by_measure[measure]          # already in shared order
-        focus_rec = next(r for r in records if r["network"] == focus_network)
+    fig, axes = plt.subplots(1, n_meas, figsize=(3.0 * n_meas, 3.2),
+                             sharey=True, squeeze=False)
+    axes = axes[0]
+    for ax, measure in zip(axes, measures):
+        focus_rec = next(r for r in results_by_measure[measure]
+                         if r["network"] == focus_network)
         res = focus_rec["res"]
         g_mpc = focus_rec["g_mpc_at_sn"]
-
-        # Re-emit the focus-network projection map (from the cached _P column).
-        P_full = df_yeo_surf_5k[f"{focus_network}_{measure}_P"].values
-        save_brain_map(
-            surf5k_lh_infl, surf5k_rh_infl, P_full,
-            filename=project_root / f"results/figures/figure_2a_brain_{measure}_rho.svg",
-            color_range=_pct_range(P_full),
-        )
-
-        # Column 0 - scatter: x = MPC gradient (shared), y = projection P.
-        ax = axes[row, 0]
         valid = np.isfinite(g_mpc) & np.isfinite(res["P_mean"])
         colors_per_sn = _colors_from_dominant_int(focus_rec["dominant_int"], focus_color)
-        ax.scatter(g_mpc[valid], res["P_mean"][valid],
-                   s=15, alpha=0.75, c=colors_per_sn[valid],
+        ax.scatter(res["P_mean"][valid], g_mpc[valid],
+                   s=12, alpha=0.75, c=colors_per_sn[valid],
                    edgecolor="none", rasterized=True)
-        sns.regplot(x=g_mpc[valid], y=res["P_mean"][valid],
+        sns.regplot(x=res["P_mean"][valid], y=g_mpc[valid],
                     scatter=False, color="black", line_kws={"linewidth": 2.5}, ax=ax)
-        # Up to three nulls: p_moran (map smoothness, all measures), p_topo (connectome
-        # geometry, SC/MPC/FC) and p_spin (FC-gradient anatomy, all measures).
         stat_txt = (f"$r={res['r_group']:+.2f}$\n"
-                    f"$p_{{moran}}={res['p_moran']:.3f}$")
+                    f"$p={format_pvalue(res['p_moran'])}$")
         if np.isfinite(res.get("p_topo", np.nan)):
-            stat_txt += f"\n$p_{{topo}}={res['p_topo']:.3f}$"
+            stat_txt += f"\n$p_{{topo}}={format_pvalue(res['p_topo'])}$"
         if np.isfinite(res.get("p_spin", np.nan)):
-            stat_txt += f"\n$p_{{spin}}={res['p_spin']:.3f}$"
-        ax.text(0.05, 0.95, stat_txt,
-                transform=ax.transAxes, va="top", fontweight="bold", fontsize=12)
-        t = ax.set_title(title_txt.get(measure, measure), loc="left", pad=15)
-        t.set_in_layout(False)
-        ax.set_ylabel(f"{measure} projection")
-        ax.set_xlim(*gxlim)
-        # Shared y-range across all modality rows (z-scored P, SD units); ticks only
-        # at -4, 0, 4.
-        ax.set_ylim(-5, 5)
-        ax.set_yticks([-4, 0, 4])
-        # Integer-only x ticks (x = z-scored MPC gradient, SD units).
-        ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+            stat_txt += f"\n$p_{{spin}}={format_pvalue(res['p_spin'])}$"
+        ax.text(0.05, 0.95, stat_txt, transform=ax.transAxes, va="top",
+                fontweight="bold", fontsize=12)
+        ax.set_xlabel(f"{measure} projection", fontsize=16)
+        ax.set_xlim(-5, 5)
+        ax.set_xticks([-4, 0, 4])
+        ax.set_ylim(*gylim)
+        ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
         ax.set_box_aspect(1)
-        ax.spines["right"].set_visible(False)
-        ax.spines["top"].set_visible(False)
-        if row < n_meas - 1:
-            ax.tick_params(labelbottom=False)
-
-        # Column 1 - horizontal lollipop: y = networks, x = |r| (shared).
-        axl = axes[row, 1]
-        for rec in records:
-            net = rec["network"]
-            r_abs = abs(rec["res"]["r_group"])
-            q = rec.get("q_moran", np.nan)
-            color = tuple(yeo7_rgb[int(net_int_map[net])])
-            sig = np.isfinite(q) and q < 5e-2
-            y = ypos[net]
-            axl.hlines(y, 0, r_abs, colors=[color], lw=2.5, alpha=1.0 if sig else 0.45)
-            axl.scatter(r_abs, y, s=55, facecolors=(color if sig else "white"),
-                        edgecolors=[color], linewidths=1.8,
-                        alpha=1.0 if sig else 0.85, zorder=3)
-            stars = _sig_stars(q)
-            label = f"{r_abs:.2f}{stars if sig and stars not in ('', 'n.s.') else ''}"
-            axl.annotate(label, xy=(r_abs, y), xytext=(6, 0),
-                         textcoords="offset points", ha="left", va="center",
-                         fontsize=8.5, color="0.25")
-        axl.set_xlim(0, rmax)
-        axl.set_ylim(-0.6, n_net - 0.4)
-        axl.set_yticks([ypos[n] for n in networks])
-        axl.set_yticklabels([yeo7_abbrev.get(n, n) for n in networks])
-        for tick, n in zip(axl.get_yticklabels(), networks):
-            tick.set_color(tuple(yeo7_rgb[int(net_int_map[n])]))
-        axl.tick_params(axis="y", length=0)
-        axl.set_box_aspect(1)
-        axl.spines["right"].set_visible(False)
-        axl.spines["top"].set_visible(False)
-        if row < n_meas - 1:
-            axl.tick_params(labelbottom=False)
-            axl.spines["bottom"].set_visible(False)
-
-    axes[-1, 0].set_xlabel("MPC gradient")
-    axes[-1, 1].set_xlabel(r"Spearman $|r|$")
-
+    axes[0].set_ylabel("MPC gradient", fontsize=16)
     sns.despine(fig=fig)
-    plt.savefig(project_root / "results/figures/figure_2a_distance_metric.svg",
+    plt.tight_layout()
+    plt.savefig(project_root / f"results/figures/figure_2a_scatter_supp_{hemisphere}.svg",
                 bbox_inches="tight", transparent=True)
     plt.close(fig)
-    logger.info("[Figure 2A] scatter + lollipop figure written to "
-                "figure_2a_distance_metric.svg")
+    logger.info(f"[Figure 2A] supplementary scatter grid written to "
+                f"figure_2a_scatter_supp_{hemisphere}.svg")
 
 
 # Connectivity measure -> the df_pni column holding its per-subject file paths.
@@ -888,6 +925,17 @@ def compute_network_results(
                 g_fc_spun_cortex=g_fc_spun_cortex,
             )
 
+            # Central 95 % and median of the Moran null group-r distribution, for the
+            # Figure 2A forest (observed r vs null band); persisted in the stats CSV.
+            moran_null = res.get("null_group_moran")
+            moran_null = (moran_null[np.isfinite(moran_null)]
+                          if moran_null is not None else np.array([]))
+            if moran_null.size:
+                (res["moran_null_lo"], res["moran_null_med"],
+                 res["moran_null_hi"]) = np.percentile(moran_null, [2.5, 50, 97.5])
+            else:
+                res["moran_null_lo"] = res["moran_null_med"] = res["moran_null_hi"] = np.nan
+
             logger.info(
                 f"[compute | {network} | {measure}] r_group={res['r_group']:+.3f} "
                 f"[{res['ci_low']:+.3f}, {res['ci_high']:+.3f}] "
@@ -962,6 +1010,9 @@ def compute_network_results(
             "p_moran": rec["res"]["p_moran"], "q_moran": rec["q_moran"],
             "p_topo": rec["res"]["p_topo"], "q_topo": rec["q_topo"],
             "p_spin": rec["res"]["p_spin"], "q_spin": rec["q_spin"],
+            "moran_null_lo": rec["res"].get("moran_null_lo", np.nan),
+            "moran_null_med": rec["res"].get("moran_null_med", np.nan),
+            "moran_null_hi": rec["res"].get("moran_null_hi", np.nan),
         } for rec in results_per_net]
         pd.DataFrame(stats_rows).to_csv(
             project_root / f"data/dataframes/df_2b_network_stats_{measure}_{hemisphere}.csv",
@@ -1158,6 +1209,10 @@ def load_results_from_cache(
                 # p_spin/q_spin absent in caches predating the spin null.
                 "p_topo": float(srow["p_topo"]) if "p_topo" in srow.index else np.nan,
                 "p_spin": float(srow["p_spin"]) if "p_spin" in srow.index else np.nan,
+                # Moran null band for the Figure 2A forest (NaN in caches predating it).
+                "moran_null_lo": float(srow["moran_null_lo"]) if "moran_null_lo" in srow.index else np.nan,
+                "moran_null_med": float(srow["moran_null_med"]) if "moran_null_med" in srow.index else np.nan,
+                "moran_null_hi": float(srow["moran_null_hi"]) if "moran_null_hi" in srow.index else np.nan,
             }
             records.append({
                 "network": network, "res": res, "g_mpc_at_sn": g_mpc_at_sn,
@@ -1296,10 +1351,14 @@ def main():
     # figures; only the heavy computation is gated by -stage). Figures are gated by
     # -panel. ---
     if args.panel in ("both", "2a"):
-        plot_figure_2a_scatter_lollipop(
+        plot_figure_2a_zoom_forest(
             results_by_measure, list(measures), df_yeo_surf_5k,
             surf5k_lh_infl, surf5k_rh_infl, project_root,
-            focus_network="SalVentAttn",
+            hemisphere=args.hemi, focus_network="SalVentAttn",
+        )
+        plot_figure_2a_scatter_supp(
+            results_by_measure, list(measures), df_yeo_surf_5k,
+            project_root, hemisphere=args.hemi, focus_network="SalVentAttn",
         )
     if args.panel in ("both", "2b"):
         plot_figure_2b(

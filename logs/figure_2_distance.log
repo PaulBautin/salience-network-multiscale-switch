@@ -7322,3 +7322,162 @@ Moran null: 2 connected component(s) (block sizes=[445, 636]); surrogates genera
 [sparsity | Cont | GD] targets/SN-vertex median=3682 IQR=[3682, 3868] | frac SN vertices with <=10 targets: 0.00
 [compute | GD] processing network: SalVentAttn
 Moran null: 2 connected component(s) (block sizes=[530, 611]); surrogates generated per component.
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-10-18 16:33:08
+  --hemi: both
+  --panel: 2a
+  --stage: plot
+  --n_rand: 1000
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC/FC weights : positive connections only (weighted-mean projection)
+Null models    : Moran spectral randomisation (map smoothness, all measures) + geometry-preserving topological null (wiring specificity, SC/MPC/FC) + target-side FC-gradient spin null (anatomical alignment, all measures)
+Stage / panel  : stage=plot, panel=2a, hemi=both
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+[plot] loading figure-data caches (skipping projection + nulls)
+[zoom] lh_lateral: Anterior insula (aINS) -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: Precuneus (PCU) -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: lh_medial -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: rh_medial -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: rh_lateral -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: Precuneus (PCU) -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: lh_medial -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: rh_medial -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: rh_lateral -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: Precuneus (PCU) -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: lh_medial -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: rh_medial -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: rh_lateral -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: Precuneus (PCU) -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: lh_medial -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: rh_medial -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: rh_lateral -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[Figure 2A] 4 projection zoom rows + forest written (figure_2a_*_zoom_roi_both.svg, figure_2a_forest_both.svg)
+[Figure 2A] supplementary scatter grid written to figure_2a_scatter_supp_both.svg
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-10-18 16:34:57
+  --hemi: both
+  --panel: 2a
+  --stage: plot
+  --n_rand: 1000
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC/FC weights : positive connections only (weighted-mean projection)
+Null models    : Moran spectral randomisation (map smoothness, all measures) + geometry-preserving topological null (wiring specificity, SC/MPC/FC) + target-side FC-gradient spin null (anatomical alignment, all measures)
+Stage / panel  : stage=plot, panel=2a, hemi=both
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+[plot] loading figure-data caches (skipping projection + nulls)
+[zoom] lh_lateral: Anterior insula (aINS) -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: Precuneus (PCU) -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: lh_medial -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: rh_medial -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: rh_lateral -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: Precuneus (PCU) -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: lh_medial -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: rh_medial -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: rh_lateral -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: Precuneus (PCU) -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: lh_medial -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: rh_medial -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: rh_lateral -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: Precuneus (PCU) -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: lh_medial -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: rh_medial -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: rh_lateral -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[Figure 2A] 4 projection zoom rows + forest written (figure_2a_*_zoom_roi_both.svg, figure_2a_forest_both.svg)
+[Figure 2A] supplementary scatter grid written to figure_2a_scatter_supp_both.svg
+========================================================================
+SCRIPT : figure_2_distance
+DATE   : 2026-10-18 16:52:54
+  --hemi: both
+  --panel: 2a
+  --stage: plot
+  --n_rand: 1000
+========================================================================
+Surface space  : fsLR-5k, Yeo 7-network labels
+Statistic      : per-network-vertex connectivity-weighted projection P[i]
+Group test     : Fisher-z r_s + one-sample t-test (random effects)
+SC weights     : SIFT2 masked by Betzel consensus (per-subject log10)
+GD weights     : 1/GD (within-hemisphere)
+MPC/FC weights : positive connections only (weighted-mean projection)
+Null models    : Moran spectral randomisation (map smoothness, all measures) + geometry-preserving topological null (wiring specificity, SC/MPC/FC) + target-side FC-gradient spin null (anatomical alignment, all measures)
+Stage / panel  : stage=plot, panel=2a, hemi=both
+Script path: /local_raid/data/pbautin/software/salience-network-multiscale-switch/scripts/figure_2_distance.py
+Project root: /local_raid/data/pbautin/software/salience-network-multiscale-switch
+[plot] loading figure-data caches (skipping projection + nulls)
+[zoom] lh_lateral: Anterior insula (aINS) -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: Precuneus (PCU) -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: lh_medial -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: rh_medial -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: rh_lateral -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: Precuneus (PCU) -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: lh_medial -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: rh_medial -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: rh_lateral -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: Precuneus (PCU) -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: lh_medial -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: rh_medial -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: rh_lateral -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: Anterior insula (aINS) -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: Dorsal anterior cingulate cortex (dACC) -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: Precuneus (PCU) -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: Inferior parietal lobule (IPL) -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[zoom] lh_lateral: lh_lateral -> 161 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] lh_medial: lh_medial -> 84 visible vertices, window radius 29.6 mm, magnification x2.3
+[zoom] rh_medial: rh_medial -> 70 visible vertices, window radius 21.7 mm, magnification x3.1
+[zoom] rh_lateral: rh_lateral -> 177 visible vertices, window radius 32.4 mm, magnification x2.1
+[Figure 2A] 4 projection zoom rows + forest written (figure_2a_*_zoom_roi_both.svg, figure_2a_forest_both.svg)
+[Figure 2A] supplementary scatter grid written to figure_2a_scatter_supp_both.svg
