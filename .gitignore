@@ -1,0 +1,21 @@
+# Python, and the test and lint caches
+__pycache__/
+*.pyc
+env_salience/
+.pytest_cache/
+.ruff_cache/
+
+# Editor settings and the built docs site
+.vscode/
+site/
+
+# This machine's data paths (copy config/paths.example.yaml)
+config/paths.yaml
+
+# Participant-level data and run logs stay local (enforced by .githooks/pre-commit)
+data/dataframes/
+logs/
+*.pkl
+*.mat
+*.npy
+*.npz

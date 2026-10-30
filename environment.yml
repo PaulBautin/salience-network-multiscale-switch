@@ -1,0 +1,31 @@
+name: env_salience
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy
+  - pandas
+  - nibabel
+  - matplotlib
+  - seaborn
+  - scipy
+  - pyyaml
+  - pip
+  - pip:
+      - brainspace==0.1.22
+      - vtk>=9.3,<9.4    # brainspace 0.1.22 cannot draw colour bars with VTK >= 9.4
+      - specparam==2.0.0rc7
+      - -e .             # this repository's library (src/salience_switch)
+
+
+## To create the environment from this file, run:
+# conda env create -f environment.yml
+
+## To update the environment with changes to this file, run:
+# conda env update -f environment.yml --prune
+
+## The documentation is built separately: pip install -r docs/requirements.txt
+
+## To export the current environment to this file, run:
+# conda env export --no-builds > environment.yml

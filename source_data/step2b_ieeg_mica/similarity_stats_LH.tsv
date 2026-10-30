@@ -1,0 +1,2 @@
+network	hemisphere	r_group	p_moran	r_uniform	r_distance	n_sources	n_perm	leak_cos_thresh	n_pairs_removed	n_pairs
+SalVentAttn	LH	0.17546527600144168	0.003996003996003996	-0.21027179058966197	0.23778643637984764	3493	1000	0.1	194024	87893196

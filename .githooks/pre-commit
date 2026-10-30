@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Refuse commits that would publish participant-level data.
+# Enable once per clone:  git config core.hooksPath .githooks
+#
+# Blocks (1) files in the private cache and log folders or with raw-data extensions, and
+# (2) text files containing a participant ID: MICA-PNI (PNC + 3 digits), MICA-MICs (HC + 3
+# digits) or electroMICA (PX + 3 digits). IDs inside base64 image data are not matched.
+id_pattern='(^|[^A-Za-z0-9+/])(PNC|HC|PX)[0-9]{3}([^0-9]|$)'
+status=0
+while IFS= read -r -d '' f; do
+    case "$f" in
+        data/dataframes/*|logs/*|*.pkl|*.mat|*.npy|*.npz)
+            echo "pre-commit: private data location or file type: $f"
+            status=1
+            continue ;;
+    esac
+    if git show ":$f" | grep -qIE "$id_pattern"; then
+        echo "pre-commit: participant ID in: $f"
+        status=1
+    fi
+done < <(git diff --cached --name-only --diff-filter=ACMR -z)
+if [ "$status" -ne 0 ]; then
+    echo "Commit refused: participant-level data stays local (git restore --staged <file>)."
+fi
+exit "$status"

@@ -1,0 +1,24 @@
+# Where the private data are on your machine. Copy this file to config/paths.yaml
+# (git-ignored) and set each path. Only the compute stage needs it; drawing the figures
+# from source_data/ needs no private data.
+
+# Private work directory: subject lists, per-subject tables, caches, logs and manifests.
+# Keep it outside the repository.
+work_dir: /path/to/salience_work
+
+# micapipe v0.2.0 derivatives (step 1a; step 3 reads the connectomes listed by step 1a)
+micapipe_pni: /path/to/BIDS_PNI/derivatives/micapipe_v0.2.0
+micapipe_mics: /path/to/BIDS_MICs/derivatives/micapipe_v0.2.0
+
+# MICA-PNI participant table: only to build the subject lists and log sex and age (step 1a)
+participants: /path/to/MICA_PNI.csv
+
+# electroMICA iEEG derivatives and original recordings (steps 2b and 2c)
+electromica: /path/to/BIDS_iEEG/derivatives/electroMICA
+ieeg_raw: /path/to/BIDS_iEEG/original
+
+# MNI Open iEEG Atlas (step 2a)
+mni_ieeg: /path/to/MNI_ieeg/MatlabFile.mat
+# MNI Open iEEG Atlas surfaces registered to the template: L.anat.reg.surf.gii and
+# R.anat.reg.surf.gii (step 2a)
+mni_ieeg_surfaces: /path/to/mni_ieeg_surfaces

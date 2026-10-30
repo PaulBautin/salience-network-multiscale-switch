@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap');
+
+/* === Light mode =========================================== */
+:root {
+  --md-primary-fg-color:             #d97757;
+  --md-primary-fg-color--light:      #e8a088;
+  --md-primary-fg-color--dark:       #b85d3c;
+  --md-primary-bg-color:             #ffffff;
+  --md-primary-bg-color--light:      rgba(255,255,255,0.7);
+  --md-accent-fg-color:              #d97757;
+  --md-accent-fg-color--transparent: rgba(217,119,87,0.1);
+  --md-accent-bg-color:              #ffffff;
+  --md-code-bg-color:                #fdf0eb;
+  --md-code-fg-color:                #b85d3c;
+}
+
+/* === Dark mode ============================================ */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color:             #d97757;
+  --md-primary-fg-color--light:      #e8a088;
+  --md-primary-fg-color--dark:       #b85d3c;
+  --md-primary-bg-color:             #ffffff;
+  --md-primary-bg-color--light:      rgba(255,255,255,0.7);
+  --md-accent-fg-color:              #d97757;
+  --md-accent-fg-color--transparent: rgba(0,0,0,0.1);
+  --md-accent-bg-color:              rgba(0,0,0,0.87);
+  --md-default-bg-color:             #0f0f0f;
+  --md-default-bg-color--light:      #161616;
+  --md-default-bg-color--lighter:    #1e1e1e;
+  --md-default-bg-color--lightest:   #272727;
+  --md-code-bg-color:                #333333;
+  --md-code-fg-color:                rgba(255,255,255,0.7);
+}
+
+/* === Headings ============================================= */
+.md-typeset h1 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--md-primary-fg-color);
+  text-transform: uppercase;
+}
+
+.md-typeset h2,
+.md-typeset h3 {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 600;
+}
+
+
+[data-md-color-scheme="slate"] .md-typeset h2,
+[data-md-color-scheme="slate"] .md-typeset h3 {
+  color: #ffffff;
+}
+
+/* === Code blocks ========================================== */
+.highlight pre {
+  border-left: 3px solid var(--md-primary-fg-color);
+  border-radius: 4px;
+}
+
+/* === Tables =============================================== */
+.md-typeset table:not([class]) {
+  border: none;
+  box-shadow: none;
+}
+
+.md-typeset table:not([class]) th,
+.md-typeset table:not([class]) td {
+  border-left: none;
+  border-right: none;
+  padding: 0.8em 0.8em;
+  line-height: 1.4;
+}
+
+.md-typeset table:not([class]) th {
+  background-color: var(--md-default-bg-color, #ffffff);
+  color: var(--md-default-fg-color);
+  font-family: Avenir Next;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* === Header =============================================== */
+.md-header {
+  background-color: var(--md-default-bg-color, #ffffff);
+  color: #131314;
+  box-shadow: none;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+  font-family: 'Source Serif 4', Georgia, serif;
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+
+/* === Nav tabs ============================================= */
+.md-tabs {
+  background-color: var(--md-default-bg-color, #ffffff);
+  font-family: 'Avenir Next', sans-serif;
+  color: #131314;
+  box-shadow: none;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+  
+}
+
+[data-md-color-scheme="slate"] .md-tabs {
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+/* === Misc ================================================= */
+.md-typeset { font-size: 0.75rem; }
+.md-nav__link--active { font-weight: 700; }

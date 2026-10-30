@@ -1,0 +1,116 @@
+site_name: Salience Network Multiscale Switch
+site_description: Code and data to reproduce analyses from "The multiscale architecture of the salience network supports a brain-wide switch function"
+site_author: Paul Bautin
+site_url: https://paulbautin.github.io/salience-network-multiscale-switch/
+repo_url: https://github.com/PaulBautin/salience-network-multiscale-switch
+repo_name: PaulBautin/salience-network-multiscale-switch
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Light mode (default)
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Avenir Next
+    code: Roboto Mono
+  features:
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.instant
+    - content.code.copy
+    - content.action.edit
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/library-shelves
+
+nav:
+  - Home: index.md
+  - Usage: usage.md
+  - Architecture: architecture.md
+  - Reproducibility: reproducibility.md
+  - API Reference:
+    - Overview: api/overview.md
+    - surface: api/surface.md
+    - microstructure: api/microstructure.md
+    - connectivity: api/connectivity.md
+    - stats: api/stats.md
+    - ieeg: api/ieeg.md
+    - plotting: api/plotting.md
+    - colors: api/colors.md
+    - config: api/config.md
+    - provenance: api/provenance.md
+  - Methods:
+    - Data Acquisition: methods/datasets.md
+    - Shared Methods: methods/shared.md
+    - Figure 1 — Microstructural heterogeneity: methods/figure_1.md
+    - Figure 2 — iEEG mapping: methods/figure_2.md
+    - Figure 3 — Connectivity fingerprints: methods/figure_3.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]          # read statically: building the docs needs no VTK or brainspace
+          options:
+            docstring_style: numpy
+            members_order: source
+            filters: ["!^_"]    # public functions only
+            show_source: false
+            show_root_heading: false
+            show_root_toc_entry: false
+            heading_level: 2
+            show_signature_annotations: true
+            separate_signature: true
+
+docs_dir: docs
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+markdown_extensions:
+  - admonition
+  - tables
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.arithmatex:
+      generic: true
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/PaulBautin
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/micalab/micapipe
+    - icon: fontawesome/solid/globe
+      link: https://mica-mni.github.io/

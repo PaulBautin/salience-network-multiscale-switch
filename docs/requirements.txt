@@ -1,0 +1,4 @@
+mkdocs-material>=9.5
+mkdocstrings[python]>=0.26
+# mkdocstrings 1.0 calls the pre-12 highlighting API of pymdown-extensions
+pymdown-extensions>=10,<12

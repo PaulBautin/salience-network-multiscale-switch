@@ -1,0 +1,20 @@
+{
+  "step": "step1a_mpc_gradient",
+  "created": "2026-10-30T14:26:03",
+  "git": "b79e6c3-dirty",
+  "versions": {
+    "python": "3.10.12",
+    "numpy": "2.2.6",
+    "scipy": "1.15.3",
+    "pandas": "2.3.3",
+    "nibabel": "5.4.2",
+    "brainspace": "0.1.22",
+    "vtk": "9.6.1",
+    "specparam": "2.0.0rc7",
+    "matplotlib": "3.10.8"
+  },
+  "network": "SalVentAttn",
+  "hemisphere": "both",
+  "n_subjects": 25,
+  "n_permutations": 1000
+}

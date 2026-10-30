@@ -1,0 +1,3 @@
+density	network	hemisphere	n_subjects	n_vertices	n_components	sparsity	variance_explained_g1_mean	variance_explained_g1_sd	variance_explained_g1_min	variance_explained_g1_max
+fslr32k	SalVentAttn	both	25	7593	10	0.9	0.2111798416297816	0.006007532984155319	0.19575895846504754	0.2209730332521838
+fslr5k	SalVentAttn	both	25	1141	10	0.9	0.21007073372388463	0.006333914175722728	0.19119278358580144	0.22073321268097104

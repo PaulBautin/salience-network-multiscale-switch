@@ -1,0 +1,22 @@
+{
+  "step": "step2c_ieeg_states",
+  "created": "2026-10-30T15:28:29",
+  "git": "b79e6c3-dirty",
+  "versions": {
+    "python": "3.10.19",
+    "numpy": "2.2.6",
+    "scipy": "1.15.3",
+    "pandas": "2.3.3",
+    "nibabel": "5.3.2",
+    "brainspace": "0.1.22",
+    "vtk": "9.3.1",
+    "specparam": "2.0.0rc7",
+    "matplotlib": "3.10.8"
+  },
+  "network": "SalVentAttn",
+  "hemisphere": "LH",
+  "n_patients": 38,
+  "n_channels": 5065,
+  "segment_s": 180.0,
+  "n_permutations": 1000
+}

@@ -1,0 +1,30 @@
+# Settings of each pipeline step. Every other parameter is a named constant at the top of
+# its step (pipeline/) or library module (src/salience_switch/).
+
+step1a_mpc_gradient:
+  network: SalVentAttn        # network whose MPC gradient is computed (Yeo 7)
+  hemisphere: both            # both, LH or RH
+
+step1b_histology:
+  hemisphere: both            # gradient table of step 1a to read (both, LH or RH)
+
+step1c_cortical_types:
+  hemisphere: both            # both, LH or RH
+
+step2a_ieeg_mni:
+  network: SalVentAttn        # network whose gradient quarters define the ES difference
+
+step2b_ieeg_mica:
+  network: SalVentAttn
+  hemisphere: LH              # hemisphere of the statistics (LH or RH); maps show both
+
+step2c_ieeg_states:
+  network: SalVentAttn
+  hemisphere: LH              # hemisphere of the statistics (LH or RH); maps show both
+
+step3_connectivity:
+  hemisphere: both            # both, LH or RH
+  n_permutations: 1000        # surrogates per null model; the add-one p floor is 1/(1+n)
+
+step3_schematic:
+  hemisphere: both            # source-network hemispheres, as step 3
