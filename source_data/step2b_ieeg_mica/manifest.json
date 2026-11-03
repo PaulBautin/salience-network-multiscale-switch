@@ -1,7 +1,7 @@
 {
   "step": "step2b_ieeg_mica",
-  "created": "2026-10-30T15:08:54",
-  "git": "b79e6c3-dirty",
+  "created": "2026-10-30T18:25:45",
+  "git": "1652fc9",
   "versions": {
     "python": "3.10.19",
     "numpy": "2.2.6",

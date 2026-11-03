@@ -1,7 +1,7 @@
 {
   "step": "step1b_histology",
-  "created": "2026-10-30T14:40:33",
-  "git": "b79e6c3-dirty",
+  "created": "2026-10-30T18:19:51",
+  "git": "1652fc9",
   "versions": {
     "python": "3.10.19",
     "numpy": "2.2.6",

@@ -1,7 +1,7 @@
 {
   "step": "step3_connectivity",
-  "created": "2026-10-30T16:42:07",
-  "git": "b79e6c3-dirty",
+  "created": "2026-10-30T20:16:20",
+  "git": "1652fc9",
   "versions": {
     "python": "3.10.19",
     "numpy": "2.2.6",

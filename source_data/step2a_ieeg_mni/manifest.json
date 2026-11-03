@@ -1,7 +1,7 @@
 {
   "step": "step2a_ieeg_mni",
-  "created": "2026-10-30T14:51:02",
-  "git": "b79e6c3-dirty",
+  "created": "2026-10-30T18:21:49",
+  "git": "1652fc9",
   "versions": {
     "python": "3.10.19",
     "numpy": "2.2.6",
