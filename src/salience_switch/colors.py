@@ -4,8 +4,8 @@ Importing the module registers the colormaps with matplotlib, so they can also b
 by name (e.g. ``cmap="CustomCmap_ieeg"``).
 
 - ``yeo7_rgb``, ``yeo7_rgba`` (rows in alphabetical network order, then the background
-  colour), ``yeo7_abbrev`` (network abbreviations) and ``yeo7_cmap``
-  (``CustomCmap_yeo``): the Yeo et al. (2011) 7 networks.
+  colour), ``network_rgb`` (the colour of a network label), ``yeo7_abbrev`` (network
+  abbreviations) and ``yeo7_cmap`` (``CustomCmap_yeo``): the Yeo et al. (2011) 7 networks.
 - ``cmap_types`` (``CustomCmap_type``) and ``cmap_types_mw`` (``CustomCmap_type_mw``,
   with the medial wall): the von Economo cortical types.
 - ``histology_cmap`` (``CustomCmap_histology``, violet to ochre), ``ieeg_cmap``
@@ -56,6 +56,24 @@ yeo7_abbrev = {
     "SomMot":     "SM",
     "Vis":        "Vis",
 }
+
+
+def network_rgb(network) -> np.ndarray:
+    """Colour of a Yeo 7-network label (``yeo7_rgb`` row), or the background colour.
+
+    Parameters
+    ----------
+    network : str
+        Network label, e.g. ``'SalVentAttn'``; any other value (``'medial_wall'``, NaN)
+        gets the background colour.
+
+    Returns
+    -------
+    rgb : (3,) array
+        RGB in [0, 1].
+    """
+    names = sorted(yeo7_abbrev)  # the alphabetical row order of yeo7_rgb
+    return yeo7_rgb[names.index(network) if network in names else len(names)]
 
 
 # Von Economo – cortical types
@@ -141,7 +159,7 @@ histology_cmap = _lch_diverging("CustomCmap_histology", hue_low=300, hue_high=75
 mpl.colormaps.register(histology_cmap)
 
 
-# Figure 2b iEEG maps – third companion on the shared +/-2 SD scale, for spectral measures
+# Figure 2 iEEG maps – third companion on the shared +/-2 SD scale, for spectral measures
 # z-scored within the SN: green (below the SN mean) -> light neutral grey -> plum (above).
 # Same lightness and chroma profile as CustomCmap_histology, so a given z reads with the
 # same weight as in the gradient and histology maps, with hues distinct from both. The

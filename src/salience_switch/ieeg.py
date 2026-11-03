@@ -1,8 +1,9 @@
 """Intracranial EEG: spectra, spectral parameterisation and projection onto the cortex.
 
-Reads electroMICA recordings, computes Welch power spectra, fits the aperiodic exponent
-and per-band peak power with specparam, and maps channel values onto the fsLR-32k
-surface through the contact sensitivity maps.
+Reads electroMICA recordings, computes Welch power spectra (also over the zero-gapped
+clips of the MNI Open iEEG Atlas), fits the aperiodic exponent and per-band peak power
+with specparam, and maps channel values onto the fsLR-32k surface through the contact
+sensitivity maps (electroMICA leadfields) or Gaussian footprints around channel positions.
 """
 import contextlib
 import glob
@@ -18,7 +19,8 @@ import pandas as pd
 import scipy.io as sio
 from brainspace.mesh.array_operations import compute_point_area
 from brainspace.mesh.mesh_creation import build_polydata
-from scipy.signal import butter, filtfilt, resample_poly, welch
+from scipy.signal import butter, resample_poly, sosfiltfilt, welch
+from scipy.spatial import cKDTree
 
 logger = logging.getLogger(__name__)
 
@@ -27,22 +29,26 @@ logger = logging.getLogger(__name__)
 N_LH = 32492
 
 
-# Preprocessing / Welch parameters of the MICA iEEG analyses (Figures 2b and 2c), passed
-# to preprocess_and_compute_psd_ieeg and part of the channel-PSD cache key.
-MICA_PSD_PARAMS = dict(fmin=0.5, fmax=80.0, fs_target=200.0, filter_order=4, window_sec=2.0, overlap_sec=1.0)
+# Preprocessing / Welch parameters of every iEEG analysis (Figure 2), passed to
+# preprocess_and_compute_psd_ieeg and part of the channel-PSD cache key.
+# Implementation of the band-pass filter, also part of the cache key: changing how
+# preprocess_and_compute_psd_ieeg filters must change this, so cached spectra are recomputed.
+PSD_FILTER = "butterworth, second-order sections, zero phase (sosfiltfilt)"
+PSD_PARAMS = dict(fmin=0.5, fmax=80.0, fs_target=200.0, filter_order=4, window_sec=2.0, overlap_sec=1.0)
 
 
 # Canonical frequency bands (Hz), spanning the 0.5-80 Hz preprocessing band.
 FREQ_BANDS = {"delta": (0.5, 4), "theta": (4, 8), "alpha": (8, 13), "beta": (13, 30), "gamma": (30, 80)}
 
 
-# specparam fit range (Hz) of the MICA iEEG analyses (Figures 2b and 2c). It stops below
-# the 60 Hz line-noise notch of the recordings and the transition band of the 80 Hz
-# low-pass of MICA_PSD_PARAMS: specparam advises against fitting filtered-out frequencies.
+# specparam fit range (Hz) of every iEEG analysis (Figure 2). It stops below the 60 Hz
+# line-noise notch of the MICA recordings and the transition band of the 80 Hz low-pass
+# of PSD_PARAMS, and below the 50/60 Hz line frequencies and 80 Hz anti-aliasing filter
+# of the MNI atlas recordings: specparam advises against fitting filtered-out frequencies.
 SPEC_FIT_RANGE = (1.0, 45.0)
 
 
-# Oscillatory peak-power readout bands (Hz) of Figures 2b and 2c: the canonical bands
+# Oscillatory peak-power readout bands (Hz) of Figure 2: the canonical bands
 # clipped to the fit range, where peaks can be fitted (delta 1-4 Hz, gamma 30-45 Hz).
 SPEC_BANDS = {name: (max(lo, SPEC_FIT_RANGE[0]), min(hi, SPEC_FIT_RANGE[1])) for name, (lo, hi) in FREQ_BANDS.items()}
 
@@ -57,13 +63,18 @@ def compute_vertex_areas(vertices: np.ndarray, faces: np.ndarray) -> np.ndarray:
     per-area density before thresholding; it delegates to brainspace's
     ``compute_point_area(..., area_as='one_third')``.
 
-    Args:
-        vertices: Vertex coordinates, shape (n_vertices, 3), in millimetres.
-        faces: Triangle vertex indices, shape (n_faces, 3). MATLAB-style 1-based
-            indexing is detected and converted to 0-based automatically.
+    Parameters
+    ----------
+    vertices
+        Vertex coordinates, shape (n_vertices, 3), in millimetres.
+    faces
+        Triangle vertex indices, shape (n_faces, 3). MATLAB-style 1-based
+        indexing is detected and converted to 0-based automatically.
 
-    Returns:
-        np.ndarray: Per-vertex area, shape (n_vertices,).
+    Returns
+    -------
+    np.ndarray
+        Per-vertex area, shape (n_vertices,).
     """
     f = np.asarray(faces)
     if f.min() == 1:  # MATLAB 1-based faces
@@ -79,13 +90,18 @@ def list_original_data_files(
     """
     List the iEEG recordings of one vigilance state of the original MICA dataset.
 
-    Args:
-        root (str): Root directory of the BIDS iEEG recordings. Expected layout:
-            ``<root>/sub-PX*/ses-01/*stage-<stage>.mat``
-        stage (str): Vigilance state: ``'W'`` (wakefulness), ``'N2'`` or ``'N3'``.
+    Parameters
+    ----------
+    root : str
+        Root directory of the BIDS iEEG recordings. Expected layout:
+        ``<root>/sub-PX*/ses-01/*stage-<stage>.mat``
+    stage : str
+        Vigilance state: ``'W'`` (wakefulness), ``'N2'`` or ``'N3'``.
 
-    Returns:
-        list[str]: Sorted file paths, so that downstream channel order (and any
+    Returns
+    -------
+    list[str]
+        Sorted file paths, so that downstream channel order (and any
         cache keyed on this list) is deterministic.
     """
     return sorted(glob.glob(f"{root}/sub-PX*/ses-01/*stage-{stage}.mat"))
@@ -117,33 +133,41 @@ def compute_original_psd(
     matrix. Truncation is by sample count, so all recordings must share one
     sampling rate.
 
-    Args:
-        root (str): Root directory of the BIDS iEEG recordings (see
-            :func:`list_original_data_files`).
-        stage (str): Vigilance state of the recordings: ``'W'``, ``'N2'`` or ``'N3'``.
-        duration_s (float | None): Analysed length in seconds (from the start of each
-            recording); ``None`` uses the shortest recording.
-        **psd_kwargs: Forwarded to :func:`preprocess_and_compute_psd_ieeg`
-            (``fmin``, ``fmax``, ``fs_target``, ``filter_order``, ``window_sec``,
-            ``overlap_sec``).
+    Parameters
+    ----------
+    root : str
+        Root directory of the BIDS iEEG recordings (see
+        :func:`list_original_data_files`).
+    stage : str
+        Vigilance state of the recordings: ``'W'``, ``'N2'`` or ``'N3'``.
+    duration_s : float | None
+        Analysed length in seconds (from the start of each
+        recording); ``None`` uses the shortest recording.
+    **psd_kwargs
+        Forwarded to :func:`preprocess_and_compute_psd_ieeg`
+        (``fmin``, ``fmax``, ``fs_target``, ``filter_order``, ``window_sec``,
+        ``overlap_sec``).
 
-    Returns:
-        tuple[pd.DataFrame, np.ndarray, np.ndarray]:
-            - Channel table with columns:
-                - Subject
-                - Session
-                - ChannelName    — bipolar pair label (e.g. ``"LCi1-LCi2"``)
-                - SamplingRate
-                - ContactName1   — first contact of the bipolar pair (upper element)
-                - ContactName2   — second contact of the bipolar pair (lower element)
-            - freq: frequencies in Hz, shape (n_frequencies,).
-            - pxx: normalized PSD, shape (n_channels, n_frequencies), row-aligned
-              with the channel table.
+    Returns
+    -------
+    tuple[pd.DataFrame, np.ndarray, np.ndarray]
+        - Channel table with columns:
+            - Subject
+            - Session
+            - ChannelName    — bipolar pair label (e.g. ``"LCi1-LCi2"``)
+            - SamplingRate
+            - ContactName1   — first contact of the bipolar pair (upper element)
+            - ContactName2   — second contact of the bipolar pair (lower element)
+        - freq: frequencies in Hz, shape (n_frequencies,).
+        - pxx: normalized PSD, shape (n_channels, n_frequencies), row-aligned
+          with the channel table.
 
-    Raises:
-        ValueError: If no recording is found, a file's ``Data`` shape does not
-            match its channel count, the recordings use more than one sampling
-            rate, or ``duration_s`` exceeds the shortest recording.
+    Raises
+    ------
+    ValueError
+        If no recording is found, a file's ``Data`` shape does not
+        match its channel count, the recordings use more than one sampling
+        rate, or ``duration_s`` exceeds the shortest recording.
     """
     pattern = re.compile(r"sub-(PX\d+)/ses-(\d+)")
 
@@ -228,19 +252,27 @@ def load_or_compute_channel_psd(
 
     The cache holds the channel table, frequency axis and PSD (a few MB) with a key
     built from every recording's relative path, size and modification time plus
-    ``stage``, ``duration_s`` and ``psd_kwargs``. Any change to the recordings or
-    parameters invalidates it, so the figures are never built from data that no
+    ``stage``, ``duration_s``, ``psd_kwargs`` and the filter implementation
+    (``PSD_FILTER``). Any change to the recordings, parameters or filter invalidates it, so the figures are never built from data that no
     longer matches the source.
 
-    Args:
-        raw_root (str): Root of the original recordings (see :func:`list_original_data_files`).
-        cache_path: Pickle file of the cache.
-        stage (str): Vigilance state: ``'W'``, ``'N2'`` or ``'N3'``.
-        duration_s (float | None): Analysed length in seconds (see :func:`compute_original_psd`).
-        **psd_kwargs: Forwarded to :func:`preprocess_and_compute_psd_ieeg` (e.g. ``MICA_PSD_PARAMS``).
+    Parameters
+    ----------
+    raw_root : str
+        Root of the original recordings (see :func:`list_original_data_files`).
+    cache_path
+        Pickle file of the cache.
+    stage : str
+        Vigilance state: ``'W'``, ``'N2'`` or ``'N3'``.
+    duration_s : float | None
+        Analysed length in seconds (see :func:`compute_original_psd`).
+    **psd_kwargs
+        Forwarded to :func:`preprocess_and_compute_psd_ieeg` (e.g. ``PSD_PARAMS``).
 
-    Returns:
-        tuple[pd.DataFrame, np.ndarray, np.ndarray]: Channel table, frequencies and
+    Returns
+    -------
+    tuple[pd.DataFrame, np.ndarray, np.ndarray]
+        Channel table, frequencies and
         PSD, as :func:`compute_original_psd`.
     """
     cache_path = Path(cache_path)
@@ -250,6 +282,7 @@ def load_or_compute_channel_psd(
         "stage": stage,
         "duration_s": duration_s,
         "psd_params": psd_kwargs,
+        "filter": PSD_FILTER,
     }
     if cache_path.exists():
         with open(cache_path, 'rb') as fh:
@@ -285,25 +318,28 @@ def load_sensitivity_info(
     difference are deferred to :func:`build_bipolar_sensitivity`, which combines
     contact pairs the way electroMICA does.
 
-    Args:
-        root_dir (str): Root directory containing electroMICA derivatives.
-            Expected layout:
-            ``<root_dir>/sub-PX*/ses-01/model/
-              *_leadfield_hemi-{L,R}_space-nativepro_surf-fsLR-32k_label-midthickness.mat``
+    Parameters
+    ----------
+    root_dir : str
+        Root directory containing electroMICA derivatives.
+        Expected layout:
+        ``<root_dir>/sub-PX*/ses-01/model/
+          *_leadfield_hemi-{L,R}_space-nativepro_surf-fsLR-32k_label-midthickness.mat``
 
-    Returns:
-        tuple[pd.DataFrame, dict]:
-            - df with one row per (Subject, Session, ContactName):
-                - Subject, Session
-                - ContactName — physical electrode identifier (upper-cased);
-                  distinct from bipolar ``ChannelName`` ("LCi1" vs "LCi1-LCi2").
-                - Sens_L, Sens_R — signed sensitivity arrays of shape (32492,) on
-                  the LH and RH surfaces (zeros where that hemisphere's file lacks
-                  the contact).
-            - areas: mapping ``(Subject, Session) -> {"L": areas_L, "R": areas_R}``
-              of per-vertex surface areas (shape (32492,)) from each hemisphere's
-              midthickness surface, used to normalise sensitivity to a per-area
-              density before thresholding.
+    Returns
+    -------
+    tuple[pd.DataFrame, dict]
+        - df with one row per (Subject, Session, ContactName):
+            - Subject, Session
+            - ContactName — physical electrode identifier (upper-cased);
+              distinct from bipolar ``ChannelName`` ("LCi1" vs "LCi1-LCi2").
+            - Sens_L, Sens_R — signed sensitivity arrays of shape (32492,) on
+              the LH and RH surfaces (zeros where that hemisphere's file lacks
+              the contact).
+        - areas: mapping ``(Subject, Session) -> {"L": areas_L, "R": areas_R}``
+          of per-vertex surface areas (shape (32492,)) from each hemisphere's
+          midthickness surface, used to normalise sensitivity to a per-area
+          density before thresholding.
     """
     pattern = os.path.join(root_dir, "sub-PX*", "ses-01", "model", "*_leadfield_hemi-*_space-nativepro_surf-fsLR-32k_label-midthickness.mat")
     mat_files = glob.glob(pattern)
@@ -418,14 +454,21 @@ def _threshold_channel_sensitivity(
     NaN leadfield values are treated as zero sensitivity, so they neither
     propagate nor disable the channel's thresholds.
 
-    Args:
-        chan: Signed channel leadfield, shape (n_channels, n_vertices).
-        areas: Per-vertex surface areas, shape (n_vertices,), broadcast over channels.
-        global_thresh: Absolute density floor (electroMICA ``GlobalTresh``, 0.001).
-        rel_thresh: Relative density floor fraction (electroMICA ``ChanTresh``, 0.05).
+    Parameters
+    ----------
+    chan
+        Signed channel leadfield, shape (n_channels, n_vertices).
+    areas
+        Per-vertex surface areas, shape (n_vertices,), broadcast over channels.
+    global_thresh
+        Absolute density floor (electroMICA ``GlobalTresh``, 0.001).
+    rel_thresh
+        Relative density floor fraction (electroMICA ``ChanTresh``, 0.05).
 
-    Returns:
-        np.ndarray: Non-negative thresholded sensitivity, shape of ``chan``.
+    Returns
+    -------
+    np.ndarray
+        Non-negative thresholded sensitivity, shape of ``chan``.
     """
     mag = np.abs(np.nan_to_num(chan, nan=0.0))
     density = mag / (areas + 1e-12)
@@ -460,22 +503,30 @@ def build_bipolar_sensitivity(
     so each mesh's per-vertex area vector is applied once (broadcast over the group's
     channels) rather than tiled per channel.
 
-    Args:
-        df_channels: One row per bipolar channel, with columns ``Subject``,
-            ``Session``, ``ContactName1``, ``ContactName2`` (contact names matching
-            ``df_sensitivity``).
-        df_sensitivity: Per-contact signed maps from :func:`load_sensitivity_info`,
-            with columns ``Subject``, ``Session``, ``ContactName``, ``Sens_L``,
-            ``Sens_R`` (each shape (32492,)). Contacts absent here contribute zero;
-            a warning reports, per (Subject, Session), how many contacts and
-            channels this affects.
-        areas: ``(Subject, Session) -> {"L": areas_L, "R": areas_R}`` per-vertex
-            surface areas from :func:`load_sensitivity_info`.
-        global_thresh: Absolute density noise floor (Vm/A).
-        rel_thresh: Channel-relative density floor fraction.
+    Parameters
+    ----------
+    df_channels
+        One row per bipolar channel, with columns ``Subject``,
+        ``Session``, ``ContactName1``, ``ContactName2`` (contact names matching
+        ``df_sensitivity``).
+    df_sensitivity
+        Per-contact signed maps from :func:`load_sensitivity_info`,
+        with columns ``Subject``, ``Session``, ``ContactName``, ``Sens_L``,
+        ``Sens_R`` (each shape (32492,)). Contacts absent here contribute zero;
+        a warning reports, per (Subject, Session), how many contacts and
+        channels this affects.
+    areas
+        ``(Subject, Session) -> {"L": areas_L, "R": areas_R}`` per-vertex
+        surface areas from :func:`load_sensitivity_info`.
+    global_thresh
+        Absolute density noise floor (Vm/A).
+    rel_thresh
+        Channel-relative density floor fraction.
 
-    Returns:
-        np.ndarray: Non-negative bipolar sensitivity, shape (n_channels, 32492),
+    Returns
+    -------
+    np.ndarray
+        Non-negative bipolar sensitivity, shape (n_channels, 32492),
         row-aligned with ``df_channels``.
     """
     zeros = (np.zeros(N_LH), np.zeros(N_LH))
@@ -517,14 +568,19 @@ def project_channel_measure(channel_vals: np.ndarray, sens: np.ndarray) -> np.nd
     values (the electroMICA smoothed feature map); vertices with no sensitivity
     (uncovered) are returned as NaN.
 
-    Args:
-        channel_vals: Per-channel values, shape (n_channels,) for a scalar measure or
-            (k, n_channels) for k values per channel (e.g. a spectrum).
-        sens: Bipolar sensitivity maps, shape (n_channels, n_vertices)
-            (see :func:`build_bipolar_sensitivity`; NaN zeroed).
+    Parameters
+    ----------
+    channel_vals
+        Per-channel values, shape (n_channels,) for a scalar measure or
+        (k, n_channels) for k values per channel (e.g. a spectrum).
+    sens
+        Bipolar sensitivity maps, shape (n_channels, n_vertices)
+        (see :func:`build_bipolar_sensitivity`; NaN zeroed).
 
-    Returns:
-        np.ndarray: Shape (n_vertices,) or (k, n_vertices).
+    Returns
+    -------
+    np.ndarray
+        Shape (n_vertices,) or (k, n_vertices).
     """
     sens_sum = np.sum(sens, axis=0)
     surf = (channel_vals @ sens) / (sens_sum + 1e-12)
@@ -541,14 +597,20 @@ def mirror_to_cortex(template_vals: np.ndarray, df_surf: pd.DataFrame, network: 
     and its homologue, right vertex ``N_LH + i``. The value is placed on both, kept on
     labelled cortex (or on ``network`` vertices when given) and NaN elsewhere.
 
-    Args:
-        template_vals: Per-template-vertex values, shape (N_LH,).
-        df_surf: Surface table over both hemispheres with ``hemisphere`` and
-            ``network`` columns (e.g. ``df_yeo_surf``).
-        network: Yeo network to keep; ``None`` keeps all labelled cortex.
+    Parameters
+    ----------
+    template_vals
+        Per-template-vertex values, shape (N_LH,).
+    df_surf
+        Surface table over both hemispheres with ``hemisphere`` and
+        ``network`` columns (e.g. ``df_yeo_surf``).
+    network
+        Yeo network to keep; ``None`` keeps all labelled cortex.
 
-    Returns:
-        np.ndarray: Shape (2 * N_LH,), LH then RH.
+    Returns
+    -------
+    np.ndarray
+        Shape (2 * N_LH,), LH then RH.
     """
     full = np.tile(np.asarray(template_vals, dtype=float), 2)
     keep = df_surf['hemisphere'].notna().to_numpy()
@@ -572,30 +634,44 @@ def preprocess_and_compute_psd_ieeg(
     Full iEEG preprocessing and PSD computation.
 
     Following the MNI Open iEEG Atlas procedure, the pipeline consists of:
-    - Band-pass filtering
+    - Band-pass filtering (zero-phase Butterworth, as second-order sections)
     - Downsample to a target sampling rate
     - Demeaning
     - Welch PSD estimation
     - Frequency-range restriction
     - Power normalization
 
-    Args:
-        data: iEEG data of shape (..., n_samples), where the last axis is time.
-        fs: Original sampling frequency in Hz.
-        fmin: Minimum frequency for band-pass filter and PSD in Hz.
-        fmax: Maximum frequency for band-pass filter and PSD in Hz.
-        fs_target: Target sampling frequency after downsampling in Hz.
-        filter_order: Order of the Butterworth band-pass filter.
-        window_sec: Length of each segment for Welch's method in seconds.
-        overlap_sec: Overlap between segments for Welch's method in seconds.
+    Parameters
+    ----------
+    data
+        iEEG data of shape (..., n_samples), where the last axis is time.
+    fs
+        Original sampling frequency in Hz.
+    fmin
+        Minimum frequency for band-pass filter and PSD in Hz.
+    fmax
+        Maximum frequency for band-pass filter and PSD in Hz.
+    fs_target
+        Target sampling frequency after downsampling in Hz.
+    filter_order
+        Order of the Butterworth band-pass filter (applied forward and backward).
+    window_sec
+        Length of each segment for Welch's method in seconds.
+    overlap_sec
+        Overlap between segments for Welch's method in seconds.
 
-    Returns:
-        freq (np.ndarray): Frequencies within [fmin, fmax] in Hz.
-        pxx (np.ndarray): Normalized PSD of shape (..., n_frequencies), summing to 1 along the last axis.
+    Returns
+    -------
+    freq : np.ndarray
+        Frequencies within [fmin, fmax] in Hz.
+    pxx : np.ndarray
+        Normalized PSD of shape (..., n_frequencies), summing to 1 along the last axis.
     """
-    # Band-pass filter
-    b, a = butter(filter_order, [fmin / (fs / 2), fmax / (fs / 2)], btype="band")
-    data = filtfilt(b, a, data, axis=-1)
+    # Band-pass filter as cascaded second-order sections: in transfer-function (b, a) form a
+    # 0.5 Hz corner at kHz sampling rates is ill-conditioned (at 2,000 Hz its gain at the
+    # corner is -5 dB instead of -3 dB).
+    sos = butter(filter_order, [fmin / (fs / 2), fmax / (fs / 2)], btype="band", output="sos")
+    data = sosfiltfilt(sos, data, axis=-1)
 
     # Downsample
     if fs != fs_target:
@@ -626,6 +702,86 @@ def preprocess_and_compute_psd_ieeg(
     return freq[mask], pxx  # type: ignore[return-value]
 
 
+def _zero_gap_segments(x: np.ndarray, min_gap: int) -> list[tuple[int, int]]:
+    """``[start, stop)`` of the data between the zero gaps of one channel (see `welch_psd_segments`)."""
+    zero = np.r_[False, x == 0, False].astype(int)
+    edges = np.flatnonzero(np.diff(zero))
+    starts, stops = edges[::2], edges[1::2]  # runs of exact zeros, [start, stop)
+    gap = ((stops - starts) >= min_gap) | (starts == 0) | (stops == x.size)
+    bounds = np.r_[0, np.column_stack((starts[gap], stops[gap])).ravel(), x.size].reshape(-1, 2)
+    return [(int(a), int(b)) for a, b in bounds if b > a]
+
+
+def welch_psd_segments(
+    data: np.ndarray,
+    fs: float,
+    fmin: float = 0.5,
+    fmax: float = 80.0,
+    window_sec: float = 2.0,
+    overlap_sec: float = 1.0,
+    min_gap_s: float = 2.0,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Welch PSD of recordings made of contiguous segments separated by zero gaps.
+
+    The MNI Open iEEG Atlas distributes, per channel and vigilance state, artifact-free
+    segments concatenated with 2-s buffers of zeros and zero-padded at the end (to 68 s
+    in wakefulness). A Welch window spanning a buffer would mix a step discontinuity into
+    the spectrum, so each channel is split at its gaps -- runs of exact zeros lasting at
+    least ``min_gap_s``, or reaching either end of the recording (the padding) -- and the
+    Welch periodogram (Hamming window, constant detrend, as in
+    :func:`preprocess_and_compute_psd_ieeg`) is averaged over the windows that lie
+    entirely within one segment. Segments shorter than one window are not used. The
+    spectrum is then restricted to ``[fmin, fmax]`` and normalised to unit sum, as in
+    :func:`preprocess_and_compute_psd_ieeg`. No filtering is applied: the recordings are
+    expected at their analysis rate, already filtered.
+
+    Parameters
+    ----------
+    data
+        Recordings of shape (n_channels, n_samples) or (n_samples,).
+    fs
+        Sampling frequency in Hz.
+    fmin, fmax
+        Frequency range of the returned spectrum in Hz.
+    window_sec
+        Length of each Welch window in seconds.
+    overlap_sec
+        Overlap between Welch windows in seconds.
+    min_gap_s
+        Shortest run of zeros, in seconds, that separates two segments.
+
+    Returns
+    -------
+    freq : np.ndarray
+        Frequencies within [fmin, fmax] in Hz.
+    pxx : np.ndarray
+        Normalised PSD of shape (n_channels, n_frequencies), the mean of the
+        within-segment window periodograms; NaN for a channel without a full window.
+    n_windows : np.ndarray
+        Number of Welch windows of each channel, shape (n_channels,).
+    """
+    data = np.atleast_2d(np.asarray(data, dtype=float))
+    nperseg, noverlap = int(window_sec * fs), int(overlap_sec * fs)
+    step = nperseg - noverlap
+    freq = np.fft.rfftfreq(nperseg, 1.0 / fs)
+    keep = (freq >= fmin) & (freq <= fmax)
+    pxx = np.zeros((data.shape[0], int(keep.sum())))
+    n_windows = np.zeros(data.shape[0], dtype=int)
+    for ch, x in enumerate(data):
+        for start, stop in _zero_gap_segments(x, int(round(min_gap_s * fs))):
+            if stop - start < nperseg:
+                continue
+            n_win = (stop - start - nperseg) // step + 1
+            _, p = welch(x[start:stop], fs=fs, window="hamming", nperseg=nperseg, noverlap=noverlap)
+            pxx[ch] += n_win * p[keep]
+            n_windows[ch] += n_win
+    with np.errstate(invalid="ignore", divide="ignore"):
+        pxx /= n_windows[:, None]
+    pxx /= np.sum(pxx, axis=-1, keepdims=True) + 1e-12
+    return freq[keep], pxx, n_windows
+
+
 def compute_spectral_parameters(
     pxx: np.ndarray,
     freq: np.ndarray,
@@ -647,9 +803,9 @@ def compute_spectral_parameters(
     spectrum into an aperiodic component $L(f) = b - \\log_{10}(k + f^{\\chi})$ and a
     set of Gaussian oscillatory peaks, from which two non-redundant measures are
     returned: the aperiodic exponent $\\chi$ and, per requested band, the power of the
-    strongest oscillatory peak *above the aperiodic fit*. Deriving band power from the
-    periodic component (rather than integrating the raw PSD) makes it orthogonal to the
-    exponent, so the two measures do not re-encode the same 1/f change. The settings
+    strongest oscillatory peak *above the aperiodic fit*. Measured relative to the
+    aperiodic fit, rather than integrated over the raw PSD, band power is not confounded
+    by differences in the exponent (Donoghue et al., 2020). The settings
     follow the specparam 2.0 guidance: one model and one set of settings for every
     spectrum; a fit range (``SPEC_FIT_RANGE``, 1--45 Hz) that excludes the line-noise
     notch of the recordings and the transition band of the 80 Hz low-pass, since
@@ -659,53 +815,70 @@ def compute_spectral_parameters(
     non-physical negative knee. The per-channel unit-sum PSD normalisation only shifts
     the aperiodic offset, leaving both measures unchanged.
 
-    Args:
-        pxx: PSD array of shape (n_spectra, n_frequencies) or (n_frequencies,); the
-            last axis is frequency. Power is supplied in linear units (``specparam``
-            log-transforms internally).
-        freq: Frequency axis in Hz, shape (n_frequencies,).
-        bands: Mapping of band name to ``(fmin, fmax)`` in Hz for the oscillatory
-            band-power readout (e.g. ``SPEC_BANDS``); every band must lie within the
-            fit range. If ``None`` only the aperiodic parameters are returned.
-        fmin: Lower bound of the fitting range in Hz (the lowest bins are excluded
-            because the high-pass makes them unreliable).
-        fmax: Upper bound of the fitting range in Hz.
-        aperiodic_mode: ``specparam`` aperiodic mode, ``'knee'`` or ``'fixed'``.
-        peak_width_limits: (min, max) Gaussian peak bandwidth in Hz; specparam
-            recommends a lower limit of about twice the frequency resolution.
-        max_n_peaks: Maximum number of oscillatory peaks fitted per spectrum.
-        min_peak_height: Minimum peak height above the aperiodic fit (log10 power).
-        peak_threshold: Relative peak-detection threshold, in standard deviations of
-            the flattened spectrum.
-        nonnegative_knee: In ``'knee'`` mode, bound the knee to $k \\ge 0$.
-        return_model: Also return the fitted ``SpectralGroupModel`` (for fit checks,
-            e.g. :func:`plot_fit_quality`).
+    Parameters
+    ----------
+    pxx
+        PSD array of shape (n_spectra, n_frequencies) or (n_frequencies,); the
+        last axis is frequency. Power is supplied in linear units (``specparam``
+        log-transforms internally).
+    freq
+        Frequency axis in Hz, shape (n_frequencies,).
+    bands
+        Mapping of band name to ``(fmin, fmax)`` in Hz for the oscillatory
+        band-power readout (e.g. ``SPEC_BANDS``); every band must lie within the
+        fit range. If ``None`` only the aperiodic parameters are returned.
+    fmin
+        Lower bound of the fitting range in Hz (the lowest bins are excluded
+        because the high-pass makes them unreliable).
+    fmax
+        Upper bound of the fitting range in Hz.
+    aperiodic_mode
+        ``specparam`` aperiodic mode, ``'knee'`` or ``'fixed'``.
+    peak_width_limits
+        (min, max) Gaussian peak bandwidth in Hz; specparam
+        recommends a lower limit of about twice the frequency resolution.
+    max_n_peaks
+        Maximum number of oscillatory peaks fitted per spectrum.
+    min_peak_height
+        Minimum peak height above the aperiodic fit (log10 power).
+    peak_threshold
+        Relative peak-detection threshold, in standard deviations of
+        the flattened spectrum.
+    nonnegative_knee
+        In ``'knee'`` mode, bound the knee to $k \\ge 0$.
+    return_model
+        Also return the fitted ``SpectralGroupModel`` (for fit checks,
+        e.g. :func:`plot_fit_quality`).
 
-    Returns:
-        dict with:
-            - ``'exponent'``: aperiodic exponent $\\chi$ (positive for $1/f$-like
-              spectra), shape ``pxx.shape[:-1]``; NaN where the fit failed to converge.
-            - ``'offset'``: aperiodic offset $b$ (log10 power), same shape.
-            - ``'knee'``: aperiodic knee $k$, same shape; 0 in ``'fixed'`` mode, for
-              which $L(f) = b - \\log_{10}(f^{\\chi})$ is the knee formula with $k = 0$.
-              With ``'offset'`` and ``'exponent'`` it gives the fitted aperiodic
-              component through :func:`aperiodic_component`.
-            - ``'knee_freq'``: knee frequency $k^{1/\\chi}$ in Hz (specparam's
-              ``compute_knee_frequency``; Gao et al., 2020), same shape; a value below
-              ``fmin`` places the knee below the fit range. NaN in ``'fixed'`` mode.
-            - ``'r_squared'``, ``'mae'``: goodness of fit ($R^2$) and mean absolute
-              error (log10 power) of each fit, same shape.
-            - ``'n_peaks'``: number of oscillatory peaks fitted per spectrum, same shape.
-            - ``'band_power'``: ``{name: array}`` of oscillatory peak power for each
-              requested band, same shape as ``'exponent'``; NaN where no peak was
-              detected in the band (i.e. no oscillation) or the fit failed.
-            - ``'report'``: specparam's methods report (code version, algorithm,
-              settings, fit range), as text.
-            - ``'model'``: the fitted ``SpectralGroupModel``, if ``return_model``.
+    Returns
+    -------
+    dict
+        - ``'exponent'``: aperiodic exponent $\\chi$ (positive for $1/f$-like
+          spectra), shape ``pxx.shape[:-1]``; NaN where the fit failed to converge.
+        - ``'offset'``: aperiodic offset $b$ (log10 power), same shape.
+        - ``'knee'``: aperiodic knee $k$, same shape; 0 in ``'fixed'`` mode, for
+          which $L(f) = b - \\log_{10}(f^{\\chi})$ is the knee formula with $k = 0$.
+          With ``'offset'`` and ``'exponent'`` it gives the fitted aperiodic
+          component through :func:`aperiodic_component`.
+        - ``'knee_freq'``: knee frequency $k^{1/\\chi}$ in Hz (specparam's
+          ``compute_knee_frequency``; Gao et al., 2020), same shape; a value below
+          ``fmin`` places the knee below the fit range. NaN in ``'fixed'`` mode.
+        - ``'r_squared'``, ``'mae'``: goodness of fit ($R^2$) and mean absolute
+          error (log10 power) of each fit, same shape.
+        - ``'n_peaks'``: number of oscillatory peaks fitted per spectrum, same shape.
+        - ``'band_power'``: ``{name: array}`` of oscillatory peak power for each
+          requested band, same shape as ``'exponent'``; NaN where no peak was
+          detected in the band (i.e. no oscillation) or the fit failed.
+        - ``'report'``: specparam's methods report (code version, algorithm,
+          settings, fit range), as text.
+        - ``'model'``: the fitted ``SpectralGroupModel``, if ``return_model``.
 
-    Raises:
-        ImportError: If ``specparam`` is not installed.
-        ValueError: If a band extends outside the fit range ``[fmin, fmax]``.
+    Raises
+    ------
+    ImportError
+        If ``specparam`` is not installed.
+    ValueError
+        If a band extends outside the fit range ``[fmin, fmax]``.
     """
     try:
         from specparam import SpectralGroupModel
@@ -793,14 +966,21 @@ def aperiodic_component(
     :func:`compute_spectral_parameters`; subtracting it from the log10 power spectrum
     leaves the periodic (oscillatory) residual, i.e. the flattened spectrum.
 
-    Args:
-        freq: Frequencies in Hz, shape (n_frequencies,).
-        offset: Aperiodic offset $b$, any shape ``S``.
-        knee: Aperiodic knee $k$ (0 for ``'fixed'`` mode), shape ``S``.
-        exponent: Aperiodic exponent $\\chi$, shape ``S``.
+    Parameters
+    ----------
+    freq
+        Frequencies in Hz, shape (n_frequencies,).
+    offset
+        Aperiodic offset $b$, any shape ``S``.
+    knee
+        Aperiodic knee $k$ (0 for ``'fixed'`` mode), shape ``S``.
+    exponent
+        Aperiodic exponent $\\chi$, shape ``S``.
 
-    Returns:
-        np.ndarray: Aperiodic component, shape ``S + (n_frequencies,)``.
+    Returns
+    -------
+    np.ndarray
+        Aperiodic component, shape ``S + (n_frequencies,)``.
     """
     offset, knee, exponent = (np.asarray(a, dtype=float)[..., None] for a in (offset, knee, exponent))
     return offset - np.log10(knee + np.asarray(freq, dtype=float) ** exponent)
@@ -815,13 +995,19 @@ def fit_quality_summary(spec: dict, fmin: float = SPEC_FIT_RANGE[0], mask: np.nd
     high value can indicate over-fitting), and the median knee frequency with the number
     of fits whose knee lies below the fit range (``< fmin``).
 
-    Args:
-        spec: Output of :func:`compute_spectral_parameters`.
-        fmin: Lower bound of the fit range in Hz.
-        mask: Optional boolean selection of the spectra.
+    Parameters
+    ----------
+    spec
+        Output of :func:`compute_spectral_parameters`.
+    fmin
+        Lower bound of the fit range in Hz.
+    mask
+        Optional boolean selection of the spectra.
 
-    Returns:
-        str: The summary.
+    Returns
+    -------
+    str
+        The summary.
     """
     keep = np.isfinite(spec["exponent"]) if mask is None else (np.asarray(mask, dtype=bool) & np.isfinite(spec["exponent"]))
     r2, mae, kf = spec["r_squared"][keep], spec["mae"][keep], spec["knee_freq"][keep]
@@ -834,31 +1020,131 @@ def fit_quality_summary(spec: dict, fmin: float = SPEC_FIT_RANGE[0], mask: np.nd
     return text
 
 
-def compute_gradient_quantiles(
-    df_surf: pd.DataFrame,
-    channel_indices: np.ndarray,
-    gradient_col: str,
-    quantiles: tuple[float, float] = (0.25, 0.75),
-) -> np.ndarray:
-    """Assign gradient quantile labels to channels.
+def hemisphere_slice(hemi: str) -> slice:
+    """Rows of one hemisphere in an fsLR-32k array or table over both (left first).
 
-    Marks the surface vertices covered by *channel_indices* as bottom-quantile
-    (-1) or top-quantile (+1) based on their gradient value, writing the result
-    into a ``'quantiles'`` column on *df_surf* in-place.  Returns the
-    per-channel quantile label array.
+    Parameters
+    ----------
+    hemi : {'LH', 'RH'}
 
-    Args:
-        df_surf: Surface DataFrame containing *gradient_col*.
-        channel_indices: Integer vertex indices of each channel on the 32k surface.
-        gradient_col: Name of the gradient column in *df_surf*.
-        quantiles: (low, high) thresholds as fractions (default: 25th/75th percentile).
-
-    Returns:
-        np.ndarray: Quantile label per channel (-1, 0, or 1; NaN where unassigned).
+    Returns
+    -------
+    rows : slice
+        ``N_LH`` rows starting at 0 (LH) or ``N_LH`` (RH).
     """
-    low_q, high_q = np.nanquantile(df_surf[gradient_col], list(quantiles))
-    channel_mask = np.zeros(len(df_surf), dtype=bool)
-    channel_mask[channel_indices] = True
-    df_surf.loc[channel_mask & (df_surf[gradient_col] <= low_q), "quantiles"] = -1
-    df_surf.loc[channel_mask & (df_surf[gradient_col] >= high_q), "quantiles"] = 1
-    return df_surf["quantiles"].iloc[channel_indices].values
+    start = N_LH if hemi == 'RH' else 0
+    return slice(start, start + N_LH)
+
+
+def covered_vertices(sens: np.ndarray, mask: np.ndarray, values: np.ndarray) -> np.ndarray:
+    """Template vertices of `mask` that at least one channel covers and where `values` is finite.
+
+    Parameters
+    ----------
+    sens : (n_channels, n_vertices) array
+        Non-negative channel sensitivity maps (`build_bipolar_sensitivity`).
+    mask : (n_vertices,) bool
+        Candidate vertices, e.g. a network on the template hemisphere.
+    values : (n_vertices,) array
+        Map that must be defined at the vertex, e.g. the MPC gradient.
+
+    Returns
+    -------
+    vertices : (n_covered,) int array
+        Indices in increasing order.
+    """
+    return np.flatnonzero(np.asarray(mask, dtype=bool) & (np.sum(sens, axis=0) > 0) & np.isfinite(values))
+
+
+def load_channel_sensitivity(df_channels: pd.DataFrame, root_dir: str) -> np.ndarray:
+    """Bipolar sensitivity map of every channel, from the electroMICA leadfields.
+
+    Loads the contact leadfields (`load_sensitivity_info`), matches the channels'
+    contacts to them by upper-cased name (electroMICA's convention), and combines each
+    pair into the channel's thresholded, hemisphere-folded sensitivity
+    (`build_bipolar_sensitivity`). Channels whose contacts have no leadfield, or no
+    suprathreshold sensitivity, carry zero weight; their number is logged.
+
+    Parameters
+    ----------
+    df_channels : pd.DataFrame
+        One row per bipolar channel with ``Subject``, ``Session``, ``ContactName1`` and
+        ``ContactName2`` (e.g. from `compute_original_psd`).
+    root_dir : str
+        Root of the electroMICA derivatives (see `load_sensitivity_info`).
+
+    Returns
+    -------
+    sens : (n_channels, N_LH) array
+        Non-negative sensitivity, NaN set to 0, row-aligned with `df_channels`.
+    """
+    df_sensitivity, areas = load_sensitivity_info(root_dir=str(root_dir))
+    logger.info(f"Sensitivity maps loaded: {df_sensitivity['Subject'].nunique()} subjects, "
+                f"{len(df_sensitivity)} contacts")
+    channels = df_channels.assign(ContactName1=df_channels['ContactName1'].str.upper(),
+                                  ContactName2=df_channels['ContactName2'].str.upper())
+    sens = np.nan_to_num(build_bipolar_sensitivity(channels, df_sensitivity, areas), nan=0.0)
+    n_no_sens = int((sens.sum(axis=1) == 0).sum())
+    if n_no_sens:
+        logger.warning(f"{n_no_sens}/{len(sens)} channels have no suprathreshold sensitivity; "
+                       f"they carry no weight in the surface projections.")
+    return sens
+
+
+def gaussian_channel_sensitivity(
+    points_lh: np.ndarray,
+    points_rh: np.ndarray,
+    channel_vertex: np.ndarray,
+    half_weight_mm: float = 4.0,
+    rel_thresh: float = 0.05,
+) -> np.ndarray:
+    """Gaussian surface footprint of every channel, folded onto one fsLR-32k template.
+
+    For channels located by a position only (no leadfield), the spatial sensitivity is
+    modelled as a Gaussian of the Euclidean distance $d$ from the channel's vertex,
+    $w(d) = \\exp(-\\ln 2 \\, d^2 / h^2)$, which halves at $d = h$
+    (``half_weight_mm``). Distances are taken between the vertices of the channel's own
+    hemisphere; weights below a fraction $r$ (``rel_thresh``) of the peak (1, at the
+    channel's vertex) are set to zero, as the relative threshold of the electroMICA
+    sensitivities (:func:`build_bipolar_sensitivity`), so each footprint ends at
+    $d = h \\sqrt{\\log_2(1 / r)}$. A left vertex $i$ and a right
+    vertex ``N_LH + i`` both map to template vertex $i$, the hemisphere fold of
+    :func:`build_bipolar_sensitivity`, so the result is used in place of
+    :func:`load_channel_sensitivity`.
+
+    Parameters
+    ----------
+    points_lh, points_rh : (N_LH, 3) array
+        Vertex coordinates (mm) of the left and right fsLR-32k surfaces, e.g. the
+        midthickness.
+    channel_vertex : (n_channels,) int array
+        Vertex of each channel on both hemispheres joined (left first).
+    half_weight_mm : float
+        Distance $h$ (mm) at which the weight is one half.
+    rel_thresh : float
+        Weight below which a vertex is set to zero.
+
+    Returns
+    -------
+    sens : (n_channels, N_LH) array
+        Non-negative footprint of each channel on the template.
+
+    Raises
+    ------
+    ValueError
+        If a surface does not have ``N_LH`` vertices.
+    """
+    points = tuple(np.asarray(p, dtype=float) for p in (points_lh, points_rh))
+    if any(p.shape != (N_LH, 3) for p in points):
+        raise ValueError(f"Expected two fsLR-32k hemispheres of shape ({N_LH}, 3), got "
+                         f"{[p.shape for p in points]}.")
+    trees = tuple(cKDTree(p) for p in points)
+    radius = half_weight_mm * np.sqrt(np.log2(1.0 / rel_thresh))
+    sens = np.zeros((len(channel_vertex), N_LH))
+    for i, v in enumerate(np.asarray(channel_vertex, dtype=int)):
+        hemi, vertex = divmod(int(v), N_LH)
+        idx = np.asarray(trees[hemi].query_ball_point(points[hemi][vertex], radius), dtype=int)
+        d2 = np.sum((points[hemi][idx] - points[hemi][vertex]) ** 2, axis=1)
+        sens[i, idx] = np.exp(-np.log(2.0) * d2 / half_weight_mm ** 2)
+    sens[sens < rel_thresh] = 0.0
+    return sens

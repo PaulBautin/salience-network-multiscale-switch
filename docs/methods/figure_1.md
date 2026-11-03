@@ -99,13 +99,24 @@ cortex and the agranular cortex, in which layers are largely indistinct. The von
 Economo atlas was mapped onto the fsLR-32k surface, and each vertex was assigned the
 type of its area; vertices without a type formed a seventh, unassigned category. The
 composition of the SN was expressed as the percentage of its vertices in each
-category. Enrichment was evaluated against a spin permutation null model to account
-for spatial autocorrelation ([Shared Methods](shared.md#spin-permutation-test)): the SN
-mask was rotated on the sphere 1,000 times, and the same percentages were recomputed
-over the vertices covered by each rotated mask. This procedure preserves the size and
-spatial contiguity of the network while randomizing its position relative to the
-cortical types. For each category, a two-sided permutation p-value compared the
-observed percentage with the null distribution, both expressed as deviations from the
-null mean, so that enrichment and depletion were tested alike. The seven tests formed
-one family for the correction for multiple comparisons
-([Shared Methods](shared.md#spatial-null-models)).
+category. Enrichment and depletion were evaluated against a spin permutation null model
+to account for spatial autocorrelation, following the procedure that Paquola et al.
+(2025) applied to the default mode network
+([Shared Methods](shared.md#spin-permutation-test)): the SN was rotated on the sphere
+10,000 times, and the same percentages were recomputed over the vertices covered by each
+rotated network. Rotated vertices that fell within the medial wall, which has no
+cortical type, were excluded from the composition of that rotation (Markello & Mišić,
+2021), so that the observed and null compositions were both computed over cortex. This
+procedure preserves the size and spatial contiguity of the network while randomizing its
+position relative to the cortical types. For each category, depletion and enrichment
+were assessed by the one-sided permutation p-values
+
+$$p_{\downarrow} = \frac{1 + \#\{\text{null} \leq \text{obs}\}}{1 + n}, \qquad
+p_{\uparrow} = \frac{1 + \#\{\text{null} \geq \text{obs}\}}{1 + n},$$
+
+where $n$ is the number of rotations, and each category was tested with their
+equal-tailed two-sided combination, $p = \min\left(1,\, 2\min(p_{\downarrow}, p_{\uparrow})\right)$.
+Unlike a test on the absolute deviation from the null mean, this combination does not
+assume a symmetric null distribution, which the percentages of rare types, bounded below
+by zero, do not have. The seven tests formed one family for the correction for multiple
+comparisons ([Shared Methods](shared.md#spatial-null-models)).

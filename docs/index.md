@@ -48,7 +48,7 @@ salience-network-multiscale-switch/
 ├── data/                # template surfaces, atlases and histological maps
 ├── results/             # composite figures; results/figures/: the panels
 ├── tests/               # tests on synthetic data, and the privacy check of source_data/
-├── tools/               # one-off preparation of the bundled fsLR-5k maps
+├── tools/               # the privacy check (hook, CI, tests); preparation of the bundled fsLR-5k maps
 └── docs/                # this documentation
 ```
 

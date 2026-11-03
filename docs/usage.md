@@ -29,7 +29,7 @@ with `xvfb-run -a` (the brain renders need an X display).
 
 | Folder | Contents | In git |
 |---|---|---|
-| `source_data/<step>/` | the tables behind the step's figures, de-identified, and `manifest.json` (code version, package versions, settings, sample sizes) | yes |
+| `source_data/<step>/` | the tables behind the step's figures, de-identified, and `manifest.json` (code version, package versions, settings, sample sizes; no date) | yes |
 | `results/figures/` | the figure panels (SVG) | yes |
 | `results/` | the composite figures (`figure*.svg`, edited in Inkscape) and their PNG/PDF exports | yes |
 | `<work_dir>/<step>/` | the step's private tables and caches, and its log (`<step>.log`, appended at every run) | no |
@@ -72,7 +72,7 @@ gradients are reused while the subject list is unchanged.
 and Parvalbumin maps over the network vertices, each against a Moran null fitted per
 hemisphere. Its inputs are all public, so it computes without `config/paths.yaml`.
 
-- **Settings:** `hemisphere`.
+- **Settings:** `network`, `hemisphere`.
 - **Public:** `histology_maps_<hemi>.tsv` (per network vertex: `vertex` and the z-scored
   mean intensity of each map), `context_stats_<hemi>.tsv` (per map: `r`, `p`, `null_lo` /
   `null_med` / `null_hi` (2.5th / 50th / 97.5th percentiles of the null), `n_vertices`,
@@ -85,32 +85,39 @@ hemisphere. Its inputs are all public, so it computes without `config/paths.yaml
 ## Step 1c: cortical types
 
 `pipeline/step1c_cortical_types.py` — the von Economo–Koskinas cortical-type composition of
-every network and, for the salience network, its enrichment test against 1,000 spin
-permutations. Its inputs are all public.
+every network and, for the network of the settings, the test of the depletion and
+enrichment of each type against 10,000 rotations of the network on the sphere (spin test;
+rotated vertices on the medial wall are left out). Its inputs are all public.
 
-- **Settings:** `hemisphere`.
+- **Settings:** `network`, `hemisphere`.
 - **Public:** `type_composition_<hemi>.tsv` (per network and type: `percent`),
-  `type_null_SalVentAttn_<hemi>.tsv` (per spin and type: `percent`),
-  `type_stats_SalVentAttn_<hemi>.tsv` (per type: `observed`, `null_mean`, `null_sd`, `z`,
-  `p`, `n_spins`).
+  `type_null_<network>_<hemi>.tsv` (per rotation and type: `percent`),
+  `type_stats_<network>_<hemi>.tsv` (per type: `observed`, `null_mean`, `null_sd`, `z`,
+  `p_depletion`, `p_enrichment`, the two-sided `p`, `n_spins`).
 - **Figures:** `figure_1c_brain_economo.svg`, `figure_1c_brain_economo_zoom{,_roi}.svg`,
   `figure_1c_type_salience.svg`.
 
 ## Step 2a: MNI Open iEEG Atlas
 
-`pipeline/step2a_ieeg_mni.py` — maps the atlas channels onto the fsLR-32k template, and
-correlates the difference in spectral similarity with the top and bottom gradient
-quarters of the network against the second BigBrain gradient (Moran null on the channel
-layout).
+`pipeline/step2a_ieeg_mni.py` — the analysis of step 2b in the replication cohort (a
+supplementary figure). The
+hippocampus and amygdala channels are left out; each channel's Welch spectrum is averaged
+over the windows within its recorded segments (the atlas separates them with 2-s zero
+buffers and pads them to 68 s), and the channel is mapped onto the fsLR-32k template through
+the atlas surfaces registered to it, with a Gaussian footprint (half weight at 4 mm, zero
+below 5 % of the peak) in place of a leadfield. The exponent and band peak powers are then
+tested against the network gradient of the `hemisphere`, and the FC gradient is projected
+through the spectral similarity of the vertices, exactly as in step 2b.
 
 - **Reads:** `mni_ieeg` (MatlabFile.mat), `mni_ieeg_surfaces` (`L.anat.reg.surf.gii`,
   `R.anat.reg.surf.gii`); step 1a `surface_fslr32k_both.tsv`.
-- **Settings:** `network`.
-- **Public:** `channels.tsv` (per channel: template `vertex`, `network`, gradient
-  `quantile`, `corr_diff`, `bigbrain_g2`), `es_difference_stats.tsv` (`r`, `p_moran`, null
-  95 % interval, `n_channels`, `n_permutations`).
-- **Figures:** `figure_2a_ieeg_mni_corr_scatter.svg`,
-  `figure_2a_ieeg_mni_channel_corr_diff{,_smooth}.svg`.
+- **Settings:** `network`, `hemisphere`.
+- **Public:** the tables of step 2b, `spectral_{maps,stats,null,spectra}_<hemi>.tsv` and
+  `similarity_{vertices,targets,stats}_<hemi>.tsv`, with the same columns.
+- **Figures:** the panels of step 2b, named `figure_2a_ieeg_mni_*` in place of
+  `figure_2b_ieeg_mica_*`. The main ridgeline `*_forest_<hemi>` holds the tests shown in
+  Figure 2 (`MAIN_MEASURES`: exponent and theta), whatever their p here, so the
+  composite `results/figure_2a_mni.svg` has the layout of `results/figure_2b_mica.svg`.
 
 ## Step 2b: MICA iEEG spectra
 
@@ -118,7 +125,8 @@ layout).
 channel with specparam, projects the aperiodic exponent (primary) and the peak power of
 five bands (secondary) onto the template, and tests each against the network gradient of
 the `hemisphere` (Moran null). The supplementary analysis projects the FC gradient through
-the spectral similarity of the vertices.
+the spectral similarity of the vertices. The analysis and its panels live in
+`pipeline/ieeg_spectral.py`, shared with step 2a.
 
 - **Reads:** `electromica` (sensitivity maps), `ieeg_raw` (recordings); step 1a
   `surface_fslr32k_both.tsv`.
@@ -144,8 +152,8 @@ the spectral similarity of the vertices.
 
 ## Step 2c: wakefulness, N2 and N3
 
-`pipeline/step2c_ieeg_states.py` — the same channels in the three states (first 180 s of
-each recording): the aperiodic exponent of each state and its change from wakefulness to
+`pipeline/step2c_ieeg_states.py` — supplementary to Figure 2: the same channels in the
+three states (first 180 s of each recording): the aperiodic exponent of each state and its change from wakefulness to
 N3 against the gradient, and the difference between the correlations of every pair of
 states (paired Moran surrogates); supplementary, the peak power of each band per state.
 
@@ -167,11 +175,11 @@ states (paired Moran surrogates); supplementary, the peak power of each band per
 `pipeline/step3_connectivity.py` — for every network and connectivity measure (SC, GD,
 MPC, FC), the connectivity-weighted projection of the FC gradient for each network vertex
 and subject, its per-subject Spearman r with the network MPC gradient, the group test, and
-the Moran, topological and spin null models. The compute stage takes about two hours.
+the Moran, topological and spin null models. The compute stage takes about 2 hours.
 
 - **Reads:** step 1a `subjects_fslr5k.csv` (private) and `surface_fslr5k_<hemi>.tsv`; the
   connectomes listed in the subject list.
-- **Settings:** `hemisphere`, `n_permutations`.
+- **Settings:** `network` (the focus network of panel B), `hemisphere`, `n_permutations`.
 - **Private:** `subject_r_<hemi>.tsv` (per subject, network and measure: `r`).
 - **Public** (`manifest.json` records the table version and refuses tables of another):
   - `vertex_<hemi>.tsv` — per network, measure and source vertex: `vertex` (fsLR-5k
@@ -198,7 +206,7 @@ the Moran, topological and spin null models. The compute stage takes about two h
 the subject whose structural r_s is closest to the group median.
 
 - **Reads:** as step 3 (SC only).
-- **Settings:** `hemisphere`.
+- **Settings:** `network`, `hemisphere`.
 - **Private:** `example_subject_<hemi>.json` (the example subject's ID, every subject's r_s).
 - **Public:** `schematic_vertex_<hemi>.tsv` (per network vertex: `g_mpc`, the example
   subject's `P` and `n_targets`, the group `P_mean`), `schematic_edges_<hemi>.tsv` (the
@@ -226,5 +234,6 @@ again; `--watch` keeps doing so as the panels change.
 
 `pytest` runs the tests in `tests/` on synthetic data (no private data), including a
 calibration of the Moran test and the privacy check of `source_data/`;
-`ruff check src pipeline tests` checks for undefined names and unused imports. Both run
-on GitHub at every push, with a scan of every tracked file for participant data.
+`ruff check src pipeline tests tools` checks for undefined names and unused imports. Both
+run on GitHub at every push, with `python tools/check_privacy.py --tracked`, the privacy
+check of every tracked file (the pre-commit hook runs it with `--staged`).

@@ -31,11 +31,13 @@ Measures (each uses only positive connections and the same weighted-mean project
   FC   positive correlations (resting state). The target axis is itself the principal
        FC gradient, so this is a convergence reading rather than an independent test.
 
-Figure 3A: per measure, the network's z-scored projection as a brain row with the
-salience zoom insets and the inset row alone, level with a lollipop block of the group r
-of all seven networks over the central 95 % of each network's Moran null (dot filled
-where the uncorrected Moran p < 0.05). Figure 3B (supplementary): every network x
-measure, as a bubble matrix, test grids and per-network brain rows.
+Panels: ``figure_3a_*`` are panel B of Figure 3 (panel A is the schematic of
+step3_schematic): per measure, the focus network's z-scored projection
+as a brain row with the salience zoom insets and the inset row alone, level with a
+lollipop block of the group r of all seven networks over the central 95 % of each
+network's Moran null (dot filled where the uncorrected Moran p < 0.05). ``figure_3b_*``
+(supplementary): every network x measure, as a bubble matrix, test grids and
+per-network brain rows.
 
 Inputs   step 1a: the fsLR-5k subject list with connectome paths (private) and the
          fsLR-5k MPC gradient (source_data); the connectomes it lists (micapipe).
@@ -63,16 +65,17 @@ from brainspace.mesh.mesh_io import read_surface
 
 import common
 from salience_switch import config
-from salience_switch.colors import connectivity_cmap, yeo7_abbrev, yeo7_rgb
-from salience_switch.connectivity import (build_consensus_mask, compute_dominant_target_network,
+from salience_switch.colors import connectivity_cmap, network_rgb, yeo7_abbrev
+from salience_switch.connectivity import (N_TOTAL_5K, build_consensus_mask, compute_dominant_target_network,
                                           compute_projection_nulls, compute_topological_null_projection,
                                           group_spearman_r, load_group_mean_matrix, load_subject_matrix,
-                                          make_fc_spin_surrogates)
+                                          make_fc_spin_surrogates, projection_masks)
 from salience_switch.microstructure import compute_t1_gradient, load_t1_salience_profiles
-from salience_switch.plotting import (SALIENCE_Z_LABELS, SALIENCE_Z_RANGE, format_pvalue, mask_outline,
+from salience_switch.plotting import (SALIENCE_Z_LABELS, SALIENCE_Z_RANGE, ZOOM_ROW_KW, format_pvalue, mask_outline,
                                       plot_forest, plot_hemispheres_zoom, plot_network_lollipop, plot_ridge,
-                                      plot_test_grid, salience_zoom_rois)
+                                      plot_test_grid, plot_zoom_rows, salience_zoom_rois, shared_row_geometry)
 from salience_switch.provenance import write_manifest
+from salience_switch.stats import null_interval
 from salience_switch.surface import (DATA_DIR, compute_network_mask, load_fc_gradient_5k, load_inflated_surfaces,
                                      load_yeo_surf_5k)
 
@@ -81,16 +84,11 @@ GRADIENT_STEP = "step1a_mpc_gradient"
 logger = logging.getLogger(STEP)
 
 plt.rcParams["font.size"] = 16
-plt.rcParams["svg.fonttype"] = "none"
-plt.rcParams["text.usetex"] = False
-
-N_TOTAL_5K = 9684
 
 # SC (axonal, independent of the MPC gradient) is the primary measure: its signed group
 # effect sets the network order shared by every Figure 3B panel.
 MEASURES = ("SC", "GD", "MPC", "FC")
 NETWORKS = ("Limbic", "Default", "Cont", "SalVentAttn", "DorsAttn", "Vis", "SomMot")
-FOCUS_NETWORK = "SalVentAttn"
 NULL_MODELS = ("moran", "topo", "spin")
 
 # Figure data written by the compute stage to source_data/ and read by the plot stage.
@@ -106,14 +104,11 @@ CACHE_COLUMNS = {
     "topo_control": ("control", "r_obs", "p_topo", "n_perm"),
 }
 
-# Figure 1 zoom-row window (as figure_1a/1b/1c and figure_2b): 1450 x 300, zoom 1.3,
-# colour-bar column, region names at 30 pt and inset-row titles at 36 pt; the rows are
-# shown ZOOM_ROW_WIDTH_MM wide in the figure layout (~0.29x, so 30 pt reads as ~8.8 pt).
-# outline_sharpness=3 crisps the SN border: the fsLR-5k mesh is coarse, so the default
-# soft one-triangle trace reads as a thick fuzzy halo here, unlike the fine fsLR-32k
-# borders of figures 1 and 2; a higher falloff power concentrates it into a thin line.
-ZOOM_KW = dict(size=(1450, 300), zoom=1.3, color_bar=True, nan_color=(220, 220, 220, 1),
-               label_fontsize=30, title_fontsize=36, outline_sharpness=3.0)
+# The zoom-row window of Figures 1 and 2. outline_sharpness=3 crisps the network border:
+# the fsLR-5k mesh is coarse, so the default soft one-triangle trace reads as a thick fuzzy
+# halo here, unlike the fine fsLR-32k borders of Figures 1 and 2; a higher falloff power
+# concentrates it into a thin line.
+ZOOM_KW = dict(ZOOM_ROW_KW, outline_sharpness=3.0)
 
 # Connectivity measure -> the df_pni column holding its per-subject file paths.
 _MEASURE_PATH_COL = {
@@ -129,10 +124,6 @@ _MODALITY_TITLES = {
     "FC":  "Functional connectivity – resting-state BOLD",
 }
 
-# yeo7_rgb rows follow the alphabetical network order (that of convert_states_str2int);
-# its last row is the background colour.
-_NETWORK_INDEX = {net: i for i, net in enumerate(sorted(yeo7_abbrev))}
-
 
 # =======================================================================================
 # Compute stage: data processing only (no matplotlib)
@@ -144,20 +135,17 @@ def _measure_inputs(
 ) -> tuple[list, list, np.ndarray | None, list[np.ndarray] | None]:
     """Resolve (subject_ids, files, mask_G, sc_subjects) for one connectivity measure.
 
-    `subject_ids` and `files` are read from the same df_pni rows, so they stay
-    aligned with the per-subject results positionally (subject ``s`` of
-    ``r_subjects`` is ``subject_ids[s]``). SC carries the Betzel consensus mask and
-    the pre-loaded per-subject weights (built from the full df_pni, so SC keeps every
-    subject); GD/MPC/FC are loaded per file. FC is the one measure with a reduced
-    subject set: rows whose `path_fc_5k` is NaN (no session-matched connectome) are
-    dropped from both `subject_ids` and `files`.
+    Step 1a lists only subjects with every connectome, so every measure has the same
+    subjects, in the order of `df_pni` (subject ``s`` of ``r_subjects`` is
+    ``subject_ids[s]``). SC carries the Betzel consensus mask and the pre-loaded
+    per-subject weights; GD, MPC and FC are loaded from their files.
     """
     col = _MEASURE_PATH_COL.get(measure)
     if col is None:
         raise ValueError(f"measure must be one of {MEASURES}; got '{measure}'")
-    rows = df_pni[df_pni[col].notna()] if measure == "FC" else df_pni
-    subject_ids = rows["ID_PNI"].tolist()
-    files = rows[col].tolist()
+    if df_pni[col].isna().any():
+        raise ValueError(f"The subject list lacks {measure} connectomes; rerun step 1a.")
+    subject_ids, files = df_pni["ID_PNI"].tolist(), df_pni[col].tolist()
     if measure == "SC":
         return subject_ids, files, mask_G, sc_subjects
     return subject_ids, files, None, None
@@ -195,14 +183,7 @@ def _prepare_network_gradient(
     other_mask_cortex : np.ndarray of bool, shape (n_cortex,)
         Target-set mask (cortex, non-network, hemisphere-filtered).
     """
-    cortex_mask = df["hemisphere"].notna().to_numpy()
-    grad_cortex = _network_gradient(df, network, df_pni, hemisphere)[cortex_mask]
-    sn_mask_cortex = (compute_network_mask(df, network, hemisphere)[cortex_mask]
-                      & np.isfinite(grad_cortex))
-    other = df["network"].ne(network).to_numpy()
-    if hemisphere in ("LH", "RH"):
-        other &= df["hemisphere"].eq(hemisphere).to_numpy()
-    return grad_cortex[sn_mask_cortex], sn_mask_cortex, other[cortex_mask]
+    return projection_masks(df, _network_gradient(df, network, df_pni, hemisphere), network, hemisphere)
 
 
 def _attach_gradient_cache(df: pd.DataFrame, hemisphere: str) -> pd.DataFrame:
@@ -310,7 +291,7 @@ def compute_network_results(
 def compute_topological_control(
     results: dict, df_surf: pd.DataFrame, net_gradients: dict,
     sc_subjects: list[np.ndarray], mask_G: np.ndarray, gd_cortex: np.ndarray,
-    *, n_rand: int, focus_network: str = FOCUS_NETWORK,
+    *, n_rand: int, focus_network: str,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Power/specificity control: does the SC topological null discriminate wiring from
     geometry at the real connection density?
@@ -379,10 +360,7 @@ def results_to_tables(
     for (network, measure), res in results.items():
         idx = cortex_idx[res["sn_mask_cortex"]]
         dominant, names = compute_dominant_target_network(res)
-        if dominant is None:
-            dominant_name = np.full(idx.size, None, dtype=object)
-        else:
-            dominant_name = np.array([names[d] if d >= 0 else None for d in dominant], dtype=object)
+        dominant_name = np.array([names[d] if d >= 0 else None for d in dominant], dtype=object)
         vertex.append(pd.DataFrame({
             "network": network, "measure": measure, "vertex": idx, "hemisphere": hemi_all[idx],
             "g_mpc": res["g_mpc_at_sn"], "P": res["P_mean"], "n_targets": res["n_targets_per_sn"],
@@ -413,7 +391,7 @@ def results_to_tables(
     }
 
 
-def run_compute_stage(paths: dict, hemisphere: str, n_rand: int) -> tuple[dict, dict]:
+def run_compute_stage(paths: dict, hemisphere: str, n_rand: int, focus_network: str) -> tuple[dict, dict]:
     """Load the inputs, run every projection and null, and return the figure-data tables.
 
     Returns
@@ -458,7 +436,7 @@ def run_compute_stage(paths: dict, hemisphere: str, n_rand: int) -> tuple[dict, 
     )
     tables = results_to_tables(results, subject_ids, df_surf, n_rand)
     control, control_null = compute_topological_control(
-        results, df_surf, net_gradients, sc_subjects, mask_G, gd_cortex, n_rand=n_rand,
+        results, df_surf, net_gradients, sc_subjects, mask_G, gd_cortex, n_rand=n_rand, focus_network=focus_network,
     )
     tables["topo_control"] = control
     tables["null"] = pd.concat([tables["null"], control_null], ignore_index=True)
@@ -469,7 +447,7 @@ def run_compute_stage(paths: dict, hemisphere: str, n_rand: int) -> tuple[dict, 
         "n_rand": n_rand,
         "networks": list(NETWORKS),
         "measures": list(MEASURES),
-        "focus_network": FOCUS_NETWORK,
+        "focus_network": focus_network,
         "n_subjects": {m: len(ids) for m, ids in subject_ids.items()},
     }
     return tables, manifest
@@ -503,7 +481,7 @@ def write_figure_data(tables: dict, manifest: dict, paths: dict, hemisphere: str
     logger.info(f"[compute] wrote {manifest_path.name} (schema {record['schema']}, git {record['git']})")
 
 
-def read_figure_data(hemisphere: str) -> tuple[dict, dict]:
+def read_figure_data(hemisphere: str, focus_network: str) -> tuple[dict, dict]:
     """Read and validate the figure tables written by `write_figure_data`.
 
     Raises
@@ -511,8 +489,8 @@ def read_figure_data(hemisphere: str) -> tuple[dict, dict]:
     FileNotFoundError
         If the manifest or a table is missing (run ``--stage compute`` first).
     ValueError
-        If the tables were written with another schema version, for another hemisphere,
-        or lack a column.
+        If the tables were written with another schema version, for another hemisphere
+        or focus network, or lack a column.
     """
     manifest_path = config.source_dir(STEP) / "manifest.json"
     if not manifest_path.exists():
@@ -523,9 +501,10 @@ def read_figure_data(hemisphere: str) -> tuple[dict, dict]:
             f"{manifest_path.name} has schema {manifest.get('schema')}; this step reads "
             f"schema {CACHE_SCHEMA}. Re-run '--stage compute'."
         )
-    if manifest.get("hemisphere") != hemisphere:
-        raise ValueError(f"{manifest_path.name} records hemisphere {manifest.get('hemisphere')}, "
-                         f"not {hemisphere}. Re-run '--stage compute'.")
+    for key, value in (("hemisphere", hemisphere), ("focus_network", focus_network)):
+        if manifest.get(key) != value:
+            raise ValueError(f"{manifest_path.name} records {key} {manifest.get(key)}, not {value}. "
+                             f"Re-run '--stage compute'.")
     tables = {}
     for name, columns in CACHE_COLUMNS.items():
         path = _cache_path(name, hemisphere)
@@ -537,7 +516,7 @@ def read_figure_data(hemisphere: str) -> tuple[dict, dict]:
             raise ValueError(f"{path.name} lacks columns {missing}; re-run '--stage compute'.")
         tables[name] = table
     logger.info(f"[plot] figure data read: schema {manifest['schema']}, git {manifest['git']}, "
-                f"created {manifest['created']}, n_rand={manifest['n_rand']}")
+                f"n_rand={manifest['n_rand']}")
     return tables, manifest
 
 
@@ -545,15 +524,10 @@ def read_figure_data(hemisphere: str) -> tuple[dict, dict]:
 # Plot stage: figure making only (reads the figure-data tables)
 # =======================================================================================
 
-def _network_rgb(network) -> np.ndarray:
-    """Yeo colour of `network` (background colour for any other label)."""
-    return yeo7_rgb[_NETWORK_INDEX.get(network, len(yeo7_rgb) - 1)]
-
-
 def _dominant_colors(dominant: pd.Series, network: str) -> np.ndarray:
     """Point colours: Yeo colour of each vertex's dominant target network, or of the
     source `network` where the vertex has none."""
-    return np.array([_network_rgb(d if isinstance(d, str) else network) for d in dominant])
+    return np.array([network_rgb(d if isinstance(d, str) else network) for d in dominant])
 
 
 def _stats_row(stats: pd.DataFrame, network: str, measure: str) -> pd.Series:
@@ -607,54 +581,16 @@ def _null_values(null: pd.DataFrame, network: str, measure: str,
 def _null_band(null: pd.DataFrame, network: str, measure: str,
                null_model: str = "moran") -> tuple[float, float, float]:
     """2.5th, 50th and 97.5th percentiles of a null's group r (NaN if absent)."""
-    r = _null_values(null, network, measure, null_model)
-    if not r.size:
-        return np.nan, np.nan, np.nan
-    lo, med, hi = np.percentile(r, [2.5, 50, 97.5])
-    return float(lo), float(med), float(hi)
-
-
-def _plot_measure_zoom_fig2(
-    values: np.ndarray, prefix: str, title: str, *, rois: list[dict], surf_lh, surf_rh,
-    out_dir: Path, suffix: str, cmap: str, color_range: tuple[float, float],
-    cbar_labels: tuple[str, str], cbar_title: str | None,
-    outline: np.ndarray | None = None,
-) -> tuple[float, float]:
-    """Figure 1-style brain row with zoom insets, plus the inset row alone.
-
-    Writes ``{prefix}_zoom_{suffix}.svg`` (brain row with marker circles, insets and
-    region names, as ``figure_1a_brain_zoom.svg``) and ``{prefix}_zoom_roi_{suffix}.svg``
-    (the inset row alone, titled, colour bar drawn, no region names, as the Figure 1b/2b
-    zoom rows), both on the Figure 1 window (``ZOOM_KW``), with ``outline`` (the
-    source-network border from ``mask_outline``) traced on the brains and insets. Mirrors
-    ``step2b_ieeg_mica._plot_measure_zoom``.
-
-    Returns
-    -------
-    tuple[float, float]
-        Inset-row centre and height (pt) of the ``_zoom_roi`` figure, which place the
-        ridgeline-plot rows level with the stacked inset rows.
-    """
-    kwargs = dict(ZOOM_KW, cmap=cmap, color_range=color_range, cbar_labels=cbar_labels,
-                  cbar_title=cbar_title, outline=outline)
-    plot_hemispheres_zoom(surf_lh, surf_rh, values, rois,
-                          filename=out_dir / f"{prefix}_zoom_{suffix}.svg", **kwargs)
-    fig = plot_hemispheres_zoom(surf_lh, surf_rh, values,
-                                [dict(r, label=None) for r in rois], roi_only=True,
-                                draw_color_bar=True, title=title,
-                                filename=out_dir / f"{prefix}_zoom_roi_{suffix}.svg", **kwargs)
-    geometry = (fig.inset_cy, fig.get_size_inches()[1] * 72)
-    plt.close("all")
-    return geometry
+    return null_interval(_null_values(null, network, measure, null_model))
 
 
 def plot_figure_3a(
     tables: dict, networks: list[str], df_atlas: pd.DataFrame, surf_lh, surf_rh, out_dir: Path,
-    hemisphere: str,
+    hemisphere: str, focus: str,
 ) -> None:
     """Figure 3A (Figure 1/2 norm): per-modality projection zoom rows + aligned network lollipops.
 
-    For the focus network, each connectivity measure is drawn as a Figure-1-style brain
+    For the focus network (`focus`), each connectivity measure is drawn as a Figure-1-style brain
     row with the ``SALIENCE_ZOOM_ROIS`` insets (aINS, dACC, PCU, IPL) and the inset row
     alone, P z-scored within the network on the shared +/-2 SD scale in
     ``CustomCmap_connectivity``, with the network border traced (``mask_outline``).
@@ -668,33 +604,30 @@ def plot_figure_3a(
     (``figure_3a_forest_band_{hemi}.svg``).
     """
     vertex, stats, null = tables["vertex"], tables["stats"], tables["null"]
-    outline = mask_outline(surf_lh, surf_rh, compute_network_mask(df_atlas, FOCUS_NETWORK, hemisphere))
+    outline = mask_outline(surf_lh, surf_rh, compute_network_mask(df_atlas, focus, hemisphere))
     rois = salience_zoom_rois(df_atlas, hemisphere)
 
     summary_rows, nulls, blocks, row_geometry = [], [], [], []
     for measure in MEASURES:
-        row_geometry.append(_plot_measure_zoom_fig2(
-            _surface_map(vertex, FOCUS_NETWORK, measure), f"figure_3a_{measure}",
-            _MODALITY_TITLES[measure], rois=rois, surf_lh=surf_lh, surf_rh=surf_rh,
-            out_dir=out_dir, suffix=hemisphere, cmap=connectivity_cmap.name,
-            color_range=SALIENCE_Z_RANGE, cbar_labels=SALIENCE_Z_LABELS, cbar_title="z",
-            outline=outline,
+        row_geometry.append(plot_zoom_rows(
+            surf_lh, surf_rh, _surface_map(vertex, focus, measure), rois, f"figure_3a_{measure}",
+            _MODALITY_TITLES[measure], out_dir=out_dir, suffix=hemisphere, **ZOOM_KW,
+            cmap=connectivity_cmap.name, color_range=SALIENCE_Z_RANGE, cbar_labels=SALIENCE_Z_LABELS,
+            cbar_title="z", outline=outline,
         ))
-        srow = _stats_row(stats, FOCUS_NETWORK, measure)
-        lo, med, hi = _null_band(null, FOCUS_NETWORK, measure)
+        srow = _stats_row(stats, focus, measure)
+        lo, med, hi = _null_band(null, focus, measure)
         summary_rows.append(dict(measure=measure, r=srow["r_group"], p=srow["p_moran"],
                                  null_lo=lo, null_med=med, null_hi=hi))
-        nulls.append(_null_values(null, FOCUS_NETWORK, measure))
+        nulls.append(_null_values(null, focus, measure))
         lines = []
         for network in networks:
             nrow = _stats_row(stats, network, measure)
             n_lo, _, n_hi = _null_band(null, network, measure)
             lines.append(dict(label=yeo7_abbrev.get(network, network), r=nrow["r_group"], p=nrow["p_moran"],
-                              p_print=nrow["p_moran"], null_lo=n_lo, null_hi=n_hi, color=_network_rgb(network)))
+                              p_print=nrow["p_moran"], null_lo=n_lo, null_hi=n_hi, color=network_rgb(network)))
         blocks.append(pd.DataFrame(lines))
-    if len(set(row_geometry)) != 1:
-        raise RuntimeError(f"Inset rows differ in geometry {set(row_geometry)}; "
-                           f"the companion rows cannot be aligned.")
+    geometry = shared_row_geometry(row_geometry)
 
     summary = pd.DataFrame(summary_rows)
     for measure, block in zip(MEASURES, blocks):
@@ -710,13 +643,13 @@ def plot_figure_3a(
     # tick so the two ends and 0 read cleanly, never past |r| = 1.
     values = np.concatenate([b[["r", "null_lo", "null_hi"]].to_numpy().ravel() for b in blocks])
     lim = min(1.0, max(0.1, np.ceil(np.nanmax(np.abs(values)) * 1.15 * 20) / 20))
-    plot_network_lollipop(blocks, *row_geometry[0], out_dir / f"figure_3a_forest_{hemisphere}.svg",
-                          highlight=yeo7_abbrev.get(FOCUS_NETWORK), xlim=(-lim, lim), xlabel="Spearman r",
+    plot_network_lollipop(blocks, *geometry, out_dir / f"figure_3a_forest_{hemisphere}.svg",
+                          highlight=yeo7_abbrev.get(focus), xlim=(-lim, lim), xlabel="Spearman r",
                           p_label="$p_{m}$")
-    plot_ridge(summary, nulls, *row_geometry[0], out_dir / f"figure_3a_ridge_{hemisphere}.svg",
+    plot_ridge(summary, nulls, *geometry, out_dir / f"figure_3a_ridge_{hemisphere}.svg",
                xlim=(-lim, lim), xlabel="Spearman r")
     # The same rows with the null as its central 95 % band and median (forest variant).
-    plot_forest(summary, *row_geometry[0], out_dir / f"figure_3a_forest_band_{hemisphere}.svg",
+    plot_forest(summary, *geometry, out_dir / f"figure_3a_forest_band_{hemisphere}.svg",
                 xlim=(-lim, lim), xlabel="Spearman r")
     plt.close("all")
     logger.info(f"[Figure 3A] {len(MEASURES)} projection zoom rows, network lollipops and the focus "
@@ -725,7 +658,7 @@ def plot_figure_3a(
                 f"figure_3a_forest_band_{hemisphere}.svg)")
 
 
-def plot_figure_3a_scatter_supp(tables: dict, out_dir: Path, hemisphere: str) -> None:
+def plot_figure_3a_scatter_supp(tables: dict, out_dir: Path, hemisphere: str, focus: str) -> None:
     """Supplementary Figure 3A: per-measure vertex scatter behind the ridgeline.
 
     One panel per connectivity measure: the focus network's z-scored projection P (x)
@@ -734,23 +667,23 @@ def plot_figure_3a_scatter_supp(tables: dict, out_dir: Path, hemisphere: str) ->
     $p_{spin}$ and (SC, MPC, FC) $p_{topo}$ — each labelled by its null, all uncorrected.
     """
     vertex, stats = tables["vertex"], tables["stats"]
-    focus = vertex[vertex["network"] == FOCUS_NETWORK]
-    g_all = focus["g_mpc"].to_numpy(dtype=float)
+    focus_rows = vertex[vertex["network"] == focus]
+    g_all = focus_rows["g_mpc"].to_numpy(dtype=float)
     g_all = g_all[np.isfinite(g_all)]
     gpad = 0.05 * (np.ptp(g_all) or 1.0)
     gylim = (g_all.min() - gpad, g_all.max() + gpad)
-    # x-range covers every point (the old fixed +/-5 could clip outliers silently).
-    xlim = max(5.0, 1.05 * float(np.nanmax(np.abs(focus["P_z"].to_numpy(dtype=float)))))
+    # x-range covers every point, at least +/-5.
+    xlim = max(5.0, 1.05 * float(np.nanmax(np.abs(focus_rows["P_z"].to_numpy(dtype=float)))))
 
     fig, axes = plt.subplots(1, len(MEASURES), figsize=(3.0 * len(MEASURES), 3.2),
                              sharey=True, squeeze=False)
     axes = axes[0]
     for ax, measure in zip(axes, MEASURES):
-        rows = _vertex_rows(vertex, FOCUS_NETWORK, measure)
-        srow = _stats_row(stats, FOCUS_NETWORK, measure)
+        rows = _vertex_rows(vertex, focus, measure)
+        srow = _stats_row(stats, focus, measure)
         valid = rows["g_mpc"].notna() & rows["P_z"].notna()
         x, y = rows.loc[valid, "P_z"].to_numpy(), rows.loc[valid, "g_mpc"].to_numpy()
-        colors = _dominant_colors(rows.loc[valid, "dominant_network"], FOCUS_NETWORK)
+        colors = _dominant_colors(rows.loc[valid, "dominant_network"], focus)
         ax.scatter(x, y, s=12, alpha=0.75, c=colors, edgecolor="none", rasterized=True)
         sns.regplot(x=x, y=y, scatter=False, color="black", line_kws={"linewidth": 2.5}, ax=ax, seed=0)
         stat_txt = (f"$r={srow['r_group']:+.2f}$\n"
@@ -873,7 +806,7 @@ def plot_network_bubble_matrix(
     ax.set_yticks([(n_net - 1) - j for j in range(n_net)])
     ax.set_yticklabels([yeo7_abbrev.get(net, net) for net in networks])
     for tick, net in zip(ax.get_yticklabels(), networks):
-        tick.set_color(_network_rgb(net))
+        tick.set_color(network_rgb(net))
     ax.tick_params(axis="both", length=0)
     for spine in ax.spines.values():
         spine.set_visible(False)
@@ -897,7 +830,7 @@ def plot_network_bubble_matrix(
 def plot_figure_3b_test_grid(tables: dict, networks: list[str], out_dir: Path, hemisphere: str) -> None:
     """Figure 3B test grid: every network x measure group $r$ against its Moran null.
 
-    One row per network (in `networks` order, level with the stacked 2B brain rows, each
+    One row per network (in `networks` order, level with the stacked 3B brain rows, each
     300 pt tall without insets) and one column per measure, on one shared $r$ axis. The
     ridge version draws each cell's Moran-null density with the observed $r$ as a dot on
     its baseline; the forest version the null's central 95 % and median. The dot is filled
@@ -921,7 +854,7 @@ def plot_figure_3b_test_grid(tables: dict, networks: list[str], out_dir: Path, h
     for kind in ("ridge", "forest"):
         plot_test_grid(cells, row_h / 2, row_h, out_dir / f"figure_3b_{kind}_{hemisphere}.svg",
                        nulls=nulls, kind=kind, row_labels=[yeo7_abbrev.get(n, n) for n in networks],
-                       row_colors=[_network_rgb(n) for n in networks], xlim=(-lim, lim),
+                       row_colors=[network_rgb(n) for n in networks], xlim=(-lim, lim),
                        xlabel="Spearman r", p_label="$p_{m}$")
         plt.close("all")
     logger.info(f"[Figure 3B] network x measure test grids written "
@@ -937,8 +870,7 @@ def plot_figure_3b_brain_maps(
     Drawn as the Figure 3A brain rows (four views, ``CustomCmap_connectivity`` on the
     shared +/-2 SD scale, network border traced) without zoom insets, 1450 x 300 pt.
     The colour-bar column is kept but left empty: the scale is that of the 2A rows, and
-    a bar would be cut by a thumbnail crop in a composite figure. The ``_rho_`` in the
-    file names is kept from earlier layouts of results/figure3.svg, which linked them.
+    a bar would be cut by a thumbnail crop in a composite figure.
     """
     vertex = tables["vertex"]
     kwargs = dict(ZOOM_KW, cmap=connectivity_cmap.name, color_range=SALIENCE_Z_RANGE,
@@ -975,7 +907,7 @@ def _plot_network_scatter_grid(
         colors = _dominant_colors(rows.loc[valid, "dominant_network"], network)
         ax.scatter(x, y, s=10, alpha=0.7, c=colors, edgecolor="none", rasterized=True)
         sns.regplot(x=x, y=y, scatter=False, color="black", line_kws={"linewidth": 1}, ax=ax, seed=0)
-        ax.set_title(yeo7_abbrev.get(network, network), fontdict={"color": _network_rgb(network)})
+        ax.set_title(yeo7_abbrev.get(network, network), fontdict={"color": network_rgb(network)})
         ax.yaxis.set_major_formatter(ticker.StrMethodFormatter('{x:.1f}'))
     axes[0].set_ylabel("MPC gradient")
     fig.supxlabel(f"{measure} projection P (z)")
@@ -1011,7 +943,7 @@ def plot_topological_control(tables: dict, out_dir: Path) -> None:
     logger.info(f"[control] topological-null control figure written to {out.name}")
 
 
-def run_plot_stage(tables: dict, hemisphere: str) -> None:
+def run_plot_stage(tables: dict, hemisphere: str, focus: str) -> None:
     """Draw every Figure 3 panel and supplement from the figure tables."""
     out_dir = config.FIGURES_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -1020,8 +952,8 @@ def run_plot_stage(tables: dict, hemisphere: str) -> None:
     df_atlas = load_yeo_surf_5k()
     surf_lh, surf_rh = load_inflated_surfaces("fsLR-5k")
 
-    plot_figure_3a(tables, networks, df_atlas, surf_lh, surf_rh, out_dir, hemisphere)
-    plot_figure_3a_scatter_supp(tables, out_dir, hemisphere)
+    plot_figure_3a(tables, networks, df_atlas, surf_lh, surf_rh, out_dir, hemisphere, focus)
+    plot_figure_3a_scatter_supp(tables, out_dir, hemisphere, focus)
     plot_network_bubble_matrix(tables["stats"], networks, out_dir, hemisphere)
     plot_figure_3b_test_grid(tables, networks, out_dir, hemisphere)
     plot_figure_3b_brain_maps(tables, df_atlas, surf_lh, surf_rh, networks, out_dir, hemisphere)
@@ -1042,14 +974,14 @@ def compute(settings: dict, paths: dict) -> None:
     logger.info("Null models    : Moran spectral randomisation (map smoothness, all measures) + "
                 "geometry-preserving topological null (wiring specificity, SC/MPC/FC) + "
                 "target-side FC-gradient spin null (anatomical alignment, all measures)")
-    tables, manifest = run_compute_stage(paths, hemi, n_rand)
+    tables, manifest = run_compute_stage(paths, hemi, n_rand, settings["network"])
     write_figure_data(tables, manifest, paths, hemi)
 
 
 def plot(settings: dict) -> None:
     """Every Figure 3 panel, from source_data only."""
-    tables, _ = read_figure_data(settings["hemisphere"])
-    run_plot_stage(tables, settings["hemisphere"])
+    tables, _ = read_figure_data(settings["hemisphere"], settings["network"])
+    run_plot_stage(tables, settings["hemisphere"], settings["network"])
 
 
 if __name__ == "__main__":

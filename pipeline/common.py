@@ -51,6 +51,8 @@ def run(step: str, compute, plot, stage: str = "all", private: bool = True) -> N
     private : bool
         Whether the compute stage reads private data (and so needs ``config/paths.yaml``).
     """
+    # Text stays text in every SVG panel, editable in the composites.
+    matplotlib.rcParams["svg.fonttype"] = "none"
     # Byte-identical SVG panels on every run: a fixed element-id salt and a fixed date
     # (matplotlib honours SOURCE_DATE_EPOCH; GL2PS dates are stripped after the stages), so
     # a redraw changes only panels whose data changed.

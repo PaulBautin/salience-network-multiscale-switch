@@ -1,7 +1,5 @@
 """Pipeline settings, table round trips, and the privacy of the public figure data."""
 import importlib.util
-import json
-import re
 
 import numpy as np
 import pandas as pd
@@ -10,11 +8,13 @@ import yaml
 
 from salience_switch import config
 
-# Participant identifiers of MICA-PNI, MICA-MICs and electroMICA (not inside base64 data)
-ID_PATTERN = re.compile(r"(^|[^A-Za-z0-9+/])(PNC|HC|PX)[0-9]{3}([^0-9]|$)")
-# Columns that would identify a participant, a recording or a session
-PRIVATE_COLUMNS = {"subject", "ID_PNI", "ID_MICs", "session", "Session", "ChannelName", "ContactName1",
-                   "ContactName2", "path_t1_profile", "dob", "age", "sex"}
+
+
+def _load_tool(name: str):
+    spec = importlib.util.spec_from_file_location(name, config.PROJECT_ROOT / "tools" / f"{name}.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def _run_all():
@@ -50,18 +50,19 @@ def _source_files():
     return files
 
 
-def test_source_data_holds_only_tables_and_manifests():
-    for path in _source_files():
-        assert path.suffix in {".tsv", ".json"}, f"unexpected file type in source_data: {path}"
-
-
 def test_source_data_has_no_participant_information():
+    """source_data/ passes the privacy check of the hook and the CI (tools/check_privacy.py)."""
+    check = _load_tool("check_privacy")
     for path in _source_files():
-        text = path.read_text()
-        assert not ID_PATTERN.search(text), f"participant ID in {path}"
-        if path.suffix == ".tsv":
-            columns = set(text.split("\n", 1)[0].split("\t"))
-            assert not columns & PRIVATE_COLUMNS, f"identifying columns {columns & PRIVATE_COLUMNS} in {path}"
-        else:
-            keys = set(json.loads(text))
-            assert not keys & (PRIVATE_COLUMNS | {"subjects"}), f"identifying keys {keys & PRIVATE_COLUMNS} in {path}"
+        rel = path.relative_to(config.PROJECT_ROOT).as_posix()
+        assert not check.problems(rel, path.read_bytes()), f"{rel}: {check.problems(rel, path.read_bytes())}"
+
+
+def test_privacy_check_refuses_identifiers():
+    check = _load_tool("check_privacy")
+    fake_id = b"PNC" + b"012"  # built at run time, so this file itself passes the check
+    assert check.problems("notes.md", b"subject " + fake_id + b" ran") == ["participant ID"]
+    assert check.problems("results/a.svg", b"data:image/png;base64,QUPX123") == []  # inside base64 data
+    assert check.problems("source_data/s/t.tsv", b"subject\tr\n1\t2\n") == ["identifying columns ['subject']"]
+    assert check.problems("source_data/s/x.csv", b"a\n")
+    assert check.problems("cache.pkl", b"") == ["private data location or file type"]

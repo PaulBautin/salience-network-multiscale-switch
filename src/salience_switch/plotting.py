@@ -17,7 +17,6 @@ from matplotlib.colors import Normalize, to_rgb
 from matplotlib.font_manager import FontProperties, findfont, get_font
 from matplotlib.patches import Circle, Rectangle
 from scipy.stats import gaussian_kde
-from vtkmodules.vtkFiltersSources import vtkSphereSource
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +53,13 @@ SALIENCE_Z_LABELS = ('\u22122', '+2')  # colour-bar ends (lower, upper)
 
 # Display width (mm) of the 1450-pt zoom rows in the Figure 1 and 2 layouts (~0.29x).
 ZOOM_ROW_WIDTH_MM = 150
+
+
+# Window of every zoom row of Figures 1-3: 1450 x 300 pt, zoom 1.3, a colour-bar column,
+# light grey for NaN, region names at 30 pt and inset-row titles at 36 pt (shown
+# ZOOM_ROW_WIDTH_MM wide, ~0.29x, so 30 pt reads as ~8.8 pt).
+ZOOM_ROW_KW = dict(size=(1450, 300), zoom=1.3, color_bar=True, nan_color=(220, 220, 220, 1),
+                   label_fontsize=30, title_fontsize=36)
 
 
 # plot_forest canvas (pt, drawn at its final size), that of figure_1b_forest.svg: figure
@@ -129,15 +135,21 @@ SALIENCE_ZOOM_ROIS = [
 def salience_zoom_rois(df_surf: pd.DataFrame, hemisphere: str = 'both', with_labels: bool = True) -> list[dict]:
     """``plot_hemispheres_zoom`` regions for ``SALIENCE_ZOOM_ROIS``.
 
-    Args:
-        df_surf: Surface table over both hemispheres with the Schaefer-400 ``label``
-            column (e.g. ``df_yeo_surf``).
-        hemisphere: ``'both'``, ``'LH'`` or ``'RH'``; regions of the other
-            hemisphere are left out.
-        with_labels: Attach the region names (drawn under the insets).
+    Parameters
+    ----------
+    df_surf
+        Surface table over both hemispheres with the Schaefer-400 ``label``
+        column (e.g. ``df_yeo_surf``).
+    hemisphere
+        ``'both'``, ``'LH'`` or ``'RH'``; regions of the other
+        hemisphere are left out.
+    with_labels
+        Attach the region names (drawn under the insets).
 
-    Returns:
-        list[dict]: One ``{'view', 'mask', 'label'}`` dict per region.
+    Returns
+    -------
+    list[dict]
+        One ``{'view', 'mask', 'label'}`` dict per region.
     """
     labels = df_surf['label'].fillna('')
     return [
@@ -151,14 +163,20 @@ def salience_zoom_rois(df_surf: pd.DataFrame, hemisphere: str = 'both', with_lab
 def mask_outline(surf_lh, surf_rh, mask: np.ndarray) -> np.ndarray:
     """Vertices just outside a region: the ``outline`` of ``plot_hemispheres_zoom``.
 
-    Args:
-        surf_lh: Left-hemisphere surface (``BSPolyData``).
-        surf_rh: Right-hemisphere surface (``BSPolyData``).
-        mask: Bool array over both hemispheres, LH then RH, shape (n_lh + n_rh,),
-            e.g. the vertices of a network.
+    Parameters
+    ----------
+    surf_lh
+        Left-hemisphere surface (``BSPolyData``).
+    surf_rh
+        Right-hemisphere surface (``BSPolyData``).
+    mask
+        Bool array over both hemispheres, LH then RH, shape (n_lh + n_rh,),
+        e.g. the vertices of a network.
 
-    Returns:
-        np.ndarray: Bool array, same shape, True at vertices outside ``mask`` that
+    Returns
+    -------
+    np.ndarray
+        Bool array, same shape, True at vertices outside ``mask`` that
         share a triangle with a vertex inside it, so a line traced on them encloses
         the region without covering its values.
     """
@@ -212,25 +230,36 @@ def render_surface_view(
     times ``size``. The camera and actor matrices of that render map every vertex
     to its pixel position, so annotations can be placed on the image exactly.
 
-    Args:
-        surf: Hemisphere surface (``BSPolyData``).
-        values: Per-vertex values, shape (n_vertices,); NaN is drawn in ``nan_color``.
-        view: brainspace camera view, ``'lateral'``, ``'medial'``, ``'dorsal'`` or
-            ``'ventral'`` (see ``HEMI_VIEWS`` for the right-hemisphere convention).
-        size: Viewport size (width, height) in pixels before ``scale``.
-        scale: Supersampling factor of the returned image.
-        zoom: Camera zoom, as in ``plot_hemispheres``.
-        cmap: Matplotlib colour map name.
-        color_range: (min, max) of the colour map; data range if ``None``.
-        nan_color: RGBA colour of NaN vertices (RGB in 0-255, alpha in 0-1).
+    Parameters
+    ----------
+    surf
+        Hemisphere surface (``BSPolyData``).
+    values
+        Per-vertex values, shape (n_vertices,); NaN is drawn in ``nan_color``.
+    view
+        brainspace camera view, ``'lateral'``, ``'medial'``, ``'dorsal'`` or
+        ``'ventral'`` (see ``HEMI_VIEWS`` for the right-hemisphere convention).
+    size
+        Viewport size (width, height) in pixels before ``scale``.
+    scale
+        Supersampling factor of the returned image.
+    zoom
+        Camera zoom, as in ``plot_hemispheres``.
+    cmap
+        Matplotlib colour map name.
+    color_range
+        (min, max) of the colour map; data range if ``None``.
+    nan_color
+        RGBA colour of NaN vertices (RGB in 0-255, alpha in 0-1).
 
-    Returns:
-        tuple:
-            - img: RGBA image, shape (size[1]*scale, size[0]*scale, 4), uint8.
-            - xy: pixel position (column, row) of every vertex in ``img``,
-              shape (n_vertices, 2).
-            - visible: vertices whose normal faces the camera, shape (n_vertices,).
-            - px_per_mm: image pixels per surface unit (mm).
+    Returns
+    -------
+    tuple
+        - img: RGBA image, shape (size[1]*scale, size[0]*scale, 4), uint8.
+        - xy: pixel position (column, row) of every vertex in ``img``,
+          shape (n_vertices, 2).
+        - visible: vertices whose normal faces the camera, shape (n_vertices,).
+        - px_per_mm: image pixels per surface unit (mm).
     """
     name = surf.append_array(np.asarray(values, dtype=float), at="p")
     try:
@@ -285,6 +314,26 @@ def outline_alpha(surf, outline: np.ndarray, view: str, *, sharpness: float = 1.
     ``1.0`` is the default soft falloff. On a coarse mesh (fsLR-5k) the one-triangle
     band is physically wide, so a higher ``sharpness`` keeps the traced border from
     reading as a thick fuzzy halo.
+
+    Parameters
+    ----------
+    surf
+        Hemisphere surface (``BSPolyData``).
+    outline
+        Per-vertex outline, shape (n_vertices,): 1 (or True) on the outline vertices,
+        0 elsewhere, e.g. one hemisphere of ``mask_outline``.
+    view
+        brainspace camera view, as in ``render_surface_view``.
+    sharpness
+        Power applied to the interpolated outline scalar before the gain.
+    **render_kwargs
+        ``size``, ``scale`` and ``zoom`` of ``render_surface_view``.
+
+    Returns
+    -------
+    alpha
+        Opacity of the outline at each pixel of the render, shape (height, width),
+        in [0, 1].
     """
     renders = [render_surface_view(surf, vals, view, cmap="binary", color_range=(0.0, 1.0),
                                    nan_color=(255, 255, 255, 1), **render_kwargs)[0]
@@ -347,68 +396,103 @@ def plot_hemispheres_zoom(
     figure. An optional ``title`` adds a band above everything, which shifts the
     rows down by its height.
 
-    Args:
-        surf_lh: Left-hemisphere surface (``BSPolyData``).
-        surf_rh: Right-hemisphere surface (``BSPolyData``).
-        values: Per-vertex values for both hemispheres, LH then RH, shape
-            (n_lh + n_rh,), as for ``plot_hemispheres``.
-        rois: One dict per region of interest, at most one per view:
-            - ``'view'``: key of ``HEMI_VIEWS`` the region is shown on;
-            - ``'mask'``: bool array over both hemispheres, shape (n_lh + n_rh,);
-            - ``'label'`` (optional): text under the inset (may contain ``\\n``);
-            - ``'radius'`` (optional): zoom-window radius in mm; by default the
-              smallest circle around the region's camera-facing vertices,
-              enlarged by ``roi_pad``.
-            An empty list draws the brain row alone, ``size[1]`` pt tall (the
-            size of the ``plot_hemispheres`` export).
-        views: Columns of the brain row, keys of ``HEMI_VIEWS`` (default: the four
-            ``plot_hemispheres`` panels).
-        size: ``plot_hemispheres`` window (width, height) in pixels = figure pt.
-        zoom: Camera zoom, as in ``plot_hemispheres``.
-        color_bar: Reserve the colour-bar column, as
-            ``plot_hemispheres(color_bar='right')``.
-        draw_color_bar: Draw the colour bar in that column, with the size and
-            position brainspace gives it, centred on the brain row (or on the inset
-            row when ``roi_only``). Default: drawn unless ``roi_only``.
-        roi_only: Draw only the inset row.
-        title: Text above the figure, starting at the left edge of the leftmost
-            drawn brain or inset.
-        filename: Output path; the figure is only returned if ``None``.
-        cmap: Matplotlib colour map name.
-        color_range: (min, max) shared by all views; finite data range if ``None``.
-        nan_color: RGBA colour of NaN vertices (RGB in 0-255, alpha in 0-1).
-        scale: Supersampling factor of the renders (inset sharpness).
-        inset_frac: Inset diameter as a fraction of the view width.
-        gap: Vertical space between the brain row and the insets, in pt.
-        roi_pad: Enlargement of the automatic zoom-window radius.
-        cbar_labels: Texts below and above the colour bar (e.g. ``('min', 'max')``);
-            the ``color_range`` values if ``None``.
-        cbar_title: Text written vertically beside the colour bar (e.g. its unit).
-        label_fontsize: Font size (pt) of the inset labels and colour-bar texts.
-        title_fontsize: Font size (pt) of ``title``.
-        inset_facecolor: Fill of the inset circles behind the surface.
-        line_color: Colour of the marker circles, inset outlines and lines.
-        line_width: Line width (pt) of the marker circles, inset outlines and lines.
-        outline: Optional bool array over both hemispheres, shape (n_lh + n_rh,), of
-            vertices traced as a line in ``outline_color`` over the map (e.g.
-            ``mask_outline`` of a network, which encloses it). It is rendered by
-            brainspace on the same camera (two extra renders per view), so hidden
-            parts stay hidden.
-        outline_color: Colour of the ``outline`` line.
-        outline_sharpness: Falloff power of the traced ``outline`` (see
-            ``outline_alpha``); ``> 1`` gives a crisper, narrower line, useful on a
-            coarse mesh (fsLR-5k) where the one-triangle band is physically wide.
-            Default ``1.0`` (the Figure 1/2 soft falloff).
-        dpi: Resolution of the embedded raster images when saving.
+    Parameters
+    ----------
+    surf_lh
+        Left-hemisphere surface (``BSPolyData``).
+    surf_rh
+        Right-hemisphere surface (``BSPolyData``).
+    values
+        Per-vertex values for both hemispheres, LH then RH, shape
+        (n_lh + n_rh,), as for ``plot_hemispheres``.
+    rois
+        One dict per region of interest, at most one per view:
+        - ``'view'``: key of ``HEMI_VIEWS`` the region is shown on;
+        - ``'mask'``: bool array over both hemispheres, shape (n_lh + n_rh,);
+        - ``'label'`` (optional): text under the inset (may contain ``\\n``);
+        - ``'radius'`` (optional): zoom-window radius in mm; by default the
+          smallest circle around the region's camera-facing vertices,
+          enlarged by ``roi_pad``.
+        An empty list draws the brain row alone, ``size[1]`` pt tall (the
+        size of the ``plot_hemispheres`` export).
+    views
+        Columns of the brain row, keys of ``HEMI_VIEWS`` (default: the four
+        ``plot_hemispheres`` panels).
+    size
+        ``plot_hemispheres`` window (width, height) in pixels = figure pt.
+    zoom
+        Camera zoom, as in ``plot_hemispheres``.
+    color_bar
+        Reserve the colour-bar column, as
+        ``plot_hemispheres(color_bar='right')``.
+    draw_color_bar
+        Draw the colour bar in that column, with the size and
+        position brainspace gives it, centred on the brain row (or on the inset
+        row when ``roi_only``). Default: drawn unless ``roi_only``.
+    roi_only
+        Draw only the inset row.
+    title
+        Text above the figure, starting at the left edge of the leftmost
+        drawn brain or inset.
+    filename
+        Output path; the figure is only returned if ``None``.
+    cmap
+        Matplotlib colour map name.
+    color_range
+        (min, max) shared by all views; finite data range if ``None``.
+    nan_color
+        RGBA colour of NaN vertices (RGB in 0-255, alpha in 0-1).
+    scale
+        Supersampling factor of the renders (inset sharpness).
+    inset_frac
+        Inset diameter as a fraction of the view width.
+    gap
+        Vertical space between the brain row and the insets, in pt.
+    roi_pad
+        Enlargement of the automatic zoom-window radius.
+    cbar_labels
+        Texts below and above the colour bar (e.g. ``('min', 'max')``);
+        the ``color_range`` values if ``None``.
+    cbar_title
+        Text written vertically beside the colour bar (e.g. its unit).
+    label_fontsize
+        Font size (pt) of the inset labels and colour-bar texts.
+    title_fontsize
+        Font size (pt) of ``title``.
+    inset_facecolor
+        Fill of the inset circles behind the surface.
+    line_color
+        Colour of the marker circles, inset outlines and lines.
+    line_width
+        Line width (pt) of the marker circles, inset outlines and lines.
+    outline
+        Optional bool array over both hemispheres, shape (n_lh + n_rh,), of
+        vertices traced as a line in ``outline_color`` over the map (e.g.
+        ``mask_outline`` of a network, which encloses it). It is rendered by
+        brainspace on the same camera (two extra renders per view), so hidden
+        parts stay hidden.
+    outline_color
+        Colour of the ``outline`` line.
+    outline_sharpness
+        Falloff power of the traced ``outline`` (see
+        ``outline_alpha``); ``> 1`` gives a crisper, narrower line, useful on a
+        coarse mesh (fsLR-5k) where the one-triangle band is physically wide.
+        Default ``1.0`` (the Figure 1/2 soft falloff).
+    dpi
+        Resolution of the embedded raster images when saving.
 
-    Returns:
-        matplotlib.figure.Figure: The composed figure. Its ``inset_cy`` attribute is
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The composed figure. Its ``inset_cy`` attribute is
         the centre of the inset row in pt from the figure top (with its height,
         ``fig.get_size_inches()[1] * 72``, it lets a companion panel align rows).
 
-    Raises:
-        ValueError: If a region's view is not in ``views``, a view has more than one
-            region, or a region has no vertex facing the camera in its view.
+    Raises
+    ------
+    ValueError
+        If a region's view is not in ``views``, a view has more than one
+        region, or a region has no vertex facing the camera in its view.
     """
     unknown = [v for v in views if v not in HEMI_VIEWS]
     if unknown:
@@ -559,6 +643,71 @@ def plot_hemispheres_zoom(
     return fig
 
 
+def plot_zoom_rows(surf_lh, surf_rh, values: np.ndarray, rois: list[dict], stem: str, title: str, *,
+                   out_dir, suffix: str, **kwargs) -> tuple[float, float]:
+    """A brain row with zoom insets, and the same inset row alone, titled.
+
+    Writes ``{stem}_zoom_{suffix}.svg`` (brain row, marker circles, insets and region
+    names) and ``{stem}_zoom_roi_{suffix}.svg`` (the inset row alone, with ``title`` and
+    the colour bar, without region names), both drawn by `plot_hemispheres_zoom`.
+
+    Parameters
+    ----------
+    surf_lh, surf_rh : BSPolyData
+        Left and right surfaces.
+    values : (n_vertices,) array
+        Map over both hemispheres, left first.
+    rois : list of dict
+        Zoom regions (e.g. `salience_zoom_rois`).
+    stem : str
+        File-name stem.
+    title : str
+        Title of the inset row.
+    out_dir : Path
+        Output folder.
+    suffix : str
+        File-name suffix (e.g. the hemisphere).
+    **kwargs
+        Passed to `plot_hemispheres_zoom` (e.g. ``ZOOM_ROW_KW``, ``cmap``, ``outline``).
+
+    Returns
+    -------
+    inset_cy, height : float
+        Inset-row centre and figure height (pt) of the inset row, which place a
+        companion panel's rows level with stacked inset rows (`shared_row_geometry`).
+    """
+    plot_hemispheres_zoom(surf_lh, surf_rh, values, rois, filename=out_dir / f"{stem}_zoom_{suffix}.svg", **kwargs)
+    fig = plot_hemispheres_zoom(surf_lh, surf_rh, values, [dict(r, label=None) for r in rois], roi_only=True,
+                                draw_color_bar=True, title=title,
+                                filename=out_dir / f"{stem}_zoom_roi_{suffix}.svg", **kwargs)
+    geometry = (fig.inset_cy, fig.get_size_inches()[1] * 72)
+    plt.close('all')
+    return geometry
+
+
+def shared_row_geometry(geometries) -> tuple[float, float]:
+    """The inset-row geometry shared by stacked rows.
+
+    Parameters
+    ----------
+    geometries : iterable of (float, float)
+        ``(inset_cy, height)`` of each row, e.g. from `plot_zoom_rows`.
+
+    Returns
+    -------
+    inset_cy, height : float
+
+    Raises
+    ------
+    RuntimeError
+        If the rows differ, so a companion panel could not be aligned with them.
+    """
+    unique = set(geometries)
+    if len(unique) != 1:
+        raise RuntimeError(f"Inset rows differ in geometry {unique}; the companion rows cannot be aligned.")
+    return unique.pop()
+
+
 def format_pvalue(value: float) -> str:
     """p value to 3 decimals, with more digits where rounding would cross 0.05.
 
@@ -601,20 +750,30 @@ def plot_forest(
     inset centre ``inset_cy`` pt from its top, ``row_width`` pt wide) are stacked and
     shown ``ZOOM_ROW_WIDTH_MM`` wide, with the forest's top at the first row's top.
 
-    Args:
-        stats: One row per test with columns ``r``, ``p`` (Moran permutation p),
-            ``null_lo``, ``null_med`` and ``null_hi``; a row with NaN ``r`` leaves an
-            empty slot.
-        inset_cy: Inset-row centre (pt from the top) of the rows, the ``inset_cy``
-            attribute of a ``plot_hemispheres_zoom`` figure.
-        row_h: Height (pt) of each inset row figure.
-        filename: Output path; the figure is only returned if ``None``.
-        row_width: Width (pt) of the inset rows.
-        xlim: Signed correlation axis (ticks at its ends and 0).
-        xlabel: Axis label.
+    Parameters
+    ----------
+    stats
+        One row per test with columns ``r``, ``p`` (Moran permutation p),
+        ``null_lo``, ``null_med`` and ``null_hi``; a row with NaN ``r`` leaves an
+        empty slot.
+    inset_cy
+        Inset-row centre (pt from the top) of the rows, the ``inset_cy``
+        attribute of a ``plot_hemispheres_zoom`` figure.
+    row_h
+        Height (pt) of each inset row figure.
+    filename
+        Output path; the figure is only returned if ``None``.
+    row_width
+        Width (pt) of the inset rows.
+    xlim
+        Signed correlation axis (ticks at its ends and 0).
+    xlabel
+        Axis label.
 
-    Returns:
-        matplotlib.figure.Figure: The forest figure.
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The forest figure.
     """
     with plt.rc_context({'font.size': _FOREST_FONT_PT}):
         fig, ax, centres = _row_panel(len(stats), inset_cy, row_h, row_width, xlim, xlabel)
@@ -645,26 +804,39 @@ def plot_ridge(
     uncorrected Moran p (labelled $p_m$) written above the density. All densities share
     one height scale (the tallest is 54 pt), so their widths compare across rows.
 
-    Args:
-        stats: One row per test with columns ``r`` and ``p`` (Moran permutation p); a
-            row with NaN ``r`` leaves an empty slot.
-        nulls: Null values of the statistic (e.g. the correlations of the Moran
-            surrogates), one array per ``stats`` row; non-finite values are ignored and
-            a row with fewer than two distinct finite values gets no density.
-        inset_cy: Inset-row centre (pt from the top) of the rows, the ``inset_cy``
-            attribute of a ``plot_hemispheres_zoom`` figure.
-        row_h: Height (pt) of each inset row figure.
-        filename: Output path; the figure is only returned if ``None``.
-        row_width: Width (pt) of the inset rows.
-        xlim: Signed correlation axis (ticks at its ends and 0); the densities are drawn
-            over this range.
-        xlabel: Axis label.
+    Parameters
+    ----------
+    stats
+        One row per test with columns ``r`` and ``p`` (Moran permutation p); a
+        row with NaN ``r`` leaves an empty slot.
+    nulls
+        Null values of the statistic (e.g. the correlations of the Moran
+        surrogates), one array per ``stats`` row; non-finite values are ignored and
+        a row with fewer than two distinct finite values gets no density.
+    inset_cy
+        Inset-row centre (pt from the top) of the rows, the ``inset_cy``
+        attribute of a ``plot_hemispheres_zoom`` figure.
+    row_h
+        Height (pt) of each inset row figure.
+    filename
+        Output path; the figure is only returned if ``None``.
+    row_width
+        Width (pt) of the inset rows.
+    xlim
+        Signed correlation axis (ticks at its ends and 0); the densities are drawn
+        over this range.
+    xlabel
+        Axis label.
 
-    Returns:
-        matplotlib.figure.Figure: The ridgeline figure.
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The ridgeline figure.
 
-    Raises:
-        ValueError: If ``nulls`` does not have one array per ``stats`` row.
+    Raises
+    ------
+    ValueError
+        If ``nulls`` does not have one array per ``stats`` row.
     """
     if len(nulls) != len(stats):
         raise ValueError(f"{len(nulls)} null arrays for {len(stats)} stats rows.")
@@ -706,28 +878,45 @@ def plot_test_grid(
     The dot is filled where the table's ``p`` < 0.05, and that value is printed as
     ``p_label``.
 
-    Args:
-        stats: Column title -> one row per test with columns ``r``, ``p`` (and, for
-            ``kind='forest'``, ``null_lo``, ``null_med``, ``null_hi``); a NaN ``r``
-            leaves an empty slot.
-        inset_cy: Row centre (pt from the top) of the stacked rows.
-        row_h: Height (pt) of each stacked row.
-        filename: Output path; the figure is only returned if ``None``.
-        nulls: Column title -> null values per row (required for ``kind='ridge'``).
-        kind: ``'ridge'`` or ``'forest'``.
-        row_labels: Text left of the first column, one per row (e.g. network names).
-        row_colors: Colour of each row label.
-        row_width: Width (pt) of the stacked rows.
-        xlim: Signed correlation axis shared by every column (ticks at its ends and 0).
-        xlabel: Axis label of every column.
-        p_label: Label of the printed p value.
+    Parameters
+    ----------
+    stats
+        Column title -> one row per test with columns ``r``, ``p`` (and, for
+        ``kind='forest'``, ``null_lo``, ``null_med``, ``null_hi``); a NaN ``r``
+        leaves an empty slot.
+    inset_cy
+        Row centre (pt from the top) of the stacked rows.
+    row_h
+        Height (pt) of each stacked row.
+    filename
+        Output path; the figure is only returned if ``None``.
+    nulls
+        Column title -> null values per row (required for ``kind='ridge'``).
+    kind
+        ``'ridge'`` or ``'forest'``.
+    row_labels
+        Text left of the first column, one per row (e.g. network names).
+    row_colors
+        Colour of each row label.
+    row_width
+        Width (pt) of the stacked rows.
+    xlim
+        Signed correlation axis shared by every column (ticks at its ends and 0).
+    xlabel
+        Axis label of every column.
+    p_label
+        Label of the printed p value.
 
-    Returns:
-        matplotlib.figure.Figure: The grid figure.
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The grid figure.
 
-    Raises:
-        ValueError: If ``kind`` is unknown, the columns differ in length, or ``nulls``
-            does not match ``stats``.
+    Raises
+    ------
+    ValueError
+        If ``kind`` is unknown, the columns differ in length, or ``nulls``
+        does not match ``stats``.
     """
     if kind not in ("ridge", "forest"):
         raise ValueError(f"kind must be 'ridge' or 'forest'; got {kind!r}.")
@@ -792,23 +981,35 @@ def plot_network_lollipop(
     ``p_print`` in the value columns, titled 'r' and ``p_label`` above the first row. The
     line labelled ``highlight`` has a bold label.
 
-    Args:
-        blocks: One table per row, one line per test, with columns ``label``, ``r``, ``p``
-            (deciding the fill), ``p_print`` (the printed p), ``null_lo``, ``null_hi``
-            and ``color``; a NaN ``r``
-            leaves the line empty.
-        inset_cy: Inset-row centre (pt from the top) of the rows, the ``inset_cy``
-            attribute of a ``plot_hemispheres_zoom`` figure.
-        row_h: Height (pt) of each inset row figure.
-        filename: Output path; the figure is only returned if ``None``.
-        highlight: Label of the line to emphasise in every row.
-        row_width: Width (pt) of the inset rows.
-        xlim: Signed axis shared by every row (ticks at its ends and 0).
-        xlabel: Axis label.
-        p_label: Title of the printed p column.
+    Parameters
+    ----------
+    blocks
+        One table per row, one line per test, with columns ``label``, ``r``, ``p``
+        (deciding the fill), ``p_print`` (the printed p), ``null_lo``, ``null_hi``
+        and ``color``; a NaN ``r``
+        leaves the line empty.
+    inset_cy
+        Inset-row centre (pt from the top) of the rows, the ``inset_cy``
+        attribute of a ``plot_hemispheres_zoom`` figure.
+    row_h
+        Height (pt) of each inset row figure.
+    filename
+        Output path; the figure is only returned if ``None``.
+    highlight
+        Label of the line to emphasise in every row.
+    row_width
+        Width (pt) of the inset rows.
+    xlim
+        Signed axis shared by every row (ticks at its ends and 0).
+    xlabel
+        Axis label.
+    p_label
+        Title of the printed p column.
 
-    Returns:
-        matplotlib.figure.Figure: The lollipop figure.
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The lollipop figure.
     """
     columns = [x / _FOREST_WIDTH_PT for x in _LOLLI_VALUE_PT]  # value columns, figure fraction
     value_kw = dict(xycoords=("figure fraction", "data"), ha="left", va="center", fontsize=_LOLLI_FONT_PT - 0.5,
@@ -950,16 +1151,21 @@ def plot_fit_quality(model, path, n: int = 4, labels: list[str] | None = None, t
     (spectrum, full model and aperiodic fit; log-frequency axis) titled with its $R^2$.
     Failed fits (NaN $R^2$) are left out.
 
-    Args:
-        model: Fitted ``SpectralGroupModel`` (``compute_spectral_parameters(...,
-            return_model=True)['model']``).
-        path: Output file (format from the extension).
-        n: Number of fits per row.
-        labels: Optional name of every spectrum (e.g. subject and channel), shown in
-            the panel titles.
-        title: Optional figure title.
+    Parameters
+    ----------
+    model
+        Fitted ``SpectralGroupModel`` (``compute_spectral_parameters(...,
+        return_model=True)['model']``).
+    path
+        Output file (format from the extension).
+    n
+        Number of fits per row.
+    labels
+        Optional name of every spectrum (e.g. subject and channel), shown in
+        the panel titles.
+    title
+        Optional figure title.
     """
-    import matplotlib.pyplot as plt
 
     r2 = np.asarray(model.results.get_metrics("gof", "rsquared"), dtype=float)
     finite = np.flatnonzero(np.isfinite(r2))
@@ -988,37 +1194,3 @@ def plot_fit_quality(model, path, n: int = 4, labels: list[str] | None = None, t
         warnings.filterwarnings("ignore", message="This figure includes Axes that are not compatible")
         fig.savefig(path, bbox_inches="tight")
     plt.close(fig)
-
-
-def plot_surface_sphere(p, channel_position: list | np.ndarray, channel_color: np.ndarray, screenshot_path) -> None:
-    """Draw each electrode contact as a sphere on a two-view brainspace plot and save it.
-
-    Parameters
-    ----------
-    p : brainspace Plotter
-        Plotter with two renderers (lateral and medial views), e.g. from
-        ``brainspace.plotting.plot_surf(..., return_plotter=True)``.
-    channel_position : (n_channels, 3) array
-        Contact coordinates in the surface's space.
-    channel_color : (n_channels, 3 or 4) array
-        RGB(A) colour of each contact, values in [0, 1].
-    screenshot_path : str or Path
-        Output image.
-    """
-    # renderer index → extra Z rotation applied after the standard -90X/+90Z pair
-    renderers = [(p.renderers[0][0], 0), (p.renderers[1][0], 180)]
-    for renderer, extra_z in renderers:
-        for pos, color in zip(channel_position, channel_color):
-            sphere = vtkSphereSource()
-            sphere.SetCenter(*pos)
-            sphere.SetRadius(1.5)
-            sphere.Update()
-            actor = renderer.AddActor()
-            actor.SetMapper(inputData=sphere.GetOutput())
-            actor.GetProperty().SetColor(*color[:3])
-            actor.GetProperty().SetOpacity(1.0)
-            actor.RotateX(-90)
-            actor.RotateZ(90)
-            if extra_z:
-                actor.RotateZ(extra_z)
-    p.screenshot(screenshot_path, transparent_bg=True)

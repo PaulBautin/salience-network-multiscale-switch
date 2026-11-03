@@ -23,7 +23,7 @@ salience-network-multiscale-switch/
 ├── data/                # template surfaces, atlases and histological maps (public)
 ├── results/             # composite figures (figure*.svg, PNG, PDF); results/figures/: the panels
 ├── tests/               # tests on synthetic data, and the privacy check of source_data/
-├── tools/               # one-off preparation of the bundled fsLR-5k maps
+├── tools/               # the privacy check (hook, CI, tests); preparation of the bundled fsLR-5k maps
 └── docs/                # documentation site: usage, architecture, API reference, methods
 ```
 
@@ -91,7 +91,8 @@ The participants' data are not distributed with this repository. The datasets, a
 
 ## Contributing
 
-Enable the pre-commit check once per clone; it refuses commits that contain participant data:
+Enable the pre-commit check once per clone; it refuses commits that contain participant data
+(the rules are in `tools/check_privacy.py`, which the CI also runs on every tracked file):
 
 ```bash
 git config core.hooksPath .githooks
@@ -101,7 +102,7 @@ Run the tests and the lint check before pushing (both also run on GitHub):
 
 ```bash
 pytest
-ruff check src pipeline tests
+ruff check src pipeline tests tools
 ```
 
 ## Documentation

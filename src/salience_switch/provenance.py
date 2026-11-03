@@ -1,8 +1,10 @@
 """Run logs and provenance records for each pipeline step.
 
 Every step appends a run header and its log messages to ``<work_dir>/<step>/<step>.log``
-and writes a ``manifest.json`` next to its tables: the step, the time, the git commit of
-the code, the versions of the main packages and the settings of the run.
+and writes a ``manifest.json`` next to its tables: the step, the version of the code, the
+versions of the main packages and the settings of the run. The manifest holds no date
+(the private log records when the step ran), so rerunning the same code on the same data
+rewrites it byte for byte.
 """
 import importlib.metadata
 import json
@@ -15,8 +17,8 @@ from pathlib import Path
 
 # Packages whose versions are recorded in every manifest.
 TRACKED_PACKAGES = ("numpy", "scipy", "pandas", "nibabel", "brainspace", "vtk", "specparam",
-                    "matplotlib")
-# Folders the pipeline writes to; their changes do not make the code version dirty.
+                    "matplotlib", "seaborn")
+# Folders the pipeline writes to; their changes do not change the code version.
 OUTPUT_DIRS = ("results", "source_data")
 
 
@@ -78,33 +80,39 @@ def setup_step_logger(step: str, log_dir: Path, settings: dict | None = None) ->
     return logger
 
 
-def git_version(project_root: Path) -> str:
-    """Short commit hash of the code, with ``-dirty`` if the code has uncommitted changes.
+def git_version(project_root: Path, exclude: tuple[str, ...] = OUTPUT_DIRS) -> str:
+    """Version of the code: the last commit that changed it, with ``-dirty`` if it has changed since.
 
-    Changes under `OUTPUT_DIRS`, which the pipeline itself rewrites, do not count: a run
-    of committed code records a clean hash even after earlier steps have rewritten their
-    tables and figures.
+    Files under `exclude` (the folders the pipeline writes) are not code: the version is
+    the most recent commit that changed any other file, so committing a step's outputs
+    does not change the version that the next run of the same code records. Uncommitted
+    changes outside `exclude`, untracked files included, add ``-dirty``.
 
     Parameters
     ----------
     project_root : Path
         Root of the git working tree.
+    exclude : tuple of str
+        Top-level folders that do not count as code. Default `OUTPUT_DIRS`.
 
     Returns
     -------
     version : str
-        e.g. ``'3f2a9c1'`` or ``'3f2a9c1-dirty'``; ``'unknown'`` outside a git repository
-        or before its first commit.
+        Seven-character commit hash, e.g. ``'3f2a9c1'`` or ``'3f2a9c1-dirty'``;
+        ``'unknown'`` outside a git repository, before the first commit, or if git fails.
     """
     git = ["git", "-C", str(project_root)]
+    pathspec = ["--", "."] + [f":(exclude){d}" for d in exclude]
     try:
-        head = subprocess.run(git + ["rev-parse", "--short", "HEAD"],
-                              capture_output=True, text=True, check=True).stdout.strip()
-        changed = subprocess.run(git + ["diff", "--quiet", "HEAD", "--", "."]
-                                 + [f":(exclude){d}" for d in OUTPUT_DIRS], capture_output=True)
-    except (OSError, subprocess.CalledProcessError):
+        log = subprocess.run(git + ["log", "-1", "--format=%H"] + pathspec, capture_output=True, text=True)
+        status = subprocess.run(git + ["status", "--porcelain", "--untracked-files=normal"] + pathspec,
+                                capture_output=True, text=True)
+    except OSError:
         return "unknown"
-    return head + ("-dirty" if changed.returncode else "")
+    commit = log.stdout.strip()
+    if log.returncode or status.returncode or not commit:
+        return "unknown"
+    return commit[:7] + ("-dirty" if status.stdout.strip() else "")
 
 
 def package_versions() -> dict[str, str]:
@@ -146,7 +154,6 @@ def write_manifest(path: Path, step: str, project_root: Path, **fields) -> dict:
     """
     manifest = {
         "step": step,
-        "created": datetime.now().isoformat(timespec="seconds"),
         "git": git_version(project_root),
         "versions": package_versions(),
         **fields,

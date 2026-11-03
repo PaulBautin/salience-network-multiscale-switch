@@ -27,17 +27,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from brainspace.datasets import load_conte69
-from brainspace.mesh import mesh_elements
 from brainspace.plotting import plot_hemispheres
 
 import common
 from salience_switch import config
 from salience_switch.colors import connectivity_cmap
 from salience_switch.microstructure import compute_t1_gradient, compute_t1map, load_t1_salience_profiles
-from salience_switch.plotting import (SALIENCE_Z_LABELS, SALIENCE_Z_RANGE, mask_outline, plot_hemispheres_zoom,
-                                      salience_zoom_rois)
+from salience_switch.plotting import (SALIENCE_Z_LABELS, SALIENCE_Z_RANGE, ZOOM_ROW_KW, mask_outline,
+                                      plot_hemispheres_zoom, plot_zoom_rows, salience_zoom_rois)
 from salience_switch.provenance import write_manifest
-from salience_switch.stats import HemisphereMoranRandomization, moran_spearman
+from salience_switch.stats import fit_surface_moran, moran_spearman, null_interval
 from salience_switch.surface import (compute_network_mask, load_fc_gradient_32k, load_inflated_surfaces,
                                      load_yeo_atlas, load_yeo_surf_5k)
 
@@ -46,7 +45,6 @@ logger = logging.getLogger(STEP)
 
 # Matplotlib globals
 plt.rcParams['font.size'] = 16
-plt.rcParams['svg.fonttype'] = 'none'
 
 
 # ---------------------------------------------------------------------------
@@ -93,6 +91,9 @@ REQUIRED_5K = ["path_t1_profile_5k", "path_mpc_5k", "path_sc_5k",
 
 # Moran surrogates of the comparison with the FC gradient
 N_PERMUTATIONS = 1000
+# Diffusion-map gradient settings (salience_switch.microstructure.compute_t1_gradient),
+# recorded in each gradient summary.
+GRADIENT_KW = dict(n_components=10, sparsity=0.9, random_state=0)
 
 # Axes box (pt from the top-left of the 432-pt, 6-in canvas) shared by the profiles and
 # strata panels, so pial and WM sit at the same heights in both. It is the box
@@ -295,9 +296,10 @@ def plot_brain_zoom(
     surf_lh,
     surf_rh,
     out_dir: Path,
-    hemisphere: str = 'both',
+    network: str,
+    hemisphere: str,
 ) -> None:
-    """Brain row of the SalVentAttn MPC gradient with zoom insets of ``SALIENCE_ZOOM_ROIS``.
+    """Brain row of the network MPC gradient with zoom insets of ``SALIENCE_ZOOM_ROIS``.
 
     Writes ``figure_1a_brain_zoom.svg`` (brain row, marker circles, lines, insets,
     colour bar) and ``figure_1a_brain_zoom_roi.svg`` (the inset row alone). Both use
@@ -305,26 +307,26 @@ def plot_brain_zoom(
     bar right): its brain row overlays that file exactly, and the inset row placed
     300 pt below it reproduces the full figure. Insets are drawn only for regions in
     the analysed ``hemisphere``, since the gradient is undefined on the other one. The
-    SalVentAttn border (``mask_outline``) is traced on the brains and insets.
+    network border (``mask_outline``) is traced on the brains and insets.
 
     Parameters
     ----------
     df_yeo_surf : pd.DataFrame
-        fsLR-32k surface table with ``label`` and ``t1_gradient1_SalVentAttn`` columns.
+        fsLR-32k surface table with ``label`` and ``t1_gradient1_{network}`` columns.
     surf_lh, surf_rh : BSPolyData
         Inflated fsLR-32k hemispheres.
     out_dir : Path
         Output directory.
+    network : str
+        Yeo 7-network of the gradient.
     hemisphere : {'both', 'LH', 'RH'}
         Hemisphere(s) the gradient was computed on.
     """
     rois = salience_zoom_rois(df_yeo_surf, hemisphere)
-    values = df_yeo_surf['t1_gradient1_SalVentAttn'].to_numpy()
-    # Same window as the plot_hemispheres call that writes figure_1a_brain.svg. Labels at
-    # 30 pt: the 1450-pt rows are shown at ~0.29x in the Figure 1 layout (~8.8 pt, as 1b).
-    kwargs = dict(size=(1450, 300), zoom=1.3, color_bar=True, cmap='coolwarm', color_range=SALIENCE_Z_RANGE,
-                  nan_color=(220, 220, 220, 1), label_fontsize=30,
-                  outline=mask_outline(surf_lh, surf_rh, df_yeo_surf['network'].eq('SalVentAttn').to_numpy()))
+    values = df_yeo_surf[f't1_gradient1_{network}'].to_numpy()
+    # The window of the plot_hemispheres call that writes figure_1a_brain.svg.
+    kwargs = dict(ZOOM_ROW_KW, cmap='coolwarm', color_range=SALIENCE_Z_RANGE,
+                  outline=mask_outline(surf_lh, surf_rh, df_yeo_surf['network'].eq(network).to_numpy()))
     plot_hemispheres_zoom(surf_lh, surf_rh, values, rois, cbar_labels=SALIENCE_Z_LABELS, cbar_title='z',
                           filename=out_dir / "figure_1a_brain_zoom.svg", **kwargs)
     plot_hemispheres_zoom(surf_lh, surf_rh, values, rois, roi_only=True,
@@ -354,14 +356,10 @@ def plot_fc_gradient_zoom(df_fc: pd.DataFrame, surf_lh, surf_rh, out_dir: Path, 
                                      "Functional connectivity gradient (salience network)"),
     }
     rois = salience_zoom_rois(df_fc, 'both')
-    kwargs = dict(size=(1450, 300), zoom=1.3, color_bar=True, cmap=connectivity_cmap.name, color_range=SALIENCE_Z_RANGE,
-                  nan_color=(220, 220, 220, 1), label_fontsize=30, title_fontsize=36, cbar_labels=SALIENCE_Z_LABELS,
-                  cbar_title='z', outline=mask_outline(surf_lh, surf_rh, net))
+    kwargs = dict(ZOOM_ROW_KW, cmap=connectivity_cmap.name, color_range=SALIENCE_Z_RANGE,
+                  cbar_labels=SALIENCE_Z_LABELS, cbar_title='z', outline=mask_outline(surf_lh, surf_rh, net))
     for stem, (values, title) in versions.items():
-        plot_hemispheres_zoom(surf_lh, surf_rh, values, rois, filename=out_dir / f"{stem}_zoom_supp.svg", **kwargs)
-        plot_hemispheres_zoom(surf_lh, surf_rh, values, [dict(r, label=None) for r in rois], roi_only=True,
-                              draw_color_bar=True, title=title, filename=out_dir / f"{stem}_zoom_roi_supp.svg", **kwargs)
-        plt.close('all')
+        plot_zoom_rows(surf_lh, surf_rh, values, rois, stem, title, out_dir=out_dir, suffix="supp", **kwargs)
 
 
 # ---------------------------------------------------------------------------
@@ -492,7 +490,7 @@ def write_gradient_summary(summary_path: Path, df_pni: pd.DataFrame, network: st
     summary = {
         "network": network, "hemisphere": hemisphere, "subjects": df_pni["ID_PNI"].tolist(),
         "n_vertices": int(n_vertices), "n_components": int(lambdas.shape[1]),
-        "sparsity": 0.9, "random_state": 0,
+        "sparsity": GRADIENT_KW["sparsity"], "random_state": GRADIENT_KW["random_state"],
         "mean_lambdas": lambdas.mean(axis=0).tolist(),
         "variance_explained_g1": (lambdas[:, 0] / lambdas.sum(axis=1)).tolist(),
     }
@@ -516,9 +514,9 @@ def gradient_and_profiles(
     The diffusion-map MPC gradient is computed from the per-subject T1 profiles and
     written to `table_path`, with a JSON summary at `summary_path` (subjects, settings,
     mean lambdas and every subject's lambda_1 / sum(lambda)). The table is reused only
-    if the summary lists exactly the subjects of `df_pni`, in the same order (the
-    Procrustes reference is the first subject); otherwise the gradient is recomputed
-    and both files are rewritten. The variance explained is logged either way. The
+    if the summary records the same network and `GRADIENT_KW` and lists exactly the
+    subjects of `df_pni`, in the same order (the Procrustes reference is the first
+    subject); otherwise the gradient is recomputed and both files are rewritten. The variance explained is logged either way. The
     per-subject profiles are only loaded when they are actually consumed: always on a
     recompute (they drive the gradient) and on reuse only when `need_profiles` is set.
     When they are not loaded the second return value is ``None``. The profile vertex
@@ -527,7 +525,9 @@ def gradient_and_profiles(
     net_mask = compute_network_mask(df_yeo, network, hemisphere)
     summary = json.loads(summary_path.read_text()) if summary_path.exists() else None
     subjects = df_pni["ID_PNI"].tolist()
-    if table_path.exists() and summary is not None and summary["subjects"] == subjects:
+    same_fit = summary is not None and summary["subjects"] == subjects and summary["network"] == network and all(
+        summary.get(k) == v for k, v in GRADIENT_KW.items())
+    if table_path.exists() and same_fit:
         logger.info(f"Found existing gradient table at {table_path} ({len(subjects)} subjects). Loading...")
         profiles = (load_t1_salience_profiles(df_pni[t1_col].tolist(), net_mask)
                     if need_profiles else None)
@@ -535,11 +535,11 @@ def gradient_and_profiles(
     else:
         if table_path.exists():
             reason = ("has no summary" if summary is None
-                      else f"was computed on {len(summary['subjects'])} other/differently ordered subjects")
+                      else "was computed with other subjects, network or settings")
             logger.info(f"Gradient table {table_path.name} {reason}; recomputing on the "
                         f"{len(subjects)} subjects of the subject table.")
         profiles = load_t1_salience_profiles(df_pni[t1_col].tolist(), net_mask)
-        gradient, lambdas = compute_t1_gradient(profiles, return_lambdas=True)
+        gradient, lambdas = compute_t1_gradient(profiles, return_lambdas=True, **GRADIENT_KW)
         df_yeo.loc[net_mask, f"t1_gradient1_{network}"] = gradient
         df_yeo.loc[net_mask, "T1map"] = compute_t1map(profiles)
         config.write_table(df_yeo, table_path)
@@ -581,11 +581,9 @@ def compare_with_fc_gradient(
     grad = df_fc[f"t1_gradient1_{network}"].to_numpy(dtype=float)
     fc = df_fc["fc_g1"].to_numpy(dtype=float)
     tested = compute_network_mask(df_fc, network, hemisphere) & np.isfinite(grad) & np.isfinite(fc)
-    w = mesh_elements.get_ring_distance(surf_32k, n_ring=1, mask=tested)
-    w.data **= -1
-    msr = HemisphereMoranRandomization(df_fc["hemisphere"].to_numpy()[tested], n_rep, random_state=0).fit(w)
+    msr = fit_surface_moran(surf_32k, tested, df_fc["hemisphere"].to_numpy()[tested], n_rep)
     r, p, r_null = moran_spearman(fc[tested], grad[tested], msr)
-    lo, hi = np.percentile(r_null, [2.5, 97.5])
+    lo, _, hi = null_interval(r_null)
     logger.info(f"[Figure 1A] {network} MPC gradient vs whole-brain FC gradient (Figure 3 target axis, fsLR-32k, "
                 f"default-mode network low) | Spearman r={r:+.3f}, Moran permutation p={p:.3e} (MPC gradient "
                 f"randomised per hemisphere, n_perm={n_rep}, n_vertices={int(tested.sum())}; "
@@ -644,7 +642,7 @@ def compute(settings: dict, paths: dict) -> None:
             "MPC            : fsLR-5k vertex-level MPC matrix",
             "Connectomes    : iFOD2 40M streamlines, SIFT2-weighted, fsLR-5k",
             "FC             : resting-state (desc-me_task-rest_bold), fsLR-5k",
-            "Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment",
+            f"Gradient       : diffusion maps, normalized angle kernel, {GRADIENT_KW}, procrustes alignment",
         ],
     )
     subjects_32k = work / "subjects_fslr32k.csv"
@@ -652,7 +650,7 @@ def compute(settings: dict, paths: dict) -> None:
         subjects_32k, participants, pni_deriv, mics_deriv, PATHS_32K, REQUIRED_32K,
         log_lines=[
             "T1 profiles    : acq-T1map, fsLR-32k surface, 14 intracortical depths",
-            "Gradient       : diffusion maps, normalized angle kernel, sparsity=0.9, n_components=10, procrustes alignment",
+            f"Gradient       : diffusion maps, normalized angle kernel, {GRADIENT_KW}, procrustes alignment",
         ],
     )
     df_pni = restrict_to_subjects(df_pni, df_pni_5k, subjects_32k)
@@ -705,7 +703,7 @@ def plot(settings: dict) -> None:
                      size=(1450, 300), zoom=1.3, color_bar='right', share='both', nan_color=(220, 220, 220, 1),
                      cmap='coolwarm', color_range=SALIENCE_Z_RANGE, transparent_bg=True, screenshot=True,
                      filename=out / "figure_1a_brain.svg", cb__numberOfLabels=0)
-    plot_brain_zoom(df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, out, hemisphere=hemi)
+    plot_brain_zoom(df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, out, network, hemi)
     plot_hemispheres(surf5k_lh_infl, surf5k_rh_infl, array_name=df_yeo_surf_5k[f't1_gradient1_{network}'].values,
                      size=(1450, 300), zoom=1.3, color_bar='right', share='both', nan_color=(220, 220, 220, 1),
                      cmap='coolwarm', color_range=SALIENCE_Z_RANGE, transparent_bg=True, screenshot=True,

@@ -4,8 +4,9 @@ import pytest
 from brainspace.null_models import MoranRandomization
 from scipy.stats import spearmanr
 
-from salience_switch.stats import (HemisphereMoranRandomization, empirical_p_excess_magnitude, empirical_p_twosided,
-                                   moran_spearman, moran_spearman_difference, rank_corr_columns)
+from salience_switch.stats import (HemisphereMoranRandomization, empirical_p_excess_magnitude, empirical_p_tails,
+                                   empirical_p_twosided, moran_spearman, moran_spearman_difference, null_interval,
+                                   rank_corr_columns)
 
 
 def chain_weights(n: int, reach: int = 4) -> np.ndarray:
@@ -35,6 +36,32 @@ def test_excess_magnitude_matches_twosided():
     null = rng.standard_normal(500)
     for obs in (-1.5, -0.1, 0.0, 0.7, 3.0):
         assert empirical_p_excess_magnitude(null, obs) == empirical_p_twosided(null, obs)
+
+
+def test_empirical_p_tails():
+    null = np.array([0.0, 1.0, 2.0, 3.0, np.nan])
+    lower, upper, two = empirical_p_tails(null, 2.5)
+    assert (lower, upper) == pytest.approx(((1 + 3) / 5, (1 + 1) / 5))
+    assert two == pytest.approx(2 * 2 / 5)
+    assert empirical_p_tails(null, -9.0) == pytest.approx((1 / 5, 1.0, 2 / 5))
+    assert all(np.isnan(empirical_p_tails(null, np.nan)))
+
+
+def test_null_interval_ignores_non_finite():
+    lo, med, hi = null_interval(np.array([np.nan, *np.arange(101.0)]))
+    assert (lo, med, hi) == pytest.approx((2.5, 50.0, 97.5))
+    assert all(np.isnan(null_interval(np.array([np.nan]))))
+
+
+def test_moran_surrogates_are_reused_for_the_same_map():
+    rng = np.random.default_rng(3)
+    n = 40
+    msr = HemisphereMoranRandomization(np.repeat(["LH", "RH"], n // 2), 20).fit(
+        np.kron(np.eye(2), chain_weights(n // 2)))
+    y = smooth_field(rng, n)
+    first = msr.randomize(y)
+    assert msr.randomize(y.copy()) is first and not first.flags.writeable
+    assert not np.array_equal(msr.randomize(y + 1.0), first)
 
 
 def test_rank_corr_columns_is_spearman():

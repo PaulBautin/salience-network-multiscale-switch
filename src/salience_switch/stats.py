@@ -8,6 +8,7 @@ import logging
 
 import numpy as np
 import pandas as pd
+from brainspace.mesh import mesh_elements
 from brainspace.null_models import MoranRandomization
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
@@ -57,7 +58,7 @@ class HemisphereMoranRandomization:
 
     def fit(self, w) -> "HemisphereMoranRandomization":
         """Fit one randomisation per block on ``w`` ((n, n) array or sparse matrix)."""
-        self.fits_ = []
+        self.fits_, self._last = [], None
         for b, label in enumerate(pd.unique(self.blocks)):
             idx = np.flatnonzero(self.blocks == label)
             seed = self.random_state + b
@@ -72,8 +73,16 @@ class HemisphereMoranRandomization:
         return self
 
     def randomize(self, y: np.ndarray) -> np.ndarray:
-        """``(n_rep, n)`` surrogates of ``y``, drawn within each block."""
+        """``(n_rep, n)`` surrogates of ``y``, drawn within each block (read-only).
+
+        Every block is reseeded on each call, so the same ``y`` always gives the same
+        surrogates; those of the last ``y`` are kept and returned again when several tests
+        randomize the same map.
+        """
         y = np.asarray(y, dtype=np.float64)
+        cached = getattr(self, "_last", None)
+        if cached is not None and np.array_equal(cached[0], y, equal_nan=True):
+            return cached[1]
         surrogates = np.empty((self.n_rep, y.size), dtype=np.float64)
         for idx, msr, seed in self.fits_:
             if msr is not None:
@@ -82,7 +91,42 @@ class HemisphereMoranRandomization:
                 rng = np.random.default_rng(seed)
                 for k in range(self.n_rep):
                     surrogates[k, idx] = rng.permutation(y[idx])
+        surrogates.flags.writeable = False
+        self._last = (y.copy(), surrogates)
         return surrogates
+
+
+def fit_surface_moran(surf, mask: np.ndarray, blocks, n_rep: int, *,
+                      random_state: int = 0) -> HemisphereMoranRandomization:
+    """Moran null of a map on surface vertices, with inverse 1-ring edge-length weights.
+
+    The spatial weights are the inverse lengths of the mesh edges between the masked
+    vertices (1-ring neighbours), so the graph covers exactly the vertices that enter the
+    test, and the null is fitted separately within each block
+    (`HemisphereMoranRandomization`).
+
+    Parameters
+    ----------
+    surf : brainspace BSPolyData
+        Surface whose vertices `mask` indexes (e.g. one fsLR-32k midthickness
+        hemisphere, or both joined).
+    mask : (n_vertices,) bool
+        Vertices of the test, in surface order.
+    blocks : (n_masked,) array
+        Block label of each masked vertex, e.g. its hemisphere.
+    n_rep : int
+        Number of surrogates.
+    random_state : int
+        Seed of the first block. Default 0.
+
+    Returns
+    -------
+    msr : HemisphereMoranRandomization
+        Fitted on the masked vertices, in surface order.
+    """
+    w = mesh_elements.get_ring_distance(surf, n_ring=1, mask=np.asarray(mask, dtype=bool))
+    w.data **= -1
+    return HemisphereMoranRandomization(blocks, n_rep, random_state=random_state).fit(w)
 
 
 def moran_surrogates_blockwise(
@@ -154,9 +198,7 @@ def rank_corr_columns(x: np.ndarray, Y: np.ndarray) -> np.ndarray:
     """
     rx = rankdata(x).astype(np.float64)
     rx -= rx.mean()
-    RY = np.empty(Y.shape, dtype=np.float64)
-    for k in range(Y.shape[1]):
-        RY[:, k] = rankdata(Y[:, k])
+    RY = np.ascontiguousarray(rankdata(Y, axis=0), dtype=np.float64)
     RY -= RY.mean(axis=0, keepdims=True)
     with np.errstate(invalid="ignore", divide="ignore"):
         r = (rx @ RY) / (np.linalg.norm(rx) * np.linalg.norm(RY, axis=0))
@@ -207,8 +249,8 @@ def empirical_p_excess_magnitude(null: np.ndarray, observed: float) -> float:
     (an upper-tail p-value would report no effect whenever `g_MPC` comes out
     sign-negative). The add-one keeps the estimate bounded away from zero.
 
-    The arithmetic is the same as `empirical_p_twosided`; the separate name records
-    which question the topological null asks.
+    The arithmetic is that of `empirical_p_twosided`; the separate name records which
+    question the topological null asks.
 
     Parameters
     ----------
@@ -223,11 +265,56 @@ def empirical_p_excess_magnitude(null: np.ndarray, observed: float) -> float:
         Empirical p-value in (0, 1], or NaN if `observed` is non-finite or there are
         no finite null values.
     """
+    return empirical_p_twosided(null, observed)
+
+
+def empirical_p_tails(null: np.ndarray, observed: float) -> tuple[float, float, float]:
+    """Lower-tail, upper-tail and equal-tailed two-sided add-one empirical p-values.
+
+    ``p_lower = (1 + #{null <= obs}) / (1 + n)`` and
+    ``p_upper = (1 + #{null >= obs}) / (1 + n)`` over the `n` finite null values, and
+    the two-sided ``p = min(1, 2 min(p_lower, p_upper))``. Doubling the smaller tail does
+    not assume a symmetric null, unlike `empirical_p_twosided`, so it suits skewed or
+    bounded nulls such as the percentages of a spin test.
+
+    Parameters
+    ----------
+    null : (n,) array
+        Null statistics; non-finite values are ignored.
+    observed : float
+        Observed statistic.
+
+    Returns
+    -------
+    p_lower, p_upper, p : float
+        Each in (0, 1]; NaN if `observed` is non-finite or there are no finite null values.
+    """
     finite = null[np.isfinite(null)]
     if not np.isfinite(observed) or finite.size == 0:
-        return np.nan
-    k = int(np.sum(np.abs(finite) >= np.abs(observed)))
-    return float((1 + k) / (1 + finite.size))
+        return np.nan, np.nan, np.nan
+    p_lower = (1 + int(np.sum(finite <= observed))) / (1 + finite.size)
+    p_upper = (1 + int(np.sum(finite >= observed))) / (1 + finite.size)
+    return float(p_lower), float(p_upper), float(min(1.0, 2 * min(p_lower, p_upper)))
+
+
+def null_interval(null: np.ndarray) -> tuple[float, float, float]:
+    """2.5th, 50th and 97.5th percentiles of the finite null values (NaN if there are none).
+
+    Parameters
+    ----------
+    null : (n,) array
+        Null statistics.
+
+    Returns
+    -------
+    lo, median, hi : float
+    """
+    null = np.asarray(null, dtype=float)
+    finite = null[np.isfinite(null)]
+    if finite.size == 0:
+        return np.nan, np.nan, np.nan
+    lo, med, hi = np.percentile(finite, [2.5, 50, 97.5])
+    return float(lo), float(med), float(hi)
 
 
 def moran_spearman(x: np.ndarray, y: np.ndarray, msr) -> tuple[float, float, np.ndarray]:

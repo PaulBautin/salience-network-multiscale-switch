@@ -6,13 +6,16 @@ step1a_mpc_gradient:
   hemisphere: both            # both, LH or RH
 
 step1b_histology:
+  network: SalVentAttn        # network whose step 1a gradient is compared with histology
   hemisphere: both            # gradient table of step 1a to read (both, LH or RH)
 
 step1c_cortical_types:
+  network: SalVentAttn        # network whose cortical-type composition is tested
   hemisphere: both            # both, LH or RH
 
 step2a_ieeg_mni:
-  network: SalVentAttn        # network whose gradient quarters define the ES difference
+  network: SalVentAttn
+  hemisphere: LH              # hemisphere of the statistics (LH or RH); maps show both
 
 step2b_ieeg_mica:
   network: SalVentAttn
@@ -23,8 +26,10 @@ step2c_ieeg_states:
   hemisphere: LH              # hemisphere of the statistics (LH or RH); maps show both
 
 step3_connectivity:
+  network: SalVentAttn        # focus network of Figure 3A (every network is computed)
   hemisphere: both            # both, LH or RH
   n_permutations: 1000        # surrogates per null model; the add-one p floor is 1/(1+n)
 
 step3_schematic:
+  network: SalVentAttn        # source network of the schematic, as step 3
   hemisphere: both            # source-network hemispheres, as step 3

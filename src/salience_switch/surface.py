@@ -38,29 +38,21 @@ def load_inflated_surfaces(density: str = "fsLR-32k") -> tuple:
 
 
 def convert_states_str2int(states_str: list | np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """This function takes a list of strings that designate a distinct set of binary brain states and returns
-    a numpy array of integers encoding those states alongside a list of keys for those integers.
+    """Integer code of each label, in the alphabetical order of the distinct labels.
 
-    Args:
-        states_str (N, list): a list of strings that designate which regions belong to which states.
-            For example, states = ['Vis', 'Vis', 'Vis', 'SomMot', 'SomMot', 'SomMot']
+    Parameters
+    ----------
+    states_str : (n,) list or array of str
+        One label per vertex, e.g. ``['Vis', 'Vis', 'SomMot']``.
 
-    Returns:
-        states (N, numpy array): array of integers denoting which node belongs to which state.
-        state_labels (n_states, list): list of keys corresponding to integers.
-            For example, if state_labels[1] = 'SomMot' then the integer 1 in `states` corresponds to 'SomMot'.
-            Together, a binary state can be extracted like so: x0 = states == state_labels.index('SomMot')
-
+    Returns
+    -------
+    states : (n,) float array
+        Code of each label: its index in `state_labels`.
+    state_labels : (n_states,) array
+        The distinct labels, sorted; ``states == k`` selects ``state_labels[k]``.
     """
-    n_states = len(states_str)
-    state_labels = np.unique(states_str)
-
-    states = np.zeros(n_states)
-    for i, state in enumerate(state_labels):
-        for j in np.arange(n_states):
-            if state == states_str[j]:
-                states[j] = i
-
+    state_labels, states = np.unique(states_str, return_inverse=True)
     return states.astype(float), state_labels
 
 
@@ -87,38 +79,41 @@ def compute_network_mask(df: pd.DataFrame, network: str, hemisphere: str = 'both
     return mask.to_numpy()
 
 
-def load_yeo_atlas(surf_32k) -> pd.DataFrame:
+def _schaefer_table(density: str) -> pd.DataFrame:
+    """Schaefer-400 parcel (``mics`` ID), Yeo 7 network, hemisphere and label per vertex."""
+    lh = nib.load(DATA_DIR / f'parcellations/schaefer-400_{density}_lh.label.gii').darrays[0].data + 1000
+    rh = nib.load(DATA_DIR / f'parcellations/schaefer-400_{density}_rh.label.gii').darrays[0].data + 1800
+    rh[rh == 1800] = 2000  # right medial wall
+    df = pd.DataFrame({'mics': np.concatenate([lh, rh]).astype(float)})
+    lut = pd.concat([pd.read_csv(DATA_DIR / 'parcellations/lut/lut_subcortical-cerebellum_mics.csv'),
+                     pd.read_csv(DATA_DIR / 'parcellations/lut/lut_schaefer-400_mics.csv')])
+    lut['network'] = lut['label'].str.extract(r'(Vis|Default|Cont|DorsAttn|Limbic|SalVentAttn|SomMot|medial_wall)')
+    lut['hemisphere'] = lut['label'].str.extract(r'(LH|RH)')
+    return df.merge(lut[['mics', 'hemisphere', 'network', 'label']], on='mics', validate="many_to_one", how='left')
+
+
+def load_yeo_atlas(surf_32k, border_network: str = 'SalVentAttn') -> pd.DataFrame:
     """fsLR-32k surface table: Schaefer-400 parcel, Yeo 7 network and hemisphere per vertex.
 
     Parameters
     ----------
     surf_32k : brainspace BSPolyData
-        Both fsLR-32k hemispheres combined (left first), used to trace the salience
-        network border.
+        Both fsLR-32k hemispheres combined (left first), used to trace the network border.
+    border_network : str
+        Network whose border the ``salience_border`` column traces. Default
+        ``'SalVentAttn'``.
 
     Returns
     -------
     df_yeo_surf : pd.DataFrame
         64,984 rows (left hemisphere first) with `mics` (parcel ID), `hemisphere`,
         `network`, `label`, `network_int` (integer network code of
-        `convert_states_str2int`) and `salience_border` (NaN on the salience-network
-        border, 1 elsewhere, for drawing the border on maps).
+        `convert_states_str2int`) and `salience_border` (NaN on the border of
+        `border_network`, 1 elsewhere, for drawing the border on maps).
     """
-    # Yeo 7-network atlas (Schaefer-400)
-    atlas_yeo_lh = nib.load(DATA_DIR / 'parcellations/schaefer-400_conte69_lh.label.gii').darrays[0].data + 1000
-    atlas_yeo_rh = nib.load(DATA_DIR / 'parcellations/schaefer-400_conte69_rh.label.gii').darrays[0].data + 1800
-    atlas_yeo_rh[atlas_yeo_rh == 1800] = 2000
-    df_yeo_surf = pd.DataFrame({'mics': np.concatenate([atlas_yeo_lh, atlas_yeo_rh]).astype(float)})
-
-    #### load yeo atlas 7 network information
-    df_label = pd.read_csv(DATA_DIR / 'parcellations/lut/lut_schaefer-400_mics.csv')
-    df_label_sub = pd.read_csv(DATA_DIR / 'parcellations/lut/lut_subcortical-cerebellum_mics.csv')
-    df_label = pd.concat([df_label_sub, df_label])
-    df_label['network'] = df_label['label'].str.extract(r'(Vis|Default|Cont|DorsAttn|Limbic|SalVentAttn|SomMot|medial_wall)')
-    df_label['hemisphere'] = df_label['label'].str.extract(r'(LH|RH)')
-    df_yeo_surf = df_yeo_surf.merge(df_label[['mics', 'hemisphere','network', 'label']], on='mics', validate="many_to_one", how='left')
+    df_yeo_surf = _schaefer_table('conte69')
     df_yeo_surf['network_int'] = convert_states_str2int(df_yeo_surf['network'].values)[0]
-    df_yeo_surf['salience_border'] = get_labeling_border(surf_32k, df_yeo_surf['network'].eq('SalVentAttn').to_numpy())
+    df_yeo_surf['salience_border'] = get_labeling_border(surf_32k, df_yeo_surf['network'].eq(border_network).to_numpy())
     df_yeo_surf.loc[df_yeo_surf['salience_border'].values == 1, 'salience_border'] = np.nan
     df_yeo_surf.loc[df_yeo_surf['salience_border'].values == 0, 'salience_border'] = 1
     return df_yeo_surf
@@ -136,19 +131,7 @@ def load_yeo_surf_5k() -> pd.DataFrame:
         9,684 rows (left hemisphere first) with `mics` (parcel ID), `hemisphere`,
         `network` and `label`.
     """
-    atlas_yeo_lh_5k = nib.load(DATA_DIR / 'parcellations/schaefer-400_fslr-5k_lh.label.gii').darrays[0].data + 1000
-    atlas_yeo_rh_5k = nib.load(DATA_DIR / 'parcellations/schaefer-400_fslr-5k_rh.label.gii').darrays[0].data + 1800
-    atlas_yeo_rh_5k[atlas_yeo_rh_5k == 1800] = 2000
-    yeo_surf_5k = np.concatenate((atlas_yeo_lh_5k, atlas_yeo_rh_5k), axis=0).astype(float)
-    df_yeo_surf_5k = pd.DataFrame(data={'mics': yeo_surf_5k})
-
-    df_label = pd.read_csv(DATA_DIR / 'parcellations/lut/lut_schaefer-400_mics.csv')
-    df_label_sub = pd.read_csv(DATA_DIR / 'parcellations/lut/lut_subcortical-cerebellum_mics.csv')
-    df_label = pd.concat([df_label_sub, df_label])
-    df_label['network'] = df_label['label'].str.extract(r'(Vis|Default|Cont|DorsAttn|Limbic|SalVentAttn|SomMot|medial_wall)')
-    df_label['hemisphere'] = df_label['label'].str.extract(r'(LH|RH)')
-    df_yeo_surf_5k = df_yeo_surf_5k.merge(df_label[['mics', 'hemisphere', 'network', 'label']], on='mics', validate="many_to_one", how='left')
-    return df_yeo_surf_5k
+    return _schaefer_table('fslr-5k')
 
 
 def load_fc_gradient_5k(df_yeo_surf_5k: pd.DataFrame) -> pd.DataFrame:
@@ -173,13 +156,9 @@ def load_fc_gradient_5k(df_yeo_surf_5k: pd.DataFrame) -> pd.DataFrame:
     Returns
     -------
     df : pd.DataFrame
-        A copy of `df_yeo_surf_5k` with `fc_g1` (oriented gradient, NaN off cortex),
-        `fc_g1_network` (network mean of `fc_g1`) and `network_int` (integer network
-        code of `convert_states_str2int`).
+        A copy of `df_yeo_surf_5k` with `fc_g1` (oriented gradient, NaN off cortex).
     """
-    df = _add_fc_gradient(df_yeo_surf_5k, "fslr-5k")
-    df['network_int'] = convert_states_str2int(df['network'].values)[0]
-    return df
+    return _add_fc_gradient(df_yeo_surf_5k, "fslr-5k")
 
 
 def load_fc_gradient_32k(df_yeo_surf: pd.DataFrame) -> pd.DataFrame:
@@ -198,14 +177,13 @@ def load_fc_gradient_32k(df_yeo_surf: pd.DataFrame) -> pd.DataFrame:
     Returns
     -------
     df : pd.DataFrame
-        A copy of `df_yeo_surf` with `fc_g1` (oriented gradient, NaN off cortex) and
-        `fc_g1_network` (network mean of `fc_g1`).
+        A copy of `df_yeo_surf` with `fc_g1` (oriented gradient, NaN off cortex).
     """
     return _add_fc_gradient(df_yeo_surf, "fslr-32k")
 
 
 def _add_fc_gradient(df_surf: pd.DataFrame, density: str) -> pd.DataFrame:
-    """Copy of `df_surf` with the oriented FC gradient (`fc_g1`) and its network means."""
+    """Copy of `df_surf` with the oriented FC gradient (`fc_g1`)."""
     fc_lh = nib.load(DATA_DIR / f'parcellations/fc_gradient_{density}_lh.shape.gii').darrays[0].data
     fc_rh = nib.load(DATA_DIR / f'parcellations/fc_gradient_{density}_rh.shape.gii').darrays[0].data
     df = df_surf.copy()
@@ -220,8 +198,6 @@ def _add_fc_gradient(df_surf: pd.DataFrame, density: str) -> pd.DataFrame:
         logger.info(f"[FC gradient {density}] flipped sign so the default-mode network sits at the low end.")
     else:
         logger.info(f"[FC gradient {density}] sign kept as loaded (default-mode network already at the low end).")
-
-    df['fc_g1_network'] = df.groupby('network')['fc_g1'].transform('mean')
     return df
 
 
@@ -246,10 +222,15 @@ def load_econo_atlas(df_yeo_surf: pd.DataFrame) -> pd.DataFrame:
     econo_surf = np.concatenate((econo_surf_lh, econo_surf_rh), axis=0).astype(float)
     econ_ctb = np.array([0, 0, 2, 3, 4, 3, 3, 3, 2, 2, 3, 3, 3, 4, 5, 6, 6, 6, 5, 4, 6, 6, 4, 4, 6, 6, 6, 2, 1, 1, 2, 1, 2, 3, 2, 3, 4, 3, 3, 2, 1, 1, 2, 4, 5])[[0] + list(range(2, 45))]
     df_yeo_surf['surf_type'] = relabel(econo_surf, econ_ctb).astype(float)
-    # plt_values = df_yeo_surf['surf_type'].values * df_yeo_surf['salience_border'].values
-    # plot_hemispheres(surf32k_lh_infl, surf32k_rh_infl, array_name=plt_values, size=(1450, 300), zoom=1.3, color_bar='right', share='both',
-    #             nan_color=(0, 0, 0, 1), cmap='CustomCmap_type', transparent_bg=True, interactive=False)
     return df_yeo_surf
+
+
+def _histology_mean(name: str, mask: np.ndarray, invert: bool = False) -> np.ndarray:
+    """Depth-averaged fsLR-32k intensity profile of a bundled histology map, z-scored over `mask`."""
+    profiles = nib.load(DATA_DIR / f'parcellations/sub-{name}_surf-fsLR-32k_desc-intensity_profiles.shape.gii').darrays[0].data[:, mask]
+    if invert:
+        profiles = -profiles
+    return zscore(np.mean(profiles, axis=0), nan_policy='omit')
 
 
 def load_bigbrain(mask: np.ndarray) -> np.ndarray:
@@ -266,23 +247,7 @@ def load_bigbrain(mask: np.ndarray) -> np.ndarray:
     -------
     np.ndarray, shape (n_masked_vertices,)
     """
-    data_bigbrain = nib.load(DATA_DIR / 'parcellations/sub-BigBrain_surf-fsLR-32k_desc-intensity_profiles.shape.gii').darrays[0].data
-    salience_bigbrain = -data_bigbrain[:, mask]
-    return zscore(np.mean(salience_bigbrain, axis=0), nan_policy='omit')
-
-
-def load_bigbrain_gradients() -> np.ndarray:
-    """Second BigBrain histological gradient on fsLR-32k (BigBrainWarp; Paquola et al., 2021).
-
-    Returns
-    -------
-    gradient : (64984,) array
-        Gradient value per vertex, left hemisphere first.
-    """
-    gradient_lh = nib.load(DATA_DIR / 'parcellations/tpl-fs_LR_hemi-L_den-32k_desc-Hist_G2.shape.gii').darrays[0].data
-    gradient_rh = nib.load(DATA_DIR / 'parcellations/tpl-fs_LR_hemi-R_den-32k_desc-Hist_G2.shape.gii').darrays[0].data
-    gradient = np.concatenate((gradient_lh, gradient_rh), axis=0)
-    return gradient
+    return _histology_mean('BigBrain', mask, invert=True)
 
 
 def load_ahead_biel(mask: np.ndarray) -> np.ndarray:
@@ -297,9 +262,7 @@ def load_ahead_biel(mask: np.ndarray) -> np.ndarray:
     -------
     np.ndarray, shape (n_masked_vertices,)
     """
-    data_biel = nib.load(DATA_DIR / 'parcellations/sub-Ahead-Bielschowsky_surf-fsLR-32k_desc-intensity_profiles.shape.gii').darrays[0].data
-    salience_biel = data_biel[:, mask]
-    return zscore(np.mean(salience_biel, axis=0), nan_policy='omit')
+    return _histology_mean('Ahead-Bielschowsky', mask)
 
 
 def load_ahead_parva(mask: np.ndarray) -> np.ndarray:
@@ -314,6 +277,4 @@ def load_ahead_parva(mask: np.ndarray) -> np.ndarray:
     -------
     np.ndarray, shape (n_masked_vertices,)
     """
-    data_parva = nib.load(DATA_DIR / 'parcellations/sub-Ahead-Parvalbumin_surf-fsLR-32k_desc-intensity_profiles.shape.gii').darrays[0].data
-    salience_parva = data_parva[:, mask]
-    return zscore(np.mean(salience_parva, axis=0), nan_policy='omit')
+    return _histology_mean('Ahead-Parvalbumin', mask)

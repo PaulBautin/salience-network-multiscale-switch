@@ -1,7 +1,6 @@
 {
   "step": "step2a_ieeg_mni",
-  "created": "2026-10-30T18:21:49",
-  "git": "1652fc9",
+  "git": "1652fc9-dirty",
   "versions": {
     "python": "3.10.19",
     "numpy": "2.2.6",
@@ -11,9 +10,14 @@
     "brainspace": "0.1.22",
     "vtk": "9.3.1",
     "specparam": "2.0.0rc7",
-    "matplotlib": "3.10.8"
+    "matplotlib": "3.10.8",
+    "seaborn": "0.13.2"
   },
   "network": "SalVentAttn",
-  "n_channels": 1772,
-  "n_permutations": 1000
+  "hemisphere": "LH",
+  "n_patients": 104,
+  "n_channels": 1730,
+  "n_permutations": 1000,
+  "kernel_half_weight_mm": 4.0,
+  "kernel_rel_thresh": 0.05
 }

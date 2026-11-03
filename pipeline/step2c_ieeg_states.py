@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Step 2c: state dependence of the iEEG aperiodic exponent along the gradient (Figure 2c).
+"""Step 2c: state dependence of the iEEG aperiodic exponent along the gradient (supplementary).
 
 The same bipolar channels of the MICA iEEG dataset were recorded in wakefulness (stage W),
 N2 and N3 sleep. The first 180 s of every recording are parameterised with specparam (as
@@ -30,30 +30,27 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from brainspace.datasets import load_conte69
-from brainspace.mesh import mesh_elements
 from scipy.stats import zscore
 
 import common
 from salience_switch import config
 from salience_switch.colors import ieeg_cmap
-from salience_switch.ieeg import (MICA_PSD_PARAMS, SPEC_BANDS, SPEC_FIT_RANGE, build_bipolar_sensitivity,
-                                  compute_spectral_parameters, fit_quality_summary, load_or_compute_channel_psd,
-                                  load_sensitivity_info, mirror_to_cortex, project_channel_measure)
-from salience_switch.plotting import (SALIENCE_Z_LABELS, SALIENCE_Z_RANGE, format_pvalue, mask_outline,
-                                      plot_fit_quality, plot_hemispheres_zoom, plot_ridge, salience_zoom_rois)
+from salience_switch.ieeg import (N_LH, PSD_PARAMS, SPEC_BANDS, SPEC_FIT_RANGE, compute_spectral_parameters,
+                                  covered_vertices, fit_quality_summary, hemisphere_slice, load_channel_sensitivity,
+                                  load_or_compute_channel_psd, mirror_to_cortex, project_channel_measure)
+from salience_switch.plotting import (SALIENCE_Z_LABELS, SALIENCE_Z_RANGE, ZOOM_ROW_KW, format_pvalue, mask_outline,
+                                      plot_fit_quality, plot_hemispheres_zoom, plot_ridge, salience_zoom_rois,
+                                      shared_row_geometry)
 from salience_switch.provenance import write_manifest
-from salience_switch.stats import HemisphereMoranRandomization, moran_spearman, moran_spearman_difference
-from salience_switch.surface import load_inflated_surfaces
+from salience_switch.stats import fit_surface_moran, moran_spearman, moran_spearman_difference, null_interval
+from salience_switch.surface import compute_network_mask, load_inflated_surfaces
 
 STEP = "step2c_ieeg_states"
 GRADIENT_STEP = "step1a_mpc_gradient"
 logger = logging.getLogger(STEP)
 
 plt.rcParams['font.size'] = 16
-plt.rcParams['svg.fonttype'] = 'none'
 
-# fsLR-32k vertices per hemisphere (LH and RH each carry this many).
-N_LH = 32492
 # Moran surrogates per test
 N_PERMUTATIONS = 1000
 PREFIX = "figure_2c_ieeg_states"
@@ -65,10 +62,6 @@ STATE_PAIRS = (("W", "N2"), ("W", "N3"), ("N2", "N3"))
 STATE_LABELS = {"W": "Wake", "N2": "N2", "N3": "N3"}
 STATE_TITLES = {s: f"Aperiodic exponent, {'wake' if s == 'W' else s}" for s in STATES}
 STATE_DURATION_S = 180.0
-# Figure 1 zoom-row window (figure_1a/1b/1c): 1450 x 300, zoom 1.3, colour-bar column,
-# region names at 30 pt, inset-row titles at 36 pt (rows shown 150 mm wide, ~0.29x).
-ZOOM_KW = dict(size=(1450, 300), zoom=1.3, color_bar=True, nan_color=(220, 220, 220, 1),
-               label_fontsize=30, title_fontsize=36)
 
 
 def load_state_spectra(ieeg_raw: str, cache_dir: Path) -> tuple[pd.DataFrame, np.ndarray, dict]:
@@ -93,7 +86,7 @@ def load_state_spectra(ieeg_raw: str, cache_dir: Path) -> tuple[pd.DataFrame, np
     for state in STATES:
         tables[state] = load_or_compute_channel_psd(
             ieeg_raw, cache_dir / f"channel_psd_{state}.pkl", stage=state,
-            duration_s=STATE_DURATION_S, **MICA_PSD_PARAMS)
+            duration_s=STATE_DURATION_S, **PSD_PARAMS)
         if tables[state][0].duplicated(key).any():
             raise ValueError(f"Duplicate channels in the stage-{state} recordings.")
     freq = tables['W'][1]
@@ -113,10 +106,7 @@ def load_state_spectra(ieeg_raw: str, cache_dir: Path) -> tuple[pd.DataFrame, np
 
 def _null_percentiles(null: np.ndarray) -> dict:
     """2.5th, 50th and 97.5th percentiles of a null (NaN if it has no finite value)."""
-    if not np.isfinite(null).any():
-        return dict(null_lo=np.nan, null_med=np.nan, null_hi=np.nan)
-    lo, med, hi = np.nanpercentile(null, [2.5, 50, 97.5])
-    return dict(null_lo=lo, null_med=med, null_hi=hi)
+    return dict(zip(("null_lo", "null_med", "null_hi"), null_interval(null)))
 
 
 def band_state_statistics(spec: dict, good: np.ndarray, sens_good: np.ndarray, idx_valid: np.ndarray,
@@ -190,12 +180,11 @@ def state_statistics(f: np.ndarray, pxx: dict, sens: np.ndarray, df_yeo_surf: pd
         ``null`` (measure, surrogate, r), ``band_stats`` and ``band_values``
         (`band_state_statistics`).
     """
-    hemi_offset = N_LH if hemi == 'RH' else 0
     surf_lh, surf_rh = load_conte69(join=False)
     surf_hemi = surf_rh if hemi == 'RH' else surf_lh
-    mask = ((df_yeo_surf['hemisphere'] == hemi) & (df_yeo_surf['network'] == network)).values
-    mask_hemi = mask[hemi_offset:hemi_offset + N_LH]
-    grad_hemi = df_yeo_surf[f't1_gradient1_{network}'].values[hemi_offset:hemi_offset + N_LH]
+    hemi_rows = hemisphere_slice(hemi)
+    mask_hemi = compute_network_mask(df_yeo_surf, network, hemi)[hemi_rows]
+    grad_hemi = df_yeo_surf[f't1_gradient1_{network}'].to_numpy()[hemi_rows]
 
     # One specparam fit per channel and state; keep channels fitted in every state.
     spec = {s: compute_spectral_parameters(pxx[s], f, bands=SPEC_BANDS, fmin=SPEC_FIT_RANGE[0], fmax=SPEC_FIT_RANGE[1],
@@ -217,15 +206,11 @@ def state_statistics(f: np.ndarray, pxx: dict, sens: np.ndarray, df_yeo_surf: pd
 
     # Inferential vertex set (as step 2b): covered network vertices with a finite
     # gradient; the Moran graph is fitted once on it.
-    covered = np.sum(sens_good, axis=0) > 0
-    valid = covered[mask_hemi] & np.isfinite(grad_hemi[mask_hemi])
-    idx_valid = np.flatnonzero(mask_hemi)[valid]
+    idx_valid = covered_vertices(sens_good, mask_hemi, grad_hemi)
     y_valid = grad_hemi[idx_valid]
     valid_full = np.zeros(N_LH, dtype=bool)
     valid_full[idx_valid] = True
-    w = mesh_elements.get_ring_distance(surf_hemi, n_ring=1, mask=valid_full)
-    w.data **= -1
-    msr = HemisphereMoranRandomization(np.full(idx_valid.size, hemi), n_perm, random_state=0).fit(w)
+    msr = fit_surface_moran(surf_hemi, valid_full, np.full(idx_valid.size, hemi), n_perm)
     logger.info(f"[Figure 2C] inferential vertices (covered {hemi} {network} with gradient): {idx_valid.size}")
 
     maps = {"delta_N3_W": project_channel_measure((exponent['N3'] - exponent['W'])[good], sens_good)}
@@ -339,7 +324,7 @@ def plot_band_state_quintiles(band_values: pd.DataFrame, grad_v: np.ndarray, ban
 
 
 def plot_states(tables: dict, df_yeo_surf: pd.DataFrame, hemi: str, network: str) -> None:
-    """Figure 2c panels and supplements, from the `state_statistics` tables.
+    """Panels of the state comparison, from the `state_statistics` tables.
 
     The main panels: one Figure 1 brain row per state (both hemispheres,
     ``CustomCmap_ieeg``, +/-2 SD, network outline), the ridgeline of the Moran nulls level
@@ -351,8 +336,7 @@ def plot_states(tables: dict, df_yeo_surf: pd.DataFrame, hemi: str, network: str
     out_dir = config.FIGURES_DIR
     maps, stats, null = tables["maps"], tables["stats"], tables["null"]
     surf_lh_infl, surf_rh_infl = load_inflated_surfaces("fsLR-32k")
-    hemi_offset = N_LH if hemi == 'RH' else 0
-    grad_hemi = df_yeo_surf[f't1_gradient1_{network}'].values[hemi_offset:hemi_offset + N_LH]
+    grad_hemi = df_yeo_surf[f't1_gradient1_{network}'].to_numpy()[hemisphere_slice(hemi)]
     idx_valid = np.flatnonzero(maps["inferential"].to_numpy())
     y_valid = grad_hemi[idx_valid]
     null_of = {m: g['r'].to_numpy() for m, g in null.groupby('measure')}
@@ -363,7 +347,7 @@ def plot_states(tables: dict, df_yeo_surf: pd.DataFrame, hemi: str, network: str
     # network border traced.
     rois = salience_zoom_rois(df_yeo_surf, 'both')
     outline = mask_outline(surf_lh_infl, surf_rh_infl, (df_yeo_surf['network'] == network).to_numpy())
-    kwargs = dict(ZOOM_KW, cmap=ieeg_cmap.name, color_range=SALIENCE_Z_RANGE, cbar_labels=SALIENCE_Z_LABELS,
+    kwargs = dict(ZOOM_ROW_KW, cmap=ieeg_cmap.name, color_range=SALIENCE_Z_RANGE, cbar_labels=SALIENCE_Z_LABELS,
                   cbar_title='z', outline=outline)
 
     def _z_display(template_map: np.ndarray) -> np.ndarray:
@@ -373,19 +357,18 @@ def plot_states(tables: dict, df_yeo_surf: pd.DataFrame, hemi: str, network: str
     # Main: one brain row per state (untitled), and the ridgeline level with them showing
     # the states with an uncorrected Moran p < 0.05 (it shows p_m, as the quintile panel;
     # other slots left empty).
-    geometry = set()
+    geometry = []
     for s in STATES:
         fig = plot_hemispheres_zoom(surf_lh_infl, surf_rh_infl, _z_display(maps[f"exponent_{s}"].to_numpy()), rois,
                                     filename=out_dir / f"{PREFIX}_exponent_{s}_zoom_{hemi}.svg", **kwargs)
-        geometry.add((fig.inset_cy, fig.get_size_inches()[1] * 72))
+        geometry.append((fig.inset_cy, fig.get_size_inches()[1] * 72))
         plt.close(fig)
-    if len(geometry) != 1:
-        raise RuntimeError(f"State rows differ in geometry {geometry}; the ridgeline rows cannot be aligned.")
     state_stats = map_stats[per_state].reset_index(drop=True)
     shown = state_stats.copy()
     shown.loc[~(shown['p'] < 0.05), ['r', 'p', 'null_lo', 'null_med', 'null_hi']] = np.nan
     logger.info(f"[Figure 2C] main ridgeline rows (significant): {', '.join(state_stats.loc[state_stats['p'] < 0.05, 'measure'])}")
-    plot_ridge(shown, [null_of[m] for m in shown['measure']], *geometry.pop(), out_dir / f"{PREFIX}_forest_{hemi}.svg")
+    plot_ridge(shown, [null_of[m] for m in shown['measure']], *shared_row_geometry(geometry),
+               out_dir / f"{PREFIX}_forest_{hemi}.svg")
     plt.close('all')
 
     # Main: quintile trajectories with the per-state correlations.
@@ -399,16 +382,14 @@ def plot_states(tables: dict, df_yeo_surf: pd.DataFrame, hemi: str, network: str
     plt.close('all')
     titles = {"delta_N3_W": "Aperiodic exponent, N3 − wake", **{f"exponent_{s}": STATE_TITLES[s] for s in STATES}}
     roi_rows = [dict(r, label=None) for r in rois]
-    geometry = set()
+    geometry = []
     for name in map_stats['measure']:
         fig = plot_hemispheres_zoom(surf_lh_infl, surf_rh_infl, _z_display(maps[name].to_numpy()), roi_rows,
                                     roi_only=True, draw_color_bar=True, title=titles[name],
                                     filename=out_dir / f"{PREFIX}_{name}_zoom_roi_supp_{hemi}.svg", **kwargs)
-        geometry.add((fig.inset_cy, fig.get_size_inches()[1] * 72))
+        geometry.append((fig.inset_cy, fig.get_size_inches()[1] * 72))
         plt.close(fig)
-    if len(geometry) != 1:
-        raise RuntimeError(f"Inset rows differ in geometry {geometry}; the ridgeline rows cannot be aligned.")
-    plot_ridge(map_stats, [null_of[m] for m in map_stats['measure']], *geometry.pop(),
+    plot_ridge(map_stats, [null_of[m] for m in map_stats['measure']], *shared_row_geometry(geometry),
                out_dir / f"{PREFIX}_forest_supp_{hemi}.svg")
     plt.close('all')
 
@@ -426,7 +407,7 @@ def compute(settings: dict, paths: dict) -> None:
     source = config.source_dir(STEP)
     logger.info("Dataset        : MICA iEEG (BIDS_iEEG, sub-PX*, ses-01), stage-W wakefulness, stage-N2 and stage-N3 sleep")
     logger.info(f"Segments       : first {STATE_DURATION_S:g} s of every recording; channels recorded in all three states")
-    logger.info("Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4), downsampled to 200 Hz, demeaned; Welch PSD (Hamming 2 s, 1 s overlap), unit sum")
+    logger.info("Preprocessing  : Butterworth bandpass 0.5-80 Hz (order 4, second-order sections, zero phase), downsampled to 200 Hz, demeaned; Welch PSD (Hamming 2 s, 1 s overlap), unit sum")
     logger.info(f"Spectral model : specparam, knee mode (knee >= 0), Gaussian peaks, {SPEC_FIT_RANGE[0]:g}-{SPEC_FIT_RANGE[1]:g} Hz (as step 2b)")
     logger.info("Peak bands     : " + ", ".join(f"{b} {lo:g}-{hi:g} Hz" for b, (lo, hi) in SPEC_BANDS.items()))
     logger.info("Statistic      : per-state aperiodic exponent vs MPC gradient; between-state difference of the correlations (paired Moran surrogates); change N3 - wake (supplementary); uncorrected")
@@ -437,14 +418,7 @@ def compute(settings: dict, paths: dict) -> None:
 
     logger.info(f"Raw recordings : {paths['ieeg_raw']}")
     channels, f, pxx = load_state_spectra(str(paths["ieeg_raw"]), config.work_dir(STEP, paths))
-    channels[['ContactName1', 'ContactName2']] = channels[['ContactName1', 'ContactName2']].apply(lambda c: c.str.upper())
-    df_sensitivity, sens_areas = load_sensitivity_info(root_dir=str(paths["electromica"]))
-    logger.info(f"Sensitivity maps loaded: {df_sensitivity['Subject'].nunique()} subjects, {len(df_sensitivity)} contacts")
-    sens = np.nan_to_num(build_bipolar_sensitivity(channels, df_sensitivity, sens_areas), nan=0.0)
-    n_no_sens = int((sens.sum(axis=1) == 0).sum())
-    if n_no_sens:
-        logger.warning(f"{n_no_sens}/{len(sens)} channels have no suprathreshold sensitivity; "
-                       f"they carry no weight in the surface projections.")
+    sens = load_channel_sensitivity(channels, paths["electromica"])
 
     tables = state_statistics(f, pxx, sens, df_yeo_surf, hemi=hemi, network=network)
     for name, table in tables.items():
@@ -455,7 +429,7 @@ def compute(settings: dict, paths: dict) -> None:
 
 
 def plot(settings: dict) -> None:
-    """Figure 2c panels and supplements, from source_data only."""
+    """Panels of the state comparison, from source_data only."""
     hemi, network = settings["hemisphere"], settings["network"]
     source = config.source_dir(STEP)
     df_yeo_surf = config.read_table(config.source_dir(GRADIENT_STEP) / "surface_fslr32k_both.tsv")
@@ -465,4 +439,4 @@ def plot(settings: dict) -> None:
 
 
 if __name__ == "__main__":
-    common.main(STEP, compute, plot, "Step 2c: state dependence of the iEEG aperiodic exponent (Figure 2c).")
+    common.main(STEP, compute, plot, "Step 2c: state dependence of the iEEG aperiodic exponent (supplementary to Figure 2).")

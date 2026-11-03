@@ -70,7 +70,8 @@ $$p = \frac{1 + k}{1 + n},$$
 
 where $n$ is the number of null values and $k$ the number of null values at least as
 extreme as the observed statistic (Phipson & Smyth, 2010). The smallest attainable
-value is therefore $1/1{,}001 \approx 0.001$ for 1,000 surrogates. Unless stated
+value is therefore $1/1{,}001 \approx 0.001$ for 1,000 surrogates (and $1/10{,}001$ for
+the 10,000 rotations of Fig 1C). Unless stated
 otherwise, tests were two-sided, with
 $k = |\{\text{null} : |\text{null}| \geq |\text{obs}|\}|$. The analysis code reports
 uncorrected p-values; within each family of tests, defined with each analysis, they were
@@ -81,9 +82,8 @@ each analysis are summarized in the table below.
 |----------|------------|----------------|-------------------|------------|------|
 | Fig 1A | Moran | MPC gradient (against the FC gradient) | inverse 1-ring edge length, fsLR-32k, SN vertices | 1,000 | 0 (left), 1 (right) |
 | Fig 1B | Moran | histological map | inverse 1-ring edge length, fsLR-32k, SN vertices | 1,000 | 0 (left), 1 (right) |
-| Fig 1C | spin | SN mask | fsLR-32k spheres | 1,000 | 0 |
-| Fig 2A | Moran | BigBrain gradient 2 | inverse Euclidean distance between channels | 1,000 | 0 |
-| Figs 2B and 2C | Moran | MPC gradient | inverse 1-ring edge length, fsLR-32k, left-hemisphere SN vertices | 1,000 | 0 |
+| Fig 1C | spin | SN mask | fsLR-32k spheres, medial wall excluded | 10,000 | 0 |
+| Fig 2 and supporting iEEG analyses | Moran | MPC gradient | inverse 1-ring edge length, fsLR-32k, left-hemisphere SN vertices | 1,000 | 0 |
 | Fig 3 | Moran | within-network MPC gradient | inverse group-mean geodesic distance, fsLR-5k | 1,000 | 42 (left), 43 (right) |
 | Fig 3 | topological | each participant's connectome | geodesic-distance bins | 1,000 | 42 |
 | Fig 3 | spin (target side) | FC gradient | fsLR-5k spheres | 1,000 | 42 |
@@ -96,7 +96,8 @@ to the left-hemisphere sphere and its mirror image, reflected across the midsagi
 plane, to the right-hemisphere sphere, so that homologous locations were rotated
 symmetrically. Each rotated vertex took the value of the nearest vertex of the
 original sphere. For Fig 1C, the SN mask was rotated on the fsLR-32k spheres and the
-cortical-type composition was recomputed within each rotated mask
+cortical-type composition was recomputed over the cortical vertices of each rotated mask,
+rotated vertices within the medial wall being excluded
 ([Figure 1](figure_1.md#cortical-type-composition-fig-1c)). The target-side spin null
 model of Fig 3 is described [below](#target-side-spin-null-model).
 
@@ -122,14 +123,13 @@ the spin test, this procedure preserves the spatial autocorrelation and the
 distribution of values within each hemisphere while retaining both hemispheres in the
 statistic. Bilateral tests (Figs 1A, 1B and 3) therefore used two randomizations, and
 single-hemisphere tests (Fig 2) used one; a hemisphere with fewer than three tested
-vertices would have been permuted at random instead. In Figs 1A, 1B, 2B and 2C, the
+vertices would have been permuted at random instead. In Figs 1A, 1B and 2, and in the
+supporting iEEG analyses, the
 spatial weights were the inverse edge lengths between vertices sharing a mesh edge
 (1-ring neighbors) on the fsLR-32k midthickness surface. In Fig 3, they were the
 inverse group-mean geodesic distances among the network's fsLR-5k vertices; geodesic
 distance is undefined between hemispheres, so the two hemispheres of this graph form
-its two connected components. In Fig 2A, the weights were the inverse Euclidean
-distances between channel positions
-([Figure 2](figure_2.md#surface-mapping-of-the-mni-atlas-fig-2a)).
+its two connected components.
 
 ### Geometry-preserving topological null model
 
@@ -213,7 +213,7 @@ by each connection but preserves the spatial structure of the target map.
 
 ## Software
 
-Analyses were performed in Python 3.10 with NumPy 2.2.6, SciPy 1.15.3, pandas 2.3.3
+Analyses were performed in Python 3.10.19 with NumPy 2.2.6, SciPy 1.15.3, pandas 2.3.3
 and nibabel 5.3.2. Gradients, null models, and surface renderings used BrainSpace
 0.1.22 (Vos de Wael et al., 2020) with VTK 9.3.1, spectral parameterization used
 specparam 2.0.0rc7 (Donoghue et al., 2020), and figures were produced with matplotlib

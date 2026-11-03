@@ -4,64 +4,47 @@
 **Modules:** [`salience_switch.ieeg`](../api/ieeg.md) · [`salience_switch.stats`](../api/stats.md)
 
 The spectral content of intracranial EEG (iEEG) was mapped onto the cortical surface
-in two independent cohorts, the MNI Open iEEG Atlas (Fig 2A) and the MICA iEEG dataset
-(Fig 2B). In the MICA dataset, the dependence of the aperiodic exponent on vigilance
-state was also examined (Fig 2C). Both cohorts are described in
-[Data Acquisition](datasets.md#mni-open-ieeg-atlas). Both datasets were processed with
-the same signal pipeline and projected onto the fsLR-32k surface (32,492 vertices per
-hemisphere).
+in two independent cohorts. The MICA iEEG dataset was the primary cohort (Fig 2), in
+which the dependence of the aperiodic exponent on vigilance state was also examined
+(supporting analysis); the MNI Open iEEG Atlas served as a replication cohort
+(supporting figure). Both cohorts
+are described in [Data Acquisition](datasets.md#mni-open-ieeg-atlas). The two cohorts
+were analyzed with the same spectral estimation, spectral model, surface space (fsLR-32k,
+32,492 vertices per hemisphere), statistics and null models. They differed only where
+the data required it: in the preprocessing of the recordings as distributed, and in the
+model of each channel's spatial sensitivity, which was derived from subject-specific
+leadfields in the MICA cohort and from channel positions in the MNI atlas.
 
 ## Signal preprocessing and spectral estimation
 
-For the wakefulness recordings of the MICA dataset (Fig 2B), all recordings were
+For the wakefulness recordings of the MICA dataset (Fig 2), all recordings were
 truncated to the length of the shortest recording (360,136 samples, approximately
 180 s at the native sampling rate of 2,000 Hz), so that every spectrum was estimated
-from the same amount of data. For the comparison across vigilance states (Fig 2C), the
+from the same amount of data. For the comparison across vigilance states, the
 first 180 s (360,000 samples) of every recording in every state were analyzed. Each
 channel was band-pass filtered between 0.5 and 80 Hz with a fourth-order Butterworth
-filter applied forward and backward (zero phase), resampled to 200 Hz by polyphase
-filtering, and demeaned. The MNI atlas recordings, distributed at 200 Hz, were filtered
-and demeaned in the same way without resampling.
+filter applied forward and backward (zero phase), implemented as cascaded second-order
+sections for numerical stability at the native sampling rate, resampled to 200 Hz by
+polyphase filtering, and demeaned.
+
+The MNI atlas recordings are distributed already low-pass filtered at 80 Hz to prevent
+aliasing, resampled to 200 Hz, cleared of power-line interference at 50 or 60 Hz with
+an adaptive filter, and demeaned within each recorded segment (Frauscher et al., 2018).
+Where the minute of recording of a channel was assembled from non-contiguous segments,
+the segments are separated by 2-s buffers of zeros, and every recording is zero-padded
+to 68 s. These recordings were not filtered further, because a filter applied across
+the buffers, or to segments as short as 2 s, would introduce edge transients.
 
 Power spectral density (PSD) was estimated with Welch's method (Welch, 1967), using
-2-s Hamming windows with 1-s overlap (frequency resolution, 0.5 Hz). Each spectrum was
-restricted to 0.5–80 Hz and normalized to unit sum over this range. This normalization
-shifts only the aperiodic offset of the spectral parameterization described below and
-leaves the exponent and oscillatory peak power unchanged.
+2-s Hamming windows with 1-s overlap (frequency resolution, 0.5 Hz). For the MNI atlas,
+only the windows lying entirely within one contiguous segment were averaged, so that no
+window spanned a zero buffer or the padding; segments shorter than one window were not
+used. Each spectrum was restricted to 0.5–80 Hz and normalized to unit sum over this
+range. This normalization shifts only the aperiodic offset of the spectral
+parameterization described below and leaves the exponent and oscillatory peak power
+unchanged.
 
-## Surface mapping of the MNI atlas (Fig 2A)
-
-Channel coordinates are provided in MNI152 space together with the atlas cortical
-surface and its registration to the fsLR template. Each channel was assigned to the
-nearest vertex of the atlas surface (both hemispheres pooled), transferred to the
-corresponding vertex of the registered surface, and assigned to the nearest vertex of
-the fsLR-32k midthickness surface. Because fsLR-32k is a bilaterally symmetric
-template, every channel was then placed at the homologous vertex of the right
-hemisphere. This assumption of bilateral homology parallels the combination of
-hemispheres used for the MICA cohort and maximizes cortical coverage. Each channel was
-assigned the value of the bilateral SN gradient of Fig 1 at its vertex. SN channels
-whose gradient value lay at or below the 25th percentile, or at or above the 75th
-percentile, of the gradient across all SN vertices formed the bottom and top groups,
-respectively.
-
-Electrophysiological similarity (ES) was defined from the correlation between power
-spectra. Each channel's PSD was z-scored across channels at every frequency, and the
-spectra of all pairs of channels were correlated (Pearson). For every channel outside
-the SN and the medial wall, $\mathrm{ES}_\text{top}$ and $\mathrm{ES}_\text{bottom}$
-were its mean correlations with the top and bottom groups, respectively. The measure of
-interest was the difference of their absolute values,
-$|\mathrm{ES}_\text{top}| - |\mathrm{ES}_\text{bottom}|$, z-scored across these
-channels. It was correlated across channels, using Spearman's rank correlation, with
-the second histological gradient of BigBrain (G2; Paquola et al., 2021). Significance
-was assessed against a Moran null model defined on the channel layout: because the
-channels form scattered points rather than a contiguous surface patch, the spatial
-weights were the inverse Euclidean distances between channel positions on the fsLR-32k
-midthickness surface, with a minimum distance of 1 mm for channels assigned to the same
-vertex. The BigBrain gradient was randomized (1,000 surrogates, seed 0) while the
-channel values were held fixed, and a two-sided permutation p-value was computed. Mean
-values per network are presented descriptively, without statistical testing.
-
-## Surface mapping of the MICA recordings (Fig 2B)
+## Surface mapping of the MICA recordings (Fig 2)
 
 In the MICA cohort, each electrode contact has a subject-specific signed leadfield
 (sensitivity map) computed with the electroMICA pipeline (von Ellenrieder et al.,
@@ -89,6 +72,32 @@ displayed on both hemispheres. All statistics, however, were computed in the lef
 hemisphere, using the left-hemisphere values of the bilateral SN gradient of Fig 1
 ([Shared Methods](shared.md#microstructural-profile-covariance-gradients)).
 
+## Surface mapping of the MNI atlas (replication cohort)
+
+Channel coordinates are provided in MNI152 space together with the atlas cortical
+surface and its registration to the fsLR template. Channels that the atlas assigns to
+the hippocampus (36 channels) or the amygdala (6 channels) were excluded, because the
+neocortical surface model does not represent these structures, which left 1,730
+channels from 104 patients. Each channel was assigned to the nearest vertex of the
+atlas surface (both hemispheres pooled), transferred to the corresponding vertex of the
+registered surface, and assigned to the nearest vertex of the fsLR-32k midthickness
+surface.
+
+No leadfield model is available for the atlas. The spatial sensitivity of each channel
+was therefore modeled as a Gaussian function of the Euclidean distance $d$ between its
+vertex and each vertex of the same hemisphere on the fsLR-32k midthickness surface,
+
+$$w(d) = \exp\!\left(-\ln 2\,\frac{d^{2}}{h^{2}}\right), \qquad h = 4~\text{mm},$$
+
+so that the weight fell to one half at 4 mm, the kernel width applied to this atlas by
+Gao et al. (2020). Analogous to the relative threshold of the electroMICA
+sensitivities, weights below 5% of the peak, that is, at distances beyond 8.3 mm, were
+set to zero. The sensitivities were then combined on a single fsLR-32k template, each
+vertex standing for itself and its homologue in the other hemisphere, and channel
+measures were projected onto the surface as the sensitivity-weighted average across
+channels, as for the MICA cohort. Maps were displayed on both hemispheres, and all
+statistics were computed in the left hemisphere, as for the MICA cohort.
+
 ## Spectral parameterization
 
 Each channel spectrum was parameterized once with specparam 2.0.0rc7 (Donoghue et al.,
@@ -103,19 +112,21 @@ $\kappa \ge 0$: a negative knee has no physical interpretation, and with $\kappa
 the model reduces to a power law, appropriate for spectra without a knee in the fitted
 range. Spectra were fitted between 1 and 45 Hz. In line with the recommendation not to
 fit frequencies attenuated by filtering, this range excludes both the line-noise notch
-at 60 Hz present in the recordings and the transition band of the 80 Hz low-pass
-filter (attenuation below 0.01 log10 units at 45 Hz). Peak widths were limited to
-1–12 Hz (the lower limit being twice the frequency resolution), and at most six peaks
-were fitted per spectrum. Peaks had to exceed both an absolute height of 0.05 log10
-units above the aperiodic fit and a relative threshold of 2 SD of the flattened
-spectrum. The same model and settings were applied to every channel. Goodness of fit
-($R^2$) and mean absolute error were computed for each fit, and the fits with the
-lowest, median and highest $R^2$ were inspected visually for under- and overfitting. No
-fit was excluded on these criteria; only fits that failed to converge were discarded.
-The knee frequency, $f_\kappa = \kappa^{1/\chi}$ (Gao et al., 2020), was computed to
-locate the knee relative to the fitted range.
+at 60 Hz present in the MICA recordings and the transition band of their 80 Hz
+low-pass filter (attenuation below 0.01 log10 units at 45 Hz); it also lies below the
+power-line frequencies (50 and 60 Hz) and the 80 Hz anti-aliasing filter of the MNI
+atlas recordings. Peak widths were limited to 1–12 Hz (the lower limit being twice the
+frequency resolution), and at most six peaks were fitted per spectrum. Peaks had to
+exceed both an absolute height of 0.05 log10 units above the aperiodic fit and a
+relative threshold of 2 SD of the flattened spectrum. The same model and settings were
+applied to every channel of both cohorts. Goodness of fit ($R^2$) and mean absolute
+error were computed for each fit, and in each cohort the fits with the lowest, median
+and highest $R^2$ were inspected visually for under- and overfitting. No fit was
+excluded on these criteria; only fits that failed to converge were discarded. The knee
+frequency, $f_\kappa = \kappa^{1/\chi}$ (Gao et al., 2020), was computed to locate the
+knee relative to the fitted range.
 
-## Spectral measures along the microstructural gradient (Fig 2B)
+## Spectral measures along the microstructural gradient (Fig 2)
 
 Two measures were derived from the parameterization. The primary measure was the
 aperiodic exponent, which has been related to the balance of synaptic excitation and
@@ -135,19 +146,21 @@ component. Because it is measured relative to the aperiodic fit, it is not confo
 by differences in the aperiodic exponent (Donoghue et al., 2020). Channels without a
 detected peak in a band were assigned zero power in that band.
 
-Both measures were projected onto the surface and correlated with the MPC gradient,
-using Spearman's rank correlation, across the left-hemisphere SN vertices with iEEG
-coverage and a defined gradient value. Significance was assessed against the
+The following analysis was performed identically in each cohort. Both measures were
+projected onto the surface and correlated with the MPC gradient (Fig 2B), using Spearman's rank
+correlation, across the left-hemisphere SN vertices with iEEG coverage and a defined
+gradient value. Significance was assessed against the
 within-network Moran null model ([Shared Methods](shared.md#moran-spectral-randomization)),
 fitted once on this set of vertices with spatial weights given by the inverse 1-ring
 edge lengths of the fsLR-32k midthickness surface. The MPC gradient was randomized
 (1,000 surrogates, seed 0) while the spectral map was held fixed, and the central 95%
-of the null correlations is reported alongside each observed correlation. The five
-band correlations formed one family for the correction for multiple comparisons
-([Shared Methods](shared.md#spatial-null-models)). For display, each measure was z-scored across the SN vertices of both
-hemispheres and shown on a fixed range of ±2 SD, as in Fig 1.
+of the null correlations is reported alongside each observed correlation. Within each
+cohort, the five band correlations formed one family for the correction for multiple
+comparisons ([Shared Methods](shared.md#spatial-null-models)). For display, each
+measure was z-scored across the SN vertices of both hemispheres and shown on a fixed
+range of ±2 SD, as in Fig 1.
 
-To illustrate the spectra underlying these measures, the covered SN vertices of the
+To illustrate the spectra underlying these measures (Fig 2A), the covered SN vertices of the
 left hemisphere were divided into five equal-sized bins at the quintiles of the MPC
 gradient. Within each bin, the sensitivity-weighted power spectrum over the fitted
 range was averaged, together with the flattened spectrum, that is, the log10 power
@@ -156,9 +169,10 @@ onto the surface by the same sensitivity-weighted average.
 
 ## Spectral-similarity projection (supporting analysis)
 
-As a supporting analysis, the similarity between regional power spectra, rather than
-the temporal coupling between signals, was used as the weight of the projection
-defined for Fig 3 ([Figure 3](figure_3.md#connectivity-weighted-projection)). This
+As a supporting analysis, performed in each cohort, the similarity between regional
+power spectra, rather than the temporal coupling between signals, was used as the
+weight of the projection defined for Fig 3
+([Figure 3](figure_3.md#connectivity-weighted-projection)). This
 measure reflects spectral similarity rather than functional connectivity and was
 interpreted accordingly. For every covered vertex of the left hemisphere, a spectral
 profile was obtained by sensitivity-weighted averaging of the channel spectra
@@ -172,14 +186,14 @@ $$P_i = \frac{\sum_{j} \text{SS}^{+}_{ij}\, g^{\mathrm{FC}}_j}{\sum_{j} \text{SS
 where $\text{SS}^{+}_{ij}$ is the non-negative spectral similarity and $g^{\mathrm{FC}}_j$
 the FC gradient at target $j$. The FC gradient was that of Fig 3, used at its native
 fsLR-32k resolution and oriented by the same rule, with the default-mode network at its
-low end. Vertices sampled by overlapping leadfields share a sensitivity-weighted
-spectrum and therefore appear similar for methodological rather than neural reasons;
-source–target pairs whose sensitivity profiles had a cosine similarity above 0.1 were
-therefore excluded. To assess whether spectral similarity contributed information
-beyond spatial proximity, the projection was recomputed over the same targets with
-uniform weights and with inverse Euclidean distance weights, and the three correlations
-are reported together. Vertices with fewer than ten contributing targets were left
-undefined.
+low end. Vertices sampled by the same channels share a sensitivity-weighted spectrum
+and therefore appear similar for methodological rather than neural reasons;
+source–target pairs whose sensitivity profiles (leadfield-based in the MICA cohort,
+Gaussian in the MNI atlas) had a cosine similarity above 0.1 were therefore excluded.
+To assess whether spectral similarity contributed information beyond spatial proximity,
+the projection was recomputed over the same targets with uniform weights and with
+inverse Euclidean distance weights, and the three correlations are reported together.
+Vertices with fewer than ten contributing targets were left undefined.
 
 Because the spectra were pooled across patients, inference was performed at the group
 level, as a single Spearman correlation between the MPC gradient and the projection
@@ -195,7 +209,7 @@ correlated pairwise) was ordered by the network of each channel's vertex of peak
 sensitivity; channels without suprathreshold sensitivity were omitted from this
 display.
 
-## Dependence on vigilance state (Fig 2C)
+## Dependence on vigilance state (supporting analysis)
 
 The same bipolar channels of the MICA cohort were recorded during wakefulness and
 during N2 and N3 sleep. To estimate all spectra from the same amount of data, the first
@@ -203,7 +217,7 @@ during N2 and N3 sleep. To estimate all spectra from the same amount of data, th
 recording lasted 180.07 s). Channels were matched across states by patient and channel
 name, and only channels recorded in all three states were retained. Each recording was
 preprocessed and its spectrum estimated as described above, and each spectrum was
-parameterized with the same model and settings as for Fig 2B, with the same quality
+parameterized with the same model and settings as for Fig 2, with the same quality
 checks in every state. Channels whose fit failed in any state were excluded, so that
 all states shared the same channels. The aperiodic exponent of each state and its
 within-channel change from wakefulness to N3,
@@ -234,7 +248,7 @@ state.
 
 As a supporting analysis, the oscillatory peak power of each frequency band was
 examined in the same way. For every band and state, the peak power above the aperiodic
-component (zero where no peak was detected, as for Fig 2B) was projected onto the
+component (zero where no peak was detected, as for Fig 2) was projected onto the
 surface and correlated with the MPC gradient against the within-network Moran null
 model, the five bands within each state forming one family. The correlations of each
 pair of states were compared with paired Moran surrogates as above, the three pairs

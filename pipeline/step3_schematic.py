@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Step 2 schematic: a visual key to the Figure 3 projection (Figure 3, panel A).
+"""Step 3 schematic: a visual key to the Figure 3 projection (Figure 3, panel A).
 
 Shows how the connectivity-weighted projection P is built for each salience-network (SN)
 vertex and compared with the SN microstructure gradient, from one representative subject
@@ -43,18 +43,16 @@ from matplotlib.path import Path as MplPath
 import common
 from salience_switch import config
 from salience_switch.colors import connectivity_cmap
-from salience_switch.connectivity import build_consensus_mask, compute_projection_subjects, prepare_weights
+from salience_switch.connectivity import (build_consensus_mask, compute_projection_subjects, prepare_weights,
+                                          projection_masks)
 from salience_switch.plotting import LOLLI_AXIS_PT, SALIENCE_Z_RANGE, mask_outline, outline_alpha, render_surface_view
 from salience_switch.provenance import write_manifest
-from salience_switch.surface import compute_network_mask, load_fc_gradient_5k, load_inflated_surfaces, load_yeo_surf_5k
+from salience_switch.surface import load_fc_gradient_5k, load_inflated_surfaces, load_yeo_surf_5k
 
 STEP = "step3_schematic"
 GRADIENT_STEP = "step1a_mpc_gradient"
 logger = logging.getLogger(STEP)
 
-plt.rcParams['svg.fonttype'] = 'none'
-
-NETWORK = "SalVentAttn"
 
 # Figure 3 page geometry (mm) from results/figure3.svg: the panel B inset rows (1450-pt
 # windows shown 141.91 mm wide from x = 0.64) split their colour-bar-free 89 % into four
@@ -79,7 +77,7 @@ def _table_paths(hemisphere: str) -> dict:
             "summary": source / f"schematic_summary_{hemisphere}.tsv"}
 
 
-def compute_schematic_data(paths: dict, hemisphere: str) -> None:
+def compute_schematic_data(paths: dict, network: str, hemisphere: str) -> None:
     """Per-subject SC projection of the SN, and the example subject's SN connections.
 
     Reproduces the Figure 3 SC inputs (``step3_connectivity.run_compute_stage``): the
@@ -96,7 +94,7 @@ def compute_schematic_data(paths: dict, hemisphere: str) -> None:
     """
     df_pni = pd.read_csv(config.work_dir(GRADIENT_STEP, paths) / "subjects_fslr5k.csv")
     df = load_yeo_surf_5k()
-    col = f"t1_gradient1_{NETWORK}"
+    col = f"t1_gradient1_{network}"
     cache = config.source_dir(GRADIENT_STEP) / f"surface_fslr5k_{hemisphere}.tsv"
     if not cache.exists():
         raise FileNotFoundError(f"{cache} not found. Run step 1a with hemisphere {hemisphere} first.")
@@ -106,22 +104,17 @@ def compute_schematic_data(paths: dict, hemisphere: str) -> None:
     df[col] = cached[col].to_numpy()
     df = load_fc_gradient_5k(df)
 
-    # Source / target masks as step3_connectivity._prepare_network_gradient.
+    # Source and target masks, as step 3.
     cortex = df["hemisphere"].notna().to_numpy()
     cortex_idx = np.flatnonzero(cortex)
-    grad = df[col].to_numpy(dtype=float)[cortex]
-    sn = compute_network_mask(df, NETWORK, hemisphere)[cortex] & np.isfinite(grad)
-    other = df["network"].ne(NETWORK).to_numpy()
-    if hemisphere in ("LH", "RH"):
-        other &= df["hemisphere"].eq(hemisphere).to_numpy()
-    other = other[cortex]
+    g_mpc, sn, other = projection_masks(df, df[col].to_numpy(dtype=float), network, hemisphere)
     g_fc = df["fc_g1"].to_numpy(dtype=float)[cortex]
 
     logger.info("Building the Betzel consensus mask and loading every subject's SC...")
     mask_G, sc_subjects = build_consensus_mask(df_pni["path_sc_5k"].tolist(), df_pni["path_sc_dist_5k"].tolist(),
                                                df, nbins=10)
     res = compute_projection_subjects(files=df_pni["path_sc_5k"].tolist(), modality="SC", g_fc_cortex=g_fc,
-                                      g_mpc_cortex_at_sn=grad[sn], sn_mask_cortex=sn, other_mask_cortex=other,
+                                      g_mpc_cortex_at_sn=g_mpc, sn_mask_cortex=sn, other_mask_cortex=other,
                                       df_yeo_surf_5k=df, mask_G=mask_G, preloaded_subjects=sc_subjects)
     r_s = np.asarray(res["r_subjects"], dtype=float)
     s = int(np.nanargmin(np.abs(r_s - np.nanmedian(r_s))))
@@ -130,7 +123,7 @@ def compute_schematic_data(paths: dict, hemisphere: str) -> None:
                 f"example subject {subject} (r_s = {r_s[s]:+.3f}; private)")
 
     # The example subject's weights entering P: SN rows, target columns, finite and
-    # positive, at targets with a finite FC gradient (as _weighted_mean_projection).
+    # positive, at targets with a finite FC gradient (as weighted_mean_projection).
     W = prepare_weights(sc_subjects[s], "SC", df.loc[cortex, "hemisphere"].to_numpy(), sn, mask_G=mask_G)
     del sc_subjects
     sub = W[np.ix_(sn, other)]
@@ -148,7 +141,7 @@ def compute_schematic_data(paths: dict, hemisphere: str) -> None:
         raise RuntimeError("Edge table does not reproduce the subject's projection P.")
 
     vertex = pd.DataFrame({"vertex": sn_full, "hemisphere": df.loc[cortex, "hemisphere"].to_numpy()[sn],
-                           "g_mpc": grad[sn], "P": P_s, "n_targets": np.bincount(rows, minlength=sn.sum()),
+                           "g_mpc": g_mpc, "P": P_s, "n_targets": np.bincount(rows, minlength=sn.sum()),
                            "P_mean": res["P_mean"]})
     # Example vertex a, among the left-hemisphere vertices facing the step-1 camera
     # (visibility depends on the surface and camera only, not on the values drawn)
@@ -162,14 +155,14 @@ def compute_schematic_data(paths: dict, hemisphere: str) -> None:
     config.write_table(vertex, tables["vertex"])
     # Weights at 6 significant digits, as drawn
     config.write_table(edges[edges["source"] == example], tables["edges"], float_format="%.6g")
-    config.write_table(pd.DataFrame([{"network": NETWORK, "hemisphere": hemisphere, "measure": "SC",
+    config.write_table(pd.DataFrame([{"network": network, "hemisphere": hemisphere, "measure": "SC",
                                       "example_vertex": example, "r_s": float(r_s[s]),
                                       "r_s_median": float(np.nanmedian(r_s)),
                                       "n_subjects": int(np.isfinite(r_s).sum())}]), tables["summary"])
     private = config.work_dir(STEP, paths) / f"example_subject_{hemisphere}.json"
     private.write_text(json.dumps({"subject": subject, "subjects": df_pni["ID_PNI"].tolist(),
                                    "r_subjects": [float(v) for v in r_s]}, indent=1))
-    write_manifest(config.source_dir(STEP) / "manifest.json", STEP, config.PROJECT_ROOT, network=NETWORK,
+    write_manifest(config.source_dir(STEP) / "manifest.json", STEP, config.PROJECT_ROOT, network=network,
                    hemisphere=hemisphere, measure="SC", n_subjects=int(np.isfinite(r_s).sum()))
     logger.info(f"Schematic tables written: {', '.join(p.name for p in tables.values())} "
                 f"({len(vertex)} SN vertices, {int((edges['source'] == example).sum())} edges of vertex a); "
@@ -270,7 +263,7 @@ def _pick_examples(vertex: pd.DataFrame, visible: np.ndarray, n_lh: int) -> dict
     return {"a": int(cand.loc[(cand["g_mpc"] - lo).abs().idxmin(), "vertex"])}
 
 
-def plot_schematic(hemisphere: str) -> None:
+def plot_schematic(network: str, hemisphere: str) -> None:
     """Draw ``figure_3_schematic_{hemi}.svg``, a visual key to Figure 3 panel B (210 x 40 mm).
 
     Steps (left to right): (1) on the fsLR-5k inflated left hemisphere (lateral view) of
@@ -296,7 +289,7 @@ def plot_schematic(hemisphere: str) -> None:
     df = load_fc_gradient_5k(load_yeo_surf_5k())
     surf, surf_rh = load_inflated_surfaces("fsLR-5k")
     n_lh = surf.n_points
-    sn_outline = mask_outline(surf, surf_rh, df["network"].eq(NETWORK).to_numpy())[:n_lh]
+    sn_outline = mask_outline(surf, surf_rh, df["network"].eq(network).to_numpy())[:n_lh]
 
     ok = np.isfinite(vertex["P"])
     vertex["g_z"] = (vertex["g_mpc"] - vertex["g_mpc"].mean()) / vertex["g_mpc"].std(ddof=0)
@@ -337,7 +330,7 @@ def plot_schematic(hemisphere: str) -> None:
 
         # 1. Connections of a to the targets outside the SN, over the FC gradient.
         fc_lh = fc_z[:n_lh].copy()
-        fc_lh[df["network"].to_numpy()[:n_lh] == NETWORK] = np.nan
+        fc_lh[df["network"].to_numpy()[:n_lh] == network] = np.nan
         ax1, xy, visible = _brain(fig, surf, fc_lh, col[0], 11.0, cmap=connectivity_cmap.name,
                                   color_range=SALIENCE_Z_RANGE, outline=sn_outline, width_frac=0.92)
         box = ax1.get_position()
@@ -460,13 +453,13 @@ def plot_schematic(hemisphere: str) -> None:
 
 def compute(settings: dict, paths: dict) -> None:
     """Schematic tables of the representative subject."""
-    compute_schematic_data(paths, settings["hemisphere"])
+    compute_schematic_data(paths, settings["network"], settings["hemisphere"])
 
 
 def plot(settings: dict) -> None:
     """The schematic, from source_data only."""
-    plot_schematic(settings["hemisphere"])
+    plot_schematic(settings["network"], settings["hemisphere"])
 
 
 if __name__ == "__main__":
-    common.main(STEP, compute, plot, "Step 2 schematic: visual key to the Figure 3 projection.")
+    common.main(STEP, compute, plot, "Step 3 schematic: visual key to the Figure 3 projection.")

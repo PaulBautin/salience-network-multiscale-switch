@@ -21,17 +21,16 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from brainspace.datasets import load_conte69
-from brainspace.mesh import mesh_elements
 from brainspace.plotting import plot_hemispheres
 from scipy.stats import spearmanr, zscore
 
 import common
 from salience_switch import config
 from salience_switch.colors import histology_cmap
-from salience_switch.plotting import (SALIENCE_Z_LABELS, SALIENCE_Z_RANGE, format_pvalue, mask_outline,
-                                      plot_hemispheres_zoom, plot_ridge, salience_zoom_rois)
+from salience_switch.plotting import (SALIENCE_Z_LABELS, SALIENCE_Z_RANGE, ZOOM_ROW_KW, format_pvalue, mask_outline,
+                                      plot_hemispheres_zoom, plot_ridge, salience_zoom_rois, shared_row_geometry)
 from salience_switch.provenance import write_manifest
-from salience_switch.stats import HemisphereMoranRandomization, moran_spearman
+from salience_switch.stats import fit_surface_moran, moran_spearman, null_interval
 from salience_switch.surface import (compute_network_mask, load_ahead_biel, load_ahead_parva, load_bigbrain,
                                      load_inflated_surfaces)
 
@@ -40,7 +39,6 @@ GRADIENT_STEP = "step1a_mpc_gradient"
 logger = logging.getLogger(STEP)
 
 plt.rcParams['font.size'] = 16
-plt.rcParams['svg.fonttype'] = 'none'
 
 # Moran surrogates per test: 1000, as in figures 2 and 3, keeps the add-one p floor at
 # 1/(1+1000) ~ 1e-3.
@@ -56,19 +54,14 @@ CONTEXT_TITLES = {
     'Bielschowsky': 'AHEAD – Bielschowsky staining (axonal fiber density)',
     'Parvalbumin': 'AHEAD – Parvalbumin staining (PV+ interneurons)',
 }
-ZOOM_STEMS = {'BigBrain': 'bigbrain', 'Bielschowsky': 'biel', 'Parvalbumin': 'parva'}
 BRAIN_STEMS = {'BigBrain': 'bigbrain', 'T1map': 't1map', 'Bielschowsky': 'biel', 'Parvalbumin': 'parva'}
-# Figure 1 zoom-row window (as figure_1a_brain_zoom*.svg), inset-row titles at 36 pt:
-# the 1450-pt rows are shown ZOOM_ROW_WIDTH_MM wide in the Figure 1 layout (~0.29x).
-ZOOM_KW = dict(size=(1450, 300), zoom=1.3, color_bar=True, nan_color=(220, 220, 220, 1),
-               label_fontsize=30, title_fontsize=36)
 
 
-def context_statistics(df_yeo_surf: pd.DataFrame, surf_32k, modalities: list[str], n_rep: int = N_PERMUTATIONS,
-                       hemisphere: str = 'both') -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Spearman correlation of each map with the SN MPC gradient against a Moran null.
+def context_statistics(df_yeo_surf: pd.DataFrame, surf_32k, modalities: list[str], network: str, hemisphere: str,
+                       n_rep: int = N_PERMUTATIONS) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Spearman correlation of each map with the network MPC gradient against a Moran null.
 
-    Each map is correlated with the gradient over the SN vertices (of ``hemisphere``)
+    Each map is correlated with the gradient over the network vertices (of ``hemisphere``)
     where both are finite, and the within-network Moran null is fitted on that same
     finite subset, separately within each hemisphere (``HemisphereMoranRandomization``;
     seeds 0 and 1; add-one two-sided p). The histological map is randomised and the
@@ -82,13 +75,11 @@ def context_statistics(df_yeo_surf: pd.DataFrame, surf_32k, modalities: list[str
     null : pd.DataFrame
         One row per map and surrogate: ``modality, surrogate, r``.
     """
-    net_mask = df_yeo_surf['network'].eq('SalVentAttn')
-    if hemisphere in ('LH', 'RH'):
-        net_mask = net_mask & df_yeo_surf['hemisphere'].eq(hemisphere)
-    x = zscore(df_yeo_surf.loc[net_mask, 't1_gradient1_SalVentAttn'].values)
+    net_mask = compute_network_mask(df_yeo_surf, network, hemisphere)
+    x = zscore(df_yeo_surf.loc[net_mask, f't1_gradient1_{network}'].values)
     # Full-surface indices of the network vertices, so a per-modality finite subset can
     # be mapped back to a whole-surface mask for the Moran graph (see the loop below).
-    net_idx = np.flatnonzero(net_mask.values)
+    net_idx = np.flatnonzero(net_mask)
 
     stats_rows, null_rows = [], []
     for label in modalities:
@@ -104,12 +95,10 @@ def context_statistics(df_yeo_surf: pd.DataFrame, surf_32k, modalities: list[str
         finite = np.isfinite(x) & np.isfinite(y)
         finite_mask = np.zeros(df_yeo_surf.shape[0], dtype=bool)
         finite_mask[net_idx[finite]] = True
-        w = mesh_elements.get_ring_distance(surf_32k, n_ring=1, mask=finite_mask)
-        w.data **= -1
         hemi_finite = df_yeo_surf['hemisphere'].to_numpy()[net_idx[finite]]
-        msr = HemisphereMoranRandomization(hemi_finite, n_rep, random_state=0).fit(w)
+        msr = fit_surface_moran(surf_32k, finite_mask, hemi_finite, n_rep)
         r_obs, pv_rand, r_rand = moran_spearman(x[finite], y[finite], msr)
-        null_lo, null_med, null_hi = np.percentile(r_rand, [2.5, 50, 97.5])
+        null_lo, null_med, null_hi = null_interval(r_rand)
         stats_rows.append(dict(modality=label, r=r_obs, p=pv_rand, null_lo=null_lo, null_med=null_med,
                                null_hi=null_hi, n_vertices=int(finite.sum()), n_perm=n_rep))
         null_rows.append(pd.DataFrame({'modality': label, 'surrogate': np.arange(r_rand.size), 'r': r_rand}))
@@ -119,17 +108,15 @@ def context_statistics(df_yeo_surf: pd.DataFrame, surf_32k, modalities: list[str
 
 
 def plot_context_correlations(df_yeo_surf: pd.DataFrame, stats: pd.DataFrame, modalities: list[str],
-                              out_dir: Path, hemisphere: str = 'both') -> None:
+                              out_dir: Path, network: str, hemisphere: str) -> None:
     """Supplementary vertex scatter + |r| stem figure, and the half-polar |r| plot.
 
     The scatter shows each map against the z-scored gradient over the finite network
     vertices with a regression line (95 % bootstrap band, seed 0), annotated with the
     Moran-test r and p of ``stats``.
     """
-    net_mask = df_yeo_surf['network'].eq('SalVentAttn')
-    if hemisphere in ('LH', 'RH'):
-        net_mask = net_mask & df_yeo_surf['hemisphere'].eq(hemisphere)
-    x = zscore(df_yeo_surf.loc[net_mask, 't1_gradient1_SalVentAttn'].values)
+    net_mask = compute_network_mask(df_yeo_surf, network, hemisphere)
+    x = zscore(df_yeo_surf.loc[net_mask, f't1_gradient1_{network}'].values)
 
     fig, axes = plt.subplots(
         len(modalities),
@@ -234,21 +221,21 @@ def plot_context_correlations(df_yeo_surf: pd.DataFrame, stats: pd.DataFrame, mo
 
 
 def plot_context_zoom(df_yeo_surf: pd.DataFrame, surf_lh, surf_rh, stats: pd.DataFrame, null: pd.DataFrame,
-                      out_dir: Path, hemisphere: str = 'both') -> None:
+                      out_dir: Path, network: str, hemisphere: str) -> None:
     """Figure 1b context rows: one zoom row per histological map, plus the ridgeline.
 
-    Each map in ``stats`` (in its row order) is z-scored over the SN vertices of
+    Each map in ``stats`` (in its row order) is z-scored over the network vertices of
     ``hemisphere`` and drawn as the ``SALIENCE_ZOOM_ROIS`` inset row alone (no brains,
-    no region names), titled with the map name, on the Figure 1 window (``ZOOM_KW``):
-    ``CustomCmap_histology`` on the shared +/-2 SD scale, the SN border traced
+    no region names), titled with the map name, on the Figure 1 window (``ZOOM_ROW_KW``):
+    ``CustomCmap_histology`` on the shared +/-2 SD scale, the network border traced
     (``mask_outline``). ``figure_1b_forest.svg`` (``plot_ridge``) then puts one row
     level with each inset row when the rows are stacked in that order: the map's Moran
     null distribution (``null``) with its observed r.
     """
-    net_mask = compute_network_mask(df_yeo_surf, 'SalVentAttn', hemisphere)
+    net_mask = compute_network_mask(df_yeo_surf, network, hemisphere)
     rois = [dict(r, label=None) for r in salience_zoom_rois(df_yeo_surf, hemisphere)]
-    outline = mask_outline(surf_lh, surf_rh, df_yeo_surf['network'].eq('SalVentAttn').to_numpy())
-    geometry = set()
+    outline = mask_outline(surf_lh, surf_rh, df_yeo_surf['network'].eq(network).to_numpy())
+    geometry = []
     for label in stats['modality']:
         values = np.full(len(df_yeo_surf), np.nan)
         vals = df_yeo_surf.loc[net_mask, label].to_numpy(dtype=float)
@@ -256,14 +243,12 @@ def plot_context_zoom(df_yeo_surf: pd.DataFrame, surf_lh, surf_rh, stats: pd.Dat
         fig = plot_hemispheres_zoom(surf_lh, surf_rh, values, rois, roi_only=True, draw_color_bar=True,
                                     title=CONTEXT_TITLES.get(label, label), cmap=histology_cmap.name,
                                     color_range=SALIENCE_Z_RANGE, cbar_labels=SALIENCE_Z_LABELS, cbar_title='z',
-                                    outline=outline, filename=out_dir / f"figure_1b_zoom_{ZOOM_STEMS[label]}.svg",
-                                    **ZOOM_KW)
-        geometry.add((fig.inset_cy, fig.get_size_inches()[1] * 72))
+                                    outline=outline, filename=out_dir / f"figure_1b_zoom_{BRAIN_STEMS[label]}.svg",
+                                    **ZOOM_ROW_KW)
+        geometry.append((fig.inset_cy, fig.get_size_inches()[1] * 72))
         plt.close(fig)
-    if len(geometry) != 1:
-        raise RuntimeError(f"Zoom rows differ in geometry {geometry}; the ridgeline rows cannot be aligned.")
     nulls = [null.loc[null['modality'] == m, 'r'].to_numpy() for m in stats['modality']]
-    plot_ridge(stats, nulls, *geometry.pop(), out_dir / "figure_1b_forest.svg")
+    plot_ridge(stats, nulls, *shared_row_geometry(geometry), out_dir / "figure_1b_forest.svg")
     plt.close('all')
 
 
@@ -278,16 +263,16 @@ def _surface_with_maps(hemi: str) -> pd.DataFrame:
 
 def compute(settings: dict, paths: dict | None) -> None:
     """Histological maps of the network vertices and their Moran tests against the gradient."""
-    hemi = settings["hemisphere"]
+    network, hemi = settings["network"], settings["hemisphere"]
     source = config.source_dir(STEP)
     logger.info("Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels")
-    logger.info("Network        : SalVentAttn (Salience/Ventral Attention)")
-    logger.info("Modalities     : BigBrain (cell staining), Bielschowsky (myelin), Parvalbumin (AHEAD); T1map (in-vivo MRI) brain map only")
+    logger.info(f"Network        : {network}")
+    logger.info("Modalities     : BigBrain (cell-body staining), Bielschowsky (nerve fibres), Parvalbumin (AHEAD); T1map (in-vivo MRI) brain map only")
     logger.info(f"Null model     : Moran randomization (n_rep={N_PERMUTATIONS}, procedure=singleton, inverse 1-ring distance), on the finite SN vertices of each map, fitted per hemisphere (random_state=0 for LH, or the only hemisphere, and 1 for RH)")
 
     df_yeo_surf = config.read_table(config.source_dir(GRADIENT_STEP) / f"surface_fslr32k_{hemi}.tsv")
     # The maps are loaded on the network vertices of both hemispheres, whatever `hemi`
-    net_mask = compute_network_mask(df_yeo_surf, 'SalVentAttn', 'both')
+    net_mask = compute_network_mask(df_yeo_surf, network, 'both')
     maps = pd.DataFrame({"vertex": np.flatnonzero(net_mask)})
     for label in HISTOLOGY_MAPS:
         df_yeo_surf.loc[net_mask, label] = HISTOLOGY_LOADERS[label](net_mask)
@@ -295,16 +280,16 @@ def compute(settings: dict, paths: dict | None) -> None:
         maps[label] = df_yeo_surf.loc[net_mask, label].to_numpy(dtype=float)
     config.write_table(maps, source / f"histology_maps_{hemi}.tsv")
 
-    stats, null = context_statistics(df_yeo_surf, load_conte69(join=True), HISTOLOGY_MAPS, hemisphere=hemi)
+    stats, null = context_statistics(df_yeo_surf, load_conte69(join=True), HISTOLOGY_MAPS, network, hemi)
     config.write_table(stats, source / f"context_stats_{hemi}.tsv")
     config.write_table(null, source / f"context_null_{hemi}.tsv")
-    write_manifest(source / "manifest.json", STEP, config.PROJECT_ROOT, hemisphere=hemi,
+    write_manifest(source / "manifest.json", STEP, config.PROJECT_ROOT, network=network, hemisphere=hemi,
                    n_permutations=N_PERMUTATIONS, maps=HISTOLOGY_MAPS)
 
 
 def plot(settings: dict) -> None:
     """Figure 1b panels and supplementary plots, from source_data only."""
-    hemi = settings["hemisphere"]
+    network, hemi = settings["network"], settings["hemisphere"]
     source, out = config.source_dir(STEP), config.FIGURES_DIR
     df_yeo_surf = _surface_with_maps(hemi)
     stats = config.read_table(source / f"context_stats_{hemi}.tsv")
@@ -316,9 +301,9 @@ def plot(settings: dict) -> None:
                          zoom=1.3, color_bar='right', share='both', nan_color=(220, 220, 220, 1), cmap='coolwarm',
                          transparent_bg=True, screenshot=True, filename=out / f"figure_1b_brain_{stem}.svg",
                          cb__numberOfLabels=0)
-    plot_context_correlations(df_yeo_surf, stats, HISTOLOGY_MAPS, out, hemisphere=hemi)
+    plot_context_correlations(df_yeo_surf, stats, HISTOLOGY_MAPS, out, network, hemi)
     logger.info("Generating context zoom rows (figure_1b_zoom_*.svg) and Moran-null ridgeline (figure_1b_forest.svg)")
-    plot_context_zoom(df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, stats, null, out, hemisphere=hemi)
+    plot_context_zoom(df_yeo_surf, surf32k_lh_infl, surf32k_rh_infl, stats, null, out, network, hemi)
 
 
 if __name__ == "__main__":

@@ -23,9 +23,9 @@ STEPS = (
     "step1a_mpc_gradient",      # Figure 1a: MPC gradient of the salience network
     "step1b_histology",         # Figure 1b: histological context of the gradient
     "step1c_cortical_types",    # Figure 1c: cortical types of the salience network
-    "step2a_ieeg_mni",          # Figure 2a: MNI Open iEEG Atlas
-    "step2b_ieeg_mica",         # Figure 2b: MICA iEEG spectra
-    "step2c_ieeg_states",       # Figure 2c: wakefulness, N2 and N3
+    "step2a_ieeg_mni",          # Figure 2 replication (supplementary): MNI Open iEEG Atlas
+    "step2b_ieeg_mica",         # Figure 2: MICA iEEG spectra
+    "step2c_ieeg_states",       # Figure 2 supplement: wakefulness, N2 and N3
     "step3_connectivity",       # Figure 3: gradient-weighted connectivity projection
     "step3_schematic",          # Figure 3 (panel A): schematic of the projection
 )

@@ -22,9 +22,8 @@ from .stats import (
 logger = logging.getLogger(__name__)
 
 
+# fsLR-5k vertices: left hemisphere, and both hemispheres (left first).
 N_LH_5K = 4842
-
-
 N_TOTAL_5K = 9684
 
 
@@ -88,6 +87,41 @@ def load_group_mean_matrix(files: list, cortex_mask: np.ndarray) -> np.ndarray:
     return (acc / len(files)).astype(np.float32)
 
 
+def projection_masks(
+    df_yeo_surf_5k: pd.DataFrame, gradient: np.ndarray, network: str, hemisphere: str = "both",
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Source and target vertices of the projection of a network, in cortex order.
+
+    The sources are the network's vertices (of `hemisphere`) where `gradient` is finite;
+    the targets are every other cortical vertex of `hemisphere`.
+
+    Parameters
+    ----------
+    df_yeo_surf_5k : pd.DataFrame
+        fsLR-5k surface table with ``network`` and ``hemisphere`` (NaN off cortex).
+    gradient : (n_vertices,) array
+        Source map on the full surface (e.g. the network's MPC gradient, NaN elsewhere).
+    network : str
+        Yeo 7-network label of the sources.
+    hemisphere : {'both', 'LH', 'RH'}
+        Hemisphere of sources and targets. Default 'both'.
+
+    Returns
+    -------
+    g_at_sn : (n_sn,) array
+        `gradient` at the sources.
+    sn_mask_cortex, other_mask_cortex : (n_cortex,) bool
+        Sources and targets among the cortical vertices.
+    """
+    cortex = df_yeo_surf_5k["hemisphere"].notna().to_numpy()
+    in_network = df_yeo_surf_5k["network"].eq(network).to_numpy()
+    in_hemi = (df_yeo_surf_5k["hemisphere"].eq(hemisphere).to_numpy() if hemisphere in ("LH", "RH")
+               else np.ones(len(df_yeo_surf_5k), dtype=bool))
+    grad_cortex = np.asarray(gradient, dtype=float)[cortex]
+    sn_mask_cortex = (in_network & in_hemi)[cortex] & np.isfinite(grad_cortex)
+    return grad_cortex[sn_mask_cortex], sn_mask_cortex, (~in_network & in_hemi)[cortex]
+
+
 def fcn_group_bins(
     adj: np.ndarray, dist: np.ndarray, hemiid: np.ndarray, nbins: int,
 ) -> tuple[np.ndarray, np.ndarray]:
@@ -107,8 +141,8 @@ def fcn_group_bins(
 
     Returns
     -------
-    G : (n, n) symmetric binary group-consensus matrix (distance-dependent).
-    Gc : (n, n) symmetric binary group-consensus matrix (consistency-based).
+    G : (n, n) bool
+        Symmetric binary group-consensus matrix (distance-dependent).
 
     Betzel, R. F. et al. (2019). Network Neuroscience 3(2), 475-496.
     """
@@ -122,14 +156,11 @@ def fcn_group_bins(
     distbins[-1] += 1
 
     C = np.sum(adj > 0, axis=2)
-    W = np.sum(adj, axis=2) / np.where(C > 0, C, np.nan)
-    W = np.nan_to_num(W, nan=0.0)
 
     inter_hemi_mask = np.dot(hemiid, ~hemiid.T)
     inter_hemi_mask = np.logical_or(inter_hemi_mask, inter_hemi_mask.T)
 
     Grp = np.zeros((n, n, 2))
-    Gc_arr = np.zeros((n, n, 2))
 
     for j in range(2):
         inter_hemi = ~inter_hemi_mask if j else inter_hemi_mask
@@ -152,20 +183,9 @@ def fcn_group_bins(
             G[mask[0][idx[:frac]], mask[1][idx[:frac]]] = 1
         Grp[:, :, j] = G
 
-        I = np.where(np.triu(inter_hemi, 1))
-        w = W[I]
-        idx = np.argsort(w)[::-1]
-        w_mat = np.zeros((n, n))
-        nnz = int(G.sum())
-        if nnz > 0:
-            w_mat[I[0][idx[:nnz]], I[1][idx[:nnz]]] = 1
-        Gc_arr[:, :, j] = w_mat
-
     G = np.sum(Grp, 2)
     G = G + G.T
-    Gc = np.sum(Gc_arr, 2)
-    Gc = Gc + Gc.T
-    return G.astype(bool), Gc.astype(bool)
+    return G.astype(bool)
 
 
 def build_consensus_mask(
@@ -207,7 +227,7 @@ def build_consensus_mask(
     dist = np.mean(np.stack(dist_stack, axis=0), axis=0)
     del dist_stack
 
-    G, _ = fcn_group_bins(adj, dist, hemiid, nbins)
+    G = fcn_group_bins(adj, dist, hemiid, nbins)
     logger.info(
         f"Betzel consensus mask built: density={G.mean():.4f}, "
         f"n_edges={int(G.sum() // 2)}, nbins={nbins}"
@@ -218,15 +238,20 @@ def build_consensus_mask(
 def prepare_weights(
     W_raw: np.ndarray, modality: str, hemi_cortex: np.ndarray,
     sn_mask_cortex: np.ndarray, *, mask_G: np.ndarray | None = None,
+    targets: np.ndarray | None = None,
 ) -> np.ndarray:
     """Modality-aware preprocessing of a per-subject cortex x cortex matrix.
 
     Always sets to NaN: diagonal, within-network edges. Cross-hemisphere is set
-    NaN for GD (the spec requires within-hemisphere GD only, mirroring micapipe
-    geodesic distance which is undefined across hemispheres). Every modality keeps
-    only positive connections: SC log-transforms positives, GD inverts positive
-    distances, and MPC/FC retain positive correlations while non-positive entries
-    are dropped to NaN.
+    NaN for GD, since micapipe geodesic distance is undefined across hemispheres.
+    Every modality keeps only positive connections: SC log-transforms positives
+    (relative to the smallest positive weight of the whole masked matrix), GD
+    inverts positive distances, and MPC/FC retain positive correlations while
+    non-positive entries are dropped to NaN.
+
+    With `targets`, only the source-network x target block is prepared, which is all
+    the projection reads; it equals ``prepare_weights(...)[np.ix_(sn_mask_cortex,
+    targets)]`` value for value, at a fraction of the time and memory.
 
     Parameters
     ----------
@@ -238,47 +263,49 @@ def prepare_weights(
     sn_mask_cortex : (n_cortex,) bool, True for source-network vertices.
     mask_G : (n_cortex, n_cortex) bool, optional
         Betzel consensus mask for SC.
+    targets : (n_cortex,) bool, optional
+        Target vertices; if given, only the rows of the source network and the columns
+        of `targets` are returned.
 
     Returns
     -------
-    W : (n_cortex, n_cortex) float
+    W : (n_cortex, n_cortex) or (n_sn, n_targets) float
         Preprocessed weights, with NaN marking excluded entries.
     """
+    if modality not in ("SC", "GD", "MPC", "FC"):
+        raise ValueError(f"modality must be one of 'SC', 'GD', 'MPC', 'FC'; got {modality}")
     n = W_raw.shape[0]
-    W = W_raw.astype(np.float64, copy=True)
+    if targets is None:
+        rows = cols = np.arange(n)
+        W = W_raw.astype(np.float64, copy=True)
+    else:
+        rows, cols = np.flatnonzero(sn_mask_cortex), np.flatnonzero(targets)
+        W = W_raw[np.ix_(rows, cols)].astype(np.float64)
 
     if modality == "SC":
         if mask_G is not None:
-            W = W * mask_G
+            W = W * mask_G[np.ix_(rows, cols)]
         positives = W > 0
+        log_W = np.full_like(W, np.nan, dtype=np.float64)
         if positives.any():
-            eps = W[positives].min()
-            log_W = np.full_like(W, np.nan, dtype=np.float64)
+            # The log scale is set by the whole masked matrix, whatever block is returned.
+            kept = W_raw > 0 if mask_G is None else (W_raw > 0) & mask_G
+            eps = np.float64(W_raw[kept].min())
             log_W[positives] = np.log10(W[positives] / eps)
-            W = log_W
-        else:
-            W = np.full_like(W, np.nan, dtype=np.float64)
+        W = log_W
 
     elif modality == "GD":
-        same_hemi = hemi_cortex[:, None] == hemi_cortex[None, :]
+        same_hemi = hemi_cortex[rows][:, None] == hemi_cortex[cols][None, :]
         with np.errstate(divide="ignore", invalid="ignore"):
             W = np.where(W > 0, 1.0 / W, np.nan)
         W[~same_hemi] = np.nan
 
-    elif modality in ("MPC", "FC"):
-        # Positive connections only: keep positive partial correlations (MPC) /
-        # positive correlations (FC); drop non-positive (negative/zero) edges.
-        # Whole-brain, no hemisphere restriction.
+    else:
+        # MPC / FC: positive (partial) correlations only, whole brain.
         W = np.where(W > 0, W, np.nan)
 
-    else:
-        raise ValueError(f"modality must be one of 'SC', 'GD', 'MPC', 'FC'; got {modality}")
-
-    diag_idx = np.arange(n)
-    W[diag_idx, diag_idx] = np.nan
-    within_sn = sn_mask_cortex[:, None] & sn_mask_cortex[None, :]
-    W[within_sn] = np.nan
-
+    W[rows[:, None] == cols[None, :]] = np.nan  # diagonal
+    W[sn_mask_cortex[rows][:, None] & sn_mask_cortex[cols][None, :]] = np.nan  # within network
     return W
 
 
@@ -290,8 +317,7 @@ def weighted_mean_projection(
     P[i] = sum_j w_ij g_targets[j] / sum_j w_ij over positive, finite weights only
     (NaN/non-positive weights are excluded from numerator AND denominator). Rows with
     fewer than `min_valid` finite-positive targets, or a non-positive denominator,
-    return NaN. Shared by `compute_projection_score` (full-matrix entry point) and the
-    geometry-preserving topological null, which rewires `W_sub` directly.
+    return NaN.
 
     Parameters
     ----------
@@ -314,33 +340,37 @@ def weighted_mean_projection(
     return np.where(n_valid >= min_valid, num / np.where(den > 0, den, np.nan), np.nan)
 
 
-def compute_projection_score(
-    W: np.ndarray, g_fc_cortex: np.ndarray,
-    sn_idx_cortex: np.ndarray, other_idx_cortex: np.ndarray,
-    *, min_valid: int = 10,
-) -> np.ndarray:
-    """Weighted-mean projection: P[i] = sum_j w_ij g_FC[j] / sum_j w_ij.
+def _cortex_hemispheres(df_yeo_surf_5k: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
+    """Cortex mask of the surface table and the hemisphere label of each cortex vertex."""
+    cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values
+    return cortex_mask, df_yeo_surf_5k.loc[cortex_mask, "hemisphere"].values
 
-    Slices the SN x target submatrix from the full preprocessed `W` and delegates the
-    arithmetic to `weighted_mean_projection`. Only positive weights contribute (NaN
-    weights are excluded from numerator AND denominator). Returns NaN for rows with
-    fewer than `min_valid` finite targets, or with zero/negative denominator.
 
-    Parameters
-    ----------
-    W : (n_cortex, n_cortex), preprocessed weights.
-    g_fc_cortex : (n_cortex,), whole-brain FC gradient on cortex.
-    sn_idx_cortex : (n_cortex,) bool, source network mask.
-    other_idx_cortex : (n_cortex,) bool, target set (non-network cortex).
-    min_valid : int
+def _subject_matrices(files: list | None, preloaded_subjects: list[np.ndarray] | None,
+                      cortex_mask: np.ndarray, label: str) -> tuple[int, object]:
+    """Number of subjects, and an iterator over their raw cortex x cortex matrices.
 
-    Returns
-    -------
-    P : (n_sn,) float
+    The pre-loaded matrices are used when given; otherwise each subject's file is read
+    when its turn comes, so only one matrix is held at a time.
     """
-    W_sub = W[np.ix_(sn_idx_cortex, other_idx_cortex)]
-    g_targets = g_fc_cortex[other_idx_cortex]
-    return weighted_mean_projection(W_sub, g_targets, min_valid=min_valid)
+    n_sub = len(preloaded_subjects) if preloaded_subjects is not None else len(files or [])
+    if n_sub == 0:
+        raise ValueError(f"[{label}] no subjects to process: neither `files` nor `preloaded_subjects` "
+                         f"lists any connectome.")
+    if preloaded_subjects is not None:
+        return n_sub, iter(preloaded_subjects)
+    return n_sub, (load_subject_matrix(f, cortex_mask) for f in files)
+
+
+def _group_null(null_subjects: np.ndarray, label: str) -> tuple[np.ndarray, float]:
+    """Fisher-z mean across subjects (columns) of each surrogate's correlations, and its SD."""
+    with np.errstate(invalid="ignore"):
+        z = np.arctanh(np.clip(null_subjects, -0.999, 0.999))
+    null_group = np.tanh(np.nanmean(z, axis=1))
+    null_std = float(np.nanstd(null_group))
+    if null_std < 1e-6:
+        logger.warning(f"{label} null group std={null_std:.2e}: surrogates may be degenerate.")
+    return null_group, null_std
 
 
 def _fisher_z_group(r_subjects: np.ndarray) -> dict:
@@ -404,7 +434,6 @@ def compute_projection_subjects(
     -------
     result : dict with keys:
         P_mean : (n_sn,) group-mean projection score.
-        P_subjects_full : (n_sub, n_cortex_full=9684) per-subject P_s expanded to full vertex space, NaN outside SN.
         P_subjects_sn  : (n_sub, n_sn) per-subject projection (SN-only).
         r_subjects : (n_sub,) per-subject Spearman(g_MPC, P_s).
         n_targets_per_sn : (n_sn,) mean-over-subjects count of finite-positive targets per SN vertex (sparsity diagnostic).
@@ -412,59 +441,33 @@ def compute_projection_subjects(
         target_network_names : list of str, names matching the first axis of target_net_weights.
         + Fisher-z aggregate keys: r_group, t, p, ci_low, ci_high, n.
     """
-    cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values
-    hemi_cortex = df_yeo_surf_5k.loc[cortex_mask, "hemisphere"].values
+    cortex_mask, hemi_cortex = _cortex_hemispheres(df_yeo_surf_5k)
     n_sn = int(sn_mask_cortex.sum())
-    n_sub = len(files) if files else (len(preloaded_subjects) if preloaded_subjects else 0)
-    if n_sub == 0:
-        raise ValueError(
-            f"[{modality}] no subjects to process: `files` is empty and no "
-            f"pre-loaded `preloaded_subjects` were supplied. (For FC this means no "
-            f"subject had a session-matched connectome; check `path_fc_5k`.)"
-        )
-
-    cortex_indices = np.flatnonzero(cortex_mask)
-    sn_idx_full = cortex_indices[sn_mask_cortex]
+    n_sub, matrices = _subject_matrices(files, preloaded_subjects, cortex_mask, modality)
 
     r_subjects = np.full(n_sub, np.nan)
-    P_subjects_full = np.full((n_sub, N_TOTAL_5K), np.nan)
     P_subjects_sn = np.full((n_sub, n_sn), np.nan)
     # Per-subject count of finite-positive targets per SN vertex (sparsity diagnostic).
     n_targets_subjects = np.full((n_sub, n_sn), np.nan)
-    g_targets_finite = np.isfinite(g_fc_cortex[other_mask_cortex])
+    g_targets = g_fc_cortex[other_mask_cortex]
+    g_targets_finite = np.isfinite(g_targets)
 
     if target_network_labels is not None:
-        target_net_names = [n for n in pd.unique(target_network_labels[other_mask_cortex])
-                            if isinstance(n, str)]
-        target_net_masks = {
-            net: (target_network_labels == net) & other_mask_cortex
-            for net in target_net_names
-        }
+        target_labels = target_network_labels[other_mask_cortex]
+        target_net_names = [n for n in pd.unique(target_labels) if isinstance(n, str)]
         target_net_weights_subjects = np.full((n_sub, len(target_net_names), n_sn), np.nan)
     else:
         target_net_names = []
-        target_net_masks = {}
         target_net_weights_subjects = None
 
     g_mpc_sn = g_mpc_cortex_at_sn.astype(np.float64)
     valid_g_mpc = np.isfinite(g_mpc_sn)
 
-    for s in range(n_sub):
-        if preloaded_subjects is not None:
-            W_raw = preloaded_subjects[s]
-        else:
-            W_raw = load_subject_matrix(files[s], cortex_mask)
-
-        W = prepare_weights(W_raw, modality, hemi_cortex, sn_mask_cortex, mask_G=mask_G)
-
-        P_s = compute_projection_score(
-            W, g_fc_cortex, sn_mask_cortex, other_mask_cortex, min_valid=min_valid,
-        )
-
+    for s, W_raw in enumerate(matrices):
+        W_sub = prepare_weights(W_raw, modality, hemi_cortex, sn_mask_cortex, mask_G=mask_G,
+                                targets=other_mask_cortex)
+        P_s = weighted_mean_projection(W_sub, g_targets, min_valid=min_valid)
         P_subjects_sn[s] = P_s
-        P_subjects_full[s, sn_idx_full] = P_s
-
-        W_sub = W[np.ix_(sn_mask_cortex, other_mask_cortex)]
         n_targets_subjects[s] = (np.isfinite(W_sub) & (W_sub > 0)
                                  & g_targets_finite[None, :]).sum(axis=1)
 
@@ -473,11 +476,9 @@ def compute_projection_subjects(
             r_subjects[s] = spearmanr(g_mpc_sn[finite], P_s[finite])[0]
 
         if target_net_weights_subjects is not None:
-            W_sn_rows = W[sn_mask_cortex]
-            W_pos = np.where(np.isfinite(W_sn_rows) & (W_sn_rows > 0), W_sn_rows, 0.0)
+            W_pos = np.where(np.isfinite(W_sub) & (W_sub > 0), W_sub, 0.0)
             for net_idx, net in enumerate(target_net_names):
-                col_mask = target_net_masks[net]
-                target_net_weights_subjects[s, net_idx] = W_pos[:, col_mask].sum(axis=1)
+                target_net_weights_subjects[s, net_idx] = W_pos[:, target_labels == net].sum(axis=1)
 
         if np.isnan(P_s).all():
             logger.warning(f"[{modality}] subject {s}: P_s is all-NaN.")
@@ -506,7 +507,6 @@ def compute_projection_subjects(
 
     return {
         "P_mean": P_mean,
-        "P_subjects_full": P_subjects_full,
         "P_subjects_sn": P_subjects_sn,
         "r_subjects": r_subjects,
         "n_targets_per_sn": np.nanmean(n_targets_subjects, axis=0),
@@ -550,9 +550,8 @@ def group_spearman_r(g_at_sn: np.ndarray, P_subjects_sn: np.ndarray, min_valid: 
 
 
 def compute_moran_null_projection(
-    g_mpc_cortex_at_sn: np.ndarray, sn_mask_cortex: np.ndarray,
-    gd_among_sn: np.ndarray, result: dict, n_rand: int,
-    *, random_state: int = 42,
+    g_mpc_cortex_at_sn: np.ndarray, gd_among_sn: np.ndarray, result: dict, n_rand: int,
+    *, random_state: int = 42, min_valid: int = 10,
 ) -> dict:
     """Moran spectral randomization null for the g_MPC ↔ P alignment.
 
@@ -574,7 +573,6 @@ def compute_moran_null_projection(
     Parameters
     ----------
     g_mpc_cortex_at_sn : (n_sn,)
-    sn_mask_cortex : (n_cortex,) bool
     gd_among_sn : (n_sn, n_sn) float
         Geodesic distance among SN vertices. Cross-hemisphere entries are 0 when the
         SN spans both hemispheres (yielding a 0 spatial weight, i.e. no edge in the
@@ -582,6 +580,8 @@ def compute_moran_null_projection(
     result : dict from compute_projection_subjects.
     n_rand : int
     random_state : int
+    min_valid : int
+        Minimum number of vertices finite in both maps for a subject to enter the null.
 
     Returns
     -------
@@ -609,22 +609,12 @@ def compute_moran_null_projection(
     for s in range(n_sub):
         P_s = P_subjects_sn[s]
         mask = sur_support & np.isfinite(P_s)
-        if mask.sum() < 10:
+        if mask.sum() < min_valid:
             continue
         null_subjects[:, s] = rank_corr_columns(P_s[mask], surrogates[:, mask].T)
 
-    with np.errstate(invalid="ignore"):
-        z = np.arctanh(np.clip(null_subjects, -0.999, 0.999))
-    null_group = np.tanh(np.nanmean(z, axis=1))
-
+    null_group, null_std = _group_null(null_subjects, "Moran")
     p_moran = empirical_p_twosided(null_group, result["r_group"])
-
-    null_std = float(np.nanstd(null_group))
-    if null_std < 1e-6:
-        logger.warning(
-            f"Moran null group std={null_std:.2e}: surrogates may be degenerate."
-        )
-
     return {"null_group_moran": null_group, "p_moran": p_moran, "null_std_moran": null_std}
 
 
@@ -752,8 +742,7 @@ def compute_topological_null_projection(
     """
     if method not in ("exact", "clt"):
         raise ValueError(f"method must be 'exact' or 'clt'; got {method!r}")
-    cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values
-    hemi_cortex = df_yeo_surf_5k.loc[cortex_mask, "hemisphere"].values
+    cortex_mask, hemi_cortex = _cortex_hemispheres(df_yeo_surf_5k)
     n_sn = int(sn_mask_cortex.sum())
     g_targets = g_fc_cortex[other_mask_cortex].astype(np.float64)
     g_targets_finite = np.isfinite(g_targets)
@@ -787,21 +776,13 @@ def compute_topological_null_projection(
                     pool_mu[i, b] = seg.mean()
                     pool_var[i, b] = seg.var()  # population variance (ddof=0)
 
-    n_sub = len(files) if files else (len(preloaded_subjects) if preloaded_subjects else 0)
-    if n_sub == 0:
-        raise ValueError(f"[{modality}] topological null: no subjects to process.")
-
+    n_sub, matrices = _subject_matrices(files, preloaded_subjects, cortex_mask, f"{modality} topological null")
     rng = np.random.default_rng(random_state)
     null_subjects = np.full((n_rand, n_sub), np.nan)
 
-    for s in range(n_sub):
-        if preloaded_subjects is not None:
-            W_raw = preloaded_subjects[s]
-        else:
-            W_raw = load_subject_matrix(files[s], cortex_mask)
-        W = prepare_weights(W_raw, modality, hemi_cortex, sn_mask_cortex, mask_G=mask_G)
-        W_sub = W[np.ix_(sn_mask_cortex, other_mask_cortex)]
-
+    for s, W_raw in enumerate(matrices):
+        W_sub = prepare_weights(W_raw, modality, hemi_cortex, sn_mask_cortex, mask_G=mask_G,
+                                targets=other_mask_cortex)
         pos = np.isfinite(W_sub) & (W_sub > 0) & g_targets_finite[None, :]
         row_deg = pos.sum(axis=1)
         W_total = np.where(pos, W_sub, 0.0).sum(axis=1)
@@ -842,21 +823,10 @@ def compute_topological_null_projection(
         if mask.sum() >= min_valid:
             null_subjects[:, s] = rank_corr_columns(g_mpc_sn[mask], P_surr[mask])
 
-    with np.errstate(invalid="ignore"):
-        z = np.arctanh(np.clip(null_subjects, -0.999, 0.999))
-    null_group = np.tanh(np.nanmean(z, axis=1))
-
-    # Excess-magnitude p: the null is centred on the geometry expectation (not zero) and
-    # the group r inherits g_MPC's arbitrary polarity, so the hypothesis "specific wiring
-    # *increases* alignment beyond geometry" is tested as |obs| > |null| — sign-invariant
-    # (a fixed upper-tail would misfire whenever g_MPC came out sign-negative).
+    null_group, null_std = _group_null(null_subjects, f"[{modality}] topological")
+    # Excess-magnitude p: the null is centred on the geometry expectation, not zero, and
+    # the group r inherits the arbitrary polarity of g_MPC (see the docstring).
     p_topo = empirical_p_excess_magnitude(null_group, result["r_group"])
-    null_std = float(np.nanstd(null_group))
-    if null_std < 1e-6:
-        logger.warning(
-            f"[{modality}] topological null group std={null_std:.2e}: "
-            f"surrogates may be degenerate."
-        )
     logger.info(
         f"[{modality}] topological null ({method}): nbins={nbins}, n_rand={n_rand}; "
         f"null mean={np.nanmean(null_group):+.3f} (geometry expectation), "
@@ -969,8 +939,7 @@ def compute_spin_null_projection(
     -------
     {null_group_spin, p_spin, null_std_spin}
     """
-    cortex_mask = df_yeo_surf_5k["hemisphere"].notna().values
-    hemi_cortex = df_yeo_surf_5k.loc[cortex_mask, "hemisphere"].values
+    cortex_mask, hemi_cortex = _cortex_hemispheres(df_yeo_surf_5k)
     n_rand = g_fc_spun_cortex.shape[0]
 
     # Spun target fields, restricted to this network's target set, split into the value
@@ -983,16 +952,11 @@ def compute_spin_null_projection(
     g_mpc_sn = g_mpc_cortex_at_sn.astype(np.float64)
     valid_g_mpc = np.isfinite(g_mpc_sn)
 
-    n_sub = len(files) if files else (len(preloaded_subjects) if preloaded_subjects else 0)
-    if n_sub == 0:
-        raise ValueError(f"[{modality}] spin null: no subjects to process.")
-
+    n_sub, matrices = _subject_matrices(files, preloaded_subjects, cortex_mask, f"{modality} spin null")
     null_subjects = np.full((n_rand, n_sub), np.nan)
-    for s in range(n_sub):
-        W_raw = preloaded_subjects[s] if preloaded_subjects is not None \
-            else load_subject_matrix(files[s], cortex_mask)
-        W = prepare_weights(W_raw, modality, hemi_cortex, sn_mask_cortex, mask_G=mask_G)
-        W_sub = W[np.ix_(sn_mask_cortex, other_mask_cortex)]
+    for s, W_raw in enumerate(matrices):
+        W_sub = prepare_weights(W_raw, modality, hemi_cortex, sn_mask_cortex, mask_G=mask_G,
+                                targets=other_mask_cortex)
         W_eff = np.where(np.isfinite(W_sub) & (W_sub > 0), W_sub, 0.0)  # (n_sn, n_other)
         pos = (W_eff > 0).astype(np.float64)
 
@@ -1006,16 +970,8 @@ def compute_spin_null_projection(
         if mask.sum() >= min_valid:
             null_subjects[:, s] = rank_corr_columns(g_mpc_sn[mask], P_spin[mask])
 
-    with np.errstate(invalid="ignore"):
-        z = np.arctanh(np.clip(null_subjects, -0.999, 0.999))
-    null_group = np.tanh(np.nanmean(z, axis=1))
-
+    null_group, null_std = _group_null(null_subjects, f"[{modality}] spin")
     p_spin = empirical_p_twosided(null_group, result["r_group"])
-    null_std = float(np.nanstd(null_group))
-    if null_std < 1e-6:
-        logger.warning(
-            f"[{modality}] spin null group std={null_std:.2e}: surrogates may be degenerate."
-        )
     logger.info(
         f"[{modality}] spin null: n_rand={n_rand}; null mean={np.nanmean(null_group):+.3f} "
         f"(~0 expected), obs r_group={result['r_group']:+.3f}, p_spin={p_spin:.3e} (two-sided)"
@@ -1091,9 +1047,7 @@ def compute_projection_nulls(
     )
 
     gd_among_sn = gd_cortex[np.ix_(sn_mask_cortex, sn_mask_cortex)]
-    moran = compute_moran_null_projection(
-        g_mpc_cortex_at_sn, sn_mask_cortex, gd_among_sn, result, n_rand,
-    )
+    moran = compute_moran_null_projection(g_mpc_cortex_at_sn, gd_among_sn, result, n_rand)
 
     if g_fc_spun_cortex is not None:
         spin = compute_spin_null_projection(
@@ -1124,7 +1078,7 @@ def compute_projection_nulls(
     return {**result, **moran, **topo, **spin}
 
 
-def compute_dominant_target_network(result: dict) -> tuple[np.ndarray, list[str]]:
+def compute_dominant_target_network(result: dict) -> tuple[np.ndarray | None, list[str]]:
     """For each SN vertex, return the index + name of the target network with
     the highest group-mean weighted connectivity.
 
@@ -1135,7 +1089,8 @@ def compute_dominant_target_network(result: dict) -> tuple[np.ndarray, list[str]
 
     Returns
     -------
-    dominant_idx : (n_sn,) int, argmax along network axis (-1 where all NaN).
+    dominant_idx : (n_sn,) int, argmax along network axis (-1 where all NaN); None if
+        the result holds no target-network weights.
     target_network_names : list of str, in the order indexed.
     """
     W = result.get("target_net_weights")
