@@ -114,7 +114,7 @@ flowchart TD
 |---|---|---|---|
 | 1a | micapipe qT1 profiles; participant table | subject lists with file paths; gradient fits with subject IDs | surface tables with the gradient; subject-mean qT1 profiles; gradient fit summary; comparison with the FC gradient |
 | 1b | step 1a gradient; BigBrain, AHEAD maps in `data/` | — | histological maps; statistics; Moran nulls |
-| 1c | atlases in `data/` | — | type composition; spin nulls; statistics |
+| 1c | step 1a gradient; atlases in `data/` | — | type composition; spin nulls; statistics; gradient-by-type test and its Moran null |
 | 2a | MNI iEEG atlas and its registered surfaces; step 1a gradient | — | as step 2b |
 | 2b | electroMICA recordings and sensitivity maps; step 1a gradient | channel spectra | template maps of each measure; statistics; nulls; quintile spectra; similarity projection |
 | 2c | as step 2b, for three states | channel spectra per state | template maps per state; band powers; statistics; nulls |
@@ -160,11 +160,14 @@ flowchart TD
     test1b["1b: Spearman vs each map<br/>Moran null per hemisphere"]
     types[("von Economo types")]
     test1c["1c: type composition of the network<br/>spin test, 10,000 rotations, medial wall left out"]
+    test1cg["1c: Spearman of the gradient vs type rank<br/>Moran null per hemisphere"]
     profiles --> mpc --> gradient
     gradient --> panels1a
     gradient --> test1b
     histology --> test1b
     types --> test1c
+    gradient --> test1cg
+    types --> test1cg
 ```
 
 ## 6. Figure 2: intracranial EEG

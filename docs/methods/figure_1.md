@@ -120,3 +120,23 @@ Unlike a test on the absolute deviation from the null mean, this combination doe
 assume a symmetric null distribution, which the percentages of rare types, bounded below
 by zero, do not have. The seven tests formed one family for the correction for multiple
 comparisons ([Shared Methods](shared.md#spatial-null-models)).
+
+## Microstructural gradient across cortical types (Fig 1C)
+
+To relate the in vivo gradient to cytoarchitecture, each SN vertex was assigned the rank
+of its cortical type on the scale of laminar differentiation described above, from 1
+(agranular) through 2 (dysgranular) and 3 to 5 (eulaminate I to III) to 6 (koniocortex);
+vertices without a cortical type were excluded. The MPC gradient was correlated with the
+type rank across the remaining SN vertices of both hemispheres with Spearman's rank
+correlation, tied ranks being averaged. This statistic assumes only a monotonic relation
+between gradient and type, not equal spacing between consecutive types. Significance was
+assessed against the within-network Moran null model
+([Shared Methods](shared.md#moran-spectral-randomization)), fitted on the same vertices
+with spatial weights given by the inverse 1-ring edge lengths of the fsLR-32k surface,
+separately within each hemisphere. The MPC gradient was randomized (1,000 surrogates;
+seeds 0 and 1) while the type rank was held fixed, because Moran spectral randomization
+generates continuous surrogate values and therefore cannot preserve the six discrete
+levels of an ordinal map. The central 95% of the null correlations (2.5th–97.5th
+percentiles) is reported alongside the observed correlation. As a single test, it was
+not corrected for multiple comparisons. The distribution of gradient values within each
+cortical type is shown for description only.

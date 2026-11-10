@@ -87,15 +87,23 @@ hemisphere. Its inputs are all public, so it computes without `config/paths.yaml
 `pipeline/step1c_cortical_types.py` — the von Economo–Koskinas cortical-type composition of
 every network and, for the network of the settings, the test of the depletion and
 enrichment of each type against 10,000 rotations of the network on the sphere (spin test;
-rotated vertices on the medial wall are left out). Its inputs are all public.
+rotated vertices on the medial wall are left out). It then correlates the step 1a gradient
+with the laminar differentiation rank of each vertex's type (`TYPE_RANK`: agranular 1 to
+koniocortex 6; vertices without a type left out) over the network vertices, against a
+Moran null of the gradient fitted per hemisphere (1,000 surrogates, as step 1b). Its inputs
+are all public (step 1a's `source_data/` tables and the atlases in `data/`).
 
 - **Settings:** `network`, `hemisphere`.
 - **Public:** `type_composition_<hemi>.tsv` (per network and type: `percent`),
   `type_null_<network>_<hemi>.tsv` (per rotation and type: `percent`),
   `type_stats_<network>_<hemi>.tsv` (per type: `observed`, `null_mean`, `null_sd`, `z`,
-  `p_depletion`, `p_enrichment`, the two-sided `p`, `n_spins`).
+  `p_depletion`, `p_enrichment`, the two-sided `p`, `n_spins`),
+  `type_gradient_stats_<network>_<hemi>.tsv` (gradient vs type rank: Spearman `r`, Moran
+  `p`, `null_lo` / `null_med` / `null_hi`, `n_vertices`, `n_perm`),
+  `type_gradient_null_<network>_<hemi>.tsv` (per surrogate: `r`).
 - **Figures:** `figure_1c_brain_economo.svg`, `figure_1c_brain_economo_zoom{,_roi}.svg`,
-  `figure_1c_type_salience.svg`.
+  `figure_1c_type_salience.svg`, `figure_1c_gradient_type.svg` (gradient of the network
+  vertices of each type, with the Moran test).
 
 ## Step 2a: MNI Open iEEG Atlas
 

@@ -71,7 +71,7 @@ $$p = \frac{1 + k}{1 + n},$$
 where $n$ is the number of null values and $k$ the number of null values at least as
 extreme as the observed statistic (Phipson & Smyth, 2010). The smallest attainable
 value is therefore $1/1{,}001 \approx 0.001$ for 1,000 surrogates (and $1/10{,}001$ for
-the 10,000 rotations of Fig 1C). Unless stated
+the 10,000 rotations of the Fig 1C type composition). Unless stated
 otherwise, tests were two-sided, with
 $k = |\{\text{null} : |\text{null}| \geq |\text{obs}|\}|$. The analysis code reports
 uncorrected p-values; within each family of tests, defined with each analysis, they were
@@ -82,7 +82,8 @@ each analysis are summarized in the table below.
 |----------|------------|----------------|-------------------|------------|------|
 | Fig 1A | Moran | MPC gradient (against the FC gradient) | inverse 1-ring edge length, fsLR-32k, SN vertices | 1,000 | 0 (left), 1 (right) |
 | Fig 1B | Moran | histological map | inverse 1-ring edge length, fsLR-32k, SN vertices | 1,000 | 0 (left), 1 (right) |
-| Fig 1C | spin | SN mask | fsLR-32k spheres, medial wall excluded | 10,000 | 0 |
+| Fig 1C, type composition | spin | SN mask | fsLR-32k spheres, medial wall excluded | 10,000 | 0 |
+| Fig 1C, gradient and type | Moran | MPC gradient (against the cortical type rank) | inverse 1-ring edge length, fsLR-32k, SN vertices with a cortical type | 1,000 | 0 (left), 1 (right) |
 | Fig 2 and supporting iEEG analyses | Moran | MPC gradient | inverse 1-ring edge length, fsLR-32k, left-hemisphere SN vertices | 1,000 | 0 |
 | Fig 3 | Moran | within-network MPC gradient | inverse group-mean geodesic distance, fsLR-5k | 1,000 | 42 (left), 43 (right) |
 | Fig 3 | topological | each participant's connectome | geodesic-distance bins | 1,000 | 42 |
@@ -95,7 +96,7 @@ Spherical-rotation null models were generated with BrainSpace (Alexander-Bloch e
 to the left-hemisphere sphere and its mirror image, reflected across the midsagittal
 plane, to the right-hemisphere sphere, so that homologous locations were rotated
 symmetrically. Each rotated vertex took the value of the nearest vertex of the
-original sphere. For Fig 1C, the SN mask was rotated on the fsLR-32k spheres and the
+original sphere. For the type composition of Fig 1C, the SN mask was rotated on the fsLR-32k spheres and the
 cortical-type composition was recomputed over the cortical vertices of each rotated mask,
 rotated vertices within the medial wall being excluded
 ([Figure 1](figure_1.md#cortical-type-composition-fig-1c)). The target-side spin null
@@ -121,9 +122,9 @@ the randomization of each hemisphere was seeded with the analysis seed plus the
 hemisphere index (left hemisphere first). Analogous to the hemisphere-wise rotation of
 the spin test, this procedure preserves the spatial autocorrelation and the
 distribution of values within each hemisphere while retaining both hemispheres in the
-statistic. Bilateral tests (Figs 1A, 1B and 3) therefore used two randomizations, and
+statistic. Bilateral tests (Figs 1A–1C and 3) therefore used two randomizations, and
 single-hemisphere tests (Fig 2) used one; a hemisphere with fewer than three tested
-vertices would have been permuted at random instead. In Figs 1A, 1B and 2, and in the
+vertices would have been permuted at random instead. In Figs 1A–1C and 2, and in the
 supporting iEEG analyses, the
 spatial weights were the inverse edge lengths between vertices sharing a mesh edge
 (1-ring neighbors) on the fsLR-32k midthickness surface. In Fig 3, they were the

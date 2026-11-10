@@ -8,10 +8,17 @@ procedure of Paquola et al.'s analysis of the default-mode network (network labe
 on the sphere, type composition recomputed within the rotated network, 10,000 rotations);
 rotated vertices on the medial wall, which has no cortical type, are left out.
 
-Inputs   atlases bundled in data/ (public, so this step needs no private data).
+Relates the two Figure 1 descriptions of the network, the step 1a MPC gradient and the
+cortical types, by the Spearman correlation of the gradient with the laminar
+differentiation rank of each vertex's type (agranular 1 to koniocortex 6) over the
+network vertices, against a Moran spectral randomization null of the gradient fitted
+per hemisphere, as in step 1b.
+
+Inputs   source_data/step1a_mpc_gradient/ and the atlases bundled in data/ (all public,
+         so this step needs no private data).
 Public   source_data/step1c_cortical_types/: the type composition of every network, the
          spin-null compositions and the enrichment statistics of the salience network,
-         manifest.
+         the gradient-by-type statistics and their Moran-null correlations, manifest.
 Figures  results/figures/figure_1c_*.svg
 
 Run      python pipeline/step1c_cortical_types.py [--stage compute|plot|all]
@@ -29,12 +36,14 @@ from brainspace.plotting import plot_hemispheres
 import common
 from salience_switch import config
 from salience_switch.colors import cmap_types, cmap_types_mw
-from salience_switch.plotting import ZOOM_ROW_KW, mask_outline, plot_hemispheres_zoom, salience_zoom_rois
+from salience_switch.plotting import (ZOOM_ROW_KW, format_pvalue, mask_outline, plot_hemispheres_zoom,
+                                      salience_zoom_rois)
 from salience_switch.provenance import write_manifest
-from salience_switch.stats import empirical_p_tails
+from salience_switch.stats import empirical_p_tails, fit_surface_moran, moran_spearman, null_interval
 from salience_switch.surface import compute_network_mask, load_econo_atlas, load_inflated_surfaces, load_yeo_atlas
 
 STEP = "step1c_cortical_types"
+GRADIENT_STEP = "step1a_mpc_gradient"
 logger = logging.getLogger(STEP)
 
 plt.rcParams['font.size'] = 16
@@ -42,8 +51,14 @@ plt.rcParams['font.size'] = 16
 # Rotations of the spin test: 10,000, as in Paquola et al.'s cortical-type analysis of the
 # default-mode network (caseypaquola/DMN, scripts/cytoarchitecture.m).
 N_SPINS = 10000
+# Moran surrogates of the gradient-by-type test: 1000, as in step 1b, keeps the add-one
+# p floor at 1/(1+1000) ~ 1e-3.
+N_PERMUTATIONS = 1000
 # Cortical types, codes 1-6 of load_econo_atlas, then 'Other' (code 0: no type) as code 7.
 TYPE_LABELS = ['Kon', 'Eu-III', 'Eu-II', 'Eu-I', 'Dys', 'Ag', 'Other']
+# Rank of each type on the ordinal scale of laminar differentiation (García-Cabezas et al.,
+# 2020), from agranular (least differentiated) to koniocortex; 'Other' has no rank.
+TYPE_RANK = {'Ag': 1, 'Dys': 2, 'Eu-I': 3, 'Eu-II': 4, 'Eu-III': 5, 'Kon': 6}
 
 
 def _type_percent(types: np.ndarray, mask: np.ndarray) -> np.ndarray:
@@ -131,6 +146,68 @@ def enrichment_statistics(composition: pd.DataFrame, null: pd.DataFrame, network
     return pd.DataFrame(rows)
 
 
+def _typed_gradient(df_surf: pd.DataFrame, network: str, hemisphere: str) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Network vertices (of ``hemisphere``) with a cortical type and a finite gradient.
+
+    Returns
+    -------
+    vertices : (n,) int
+        Their surface indices, in surface order.
+    gradient : (n,) float
+        Their step 1a MPC gradient.
+    types : (n,) str
+        Their cortical type (`TYPE_LABELS`, 'Other' excluded).
+    """
+    codes = df_surf['surf_type'].to_numpy()
+    gradient = df_surf[f't1_gradient1_{network}'].to_numpy(dtype=float)
+    keep = (compute_network_mask(df_surf, network, hemisphere) & np.isfinite(gradient)
+            & (codes >= 1) & (codes <= len(TYPE_RANK)))
+    vertices = np.flatnonzero(keep)
+    return vertices, gradient[vertices], np.array(TYPE_LABELS)[codes[vertices].astype(int) - 1]
+
+
+def gradient_by_type(df_surf: pd.DataFrame, surf_32k, network: str, hemisphere: str,
+                     n_rep: int = N_PERMUTATIONS) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Spearman correlation of the network MPC gradient with the laminar differentiation of the types.
+
+    Each network vertex (of ``hemisphere``) is given the rank of its cortical type on the
+    ordinal scale of laminar differentiation (`TYPE_RANK`: agranular 1 to koniocortex 6),
+    vertices without a type being left out, and the rank is correlated with the step 1a
+    gradient (Spearman, the sign as the two maps produce it). The gradient is randomised
+    by the within-network Moran null fitted on those vertices, separately within each
+    hemisphere (`fit_surface_moran`: inverse 1-ring edge lengths, seeds 0 and 1; add-one
+    two-sided p), and the type rank is held fixed: Moran spectral randomisation draws
+    continuous surrogates, which could not keep the six levels of the ordinal type map.
+
+    Returns
+    -------
+    stats : pd.DataFrame
+        One row: ``network, r, p, null_lo, null_med, null_hi, n_vertices, n_perm``
+        (``null_*``: 2.5th, 50th and 97.5th percentiles of the null correlations).
+    null : pd.DataFrame
+        One row per surrogate: ``network, surrogate, r``.
+    """
+    vertices, gradient, types = _typed_gradient(df_surf, network, hemisphere)
+    rank = np.array([TYPE_RANK[t] for t in types], dtype=float)
+    for lbl in TYPE_RANK:
+        g = gradient[types == lbl]
+        q1, med, q3 = np.percentile(g, [25, 50, 75]) if g.size else (np.nan,) * 3
+        logger.info(f"[Figure 1C] {network} {lbl} (rank {TYPE_RANK[lbl]}): {g.size} vertices, "
+                    f"MPC gradient median={med:+.3f} [IQR {q1:+.3f}, {q3:+.3f}]")
+    mask = np.zeros(len(df_surf), dtype=bool)
+    mask[vertices] = True
+    msr = fit_surface_moran(surf_32k, mask, df_surf['hemisphere'].to_numpy()[vertices], n_rep)
+    r_obs, p, r_null = moran_spearman(rank, gradient, msr)
+    null_lo, null_med, null_hi = null_interval(r_null)
+    logger.info(f"[Figure 1C] {network}: MPC gradient vs cortical-type rank | Spearman r={r_obs:.3f}, Moran "
+                f"permutation p={p:.3e} (n_perm={n_rep}, n_vertices={vertices.size}; "
+                f"null r 95% [{null_lo:+.3f}, {null_hi:+.3f}])")
+    stats = pd.DataFrame([dict(network=network, r=r_obs, p=p, null_lo=null_lo, null_med=null_med, null_hi=null_hi,
+                               n_vertices=int(vertices.size), n_perm=n_rep)])
+    null = pd.DataFrame({'network': network, 'surrogate': np.arange(r_null.size), 'r': r_null})
+    return stats, null
+
+
 def plot_type_salience(composition: pd.DataFrame, null: pd.DataFrame, network: str, path) -> None:
     """The network's type composition (dots) over the spin-null compositions (bars).
 
@@ -159,13 +236,49 @@ def plot_type_salience(composition: pd.DataFrame, null: pd.DataFrame, network: s
         plt.close(fig)
 
 
+def plot_gradient_by_type(df_surf: pd.DataFrame, stats: pd.DataFrame, network: str, hemisphere: str, path) -> None:
+    """The MPC gradient of the network vertices of each cortical type, with the Moran test.
+
+    One horizontal box per type (quartiles and median; whiskers at 1.5 IQR; outlying
+    vertices not drawn) in the type colours, the types from koniocortex (top) to
+    agranular (bottom), the order of `plot_type_salience` read from top to bottom, so the
+    laminar differentiation rank increases upwards and the gradient to the right.
+    Annotated with the Spearman r and Moran p of ``stats``.
+    """
+    shown_types = [t for t in TYPE_LABELS if t != 'Other']
+    _, gradient, types = _typed_gradient(df_surf, network, hemisphere)
+    test = stats.query("network == @network").iloc[0]
+    # Same size and font as figure_1c_type_salience, its neighbour in the Figure 1 layout.
+    with plt.rc_context({'font.size': 21}):
+        fig, ax = plt.subplots(figsize=(6, 6))
+        ax.axvline(0, color='0.8', lw=1, zorder=0)
+        sns.boxplot(x=gradient, y=types, order=shown_types, hue=types, hue_order=shown_types, legend=False,
+                    palette=[tuple(c) for c in cmap_types_mw.colors[:len(shown_types)]], showfliers=False,
+                    width=0.65, linecolor='#1a1a1a', linewidth=1.5, ax=ax)
+        ax.text(0.97, 0.03, f"r = {test['r']:+.2f}".replace('-', '−') + f"\n$p_{{m}}$ = {format_pvalue(test['p'])}",
+                transform=ax.transAxes, ha='right', va='bottom')
+        ax.set_xlabel("MPC gradient")
+        ax.set_ylabel("")
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        plt.tight_layout()
+        plt.savefig(path)
+        plt.close(fig)
+
+
 def _surface_with_types(network: str) -> pd.DataFrame:
     """fsLR-32k surface table with the cortical type of each vertex and the border of `network`."""
     return load_econo_atlas(load_yeo_atlas(load_conte69(join=True), border_network=network))
 
 
+def _surface_with_gradient(hemi: str) -> pd.DataFrame:
+    """The step 1a fsLR-32k surface table (with the network gradient) and the cortical type of each vertex."""
+    return load_econo_atlas(config.read_table(config.source_dir(GRADIENT_STEP) / f"surface_fslr32k_{hemi}.tsv"))
+
+
 def compute(settings: dict, paths: dict | None) -> None:
-    """Type composition of every network, and the spin test of the network of the settings."""
+    """Type composition of every network, the spin test of the network of the settings, and
+    the Moran test of its gradient against the cortical-type rank."""
     network, hemi = settings["network"], settings["hemisphere"]
     source = config.source_dir(STEP)
     logger.info("Surface space  : fsLR-32k, Schaefer-400, Yeo 7-network labels")
@@ -176,8 +289,16 @@ def compute(settings: dict, paths: dict | None) -> None:
     config.write_table(composition, source / f"type_composition_{hemi}.tsv")
     config.write_table(null, source / f"type_null_{network}_{hemi}.tsv")
     config.write_table(stats, source / f"type_stats_{network}_{hemi}.tsv")
+
+    logger.info(f"Gradient by type: step 1a MPC gradient vs laminar differentiation rank ({TYPE_RANK}); Moran "
+                f"randomization of the gradient (n_rep={N_PERMUTATIONS}, procedure=singleton, inverse 1-ring "
+                f"distance), on the typed SN vertices, fitted per hemisphere (random_state=0 for LH, or the only "
+                f"hemisphere, and 1 for RH)")
+    g_stats, g_null = gradient_by_type(_surface_with_gradient(hemi), load_conte69(join=True), network, hemi)
+    config.write_table(g_stats, source / f"type_gradient_stats_{network}_{hemi}.tsv")
+    config.write_table(g_null, source / f"type_gradient_null_{network}_{hemi}.tsv")
     write_manifest(source / "manifest.json", STEP, config.PROJECT_ROOT, network=network, hemisphere=hemi,
-                   n_spins=N_SPINS)
+                   n_spins=N_SPINS, n_permutations=N_PERMUTATIONS)
 
 
 def plot(settings: dict) -> None:
@@ -215,6 +336,9 @@ def plot(settings: dict) -> None:
     plot_type_salience(config.read_table(source / f"type_composition_{hemi}.tsv"),
                        config.read_table(source / f"type_null_{network}_{hemi}.tsv"), network,
                        out / "figure_1c_type_salience.svg")
+    plot_gradient_by_type(_surface_with_gradient(hemi),
+                          config.read_table(source / f"type_gradient_stats_{network}_{hemi}.tsv"), network, hemi,
+                          out / "figure_1c_gradient_type.svg")
 
 
 if __name__ == "__main__":

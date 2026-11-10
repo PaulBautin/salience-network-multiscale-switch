@@ -1,6 +1,6 @@
 {
   "step": "step1c_cortical_types",
-  "git": "1652fc9-dirty",
+  "git": "a7cc6a6-dirty",
   "versions": {
     "python": "3.10.19",
     "numpy": "2.2.6",
@@ -15,5 +15,6 @@
   },
   "network": "SalVentAttn",
   "hemisphere": "both",
-  "n_spins": 10000
+  "n_spins": 10000,
+  "n_permutations": 1000
 }
